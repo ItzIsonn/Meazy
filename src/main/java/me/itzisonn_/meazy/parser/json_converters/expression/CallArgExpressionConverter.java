@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.parser.json_converters.expression;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
@@ -19,7 +19,7 @@ public class CallArgExpressionConverter implements Converter<CallArgExpression> 
             String id = object.get("id").getAsString();
 
             if (object.get("data_type") == null) throw new InvalidCompiledFileException("CallArgExpression doesn't have field data_type");
-            DataType dataType = Utils.parseDataType(object.get("data_type").getAsString());
+            DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
 
             if (object.get("is_constant") == null) throw new InvalidCompiledFileException("CallArgExpression doesn't have field is_constant");
             boolean isConstant = object.get("is_constant").getAsBoolean();

@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
 /**
  * Identifier used by registries
  * @see SingleRegistry
- * @see MultipleRegistry
+ * @see SetRegistry
+ * @see PairRegistry
  */
 @Getter
 @EqualsAndHashCode

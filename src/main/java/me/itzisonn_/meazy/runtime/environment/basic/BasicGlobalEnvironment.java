@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.basic;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.RuntimeClass;
 import me.itzisonn_.meazy.runtime.environment.RuntimeFunction;
@@ -111,13 +111,13 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
 
 
     private void init() {
-        declareFunction("print", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataType.ANY, true))), null, this, Set.of("shared")) {
+        declareFunction("print", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY, true))), null, this, Set.of("shared")) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.print(functionArgs.getFirst().getFinalValue());
                 return null;
             }
         });
-        declareFunction("println", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataType.ANY, true))), null, this, Set.of("shared")) {
+        declareFunction("println", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY, true))), null, this, Set.of("shared")) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.println(functionArgs.getFirst().getFinalValue());
                 return null;

@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
@@ -37,7 +37,7 @@ public class FunctionDeclarationStatementConverter implements Converter<Function
 
             DataType dataType = null;
             if (object.get("return_data_type") != null) {
-                dataType = Utils.parseDataType(object.get("return_data_type").getAsString());
+                dataType = DataTypes.parse(object.get("return_data_type").getAsString());
             }
 
             if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException("FunctionDeclarationStatement doesn't have field access_modifiers");

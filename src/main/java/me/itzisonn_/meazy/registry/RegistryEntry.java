@@ -6,7 +6,8 @@ import lombok.Getter;
  * Entry used by registries
  * @see RegistryIdentifier
  * @see SingleRegistry
- * @see MultipleRegistry
+ * @see SetRegistry
+ * @see PairRegistry
  *
  * @param <T> Value's type
  */

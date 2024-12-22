@@ -1,11 +1,5 @@
 package me.itzisonn_.meazy;
 
-import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
-import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
-import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -129,30 +123,5 @@ public class Utils {
         if (offset < 0) throw new IllegalArgumentException("Offset can't be negative.");
 
         return "\t".repeat(offset);
-    }
-
-    /**
-     * Returns existing DataType or creates new that matches classes with given name
-     *
-     * @param dataType DataType's name
-     * @return Existing or created DataType
-     * @throws NullPointerException When given DataType's name is null
-     */
-    public static DataType parseDataType(String dataType) throws NullPointerException {
-        if (dataType == null) throw new NullPointerException("DataType's name can't be null");
-
-        for (RegistryEntry<DataType> entry : Registries.DATA_TYPE.getEntries()) {
-            if (entry.getValue().getName().equals(dataType)) {
-                return entry.getValue();
-            }
-        }
-
-        return new DataType(dataType) {
-            public boolean isMatches(Object value) {
-                if (value instanceof ClassValue classValue) return classValue.getId().equals(dataType);
-                if (value instanceof DefaultClassValue defaultClassValue) return defaultClassValue.getId().equals(dataType);
-                return false;
-            }
-        };
     }
 }

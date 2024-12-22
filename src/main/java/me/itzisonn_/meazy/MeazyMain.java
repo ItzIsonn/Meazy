@@ -6,8 +6,6 @@ import lombok.Getter;
 import me.itzisonn_.meazy.addons.AddonManager;
 import me.itzisonn_.meazy.addons.Addon;
 import me.itzisonn_.meazy.lexer.*;
-import me.itzisonn_.meazy.parser.BasicParser;
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
@@ -33,10 +31,7 @@ import me.itzisonn_.meazy.parser.json_converters.expression.literal.NullLiteralC
 import me.itzisonn_.meazy.parser.json_converters.expression.literal.NumberLiteralConverter;
 import me.itzisonn_.meazy.parser.json_converters.expression.literal.StringLiteralConverter;
 import me.itzisonn_.meazy.parser.json_converters.statement.*;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.runtime.environment.basic.*;
-import me.itzisonn_.meazy.runtime.interpreter.BasicInterpreter;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +42,7 @@ import java.util.ArrayList;
 
 public final class MeazyMain {
     @Getter
-    private static final String version = "2.0";
+    private static final String version = "2.1";
     @Getter
     private static final MeazyMain instance = new MeazyMain();
     @Getter
@@ -98,7 +93,7 @@ public final class MeazyMain {
 
     private void runFile(File file) {
         long startLoadMillis = System.currentTimeMillis();
-        loadRegistries();
+        Registries.INIT();
         loadAddons();
         long endLoadMillis = System.currentTimeMillis();
 
@@ -107,9 +102,9 @@ public final class MeazyMain {
         String extension = Utils.getExtension(file);
         long startRunMillis = System.currentTimeMillis();
         if (extension.equals("mea")) {
-            ArrayList<Token> tokens = Registries.LEXER.getEntry().getValue().parseTokens(Utils.getLines(file));
+            ArrayList<Token> tokens = Registries.TOKENS_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
             Program program = Registries.PARSER.getEntry().getValue().produceAST(tokens);
-            Registries.INTERPRETER.getEntry().getValue().run(program);
+            Registries.RUN_FUNCTION.getEntry().getValue().accept(program);
         }
         else if (extension.equals("meac")) {
             Program program = gson.fromJson(Utils.getLines(file), Program.class);
@@ -125,7 +120,7 @@ public final class MeazyMain {
                 logger.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), version);
                 return;
             }
-            Registries.INTERPRETER.getEntry().getValue().run(program);
+            Registries.RUN_FUNCTION.getEntry().getValue().accept(program);
         }
         else {
             logger.log(Level.ERROR, "Can't run file with extension {}", extension);
@@ -146,14 +141,14 @@ public final class MeazyMain {
         }
 
         long startLoadMillis = System.currentTimeMillis();
-        loadRegistries();
+        Registries.INIT();
         loadAddons();
         long endLoadMillis = System.currentTimeMillis();
 
         logger.log(Level.INFO, "Compiling file '{}'", file.getAbsoluteFile());
 
         long startCompileMillis = System.currentTimeMillis();
-        ArrayList<Token> tokens = Registries.LEXER.getEntry().getValue().parseTokens(Utils.getLines(file));
+        ArrayList<Token> tokens = Registries.TOKENS_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
 
         Program program = Registries.PARSER.getEntry().getValue().produceAST(tokens);
         long endCompileMillis = System.currentTimeMillis();
@@ -201,7 +196,7 @@ public final class MeazyMain {
         }
 
         long startLoadMillis = System.currentTimeMillis();
-        loadRegistries();
+        Registries.INIT();
         loadAddons();
         long endLoadMillis = System.currentTimeMillis();
 
@@ -279,25 +274,6 @@ public final class MeazyMain {
         int addons = addonManager.getAddons().length;
         if (addons == 1) logger.log(Level.INFO, "1 addon loaded");
         else logger.log(Level.INFO, "{} addons loaded", addons);
-    }
-
-
-
-    private void loadRegistries() {
-        Registries.LEXER.register(RegistryIdentifier.ofDefault("lexer"), new BasicLexer());
-        Registries.PARSER.register(RegistryIdentifier.ofDefault("parser"), new BasicParser());
-        Registries.INTERPRETER.register(RegistryIdentifier.ofDefault("interpreter"), new BasicInterpreter());
-
-        Registries.GLOBAL_ENVIRONMENT.register(RegistryIdentifier.ofDefault("global_environment"), new BasicGlobalEnvironment());
-        Registries.CLASS_ENVIRONMENT.register(RegistryIdentifier.ofDefault("class_environment"), BasicClassEnvironment.class);
-        Registries.FUNCTION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("function_environment"), BasicFunctionEnvironment.class);
-        Registries.VARIABLE_DECLARATION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("variable_declaration_environment"), BasicVariableDeclarationEnvironment.class);
-        Registries.LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), BasicLoopEnvironment.class);
-        Registries.ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), BasicEnvironment.class);
-
-        TokenType.INIT();
-        TokenTypeSet.INIT();
-        DataType.INIT();
     }
 
 

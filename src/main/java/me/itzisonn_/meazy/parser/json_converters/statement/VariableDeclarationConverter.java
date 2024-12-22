@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
@@ -22,7 +22,7 @@ public class VariableDeclarationConverter implements Converter<VariableDeclarati
             String id = object.get("id").getAsString();
 
             if (object.get("data_type") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field data_type");
-            DataType dataType = Utils.parseDataType(object.get("data_type").getAsString());
+            DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
 
             if (object.get("value") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field value");
             Expression value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);

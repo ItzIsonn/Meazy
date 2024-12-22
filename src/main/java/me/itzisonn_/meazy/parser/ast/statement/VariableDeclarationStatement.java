@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
 import java.util.Set;
@@ -17,7 +18,7 @@ public class VariableDeclarationStatement implements Statement {
     public VariableDeclarationStatement(String id, DataType dataType, Expression value, boolean isConstant, Set<String> accessModifiers) {
         this.id = id;
         if (dataType != null) this.dataType = dataType;
-        else this.dataType = DataType.ANY;
+        else this.dataType = DataTypes.ANY;
         this.value = value;
         this.isConstant = isConstant;
         this.accessModifiers = accessModifiers;

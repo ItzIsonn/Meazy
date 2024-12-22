@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @param <T> Entries' value type
  */
-public class MultipleRegistry<T> {
+public class SetRegistry<T> {
     private final Set<RegistryEntry<T>> entries = new HashSet<>();
 
     /**
@@ -43,8 +43,8 @@ public class MultipleRegistry<T> {
      *
      * @return All registered entries
      */
-    public ArrayList<RegistryEntry<T>> getEntries() {
-        return new ArrayList<>(entries);
+    public Set<RegistryEntry<T>> getEntries() {
+        return Set.copyOf(entries);
     }
 
     /**
