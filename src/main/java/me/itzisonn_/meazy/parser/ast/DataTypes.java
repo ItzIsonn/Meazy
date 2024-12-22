@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.values.BooleanValue;
-import me.itzisonn_.meazy.runtime.values.StringValue;
+import me.itzisonn_.meazy.runtime.values.InnerStringValue;
 import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
 import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
@@ -48,8 +48,10 @@ public class DataTypes {
         }
     });
 
-    public static final DataType STRING = register("string", "string", o ->
-            o instanceof String || o instanceof StringLiteral || o instanceof StringValue);
+    public static final DataType STRING = register("string", "string", o -> {
+        if (o instanceof DefaultClassValue defaultClassValue) return defaultClassValue.getId().equals("string");
+        return o instanceof String || o instanceof StringLiteral || o instanceof InnerStringValue;
+    });
 
 
 

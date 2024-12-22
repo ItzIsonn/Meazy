@@ -11,7 +11,7 @@ public abstract class RuntimeValue<T> {
     }
 
     public final Object getFinalValue() {
-        Object value = this.value;
+        Object value = getValue();
         while (value instanceof RuntimeValue<?> runtimeValue) {
             value = runtimeValue.getValue();
         }

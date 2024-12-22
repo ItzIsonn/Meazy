@@ -17,18 +17,17 @@ import me.itzisonn_.meazy.runtime.values.number.IntValue;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class StringClassEnvironment extends BasicClassEnvironment {
-    public StringClassEnvironment(Environment parent) {
-        super(parent, true, "String");
+    public StringClassEnvironment(Environment parent, String value) {
+        super(parent, false, "string");
 
 
-        declareVariable("value", DataTypes.STRING, new NullValue(), false, new HashSet<>());
-        declareConstructor(new DefaultConstructorValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.STRING, true))), this, new HashSet<>()) {
+        declareVariable("value", DataTypes.STRING, new InnerStringValue(value), false, Set.of("private"));
+        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of("private")) {
             @Override
-            public void run(ArrayList<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
-                constructorEnvironment.getVariableEnvironment("value").assignVariable("value", constructorArgs.getFirst().getFinalRuntimeValue());
-            }
+            public void run(ArrayList<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
 
@@ -45,7 +44,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
 
         declareFunction("replace", new DefaultFunctionValue(
                 new ArrayList<>(List.of(new CallArgExpression("target", DataTypes.STRING, true), new CallArgExpression("replacement", DataTypes.STRING, true))),
-                DataTypes.parse("String"), this, new HashSet<>()) {
+                DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -64,7 +63,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
 
         declareFunction("replaceRegex", new DefaultFunctionValue(
                 new ArrayList<>(List.of(new CallArgExpression("target", DataTypes.STRING, true), new CallArgExpression("replacement", DataTypes.STRING, true))),
-                DataTypes.parse("String"), this, new HashSet<>()) {
+                DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -83,7 +82,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
 
         declareFunction("replaceFirst", new DefaultFunctionValue(
                 new ArrayList<>(List.of(new CallArgExpression("target", DataTypes.STRING, true), new CallArgExpression("replacement", DataTypes.STRING, true))),
-                DataTypes.parse("String"), this, new HashSet<>()) {
+                DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -100,7 +99,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("toUpperCase", new DefaultFunctionValue(new ArrayList<>(), DataTypes.parse("String"), this, new HashSet<>()) {
+        declareFunction("toUpperCase", new DefaultFunctionValue(new ArrayList<>(), DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -116,7 +115,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("toLowerCase", new DefaultFunctionValue(new ArrayList<>(), DataTypes.parse("String"), this, new HashSet<>()) {
+        declareFunction("toLowerCase", new DefaultFunctionValue(new ArrayList<>(), DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -159,7 +158,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
 
         declareFunction("setCharAt", new DefaultFunctionValue(
                 new ArrayList<>(List.of(new CallArgExpression("pos", DataTypes.INT, true), new CallArgExpression("char", DataTypes.STRING, true))),
-                DataTypes.parse("String"), this, new HashSet<>()) {
+                DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -203,7 +202,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("repeat", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("count", DataTypes.INT, true))), DataTypes.parse("String"), this, new HashSet<>()) {
+        declareFunction("repeat", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("count", DataTypes.INT, true))), DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -227,7 +226,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("trim", new DefaultFunctionValue(new ArrayList<>(), DataTypes.parse("String"), this, new HashSet<>()) {
+        declareFunction("trim", new DefaultFunctionValue(new ArrayList<>(), DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
@@ -281,7 +280,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
 
         declareFunction("substring", new DefaultFunctionValue(
                 new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT, true), new CallArgExpression("end", DataTypes.INT, true))),
-                DataTypes.parse("String"), this, new HashSet<>()) {
+                DataTypes.STRING, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
