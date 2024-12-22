@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -22,6 +23,11 @@ public class Utils {
      * System.in Scanner
      */
     public static final Scanner SCANNER = new Scanner(System.in);
+
+    /**
+     * Random
+     */
+    public static final Random RANDOM = new Random();
 
     /**
      * Counts number of target's matches in given string

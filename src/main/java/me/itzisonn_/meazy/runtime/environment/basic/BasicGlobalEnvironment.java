@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.RuntimeClass;
 import me.itzisonn_.meazy.runtime.environment.RuntimeFunction;
 import me.itzisonn_.meazy.runtime.environment.basic.default_classes.InputClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.MathClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.basic.default_classes.TypesClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.GlobalEnvironment;
@@ -124,7 +125,7 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         });
 
         declareClass("Input", new DefaultClassValue(new InputClassEnvironment(this)));
-        //declareClass("String", new DefaultClassValue(new StringClassEnvironment(this)));
         declareClass("Types", new DefaultClassValue(new TypesClassEnvironment(this)));
+        declareClass("Math", new DefaultClassValue(new MathClassEnvironment(this)));
     }
 }
