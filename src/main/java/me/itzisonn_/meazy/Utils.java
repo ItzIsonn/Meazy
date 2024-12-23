@@ -1,5 +1,30 @@
 package me.itzisonn_.meazy;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import me.itzisonn_.meazy.parser.ast.expression.*;
+import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
+import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
+import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral;
+import me.itzisonn_.meazy.parser.ast.statement.*;
+import me.itzisonn_.meazy.parser.json_converters.expression.*;
+import me.itzisonn_.meazy.parser.json_converters.expression.call_expression.ClassCallExpressionConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.call_expression.FunctionCallExpressionConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.identifier.ClassIdentifierConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.identifier.FunctionIdentifierConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.identifier.VariableIdentifierConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.literal.BooleanLiteralConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.literal.NullLiteralConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.literal.NumberLiteralConverter;
+import me.itzisonn_.meazy.parser.json_converters.expression.literal.StringLiteralConverter;
+import me.itzisonn_.meazy.parser.json_converters.statement.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,6 +53,45 @@ public class Utils {
      * Random
      */
     public static final Random RANDOM = new Random();
+
+    /**
+     * Gson with all json converters
+     * @see me.itzisonn_.meazy.parser.json_converters
+     */
+    public static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(BreakStatement .class, new BreakStatementConverter())
+            .registerTypeAdapter(ClassDeclarationStatement .class, new ClassDeclarationStatementConverter())
+            .registerTypeAdapter(ConstructorDeclarationStatement .class, new ConstructorDeclarationStatementConverter())
+            .registerTypeAdapter(ContinueStatement .class, new ContinueStatementConverter())
+            .registerTypeAdapter(ForStatement .class, new ForStatementConverter())
+            .registerTypeAdapter(FunctionDeclarationStatement.class, new FunctionDeclarationStatementConverter())
+            .registerTypeAdapter(IfStatement.class, new IfStatementConverter())
+            .registerTypeAdapter(Program.class, new ProgramConverter())
+            .registerTypeAdapter(ReturnStatement.class, new ReturnStatementConverter())
+            .registerTypeAdapter(VariableDeclarationStatement.class, new VariableDeclarationConverter())
+            .registerTypeAdapter(WhileStatement.class, new WhileStatementConverter())
+
+            .registerTypeAdapter(BooleanLiteral .class, new BooleanLiteralConverter())
+            .registerTypeAdapter(NullLiteral .class, new NullLiteralConverter())
+            .registerTypeAdapter(NumberLiteral .class, new NumberLiteralConverter())
+            .registerTypeAdapter(StringLiteral .class, new StringLiteralConverter())
+
+            .registerTypeAdapter(AssignmentExpression .class, new AssignmentExpressionConverter())
+            .registerTypeAdapter(BinaryExpression .class, new BinaryExpressionConverter())
+            .registerTypeAdapter(CallArgExpression .class, new CallArgExpressionConverter())
+            .registerTypeAdapter(ComparisonExpression .class, new ComparisonExpressionConverter())
+            .registerTypeAdapter(LogicalExpression .class, new LogicalExpressionConverter())
+            .registerTypeAdapter(MemberExpression.class, new MemberExpressionConverter())
+            .registerTypeAdapter(ClassCallExpression .class, new ClassCallExpressionConverter())
+            .registerTypeAdapter(FunctionCallExpression .class, new FunctionCallExpressionConverter())
+            .registerTypeAdapter(ClassIdentifier .class, new ClassIdentifierConverter())
+            .registerTypeAdapter(FunctionIdentifier .class, new FunctionIdentifierConverter())
+            .registerTypeAdapter(VariableIdentifier .class, new VariableIdentifierConverter())
+
+            .registerTypeAdapter(Statement.class, new StatementConverter())
+            .registerTypeAdapter(Expression.class, new ExpressionConverter())
+
+            .create();
 
     /**
      * Counts number of target's matches in given string
@@ -99,7 +163,7 @@ public class Utils {
      * @throws NumberFormatException When either of version have non-integer part
      */
     public static boolean isVersionAfter(String version1, String version2) throws NullPointerException, NumberFormatException {
-        if (version1 == null || version2 == null) throw new NullPointerException("Neither of versions can't be null.");
+        if (version1 == null || version2 == null) throw new NullPointerException("Neither of versions can't be null");
 
         String[] split1 = version1.split("\\.");
         String[] split2 = version2.split("\\.");
@@ -126,7 +190,7 @@ public class Utils {
      * @throws IllegalArgumentException When given offset is negative
      */
     public static String getOffset(int offset) throws IllegalArgumentException {
-        if (offset < 0) throw new IllegalArgumentException("Offset can't be negative.");
+        if (offset < 0) throw new IllegalArgumentException("Offset can't be negative");
 
         return "\t".repeat(offset);
     }

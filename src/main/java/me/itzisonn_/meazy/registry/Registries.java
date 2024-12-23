@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 public class Registries {
     public static final SingleRegistry<Function<String, ArrayList<Token>>> TOKENS_FUNCTION = new SingleRegistry<>();
@@ -52,6 +51,7 @@ public class Registries {
         TokenTypes.INIT();
         DataTypes.INIT();
         AccessModifiers.INIT();
+        EvaluationFunctions.INIT();
 
         Registries.TOKENS_FUNCTION.register(RegistryIdentifier.ofDefault("tokens_function"), lines -> {
             ArrayList<Token> tokens = new ArrayList<>();
@@ -61,7 +61,7 @@ public class Registries {
 
             for (int i = 0; i < lines.length(); i++) {
                 if (i == lines.length() - 1) {
-                    tokenType = getMatchingToken(String.valueOf(lines.charAt(i)));
+                    tokenType = TokenTypes.parse(String.valueOf(lines.charAt(i)));
                     if (tokenType != null && !tokenType.isShouldSkip()) tokens.add(new Token(lineNumber, tokenType, String.valueOf(lines.charAt(i))));
                     break;
                 }
@@ -70,7 +70,7 @@ public class Registries {
                 int lastFound = -1;
                 for (int j = i; j < lines.length(); j++) {
                     lastString += lines.charAt(j);
-                    tokenType = getMatchingToken(lastString);
+                    tokenType = TokenTypes.parse(lastString);
                     if (tokenType != null) {
                         lastFound = j + 1;
                         lastMatched = tokenType;
@@ -102,7 +102,7 @@ public class Registries {
         Registries.PARSER.register(RegistryIdentifier.ofDefault("parser"), new BasicParser());
 
         Registries.RUN_FUNCTION.register(RegistryIdentifier.ofDefault("run_function"), program -> {
-            BasicInterpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
+            Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
 
             RuntimeValue<?> runtimeValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getFunction("main", new ArrayList<>());
             if (runtimeValue == null) {
@@ -130,7 +130,7 @@ public class Registries {
                         if (i + 1 < functionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
                         break;
                     }
-                    RuntimeValue<?> value = BasicInterpreter.evaluate(statement, functionEnvironment);
+                    RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
                     if (value instanceof ReturnInfoValue returnInfoValue) {
                         if (returnInfoValue.getFinalValue() != null) {
                             throw new InvalidSyntaxException("Found return statement but function must return nothing");
@@ -148,16 +148,5 @@ public class Registries {
         Registries.VARIABLE_DECLARATION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("variable_declaration_environment"), BasicVariableDeclarationEnvironment.class);
         Registries.LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), BasicLoopEnvironment.class);
         Registries.ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), BasicEnvironment.class);
-
-        EvaluationFunctions.INIT();
-    }
-
-    private static TokenType getMatchingToken(String string) {
-        for (RegistryEntry<TokenType> entry : Registries.TOKEN_TYPE.getEntries()) {
-            String regex = entry.getValue().getRegex();
-            if (regex != null && Pattern.compile(regex, Pattern.DOTALL).matcher(string).matches()) return entry.getValue();
-        }
-
-        return null;
     }
 }

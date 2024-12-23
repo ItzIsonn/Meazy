@@ -2,15 +2,18 @@ package me.itzisonn_.meazy.lexer;
 
 import lombok.Getter;
 
+import java.util.regex.Pattern;
+
 @Getter
 public class TokenType {
     private final String id;
-    private final String regex;
+    private final Pattern pattern;
     private final boolean shouldSkip;
 
     public TokenType(String id, String regex, boolean shouldSkip) {
         this.id = id;
-        this.regex = regex;
+        if (regex == null) pattern = null;
+        else this.pattern = Pattern.compile(regex, Pattern.DOTALL);
         this.shouldSkip = shouldSkip;
     }
 
@@ -24,25 +27,21 @@ public class TokenType {
         if (o == this) {
             return true;
         }
-        else if (!(o instanceof TokenType other)) {
+        if (!(o instanceof TokenType other)) {
             return false;
         }
-        else {
-            Object this$id = getId();
-            Object other$id = other.getId();
-            if (this$id == null) {
-                return other$id == null;
-            }
-            else return this$id.equals(other$id);
-        }
+        String this$id = getId();
+        String other$id = other.getId();
+        if (this$id == null) return other$id == null;
+        else return this$id.equals(other$id);
     }
 
     @Override
     public int hashCode() {
         int result = 1;
         result = result * 59 + (isShouldSkip() ? 79 : 97);
-        Object regex = getRegex();
-        result = result * 59 + (regex == null ? 43 : regex.hashCode());
+        Object pattern = getPattern();
+        result = result * 59 + (pattern == null ? 43 : pattern.hashCode());
         return result;
     }
 }

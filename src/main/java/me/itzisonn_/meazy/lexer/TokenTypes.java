@@ -2,7 +2,10 @@ package me.itzisonn_.meazy.lexer;
 
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
+
+import java.util.regex.Pattern;
 
 public class TokenTypes {
     private static boolean isInit = false;
@@ -247,6 +250,28 @@ public class TokenTypes {
         Registries.TOKEN_TYPE.register(RegistryIdentifier.ofDefault(tokenType.getId()), tokenType);
     }
 
+
+
+    /**
+     * Returns TokenType whose pattern matches given string
+     *
+     * @param string String to match
+     * @return TokenType or null if none matched
+     * @throws NullPointerException When given string is null
+     */
+    public static TokenType parse(String string) throws NullPointerException {
+        if (string == null) throw new NullPointerException("String can't be null");
+
+        for (RegistryEntry<TokenType> entry : Registries.TOKEN_TYPE.getEntries()) {
+            Pattern pattern = entry.getValue().getPattern();
+            if (pattern != null && pattern.matcher(string).matches()) return entry.getValue();
+        }
+
+        return null;
+    }
+
+
+
     public static void INIT() {
         if (isInit) throw new IllegalStateException("TokenTypes already initialized!");
         isInit = true;
@@ -315,7 +340,7 @@ public class TokenTypes {
 
         StringBuilder keywords = new StringBuilder();
         for (TokenType tokenType : TokenTypeSets.KEYWORDS.getTokenTypes()) {
-            keywords.append("(?<!").append(tokenType.getRegex()).append(")");
+            keywords.append("(?<!").append(tokenType.getPattern().pattern()).append(")");
         }
         register(new TokenType("id", Utils.IDENTIFIER_REGEX + keywords, false));
     }

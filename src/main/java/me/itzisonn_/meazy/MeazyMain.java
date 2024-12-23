@@ -1,36 +1,10 @@
 package me.itzisonn_.meazy;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import me.itzisonn_.meazy.addons.AddonManager;
 import me.itzisonn_.meazy.addons.Addon;
 import me.itzisonn_.meazy.lexer.*;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.*;
-import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
-import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral;
 import me.itzisonn_.meazy.parser.ast.statement.*;
-import me.itzisonn_.meazy.parser.json_converters.expression.ExpressionConverter;
-import me.itzisonn_.meazy.parser.json_converters.statement.StatementConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.*;
-import me.itzisonn_.meazy.parser.json_converters.expression.call_expression.ClassCallExpressionConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.call_expression.FunctionCallExpressionConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.identifier.ClassIdentifierConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.identifier.FunctionIdentifierConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.identifier.VariableIdentifierConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.literal.BooleanLiteralConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.literal.NullLiteralConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.literal.NumberLiteralConverter;
-import me.itzisonn_.meazy.parser.json_converters.expression.literal.StringLiteralConverter;
-import me.itzisonn_.meazy.parser.json_converters.statement.*;
 import me.itzisonn_.meazy.registry.Registries;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -47,7 +21,6 @@ public final class MeazyMain {
     private static final MeazyMain instance = new MeazyMain();
     @Getter
     private final Logger logger = LogManager.getLogger("meazy");
-    private final Gson gson = getGson();
 
     public static void main(String[] args) {
         instance.run(args);
@@ -107,7 +80,7 @@ public final class MeazyMain {
             Registries.RUN_FUNCTION.getEntry().getValue().accept(program);
         }
         else if (extension.equals("meac")) {
-            Program program = gson.fromJson(Utils.getLines(file), Program.class);
+            Program program = Utils.GSON.fromJson(Utils.getLines(file), Program.class);
             if (program == null) {
                 logger.log(Level.ERROR, "Failed to read file {}, try to run it in the same version of Meazy ({})", file.getAbsolutePath(), version);
                 return;
@@ -176,7 +149,7 @@ public final class MeazyMain {
             }
         }
 
-        String json = gson.toJson(program, Program.class);
+        String json = Utils.GSON.toJson(program, Program.class);
 
         try (FileWriter fileWriter = new FileWriter(outputFile)) {
             fileWriter.write(json);
@@ -203,7 +176,7 @@ public final class MeazyMain {
         logger.log(Level.INFO, "Decompiling file '{}'", file.getAbsoluteFile());
 
         long startDecompileMillis = System.currentTimeMillis();
-        Program program = gson.fromJson(Utils.getLines(file), Program.class);
+        Program program = Utils.GSON.fromJson(Utils.getLines(file), Program.class);
         if (program == null) {
             logger.log(Level.ERROR, "Failed to read file {}, try to decompile it in the same version of Meazy ({})", file.getAbsolutePath(), version);
             return;
@@ -274,44 +247,5 @@ public final class MeazyMain {
         int addons = addonManager.getAddons().length;
         if (addons == 1) logger.log(Level.INFO, "1 addon loaded");
         else logger.log(Level.INFO, "{} addons loaded", addons);
-    }
-
-
-
-    private Gson getGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(BreakStatement.class, new BreakStatementConverter())
-                .registerTypeAdapter(ClassDeclarationStatement.class, new ClassDeclarationStatementConverter())
-                .registerTypeAdapter(ConstructorDeclarationStatement.class, new ConstructorDeclarationStatementConverter())
-                .registerTypeAdapter(ContinueStatement.class, new ContinueStatementConverter())
-                .registerTypeAdapter(ForStatement.class, new ForStatementConverter())
-                .registerTypeAdapter(FunctionDeclarationStatement.class, new FunctionDeclarationStatementConverter())
-                .registerTypeAdapter(IfStatement.class, new IfStatementConverter())
-                .registerTypeAdapter(Program.class, new ProgramConverter())
-                .registerTypeAdapter(ReturnStatement.class, new ReturnStatementConverter())
-                .registerTypeAdapter(VariableDeclarationStatement.class, new VariableDeclarationConverter())
-                .registerTypeAdapter(WhileStatement.class, new WhileStatementConverter())
-
-                .registerTypeAdapter(BooleanLiteral.class, new BooleanLiteralConverter())
-                .registerTypeAdapter(NullLiteral.class, new NullLiteralConverter())
-                .registerTypeAdapter(NumberLiteral.class, new NumberLiteralConverter())
-                .registerTypeAdapter(StringLiteral.class, new StringLiteralConverter())
-
-                .registerTypeAdapter(AssignmentExpression.class, new AssignmentExpressionConverter())
-                .registerTypeAdapter(BinaryExpression.class, new BinaryExpressionConverter())
-                .registerTypeAdapter(CallArgExpression.class, new CallArgExpressionConverter())
-                .registerTypeAdapter(ComparisonExpression.class, new ComparisonExpressionConverter())
-                .registerTypeAdapter(LogicalExpression.class, new LogicalExpressionConverter())
-                .registerTypeAdapter(MemberExpression.class, new MemberExpressionConverter())
-                .registerTypeAdapter(ClassCallExpression.class, new ClassCallExpressionConverter())
-                .registerTypeAdapter(FunctionCallExpression.class, new FunctionCallExpressionConverter())
-                .registerTypeAdapter(ClassIdentifier.class, new ClassIdentifierConverter())
-                .registerTypeAdapter(FunctionIdentifier.class, new FunctionIdentifierConverter())
-                .registerTypeAdapter(VariableIdentifier.class, new VariableIdentifierConverter())
-
-                .registerTypeAdapter(Statement.class, new StatementConverter())
-                .registerTypeAdapter(Expression.class, new ExpressionConverter())
-
-                .create();
     }
 }

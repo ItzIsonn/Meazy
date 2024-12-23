@@ -7,8 +7,8 @@ import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.*;
 
-public final class BasicInterpreter {
-    private BasicInterpreter() {}
+public final class Interpreter {
+    private Interpreter() {}
 
     @SuppressWarnings("unchecked")
     public static RuntimeValue<?> evaluate(Statement statement, Environment environment, Environment... extra) {

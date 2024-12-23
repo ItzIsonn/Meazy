@@ -46,10 +46,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class EvaluationFunctions {
-    static {
+    private static boolean isInit = false;
+
+    private EvaluationFunctions() {}
+
+
+
+    public static void INIT() {
+        if (isInit) throw new IllegalStateException("EvaluationFunctions already initialized!");
+        isInit = true;
+
         register("program", Program.class, (program, environment, extra) -> {
             for (Statement statement : program.getBody()) {
-                BasicInterpreter.evaluate(statement, environment);
+                Interpreter.evaluate(statement, environment);
             }
 
             return null;
@@ -66,7 +75,7 @@ public class EvaluationFunctions {
                 }
 
                 for (Statement statement : classDeclarationStatement.getBody()) {
-                    BasicInterpreter.evaluate(statement, classEnvironment);
+                    Interpreter.evaluate(statement, classEnvironment);
                 }
 
                 ClassValue classValue = new ClassValue(classEnvironment, classDeclarationStatement.getBody());
@@ -118,7 +127,7 @@ public class EvaluationFunctions {
             variableDeclarationEnvironment.declareVariable(
                     variableDeclarationStatement.getId(),
                     variableDeclarationStatement.getDataType(),
-                    new VariableValue(variableDeclarationStatement.getValue() == null ? null : BasicInterpreter.evaluate(variableDeclarationStatement.getValue(), environment), variableDeclarationEnvironment, variableDeclarationStatement.getId()),
+                    new VariableValue(variableDeclarationStatement.getValue() == null ? null : Interpreter.evaluate(variableDeclarationStatement.getValue(), environment), variableDeclarationEnvironment, variableDeclarationStatement.getId()),
                     variableDeclarationStatement.isConstant(),
                     accessModifiers);
             return null;
@@ -127,7 +136,7 @@ public class EvaluationFunctions {
         register("if_statement", IfStatement.class, (ifStatement, environment, extra) -> {
             while (ifStatement != null) {
                 if (ifStatement.getCondition() != null) {
-                    RuntimeValue<?> condition = BasicInterpreter.evaluate(ifStatement.getCondition(), environment).getFinalRuntimeValue();
+                    RuntimeValue<?> condition = Interpreter.evaluate(ifStatement.getCondition(), environment).getFinalRuntimeValue();
                     if (!(condition instanceof BooleanValue booleanValue)) throw new InvalidArgumentException("If condition must be boolean value");
 
                     if (!booleanValue.getValue()) {
@@ -146,7 +155,7 @@ public class EvaluationFunctions {
 
                 for (int i = 0; i < ifStatement.getBody().size(); i++) {
                     Statement statement = ifStatement.getBody().get(i);
-                    RuntimeValue<?> result = BasicInterpreter.evaluate(statement, ifEnvironment);
+                    RuntimeValue<?> result = Interpreter.evaluate(statement, ifEnvironment);
 
                     if (statement instanceof ReturnStatement) {
                         if (i + 1 < ifStatement.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
@@ -189,7 +198,7 @@ public class EvaluationFunctions {
             forEnvironment.declareVariable(
                     forStatement.getVariableDeclarationStatement().getId(),
                     forStatement.getVariableDeclarationStatement().getDataType(),
-                    BasicInterpreter.evaluate(forStatement.getVariableDeclarationStatement().getValue(), forEnvironment),
+                    Interpreter.evaluate(forStatement.getVariableDeclarationStatement().getValue(), forEnvironment),
                     forStatement.getVariableDeclarationStatement().isConstant(),
                     new HashSet<>());
 
@@ -197,7 +206,7 @@ public class EvaluationFunctions {
             while (parseCondition(forStatement.getCondition(), forEnvironment)) {
                 for (int i = 0; i < forStatement.getBody().size(); i++) {
                     Statement statement = forStatement.getBody().get(i);
-                    RuntimeValue<?> result = BasicInterpreter.evaluate(statement, forEnvironment);
+                    RuntimeValue<?> result = Interpreter.evaluate(statement, forEnvironment);
 
                     if (statement instanceof ReturnStatement) {
                         if (i + 1 < forStatement.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
@@ -253,7 +262,7 @@ public class EvaluationFunctions {
 
                 for (int i = 0; i < whileStatement.getBody().size(); i++) {
                     Statement statement = whileStatement.getBody().get(i);
-                    RuntimeValue<?> result = BasicInterpreter.evaluate(statement, whileEnvironment);
+                    RuntimeValue<?> result = Interpreter.evaluate(statement, whileEnvironment);
 
                     if (statement instanceof ReturnStatement) {
                         if (i + 1 < whileStatement.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
@@ -287,7 +296,7 @@ public class EvaluationFunctions {
         register("return_statement", ReturnStatement.class, (returnStatement, environment, extra) -> {
             if (environment instanceof FunctionEnvironment || environment.hasParent(parent -> parent instanceof FunctionEnvironment)) {
                 if (returnStatement.getValue() == null) return null;
-                return BasicInterpreter.evaluate(returnStatement.getValue(), environment);
+                return Interpreter.evaluate(returnStatement.getValue(), environment);
             }
             if (returnStatement.getValue() == null &&
                     (environment instanceof VariableDeclarationEnvironment || environment.hasParent(parent -> parent instanceof VariableDeclarationEnvironment))) {
@@ -316,8 +325,8 @@ public class EvaluationFunctions {
         register("assignment_expression", AssignmentExpression.class, (assignmentExpression, environment, extra) -> evaluateAssignmentExpression(assignmentExpression, environment));
 
         register("logical_expression", LogicalExpression.class, (logicalExpression, environment, extra) -> {
-            RuntimeValue<?> left = BasicInterpreter.evaluate(logicalExpression.getLeft(), environment).getFinalRuntimeValue();
-            RuntimeValue<?> right = BasicInterpreter.evaluate(logicalExpression.getRight(), environment).getFinalRuntimeValue();
+            RuntimeValue<?> left = Interpreter.evaluate(logicalExpression.getLeft(), environment).getFinalRuntimeValue();
+            RuntimeValue<?> right = Interpreter.evaluate(logicalExpression.getRight(), environment).getFinalRuntimeValue();
 
             if (left instanceof BooleanValue leftValue && right instanceof BooleanValue rightValue) {
                 boolean result;
@@ -337,8 +346,8 @@ public class EvaluationFunctions {
         });
 
         register("comparison_expression", ComparisonExpression.class, (comparisonExpression, environment, extra) -> {
-            RuntimeValue<?> left = BasicInterpreter.evaluate(comparisonExpression.getLeft(), environment).getFinalRuntimeValue();
-            RuntimeValue<?> right = BasicInterpreter.evaluate(comparisonExpression.getRight(), environment).getFinalRuntimeValue();
+            RuntimeValue<?> left = Interpreter.evaluate(comparisonExpression.getLeft(), environment).getFinalRuntimeValue();
+            RuntimeValue<?> right = Interpreter.evaluate(comparisonExpression.getRight(), environment).getFinalRuntimeValue();
 
             if (left instanceof NumberValue<?> leftValue && right instanceof NumberValue<?> rightValue) {
                 boolean result;
@@ -420,8 +429,8 @@ public class EvaluationFunctions {
         });
 
         register("binary_expression", BinaryExpression.class, (binaryExpression, environment, extra) -> {
-            RuntimeValue<?> left = BasicInterpreter.evaluate(binaryExpression.getLeft(), environment).getFinalRuntimeValue();
-            RuntimeValue<?> right = BasicInterpreter.evaluate(binaryExpression.getRight(), environment).getFinalRuntimeValue();
+            RuntimeValue<?> left = Interpreter.evaluate(binaryExpression.getLeft(), environment).getFinalRuntimeValue();
+            RuntimeValue<?> right = Interpreter.evaluate(binaryExpression.getRight(), environment).getFinalRuntimeValue();
 
             if (left instanceof NumberValue<?> leftValue && right instanceof NumberValue<?> rightValue) {
                 return evaluateNumericBinaryExpression(leftValue, rightValue, binaryExpression.getOperator());
@@ -435,9 +444,9 @@ public class EvaluationFunctions {
             Environment extraEnvironment = extra.length == 0 ? environment : extra[0];
 
             ArrayList<RuntimeValue<?>> args = new ArrayList<>();
-            functionCallExpression.getArgs().forEach(arg -> args.add(BasicInterpreter.evaluate(arg, extraEnvironment).getFinalRuntimeValue()));
+            functionCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment).getFinalRuntimeValue()));
 
-            RuntimeValue<?> function = BasicInterpreter.evaluate(functionCallExpression.getCaller(), environment, extraEnvironment);
+            RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, extraEnvironment);
 
             if (function instanceof DefaultFunctionValue defaultFunctionValue) {
                 if (defaultFunctionValue.getArgs().size() != args.size()) {
@@ -486,7 +495,7 @@ public class EvaluationFunctions {
                     Statement statement = functionValue.getBody().get(i);
                     if (statement instanceof ReturnStatement) {
                         hasReturnStatement = true;
-                        result = BasicInterpreter.evaluate(statement, functionEnvironment);
+                        result = Interpreter.evaluate(statement, functionEnvironment);
                         if (result != null) {
                             if (functionValue.getReturnDataType() != null && !functionValue.getReturnDataType().isMatches(result.getFinalValue()))
                                 throw new InvalidSyntaxException("Returned value's data type is different from specified (" + functionValue.getReturnDataType().getName() + ")");
@@ -496,7 +505,7 @@ public class EvaluationFunctions {
                         if (i + 1 < functionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
                         break;
                     }
-                    RuntimeValue<?> value = BasicInterpreter.evaluate(statement, functionEnvironment);
+                    RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
                     if (value instanceof ReturnInfoValue returnInfoValue) {
                         hasReturnStatement = true;
                         result = returnInfoValue.getFinalRuntimeValue();
@@ -523,9 +532,9 @@ public class EvaluationFunctions {
             Environment extraEnvironment = extra.length == 0 ? environment : extra[0];
 
             ArrayList<RuntimeValue<?>> args = new ArrayList<>();
-            classCallExpression.getArgs().forEach(arg -> args.add(BasicInterpreter.evaluate(arg, extraEnvironment).getFinalRuntimeValue()));
+            classCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment).getFinalRuntimeValue()));
 
-            RuntimeValue<?> rawClass = BasicInterpreter.evaluate(classCallExpression.getCaller(), environment);
+            RuntimeValue<?> rawClass = Interpreter.evaluate(classCallExpression.getCaller(), environment);
 
             if (rawClass instanceof ClassValue classValue) {
                 ClassEnvironment classEnvironment;
@@ -537,7 +546,7 @@ public class EvaluationFunctions {
                 }
 
                 for (Statement statement : classValue.getBody()) {
-                    BasicInterpreter.evaluate(statement, classEnvironment);
+                    Interpreter.evaluate(statement, classEnvironment);
                 }
 
                 if (classEnvironment.hasConstructor()) {
@@ -573,7 +582,7 @@ public class EvaluationFunctions {
                         }
 
                         for (Statement statement : constructorValue.getBody()) {
-                            BasicInterpreter.evaluate(statement, constructorEnvironment);
+                            Interpreter.evaluate(statement, constructorEnvironment);
                         }
                     }
                 }
@@ -652,22 +661,22 @@ public class EvaluationFunctions {
         });
 
         register("member_expression", MemberExpression.class, (memberExpression, environment, extra) -> {
-            RuntimeValue<?> object = BasicInterpreter.evaluate(memberExpression.getObject(), environment);
+            RuntimeValue<?> object = Interpreter.evaluate(memberExpression.getObject(), environment);
 
             if (object instanceof VariableValue variableValue) {
                 if (variableValue.getValue() instanceof ClassValue classValue) {
-                    return BasicInterpreter.evaluate(memberExpression.getField(), classValue.getClassEnvironment(), environment);
+                    return Interpreter.evaluate(memberExpression.getField(), classValue.getClassEnvironment(), environment);
                 }
                 if (variableValue.getValue() instanceof DefaultClassValue defaultClassValue) {
-                    return BasicInterpreter.evaluate(memberExpression.getField(), defaultClassValue.getClassEnvironment(), environment);
+                    return Interpreter.evaluate(memberExpression.getField(), defaultClassValue.getClassEnvironment(), environment);
                 }
                 throw new InvalidSyntaxException("Can't get members of " + object.getValue() + " because it's not a class");
             }
             if (object instanceof ClassValue classValue) {
-                return BasicInterpreter.evaluate(memberExpression.getField(), classValue.getClassEnvironment(), environment);
+                return Interpreter.evaluate(memberExpression.getField(), classValue.getClassEnvironment(), environment);
             }
             if (object instanceof DefaultClassValue defaultClassValue) {
-                return BasicInterpreter.evaluate(memberExpression.getField(), defaultClassValue.getClassEnvironment(), environment);
+                return Interpreter.evaluate(memberExpression.getField(), defaultClassValue.getClassEnvironment(), environment);
             }
 
             throw new InvalidSyntaxException("Can't get members of " + object.getValue() + " because it's not a class");
@@ -693,7 +702,7 @@ public class EvaluationFunctions {
 
                 if (identifier instanceof FunctionIdentifier functionIdentifier) {
                     ArrayList<RuntimeValue<?>> args = new ArrayList<>();
-                    functionIdentifier.getArgs().forEach(arg -> args.add(BasicInterpreter.evaluate(arg, extra[0]).getFinalRuntimeValue()));
+                    functionIdentifier.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extra[0]).getFinalRuntimeValue()));
                     RuntimeValue<?> runtimeFunction = environment.getFunctionEnvironment(identifier.getId(), args).getFunction(identifier.getId(), args);
 
                     if (runtimeFunction != null) {
@@ -818,7 +827,7 @@ public class EvaluationFunctions {
             if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
                 throw new InvalidSyntaxException("Can't assign value not in variable declaration environment");
             }
-            RuntimeValue<?> value = BasicInterpreter.evaluate(assignmentExpression.getValue(), environment);
+            RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
             if (!(value instanceof VariableValue)) value = new VariableValue(value,
                     variableDeclarationEnvironment.getVariableEnvironment(variableIdentifier.getId()),
                     variableIdentifier.getId());
@@ -826,9 +835,9 @@ public class EvaluationFunctions {
             return value;
         }
         if (assignmentExpression.getId() instanceof MemberExpression memberExpression) {
-            RuntimeValue<?> memberExpressionValue = BasicInterpreter.evaluate(memberExpression, environment);
+            RuntimeValue<?> memberExpressionValue = Interpreter.evaluate(memberExpression, environment);
             if (memberExpressionValue instanceof VariableValue variableValue) {
-                RuntimeValue<?> value = BasicInterpreter.evaluate(assignmentExpression.getValue(), environment);
+                RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
                 if (!(value instanceof VariableValue)) value = new VariableValue(value, variableValue.getParentEnvironment(), variableValue.getId());
                 variableValue.getParentEnvironment().assignVariable(variableValue.getId(), value);
                 return value;
@@ -839,7 +848,7 @@ public class EvaluationFunctions {
     }
 
     private static boolean parseCondition(Expression rawCondition, Environment environment) {
-        RuntimeValue<?> condition = BasicInterpreter.evaluate(rawCondition, environment).getFinalRuntimeValue();
+        RuntimeValue<?> condition = Interpreter.evaluate(rawCondition, environment).getFinalRuntimeValue();
 
         if (!(condition instanceof BooleanValue booleanValue)) throw new InvalidArgumentException("Condition must be boolean value");
         return booleanValue.getValue();
@@ -849,8 +858,4 @@ public class EvaluationFunctions {
     private static <T extends Statement> void register(String id, Class<T> cls, EvaluationFunction<T> evaluationFunction) {
         Registries.EVALUATION_FUNCTION.register(RegistryIdentifier.ofDefault(id), cls, evaluationFunction);
     }
-
-
-
-    public static void INIT() {}
 }
