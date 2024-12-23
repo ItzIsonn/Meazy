@@ -37,7 +37,7 @@ public class BasicParser implements Parser {
     }
 
     protected void removeOptionalNewLine() {
-        if (getCurrent().getType().equals(TokenTypes.NEW_LINE)) getCurrentAndRemove();
+        if (getCurrent().getType().equals(TokenTypes.NEW_LINE())) getCurrentAndRemove();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BasicParser implements Parser {
         removeOptionalNewLine();
 
         ArrayList<Statement> body = new ArrayList<>();
-        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE)) {
+        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
             Statement statement = parseGlobalStatement();
             body.add(statement);
         }
@@ -57,13 +57,13 @@ public class BasicParser implements Parser {
     }
 
     protected Statement parseGlobalStatement() {
-        if (getCurrent().getType().equals(TokenTypes.FUNCTION)) return parseFunctionDeclaration(new HashSet<>());
-        if (getCurrent().getType().equals(TokenTypes.VARIABLE)) {
-            VariableDeclarationStatement variableDeclarationStatement = parseVariableDeclaration(new HashSet<>());
-            getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the variable declaration");
+        if (getCurrent().getType().equals(TokenTypes.FUNCTION())) return parseFunctionDeclaration(new HashSet<>());
+        if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            VariableDeclarationStatement variableDeclarationStatement = parseVariableDeclaration(new HashSet<>(), false);
+            getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
             return variableDeclarationStatement;
         }
-        if (getCurrent().getType().equals(TokenTypes.CLASS)) return parseClassDeclaration();
+        if (getCurrent().getType().equals(TokenTypes.CLASS())) return parseClassDeclaration();
         throw new InvalidStatementException("At global environment you only can declare variable, function or class", getCurrent().getLine());
     }
 
@@ -71,47 +71,47 @@ public class BasicParser implements Parser {
 
     protected ClassDeclarationStatement parseClassDeclaration() {
         getCurrentAndRemove();
-        String id = getCurrentAndRemove(TokenTypes.ID, "Expected identifier after class keyword").getValue();
+        String id = getCurrentAndRemove(TokenTypes.ID(), "Expected identifier after class keyword").getValue();
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.LEFT_BRACE, "Expected left brace to open class body");
+        getCurrentAndRemove(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
         removeOptionalNewLine();
 
         ArrayList<Statement> body = new ArrayList<>();
-        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE)) {
+        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             body.add(parseClassBodyStatement());
         }
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.RIGHT_BRACE, "Expected right brace to close class body");
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the class declaration");
+        getCurrentAndRemove(TokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
 
         return new ClassDeclarationStatement(id, body);
     }
 
     protected Statement parseClassBodyStatement() {
-        Set<String> accessModifiers = new HashSet<>();
+        Set<AccessModifier> accessModifiers = new HashSet<>();
         while (TokenTypeSets.ACCESS_MODIFIERS.contains(getCurrent().getType())) {
             TokenType current = getCurrentAndRemove().getType();
-            if (current.equals(TokenTypes.PRIVATE)) accessModifiers.add("private");
-            if (current.equals(TokenTypes.SHARED)) accessModifiers.add("shared");
+            if (current.equals(TokenTypes.PRIVATE())) accessModifiers.add(AccessModifiers.PRIVATE());
+            if (current.equals(TokenTypes.SHARED())) accessModifiers.add(AccessModifiers.SHARED());
         }
 
-        if (getCurrent().getType().equals(TokenTypes.FUNCTION)) return parseFunctionDeclaration(accessModifiers);
-        if (getCurrent().getType().equals(TokenTypes.VARIABLE)) {
-            VariableDeclarationStatement variableDeclarationStatement = parseVariableDeclaration(accessModifiers);
-            getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the variable declaration");
+        if (getCurrent().getType().equals(TokenTypes.FUNCTION())) return parseFunctionDeclaration(accessModifiers);
+        if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            VariableDeclarationStatement variableDeclarationStatement = parseVariableDeclaration(accessModifiers, true);
+            getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
             return variableDeclarationStatement;
         }
-        if (getCurrent().getType().equals(TokenTypes.CONSTRUCTOR)) return parseConstructorDeclaration(accessModifiers);
+        if (getCurrent().getType().equals(TokenTypes.CONSTRUCTOR())) return parseConstructorDeclaration(accessModifiers);
         throw new InvalidStatementException("Invalid statement found", getCurrent().getLine());
     }
 
 
 
-    protected FunctionDeclarationStatement parseFunctionDeclaration(Set<String> accessModifiers) {
+    protected FunctionDeclarationStatement parseFunctionDeclaration(Set<AccessModifier> accessModifiers) {
         getCurrentAndRemove();
-        String id = getCurrentAndRemove(TokenTypes.ID, "Expected identifier after function keyword").getValue();
+        String id = getCurrentAndRemove(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
         DataType dataType = null;
 
         ArrayList<Expression> rawArgs = parseArgs();
@@ -121,41 +121,41 @@ public class BasicParser implements Parser {
             args.add(callArgExpression);
         }
 
-        if (getCurrent().getType().equals(TokenTypes.COLON)) {
+        if (getCurrent().getType().equals(TokenTypes.COLON())) {
             getCurrentAndRemove();
-            if (!getCurrent().getType().equals(TokenTypes.ID))
+            if (!getCurrent().getType().equals(TokenTypes.ID()))
                 throw new InvalidStatementException("Must specify function's return data type after colon", getCurrent().getLine());
 
-            dataType = DataTypes.parse(getCurrentAndRemove(TokenTypes.ID, "Expected data type's id").getValue());
+            dataType = DataTypes.parse(getCurrentAndRemove(TokenTypes.ID(), "Expected data type's id").getValue());
         }
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.LEFT_BRACE, "Expected left brace to open function body");
+        getCurrentAndRemove(TokenTypes.LEFT_BRACE(), "Expected left brace to open function body");
         removeOptionalNewLine();
 
         ArrayList<Statement> body = new ArrayList<>();
-        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE)) {
+        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             body.add(parseStatement());
         }
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.RIGHT_BRACE, "Expected right brace to close function body");
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the function declaration");
+        getCurrentAndRemove(TokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
 
         return new FunctionDeclarationStatement(id, args, body, dataType, accessModifiers);
     }
 
     protected ArrayList<Expression> parseArgs() {
-        getCurrentAndRemove(TokenTypes.LEFT_PAREN, "Expected left parenthesis");
-        ArrayList<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_PAREN ? new ArrayList<>() : parseArgsList();
-        getCurrentAndRemove(TokenTypes.RIGHT_PAREN, "Expected right parenthesis");
+        getCurrentAndRemove(TokenTypes.LEFT_PAREN(), "Expected left parenthesis");
+        ArrayList<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_PAREN() ? new ArrayList<>() : parseArgsList();
+        getCurrentAndRemove(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
         return args;
     }
 
     protected ArrayList<Expression> parseArgsList() {
         ArrayList<Expression> args = new ArrayList<>(List.of(parseFunctionArg()));
 
-        while (getCurrent().getType().equals(TokenTypes.COMMA)) {
+        while (getCurrent().getType().equals(TokenTypes.COMMA())) {
             getCurrentAndRemove();
             args.add(parseFunctionArg());
         }
@@ -164,17 +164,17 @@ public class BasicParser implements Parser {
     }
 
     protected CallArgExpression parseFunctionArg() {
-        if (!getCurrent().getType().equals(TokenTypes.VARIABLE))
+        if (!getCurrent().getType().equals(TokenTypes.VARIABLE()))
             throw new UnexpectedTokenException("Expected variable keyword at the beginning of function arg", getCurrent().getLine());
         boolean isConstant = getCurrentAndRemove().getValue().equals("val");
-        String id = getCurrentAndRemove(TokenTypes.ID, "Expected identifier after variable keyword in function arg").getValue();
+        String id = getCurrentAndRemove(TokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
         DataType argDataType = null;
 
-        if (getCurrent().getType().equals(TokenTypes.COLON)) {
+        if (getCurrent().getType().equals(TokenTypes.COLON())) {
             getCurrentAndRemove();
-            if (!getCurrent().getType().equals(TokenTypes.ID)) throw new InvalidStatementException("Must specify arg's data type after colon", getCurrent().getLine());
+            if (!getCurrent().getType().equals(TokenTypes.ID())) throw new InvalidStatementException("Must specify arg's data type after colon", getCurrent().getLine());
 
-            argDataType = DataTypes.parse(getCurrentAndRemove(TokenTypes.ID, "Expected data type's id").getValue());
+            argDataType = DataTypes.parse(getCurrentAndRemove(TokenTypes.ID(), "Expected data type's id").getValue());
         }
 
         return new CallArgExpression(id, argDataType, isConstant);
@@ -182,32 +182,35 @@ public class BasicParser implements Parser {
 
 
 
-    protected VariableDeclarationStatement parseVariableDeclaration(Set<String> accessModifiers) {
+    protected VariableDeclarationStatement parseVariableDeclaration(Set<AccessModifier> accessModifiers, boolean canWithoutValue) {
         boolean isConstant = getCurrentAndRemove().getValue().equals("val");
-        String id = getCurrentAndRemove(TokenTypes.ID, "Expected identifier after variable keyword").getValue();
+        String id = getCurrentAndRemove(TokenTypes.ID(), "Expected identifier after variable keyword").getValue();
         DataType dataType = null;
 
-        if (getCurrent().getType().equals(TokenTypes.COLON)) {
+        if (getCurrent().getType().equals(TokenTypes.COLON())) {
             getCurrentAndRemove();
-            if (!getCurrent().getType().equals(TokenTypes.ID))
+            if (!getCurrent().getType().equals(TokenTypes.ID()))
                 throw new InvalidStatementException("Must specify variable's data type after colon", getCurrent().getLine());
 
-            dataType = DataTypes.parse(getCurrentAndRemove(TokenTypes.ID, "Expected data type's id").getValue());
+            dataType = DataTypes.parse(getCurrentAndRemove(TokenTypes.ID(), "Expected data type's id").getValue());
         }
 
-        if (getCurrent().getType().equals(TokenTypes.NEW_LINE)) {
+        if (getCurrent().getType().equals(TokenTypes.NEW_LINE())) {
+            if (canWithoutValue) {
+                return new VariableDeclarationStatement(id, dataType, null, isConstant, accessModifiers);
+            }
             if (isConstant) throw new InvalidStatementException("Can't declare a constant variable without a value", getCurrent().getLine());
             return new VariableDeclarationStatement(id, dataType, new NullLiteral(), false, accessModifiers);
         }
 
-        getCurrentAndRemove(TokenTypes.ASSIGN, "Expected ASSIGN token after the id in variable declaration");
+        getCurrentAndRemove(TokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
 
         return new VariableDeclarationStatement(id, dataType, parseExpression(), isConstant, accessModifiers);
     }
 
 
 
-    protected ConstructorDeclarationStatement parseConstructorDeclaration(Set<String> accessModifiers) {
+    protected ConstructorDeclarationStatement parseConstructorDeclaration(Set<AccessModifier> accessModifiers) {
         getCurrentAndRemove();
 
         ArrayList<Expression> rawArgs = parseArgs();
@@ -218,17 +221,17 @@ public class BasicParser implements Parser {
         }
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.LEFT_BRACE, "Expected left brace to open constructor body");
+        getCurrentAndRemove(TokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
         removeOptionalNewLine();
 
         ArrayList<Statement> body = new ArrayList<>();
-        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE)) {
+        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             body.add(parseStatement());
         }
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.RIGHT_BRACE, "Expected right brace to close constructor body");
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the constructor declaration");
+        getCurrentAndRemove(TokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
 
         return new ConstructorDeclarationStatement(args, body, accessModifiers);
     }
@@ -236,38 +239,38 @@ public class BasicParser implements Parser {
 
 
     protected Statement parseStatement() {
-        if (getCurrent().getType().equals(TokenTypes.VARIABLE)) {
-            VariableDeclarationStatement variableDeclarationStatement = parseVariableDeclaration(new HashSet<>());
-            getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the variable declaration");
+        if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            VariableDeclarationStatement variableDeclarationStatement = parseVariableDeclaration(new HashSet<>(), false);
+            getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
             return variableDeclarationStatement;
         }
-        if (getCurrent().getType().equals(TokenTypes.IF)) return parseIfStatement();
-        if (getCurrent().getType().equals(TokenTypes.FOR)) return parseForStatement();
-        if (getCurrent().getType().equals(TokenTypes.WHILE)) return parseWhileStatement();
-        if (getCurrent().getType().equals(TokenTypes.RETURN)) return parseReturnStatement();
-        if (getCurrent().getType().equals(TokenTypes.CONTINUE)) return parseContinueStatement();
-        if (getCurrent().getType().equals(TokenTypes.BREAK)) return parseBreakStatement();
+        if (getCurrent().getType().equals(TokenTypes.IF())) return parseIfStatement();
+        if (getCurrent().getType().equals(TokenTypes.FOR())) return parseForStatement();
+        if (getCurrent().getType().equals(TokenTypes.WHILE())) return parseWhileStatement();
+        if (getCurrent().getType().equals(TokenTypes.RETURN())) return parseReturnStatement();
+        if (getCurrent().getType().equals(TokenTypes.CONTINUE())) return parseContinueStatement();
+        if (getCurrent().getType().equals(TokenTypes.BREAK())) return parseBreakStatement();
 
-        if (getCurrent().getType().equals(TokenTypes.ID) && tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.LEFT_PAREN)) {
+        if (getCurrent().getType().equals(TokenTypes.ID()) && tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.LEFT_PAREN())) {
             Expression callMemberExpression = parseCallExpression();
             if (callMemberExpression instanceof FunctionCallExpression) {
-                getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the call statement");
+                getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the call statement");
                 return callMemberExpression;
             }
         }
 
-        if (getCurrent().getType().equals(TokenTypes.NEW)) {
+        if (getCurrent().getType().equals(TokenTypes.NEW())) {
             Expression classCallExpression = parseClassCallExpression();
             if (classCallExpression instanceof ClassCallExpression) {
-                getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the class call statement");
+                getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class call statement");
                 return classCallExpression;
             }
         }
 
-        if (getCurrent().getType().equals(TokenTypes.ID)) {
+        if (getCurrent().getType().equals(TokenTypes.ID())) {
             Expression assignmentExpression = parseAssignmentExpression();
             if (assignmentExpression instanceof AssignmentExpression || assignmentExpression instanceof MemberExpression) {
-                getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the assignment statement");
+                getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the assignment statement");
                 return assignmentExpression;
             }
         }
@@ -280,35 +283,35 @@ public class BasicParser implements Parser {
     protected IfStatement parseIfStatement() {
         getCurrentAndRemove();
 
-        getCurrentAndRemove(TokenTypes.LEFT_PAREN, "Expected left parenthesis to open if condition");
+        getCurrentAndRemove(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open if condition");
         Expression condition = parseExpression();
-        getCurrentAndRemove(TokenTypes.RIGHT_PAREN, "Expected right parenthesis to close if condition");
+        getCurrentAndRemove(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close if condition");
 
         ArrayList<Statement> body = new ArrayList<>();
         removeOptionalNewLine();
-        if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE)) {
+        if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
             getCurrentAndRemove();
             body = parseBody();
-            getCurrentAndRemove(TokenTypes.RIGHT_BRACE, "Expected right brace to close if body");
-            getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the if statement");
+            getCurrentAndRemove(TokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
+            getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the if statement");
         }
         else body.add(parseStatement());
 
         IfStatement elseStatement = null;
 
-        if (getCurrent().getType().equals(TokenTypes.ELSE)) {
+        if (getCurrent().getType().equals(TokenTypes.ELSE())) {
             getCurrentAndRemove();
-            if (getCurrent().getType().equals(TokenTypes.IF)) {
+            if (getCurrent().getType().equals(TokenTypes.IF())) {
                 elseStatement = parseIfStatement();
             }
             else {
                 ArrayList<Statement> elseBody = new ArrayList<>();
                 removeOptionalNewLine();
-                if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE)) {
+                if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
                     getCurrentAndRemove();
                     elseBody = parseBody();
-                    getCurrentAndRemove(TokenTypes.RIGHT_BRACE, "Expected right brace to close if body");
-                    getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the if statement");
+                    getCurrentAndRemove(TokenTypes.RIGHT_BRACE(), "Expected right brace to close if body");
+                    getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the if statement");
                 }
                 else {
                     elseBody.add(parseStatement());
@@ -326,34 +329,34 @@ public class BasicParser implements Parser {
     protected ForStatement parseForStatement() {
         getCurrentAndRemove();
 
-        getCurrentAndRemove(TokenTypes.LEFT_PAREN, "Expected left parenthesis to open for condition");
+        getCurrentAndRemove(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open for condition");
 
         VariableDeclarationStatement variableDeclarationStatement = null;
-        if (!getCurrent().getType().equals(TokenTypes.SEMICOLON)) {
-            variableDeclarationStatement = parseVariableDeclaration(new HashSet<>());
+        if (!getCurrent().getType().equals(TokenTypes.SEMICOLON())) {
+            variableDeclarationStatement = parseVariableDeclaration(new HashSet<>(), false);
         }
-        getCurrentAndRemove(TokenTypes.SEMICOLON, "Expected semicolon as separator between for statement's args");
+        getCurrentAndRemove(TokenTypes.SEMICOLON(), "Expected semicolon as separator between for statement's args");
 
         Expression condition = null;
-        if (!getCurrent().getType().equals(TokenTypes.SEMICOLON)) {
+        if (!getCurrent().getType().equals(TokenTypes.SEMICOLON())) {
             condition = parseExpression();
         }
-        getCurrentAndRemove(TokenTypes.SEMICOLON, "Expected semicolon as separator between for statement's args");
+        getCurrentAndRemove(TokenTypes.SEMICOLON(), "Expected semicolon as separator between for statement's args");
 
         AssignmentExpression assignmentExpression = null;
-        if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN)) {
+        if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN())) {
             if (parseAssignmentExpression() instanceof AssignmentExpression expression) {
                 assignmentExpression = expression;
             }
         }
-        getCurrentAndRemove(TokenTypes.RIGHT_PAREN, "Expected right parenthesis to close for condition");
+        getCurrentAndRemove(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close for condition");
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.LEFT_BRACE, "Expected left brace to open for body");
+        getCurrentAndRemove(TokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
         ArrayList<Statement> body = parseBody();
-        getCurrentAndRemove(TokenTypes.RIGHT_BRACE, "Expected right brace to close for body");
+        getCurrentAndRemove(TokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
 
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the for statement");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the for statement");
 
         return new ForStatement(variableDeclarationStatement, condition, assignmentExpression, body);
     }
@@ -363,16 +366,16 @@ public class BasicParser implements Parser {
     protected WhileStatement parseWhileStatement() {
         getCurrentAndRemove();
 
-        getCurrentAndRemove(TokenTypes.LEFT_PAREN, "Expected left parenthesis to open while condition");
+        getCurrentAndRemove(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open while condition");
         Expression condition = parseExpression();
-        getCurrentAndRemove(TokenTypes.RIGHT_PAREN, "Expected right parenthesis to close while condition");
+        getCurrentAndRemove(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close while condition");
 
         removeOptionalNewLine();
-        getCurrentAndRemove(TokenTypes.LEFT_BRACE, "Expected left brace to open while body");
+        getCurrentAndRemove(TokenTypes.LEFT_BRACE(), "Expected left brace to open while body");
         ArrayList<Statement> body = parseBody();
-        getCurrentAndRemove(TokenTypes.RIGHT_BRACE, "Expected right brace to close while body");
+        getCurrentAndRemove(TokenTypes.RIGHT_BRACE(), "Expected right brace to close while body");
 
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the while statement");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the while statement");
 
         return new WhileStatement(condition, body);
     }
@@ -381,7 +384,7 @@ public class BasicParser implements Parser {
         ArrayList<Statement> body = new ArrayList<>();
         removeOptionalNewLine();
 
-        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE)) {
+        while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             body.add(parseStatement());
         }
 
@@ -395,23 +398,23 @@ public class BasicParser implements Parser {
         getCurrentAndRemove();
 
         Expression expression = null;
-        if (!getCurrent().getType().equals(TokenTypes.NEW_LINE)) {
+        if (!getCurrent().getType().equals(TokenTypes.NEW_LINE())) {
             expression = parseExpression();
         }
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the return statement");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the return statement");
 
         return new ReturnStatement(expression);
     }
 
     protected ContinueStatement parseContinueStatement() {
         getCurrentAndRemove();
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the continue statement");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the continue statement");
         return new ContinueStatement();
     }
 
     protected BreakStatement parseBreakStatement() {
         getCurrentAndRemove();
-        getCurrentAndRemove(TokenTypes.NEW_LINE, "Expected NEW_LINE token in the end of the break statement");
+        getCurrentAndRemove(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the break statement");
         return new BreakStatement();
     }
 
@@ -425,7 +428,7 @@ public class BasicParser implements Parser {
     protected Expression parseAssignmentExpression() {
         Expression left = parseLogicalExpression();
 
-        if (getCurrent().getType() == TokenTypes.ASSIGN) {
+        if (getCurrent().getType() == TokenTypes.ASSIGN()) {
             getCurrentAndRemove();
             Expression value = parseAssignmentExpression();
             return new AssignmentExpression(left, value);
@@ -443,7 +446,7 @@ public class BasicParser implements Parser {
         Expression left = parseComparisonExpression();
 
         TokenType current = getCurrent().getType();
-        while (current == TokenTypes.AND || current == TokenTypes.OR) {
+        while (current == TokenTypes.AND() || current == TokenTypes.OR()) {
             String operator = getCurrentAndRemove().getValue();
             Expression right = parseComparisonExpression();
             left = new LogicalExpression(left, right, operator);
@@ -458,8 +461,8 @@ public class BasicParser implements Parser {
         Expression left = parseAddExpression();
 
         TokenType current = getCurrent().getType();
-        while (current == TokenTypes.EQUALS || current == TokenTypes.NOT_EQUALS || current == TokenTypes.GREATER ||
-                current == TokenTypes.GREATER_OR_EQUALS || current == TokenTypes.LESS || current == TokenTypes.LESS_OR_EQUALS) {
+        while (current == TokenTypes.EQUALS() || current == TokenTypes.NOT_EQUALS() || current == TokenTypes.GREATER() ||
+                current == TokenTypes.GREATER_OR_EQUALS() || current == TokenTypes.LESS() || current == TokenTypes.LESS_OR_EQUALS()) {
             String operator = getCurrentAndRemove().getValue();
             Expression right = parseAddExpression();
             left = new ComparisonExpression(left, right, operator);
@@ -473,7 +476,7 @@ public class BasicParser implements Parser {
     protected Expression parseAddExpression() {
         Expression left = parseMultiplyExpression();
 
-        while (getCurrent().getType() == TokenTypes.PLUS || getCurrent().getType() == TokenTypes.MINUS) {
+        while (getCurrent().getType() == TokenTypes.PLUS() || getCurrent().getType() == TokenTypes.MINUS()) {
             String operator = getCurrentAndRemove().getValue();
             Expression right = parseMultiplyExpression();
             left = new BinaryExpression(left, right, operator);
@@ -485,7 +488,7 @@ public class BasicParser implements Parser {
     protected Expression parseMultiplyExpression() {
         Expression left = parsePowerExpression();
 
-        while (getCurrent().getType() == TokenTypes.MULTIPLY || getCurrent().getType() == TokenTypes.DIVIDE || getCurrent().getType() == TokenTypes.PERCENT) {
+        while (getCurrent().getType() == TokenTypes.MULTIPLY() || getCurrent().getType() == TokenTypes.DIVIDE() || getCurrent().getType() == TokenTypes.PERCENT()) {
             String operator = getCurrentAndRemove().getValue();
             Expression right = parsePowerExpression();
             left = new BinaryExpression(left, right, operator);
@@ -497,7 +500,7 @@ public class BasicParser implements Parser {
     protected Expression parsePowerExpression() {
         Expression left = parsePostfixExpression();
 
-        while (getCurrent().getType() == TokenTypes.POWER) {
+        while (getCurrent().getType() == TokenTypes.POWER()) {
             String operator = getCurrentAndRemove().getValue();
             Expression right = parsePostfixExpression();
             left = new BinaryExpression(left, right, operator);
@@ -519,7 +522,7 @@ public class BasicParser implements Parser {
     }
 
     protected Expression parseClassCallExpression() {
-        if (getCurrent().getType().equals(TokenTypes.NEW)) {
+        if (getCurrent().getType().equals(TokenTypes.NEW())) {
             getCurrentAndRemove();
             Expression expression = parseMemberExpression();
             if (expression instanceof CallExpression callExpression) {
@@ -544,10 +547,10 @@ public class BasicParser implements Parser {
     protected Expression parseMemberExpression() {
         Expression object = parseCallExpression();
 
-        while (getCurrent().getType() == TokenTypes.DOT) {
+        while (getCurrent().getType() == TokenTypes.DOT()) {
             getCurrentAndRemove();
             Expression property = parseCallExpression();
-            if (!(property instanceof Identifier) && !(property instanceof CallExpression) && getCurrent().getType() == TokenTypes.DOT)
+            if (!(property instanceof Identifier) && !(property instanceof CallExpression) && getCurrent().getType() == TokenTypes.DOT())
                 throw new UnexpectedTokenException("Right side must be either Identifier or Call", getCurrent().getLine());
             object = new MemberExpression(object, property);
         }
@@ -558,7 +561,7 @@ public class BasicParser implements Parser {
     protected Expression parseCallExpression() {
         Expression expression = parsePrimaryExpression();
 
-        if (getCurrent().getType() == TokenTypes.LEFT_PAREN) {
+        if (getCurrent().getType() == TokenTypes.LEFT_PAREN()) {
             return new FunctionCallExpression(expression, parseCallArgs());
         }
 
@@ -566,16 +569,16 @@ public class BasicParser implements Parser {
     }
 
     protected ArrayList<Expression> parseCallArgs() {
-        getCurrentAndRemove(TokenTypes.LEFT_PAREN, "Expected left parenthesis to open call args");
-        ArrayList<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_PAREN ? new ArrayList<>() : parseCallArgsList();
-        getCurrentAndRemove(TokenTypes.RIGHT_PAREN, "Expected right parenthesis to close call args");
+        getCurrentAndRemove(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
+        ArrayList<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_PAREN() ? new ArrayList<>() : parseCallArgsList();
+        getCurrentAndRemove(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
         return args;
     }
 
     protected ArrayList<Expression> parseCallArgsList() {
         ArrayList<Expression> args = new ArrayList<>(List.of(parseExpression()));
 
-        while (getCurrent().getType().equals(TokenTypes.COMMA)) {
+        while (getCurrent().getType().equals(TokenTypes.COMMA())) {
             getCurrentAndRemove();
             args.add(parseExpression());
         }
@@ -586,12 +589,12 @@ public class BasicParser implements Parser {
     protected Expression parsePrimaryExpression() {
         TokenType tokenType = getCurrent().getType();
 
-        if (tokenType == TokenTypes.ID) {
-            if ((pos != 0 && tokens.get(pos - 1).getType().equals(TokenTypes.NEW)) ||
-                    (tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.DOT) && pos != 0 && !tokens.get(pos - 1).getType().equals(TokenTypes.DOT)))
+        if (tokenType == TokenTypes.ID()) {
+            if ((pos != 0 && tokens.get(pos - 1).getType().equals(TokenTypes.NEW())) ||
+                    (tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.DOT()) && pos != 0 && !tokens.get(pos - 1).getType().equals(TokenTypes.DOT())))
                 return new ClassIdentifier(getCurrentAndRemove().getValue());
 
-            if (tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.LEFT_PAREN)) {
+            if (tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.LEFT_PAREN())) {
                 String value = getCurrentAndRemove().getValue();
                 int currentPos = pos;
                 ArrayList<Expression> args = parseCallArgs();
@@ -601,27 +604,27 @@ public class BasicParser implements Parser {
 
             return new VariableIdentifier(getCurrentAndRemove().getValue());
         }
-        if (tokenType == TokenTypes.NULL) {
+        if (tokenType == TokenTypes.NULL()) {
             getCurrentAndRemove();
             return new NullLiteral();
         }
-        if (tokenType == TokenTypes.NUMBER) {
+        if (tokenType == TokenTypes.NUMBER()) {
             String value = getCurrentAndRemove().getValue();
             if (value.contains(".")) return new NumberLiteral(Double.parseDouble(value), false);
             else return new NumberLiteral(Double.parseDouble(value), true);
         }
-        if (tokenType == TokenTypes.STRING) {
+        if (tokenType == TokenTypes.STRING()) {
             String value = getCurrentAndRemove().getValue();
             return new StringLiteral(value.substring(1, value.length() - 1));
         }
-        if (tokenType == TokenTypes.LEFT_PAREN) {
+        if (tokenType == TokenTypes.LEFT_PAREN()) {
             getCurrentAndRemove();
             Expression value = parseExpression();
-            getCurrentAndRemove(TokenTypes.RIGHT_PAREN, "Expected right parenthesis inside expression");
+            getCurrentAndRemove(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis inside expression");
             return value;
         }
-        if (tokenType == TokenTypes.BOOLEAN) return new BooleanLiteral(Boolean.parseBoolean(getCurrentAndRemove().getValue()));
-        if (tokenType == TokenTypes.NEW_LINE) {
+        if (tokenType == TokenTypes.BOOLEAN()) return new BooleanLiteral(Boolean.parseBoolean(getCurrentAndRemove().getValue()));
+        if (tokenType == TokenTypes.NEW_LINE()) {
             getCurrentAndRemove();
             return null;
         }

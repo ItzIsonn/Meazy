@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
+import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
@@ -41,9 +43,9 @@ public class FunctionDeclarationStatementConverter implements Converter<Function
             }
 
             if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException("FunctionDeclarationStatement doesn't have field access_modifiers");
-            Set<String> accessModifiers = new HashSet<>();
+            Set<AccessModifier> accessModifiers = new HashSet<>();
             for (JsonElement accessModifier : object.get("access_modifiers").getAsJsonArray()) {
-                accessModifiers.add(accessModifier.getAsString());
+                accessModifiers.add(AccessModifiers.parse(accessModifier.getAsString()));
             }
 
             return new FunctionDeclarationStatement(id, args, body, dataType, accessModifiers);
@@ -76,8 +78,8 @@ public class FunctionDeclarationStatementConverter implements Converter<Function
         }
 
         JsonArray accessModifiers = new JsonArray();
-        for (String accessModifier : functionDeclarationStatement.getAccessModifiers()) {
-            accessModifiers.add(accessModifier);
+        for (AccessModifier accessModifier : functionDeclarationStatement.getAccessModifiers()) {
+            accessModifiers.add(accessModifier.getId());
         }
         result.add("access_modifiers", accessModifiers);
 

@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.basic;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
@@ -26,13 +27,13 @@ public class BasicVariableDeclarationEnvironment extends BasicEnvironment implem
         this.variables = new ArrayList<>();
     }
 
-    public void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers) {
+    public void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers) {
         RuntimeVariable runtimeVariable = getVariable(id);
         if (runtimeVariable != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
         variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, false));
     }
 
-    public void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers) {
+    public void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers) {
         RuntimeVariable runtimeVariable = getVariable(id);
         if (runtimeVariable != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
         variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, true));

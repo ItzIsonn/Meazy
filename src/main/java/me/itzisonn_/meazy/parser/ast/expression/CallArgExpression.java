@@ -13,7 +13,7 @@ public class CallArgExpression implements Expression {
     public CallArgExpression(String id, DataType dataType, boolean isConstant) {
         this.id = id;
         if (dataType != null) this.dataType = dataType;
-        else this.dataType = DataTypes.ANY;
+        else this.dataType = DataTypes.ANY();
         this.isConstant = isConstant;
     }
 

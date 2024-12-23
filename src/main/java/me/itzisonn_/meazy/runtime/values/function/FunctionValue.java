@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.values.function;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
@@ -16,9 +17,9 @@ public class FunctionValue extends RuntimeValue<Object> {
     private final ArrayList<Statement> body;
     private final DataType returnDataType;
     private final FunctionDeclarationEnvironment parentEnvironment;
-    private final Set<String> accessModifiers;
+    private final Set<AccessModifier> accessModifiers;
 
-    public FunctionValue(ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
+    public FunctionValue(ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
         super(null);
         this.args = args;
         this.body = body;

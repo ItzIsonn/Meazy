@@ -5,6 +5,8 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.BasicParser;
 import me.itzisonn_.meazy.parser.Parser;
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
+import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
@@ -42,10 +44,15 @@ public class Registries {
 
     public static final SetRegistry<TokenType> TOKEN_TYPE = new SetRegistry<>();
     public static final SetRegistry<DataType> DATA_TYPE = new SetRegistry<>();
+    public static final SetRegistry<AccessModifier> ACCESS_MODIFIER = new SetRegistry<>();
 
 
 
     public static void INIT() {
+        TokenTypes.INIT();
+        DataTypes.INIT();
+        AccessModifiers.INIT();
+
         Registries.TOKENS_FUNCTION.register(RegistryIdentifier.ofDefault("tokens_function"), lines -> {
             ArrayList<Token> tokens = new ArrayList<>();
             TokenType tokenType;
@@ -75,17 +82,17 @@ public class Registries {
                 }
 
                 if (!lastMatched.isShouldSkip()) tokens.add(new Token(lineNumber, lastMatched, lines.substring(i, lastFound)));
-                if (lastMatched == TokenTypes.NEW_LINE) lineNumber++;
-                else if (lastMatched == TokenTypes.MULTI_LINE_COMMENT) lineNumber += Utils.countMatches(lines.substring(i, lastFound), "\n");
+                if (lastMatched == TokenTypes.NEW_LINE()) lineNumber++;
+                else if (lastMatched == TokenTypes.MULTI_LINE_COMMENT()) lineNumber += Utils.countMatches(lines.substring(i, lastFound), "\n");
                 i = lastFound - 1;
                 lastMatched = null;
             }
-            tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE, ""));
+            tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE(), ""));
 
             ArrayList<Token> newTokens = new ArrayList<>(List.of(tokens.getFirst()));
             for (int i = 1; i < tokens.size(); i++) {
                 Token token = tokens.get(i);
-                if (token.getType().equals(TokenTypes.NEW_LINE) && tokens.get(i - 1).getType().equals(TokenTypes.NEW_LINE)) continue;
+                if (token.getType().equals(TokenTypes.NEW_LINE()) && tokens.get(i - 1).getType().equals(TokenTypes.NEW_LINE())) continue;
                 newTokens.add(token);
             }
 
@@ -142,9 +149,6 @@ public class Registries {
         Registries.LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), BasicLoopEnvironment.class);
         Registries.ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), BasicEnvironment.class);
 
-        TokenTypes.INIT();
-        TokenTypeSets.INIT();
-        DataTypes.INIT();
         EvaluationFunctions.INIT();
     }
 

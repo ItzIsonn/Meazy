@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
@@ -14,9 +15,9 @@ public class FunctionDeclarationStatement implements Statement {
     private final ArrayList<CallArgExpression> args;
     private final ArrayList<Statement> body;
     private final DataType returnDataType;
-    private final Set<String> accessModifiers;
+    private final Set<AccessModifier> accessModifiers;
 
-    public FunctionDeclarationStatement(String id, ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, Set<String> accessModifiers) {
+    public FunctionDeclarationStatement(String id, ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, Set<AccessModifier> accessModifiers) {
         this.id = id;
         this.args = args;
         this.body = body;
@@ -27,8 +28,8 @@ public class FunctionDeclarationStatement implements Statement {
     @Override
     public String toCodeString(int offset) {
         StringBuilder accessModifiersBuilder = new StringBuilder();
-        for (String accessModifier : accessModifiers) {
-            accessModifiersBuilder.append(accessModifier).append(" ");
+        for (AccessModifier accessModifier : accessModifiers) {
+            accessModifiersBuilder.append(accessModifier.getId()).append(" ");
         }
 
         StringBuilder argsBuilder = new StringBuilder();

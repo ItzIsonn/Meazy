@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.ArrayList;
@@ -11,9 +12,9 @@ import java.util.Set;
 public class ConstructorDeclarationStatement implements Statement {
     private final ArrayList<CallArgExpression> args;
     private final ArrayList<Statement> body;
-    private final Set<String> accessModifiers;
+    private final Set<AccessModifier> accessModifiers;
 
-    public ConstructorDeclarationStatement(ArrayList<CallArgExpression> args, ArrayList<Statement> body, Set<String> accessModifiers) {
+    public ConstructorDeclarationStatement(ArrayList<CallArgExpression> args, ArrayList<Statement> body, Set<AccessModifier> accessModifiers) {
         this.args = args;
         this.body = body;
         this.accessModifiers = accessModifiers;
@@ -22,8 +23,8 @@ public class ConstructorDeclarationStatement implements Statement {
     @Override
     public String toCodeString(int offset) {
         StringBuilder accessModifiersBuilder = new StringBuilder();
-        for (String accessModifier : accessModifiers) {
-            accessModifiersBuilder.append(accessModifier).append(" ");
+        for (AccessModifier accessModifier : accessModifiers) {
+            accessModifiersBuilder.append(accessModifier.getId()).append(" ");
         }
 
         StringBuilder argsBuilder = new StringBuilder();

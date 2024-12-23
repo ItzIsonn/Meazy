@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
@@ -20,11 +21,11 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Math");
 
 
-        declareVariable("PI", DataTypes.FLOAT, new DoubleValue(Math.PI), true, Set.of("shared"));
-        declareVariable("E", DataTypes.FLOAT, new DoubleValue(Math.E), true, Set.of("shared"));
+        declareVariable("PI", DataTypes.FLOAT(), new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
+        declareVariable("E", DataTypes.FLOAT(), new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
 
 
-        declareFunction("round", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true))), DataTypes.INT, this, Set.of("shared")) {
+        declareFunction("round", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof Number number) {
@@ -34,7 +35,7 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("floor", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true))), DataTypes.INT, this, Set.of("shared")) {
+        declareFunction("floor", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof Number number) {
@@ -44,7 +45,7 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("ceil", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true))), DataTypes.INT, this, Set.of("shared")) {
+        declareFunction("ceil", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof Number number) {
@@ -55,8 +56,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction("pow", new DefaultFunctionValue(
-                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true), new CallArgExpression("degree", DataTypes.FLOAT, true))),
-                DataTypes.FLOAT, this, Set.of("shared")) {
+                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
+                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 Object degree = functionArgs.get(1).getFinalValue();
@@ -67,7 +68,7 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("abs", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true))), DataTypes.FLOAT, this, Set.of("shared")) {
+        declareFunction("abs", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof Number number) {
@@ -78,8 +79,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction("min", new DefaultFunctionValue(
-                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true), new CallArgExpression("degree", DataTypes.FLOAT, true))),
-                DataTypes.FLOAT, this, Set.of("shared")) {
+                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
+                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 Object degree = functionArgs.get(1).getFinalValue();
@@ -91,8 +92,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction("max", new DefaultFunctionValue(
-                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true), new CallArgExpression("degree", DataTypes.FLOAT, true))),
-                DataTypes.FLOAT, this, Set.of("shared")) {
+                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
+                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 Object degree = functionArgs.get(1).getFinalValue();
@@ -103,7 +104,7 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("randomInt", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT, true))), DataTypes.INT, this, Set.of("shared")) {
+        declareFunction("randomInt", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof Number number) {
@@ -114,8 +115,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction("randomInt", new DefaultFunctionValue(
-                new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT, true), new CallArgExpression("end", DataTypes.INT, true))),
-                DataTypes.INT, this, Set.of("shared")) {
+                new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT(), true), new CallArgExpression("end", DataTypes.INT(), true))),
+                DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object begin = functionArgs.getFirst().getFinalValue();
                 Object end = functionArgs.get(1).getFinalValue();
@@ -126,14 +127,14 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("randomFloat", new DefaultFunctionValue(new ArrayList<>(), DataTypes.FLOAT, this, Set.of("shared")) {
+        declareFunction("randomFloat", new DefaultFunctionValue(new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new DoubleValue(Utils.RANDOM.nextDouble());
             }
         });
 
 
-        declareFunction("randomFloat", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT, true))), DataTypes.FLOAT, this, Set.of("shared")) {
+        declareFunction("randomFloat", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof Number number) {
@@ -144,8 +145,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction("randomFloat", new DefaultFunctionValue(
-                new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.FLOAT, true), new CallArgExpression("end", DataTypes.FLOAT, true))),
-                DataTypes.FLOAT, this, Set.of("shared")) {
+                new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.FLOAT(), true), new CallArgExpression("end", DataTypes.FLOAT(), true))),
+                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object begin = functionArgs.getFirst().getFinalValue();
                 Object end = functionArgs.get(1).getFinalValue();

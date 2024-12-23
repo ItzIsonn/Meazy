@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
+import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
@@ -77,7 +79,7 @@ public class EvaluationFunctions {
 
         register("constructor_declaration_statement", ConstructorDeclarationStatement.class, (constructorDeclarationStatement, environment, extra) -> {
             if (environment instanceof ConstructorDeclarationEnvironment constructorDeclarationEnvironment) {
-                if (constructorDeclarationStatement.getAccessModifiers().contains("shared"))
+                if (constructorDeclarationStatement.getAccessModifiers().contains(AccessModifiers.SHARED()))
                     throw new InvalidSyntaxException("Constructors can't have shared access modifier!");
 
                 ConstructorValue constructorValue = new ConstructorValue(
@@ -111,12 +113,12 @@ public class EvaluationFunctions {
 
         register("variable_declaration_statement", VariableDeclarationStatement.class, (variableDeclarationStatement, environment, extra) -> {
             if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) throw new InvalidSyntaxException("Can't declare variable in this environment!");
-            Set<String> accessModifiers = new HashSet<>(variableDeclarationStatement.getAccessModifiers());
-            if (!accessModifiers.contains("shared") && environment.isShared()) accessModifiers.add("shared");
+            Set<AccessModifier> accessModifiers = new HashSet<>(variableDeclarationStatement.getAccessModifiers());
+            if (!accessModifiers.contains(AccessModifiers.SHARED()) && environment.isShared()) accessModifiers.add(AccessModifiers.SHARED());
             variableDeclarationEnvironment.declareVariable(
                     variableDeclarationStatement.getId(),
                     variableDeclarationStatement.getDataType(),
-                    new VariableValue(BasicInterpreter.evaluate(variableDeclarationStatement.getValue(), environment), variableDeclarationEnvironment, variableDeclarationStatement.getId()),
+                    new VariableValue(variableDeclarationStatement.getValue() == null ? null : BasicInterpreter.evaluate(variableDeclarationStatement.getValue(), environment), variableDeclarationEnvironment, variableDeclarationStatement.getId()),
                     variableDeclarationStatement.isConstant(),
                     accessModifiers);
             return null;
@@ -452,7 +454,7 @@ public class EvaluationFunctions {
 
                 RuntimeValue<?> returnValue = defaultFunctionValue.run(args, functionEnvironment);
                 if (defaultFunctionValue.getReturnDataType() != null && !defaultFunctionValue.getReturnDataType().isMatches(returnValue))
-                    throw new InvalidSyntaxException("Returned value's data type is different from specified. It's probably an addon's error");
+                    throw new InvalidSyntaxException("Returned value's data type is different from specified. It's probably an Addon's error");
                 return returnValue;
             }
             if (function instanceof FunctionValue functionValue) {
@@ -543,7 +545,7 @@ public class EvaluationFunctions {
                     if (rawConstructor == null) throw new InvalidCallException("Class with id " + classValue.getId() + " doesn't have requested constructor");
 
                     if (rawConstructor instanceof ConstructorValue constructorValue) {
-                        if (constructorValue.getAccessModifiers().contains("private") && !extraEnvironment.hasParent(environment1 -> {
+                        if (constructorValue.getAccessModifiers().contains(AccessModifiers.PRIVATE()) && !extraEnvironment.hasParent(environment1 -> {
                             if (environment1 instanceof ClassEnvironment classEnvironment1) {
                                 return classEnvironment1.getId().equals(classValue.getId());
                             }
@@ -573,6 +575,12 @@ public class EvaluationFunctions {
                         for (Statement statement : constructorValue.getBody()) {
                             BasicInterpreter.evaluate(statement, constructorEnvironment);
                         }
+                    }
+                }
+
+                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
+                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalValue() == null) {
+                        throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call");
                     }
                 }
 
@@ -609,7 +617,7 @@ public class EvaluationFunctions {
                     if (rawConstructor == null) throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
 
                     if (rawConstructor instanceof DefaultConstructorValue defaultConstructorValue) {
-                        if (defaultConstructorValue.getAccessModifiers().contains("private") && !extraEnvironment.hasParent(environment1 -> {
+                        if (defaultConstructorValue.getAccessModifiers().contains(AccessModifiers.PRIVATE()) && !extraEnvironment.hasParent(environment1 -> {
                             if (environment1 instanceof ClassEnvironment classEnvironment1) {
                                 return classEnvironment1.getId().equals(defaultClassValue.getId());
                             }
@@ -628,6 +636,12 @@ public class EvaluationFunctions {
                         }
 
                         defaultConstructorValue.run(args, constructorEnvironment);
+                    }
+                }
+
+                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
+                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalValue() == null) {
+                        throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call. It's probably an Addon's error");
                     }
                 }
 
@@ -665,10 +679,10 @@ public class EvaluationFunctions {
                 if (identifier instanceof VariableIdentifier) {
                     RuntimeVariable runtimeVariable = environment.getVariableEnvironment(identifier.getId()).getVariable(identifier.getId());
                     if (runtimeVariable != null) {
-                        if (runtimeVariable.getAccessModifiers().contains("private") &&
+                        if (runtimeVariable.getAccessModifiers().contains(AccessModifiers.PRIVATE()) &&
                                 !environment.hasParent(environment.getVariableEnvironment(identifier.getId())))
                             throw new InvalidAccessException("Can't access variable " + identifier.getId() + " because it's private");
-                        if (!runtimeVariable.getAccessModifiers().contains("shared") && environment.isShared() && !runtimeVariable.isArgument())
+                        if (!runtimeVariable.getAccessModifiers().contains(AccessModifiers.SHARED()) && environment.isShared() && !runtimeVariable.isArgument())
                             throw new InvalidAccessException("Can't access variable " + identifier.getId() + " because it's not shared");
 
                         return runtimeVariable.getValue();
@@ -684,16 +698,16 @@ public class EvaluationFunctions {
 
                     if (runtimeFunction != null) {
                         if (runtimeFunction instanceof FunctionValue functionValue) {
-                            if (functionValue.getAccessModifiers().contains("private") &&
+                            if (functionValue.getAccessModifiers().contains(AccessModifiers.PRIVATE()) &&
                                     !environment.hasParent(environment.getFunctionEnvironment(identifier.getId(), args)))
                                 throw new InvalidAccessException("Can't access function " + identifier.getId() + " because it's private");
-                            if (!functionValue.getAccessModifiers().contains("shared") && environment.isShared())
+                            if (!functionValue.getAccessModifiers().contains(AccessModifiers.SHARED()) && environment.isShared())
                                 throw new InvalidAccessException("Can't access function " + identifier.getId() + " because it's not shared");
                         } else if (runtimeFunction instanceof DefaultFunctionValue defaultFunctionValue) {
-                            if (defaultFunctionValue.getAccessModifiers().contains("private") &&
+                            if (defaultFunctionValue.getAccessModifiers().contains(AccessModifiers.PRIVATE()) &&
                                     !environment.hasParent(environment.getFunctionEnvironment(identifier.getId(), args)))
                                 throw new InvalidAccessException("Can't access function " + identifier.getId() + " because it's private");
-                            if (!defaultFunctionValue.getAccessModifiers().contains("shared") && environment.isShared())
+                            if (!defaultFunctionValue.getAccessModifiers().contains(AccessModifiers.SHARED()) && environment.isShared())
                                 throw new InvalidAccessException("Can't access function " + identifier.getId() + " because it's not shared");
                         }
 

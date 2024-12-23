@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
+import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
@@ -21,22 +22,22 @@ public class TypesClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Types");
 
 
-        declareFunction("getType", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY, true))), DataTypes.STRING, this, Set.of("shared")) {
+        declareFunction("getType", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value == null) return new StringValue("null");
-                if (DataTypes.BOOLEAN.isMatches(value)) return new StringValue(DataTypes.BOOLEAN.getName());
-                if (DataTypes.INT.isMatches(value)) return new StringValue(DataTypes.INT.getName());
-                if (DataTypes.FLOAT.isMatches(value)) return new StringValue(DataTypes.FLOAT.getName());
-                if (DataTypes.STRING.isMatches(value)) return new StringValue(DataTypes.STRING.getName());
+                if (DataTypes.BOOLEAN().isMatches(value)) return new StringValue(DataTypes.BOOLEAN().getName());
+                if (DataTypes.INT().isMatches(value)) return new StringValue(DataTypes.INT().getName());
+                if (DataTypes.FLOAT().isMatches(value)) return new StringValue(DataTypes.FLOAT().getName());
+                if (DataTypes.STRING().isMatches(value)) return new StringValue(DataTypes.STRING().getName());
                 if (functionArgs.getFirst().getFinalRuntimeValue() instanceof ClassValue classValue) return new StringValue(classValue.getId());
                 return new StringValue("???");
             }
         });
 
         declareFunction("convert", new DefaultFunctionValue(
-                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY, true), new CallArgExpression("type", DataTypes.STRING, true))),
-                DataTypes.ANY, this, Set.of("shared")) {
+                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true), new CallArgExpression("type", DataTypes.STRING(), true))),
+                DataTypes.ANY(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 String type = functionArgs.get(1).getFinalValue().toString();
 

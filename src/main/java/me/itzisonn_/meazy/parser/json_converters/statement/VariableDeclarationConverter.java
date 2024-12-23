@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.AccessModifier;
+import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -24,16 +26,18 @@ public class VariableDeclarationConverter implements Converter<VariableDeclarati
             if (object.get("data_type") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field data_type");
             DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
 
-            if (object.get("value") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field value");
-            Expression value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);
+            Expression value = null;
+            if (object.get("value") != null) {
+                value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);
+            }
 
             if (object.get("is_constant") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field is_constant");
             boolean isConstant = object.get("is_constant").getAsBoolean();
 
             if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field access_modifiers");
-            Set<String> accessModifiers = new HashSet<>();
+            Set<AccessModifier> accessModifiers = new HashSet<>();
             for (JsonElement accessModifier : object.get("access_modifiers").getAsJsonArray()) {
-                accessModifiers.add(accessModifier.getAsString());
+                accessModifiers.add(AccessModifiers.parse(accessModifier.getAsString()));
             }
 
             return new VariableDeclarationStatement(id, dataType, value, isConstant, accessModifiers);
@@ -49,12 +53,12 @@ public class VariableDeclarationConverter implements Converter<VariableDeclarati
 
         result.addProperty("id", variableDeclarationStatement.getId());
         result.addProperty("data_type", variableDeclarationStatement.getDataType().getName());
-        result.add("value", jsonSerializationContext.serialize(variableDeclarationStatement.getValue()));
+        if (variableDeclarationStatement.getValue() != null) result.add("value", jsonSerializationContext.serialize(variableDeclarationStatement.getValue()));
         result.addProperty("is_constant", variableDeclarationStatement.isConstant());
 
         JsonArray accessModifiers = new JsonArray();
-        for (String accessModifier : variableDeclarationStatement.getAccessModifiers()) {
-            accessModifiers.add(accessModifier);
+        for (AccessModifier accessModifier : variableDeclarationStatement.getAccessModifiers()) {
+            accessModifiers.add(accessModifier.getId());
         }
         result.add("access_modifiers", accessModifiers);
 

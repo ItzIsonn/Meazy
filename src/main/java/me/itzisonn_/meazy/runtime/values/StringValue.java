@@ -9,6 +9,10 @@ public class StringValue extends DefaultClassValue {
         super(new StringClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), value));
     }
 
+    public StringValue(StringClassEnvironment stringClassEnvironment) {
+        super(stringClassEnvironment);
+    }
+
     @Override
     public String getValue() {
         return getClassEnvironment().getVariable("value").getValue().getFinalValue().toString();
