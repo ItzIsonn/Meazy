@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.interpreter;
 
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
@@ -106,14 +107,24 @@ public class EvaluationFunctions {
 
         register("function_declaration_statement", FunctionDeclarationStatement.class, (functionDeclarationStatement, environment, extra) -> {
             if (environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment) {
+                RuntimeValue<?> arraySize = null;
+                if (functionDeclarationStatement.getArraySize() != null) {
+                    RuntimeValue<?> rawArraySize = Interpreter.evaluate(functionDeclarationStatement.getArraySize(), environment);
+                    if (rawArraySize instanceof IntValue intValue) arraySize = intValue;
+                    else if (rawArraySize instanceof NullValue nullValue) arraySize = nullValue;
+                    else throw new InvalidSyntaxException("Array size must be int value");
+                }
+
                 FunctionValue functionValue = new FunctionValue(
+                        functionDeclarationStatement.getId(),
                         functionDeclarationStatement.getArgs(),
                         functionDeclarationStatement.getBody(),
                         functionDeclarationStatement.getReturnDataType(),
+                        arraySize,
                         functionDeclarationEnvironment,
                         functionDeclarationStatement.getAccessModifiers());
 
-                functionDeclarationEnvironment.declareFunction(functionDeclarationStatement.getId(), functionValue);
+                functionDeclarationEnvironment.declareFunction(functionValue);
                 return null;
             }
 
@@ -122,10 +133,21 @@ public class EvaluationFunctions {
 
         register("variable_declaration_statement", VariableDeclarationStatement.class, (variableDeclarationStatement, environment, extra) -> {
             if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) throw new InvalidSyntaxException("Can't declare variable in this environment!");
+
             Set<AccessModifier> accessModifiers = new HashSet<>(variableDeclarationStatement.getAccessModifiers());
             if (!accessModifiers.contains(AccessModifiers.SHARED()) && environment.isShared()) accessModifiers.add(AccessModifiers.SHARED());
+
+            RuntimeValue<?> arraySize = null;
+            if (variableDeclarationStatement.getArraySize() != null) {
+                RuntimeValue<?> rawArraySize = Interpreter.evaluate(variableDeclarationStatement.getArraySize(), environment);
+                if (rawArraySize instanceof IntValue intValue) arraySize = intValue;
+                else if (rawArraySize instanceof NullValue nullValue) arraySize = nullValue;
+                else throw new InvalidSyntaxException("Array size must be int value");
+            }
+
             variableDeclarationEnvironment.declareVariable(
                     variableDeclarationStatement.getId(),
+                    arraySize,
                     variableDeclarationStatement.getDataType(),
                     new VariableValue(variableDeclarationStatement.getValue() == null ? null : Interpreter.evaluate(variableDeclarationStatement.getValue(), environment), variableDeclarationEnvironment, variableDeclarationStatement.getId()),
                     variableDeclarationStatement.isConstant(),
@@ -186,6 +208,64 @@ public class EvaluationFunctions {
             return null;
         });
 
+        register("foreach_statement", ForeachStatement.class, (foreachStatement, environment, extra) -> {
+            VariableDeclarationEnvironment foreachEnvironment;
+            try {
+                foreachEnvironment = Registries.LOOP_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
+            }
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            RuntimeValue<?> rawArrayValue = Interpreter.evaluate(foreachStatement.getCollection(), foreachEnvironment);
+            ArrayList<RuntimeValue<?>> arrayList;
+            if (rawArrayValue.getFinalRuntimeValue() instanceof ArrayValue arrayValue) arrayList = arrayValue.getValue();
+            else throw new InvalidSyntaxException("Can't get members of non-array value");
+
+            main:
+            for (RuntimeValue<?> runtimeValue : arrayList) {
+                foreachEnvironment.clearVariables();
+                foreachEnvironment.declareVariable(
+                        foreachStatement.getVariableDeclarationStatement().getId(),
+                        null,
+                        foreachStatement.getVariableDeclarationStatement().getDataType(),
+                        runtimeValue,
+                        foreachStatement.getVariableDeclarationStatement().isConstant(),
+                        new HashSet<>());
+
+                for (int i = 0; i < foreachStatement.getBody().size(); i++) {
+                    Statement statement = foreachStatement.getBody().get(i);
+                    RuntimeValue<?> result = Interpreter.evaluate(statement, foreachEnvironment);
+
+                    if (statement instanceof ReturnStatement) {
+                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
+                        return new ReturnInfoValue(result);
+                    }
+                    if (result instanceof ReturnInfoValue returnInfoValue) {
+                        return returnInfoValue;
+                    }
+
+                    if (statement instanceof ContinueStatement) {
+                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Continue statement must be last in body");
+                        break;
+                    }
+                    if (result instanceof ContinueInfoValue) {
+                        break;
+                    }
+
+                    if (statement instanceof BreakStatement) {
+                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Break statement must be last in body");
+                        break main;
+                    }
+                    if (result instanceof BreakInfoValue) {
+                        break main;
+                    }
+                }
+            }
+
+            return null;
+        });
+
         register("for_statement", ForStatement.class, (forStatement, environment, extra) -> {
             VariableDeclarationEnvironment forEnvironment;
             try {
@@ -195,8 +275,16 @@ public class EvaluationFunctions {
                 throw new RuntimeException(e);
             }
 
+            IntValue arraySize = null;
+            if (forStatement.getVariableDeclarationStatement().getArraySize() != null) {
+                RuntimeValue<?> rawArraySize = Interpreter.evaluate(forStatement.getVariableDeclarationStatement().getArraySize(), environment);
+                if (rawArraySize instanceof IntValue intValue) arraySize = intValue;
+                else throw new InvalidSyntaxException("Array size must be int value");
+            }
+
             forEnvironment.declareVariable(
                     forStatement.getVariableDeclarationStatement().getId(),
+                    arraySize,
                     forStatement.getVariableDeclarationStatement().getDataType(),
                     Interpreter.evaluate(forStatement.getVariableDeclarationStatement().getValue(), forEnvironment),
                     forStatement.getVariableDeclarationStatement().isConstant(),
@@ -237,6 +325,7 @@ public class EvaluationFunctions {
                 forEnvironment.clearVariables();
                 forEnvironment.declareVariable(
                         runtimeVariable.getId(),
+                        runtimeVariable.getArraySize(),
                         runtimeVariable.getDataType(),
                         runtimeVariable.getValue(),
                         runtimeVariable.isConstant(),
@@ -324,6 +413,29 @@ public class EvaluationFunctions {
 
         register("assignment_expression", AssignmentExpression.class, (assignmentExpression, environment, extra) -> evaluateAssignmentExpression(assignmentExpression, environment));
 
+        register("array_declaration_expression", ArrayDeclarationExpression.class, (arrayDeclarationExpression, environment, extra) -> {
+            ArrayList<RuntimeValue<?>> args = new ArrayList<>();
+            arrayDeclarationExpression.getValues().forEach(arg -> args.add(Interpreter.evaluate(arg, environment)));
+            return new ArrayValue(args);
+        });
+
+        register("array_pointer_expression", ArrayPointerExpression.class, (arrayPointerExpression, environment, extra) -> {
+            RuntimeValue<?> object = Interpreter.evaluate(arrayPointerExpression.getObject(), environment);
+            if (object instanceof VariableValue variableValue) {
+                if (!(variableValue.getParentEnvironment().getVariable(variableValue.getId()).getValue().getFinalValue() instanceof ArrayList<?> arrayList))
+                    throw new InvalidSyntaxException("Can't get member of non-array");
+                if (!(Interpreter.evaluate(arrayPointerExpression.getPos(), environment).getFinalRuntimeValue() instanceof IntValue pos))
+                    throw new InvalidSyntaxException("Position of member in array must be int");
+                if (pos.getValue() > arrayList.size())
+                    throw new InvalidSyntaxException("Index " + pos.getValue() + " out of bounds for size " + arrayList.size());
+
+                Object value = arrayList.get(pos.getValue());
+                if (!(value instanceof RuntimeValue<?> runtimeValue)) return new NullValue();
+                return runtimeValue;
+            }
+            throw new InvalidSyntaxException("Can't get member of non-variable value");
+        });
+
         register("logical_expression", LogicalExpression.class, (logicalExpression, environment, extra) -> {
             RuntimeValue<?> left = Interpreter.evaluate(logicalExpression.getLeft(), environment).getFinalRuntimeValue();
             RuntimeValue<?> right = Interpreter.evaluate(logicalExpression.getRight(), environment).getFinalRuntimeValue();
@@ -399,6 +511,20 @@ public class EvaluationFunctions {
                 return new BooleanValue(result);
             }
 
+            if (left instanceof ArrayValue leftValue && right instanceof ArrayValue rightValue) {
+                boolean result;
+                ArrayList<RuntimeValue<?>> leftArray = leftValue.getValue();
+                ArrayList<RuntimeValue<?>> rightArray = rightValue.getValue();
+
+                switch (comparisonExpression.getOperator()) {
+                    case "==" -> result = leftArray.equals(rightArray);
+                    case "!=" -> result = !leftArray.equals(rightArray);
+                    default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
+                }
+
+                return new BooleanValue(result);
+            }
+
             if (left instanceof NullValue) {
                 boolean result;
                 Object rightObject = right.getValue();
@@ -444,7 +570,7 @@ public class EvaluationFunctions {
             Environment extraEnvironment = extra.length == 0 ? environment : extra[0];
 
             ArrayList<RuntimeValue<?>> args = new ArrayList<>();
-            functionCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment).getFinalRuntimeValue()));
+            functionCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment)));
 
             RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, extraEnvironment);
 
@@ -462,9 +588,13 @@ public class EvaluationFunctions {
                 }
 
                 RuntimeValue<?> returnValue = defaultFunctionValue.run(args, functionEnvironment);
-                if (defaultFunctionValue.getReturnDataType() != null && !defaultFunctionValue.getReturnDataType().isMatches(returnValue))
-                    throw new InvalidSyntaxException("Returned value's data type is different from specified. It's probably an Addon's error");
-                return returnValue;
+                if (returnValue != null) returnValue = returnValue.getFinalRuntimeValue();
+                return checkReturnValue(
+                        returnValue,
+                        defaultFunctionValue.getReturnDataType(),
+                        defaultFunctionValue.getArraySize(),
+                        defaultFunctionValue.getId(),
+                        true);
             }
             if (function instanceof FunctionValue functionValue) {
                 if (functionValue.getArgs().size() != args.size()) {
@@ -481,8 +611,18 @@ public class EvaluationFunctions {
 
                 for (int i = 0; i < functionValue.getArgs().size(); i++) {
                     CallArgExpression callArgExpression = functionValue.getArgs().get(i);
+
+                    RuntimeValue<?> arraySize = null;
+                    if (callArgExpression.getArraySize() != null) {
+                        RuntimeValue<?> rawArraySize = Interpreter.evaluate(callArgExpression.getArraySize(), environment);
+                        if (rawArraySize instanceof IntValue intValue) arraySize = intValue;
+                        else if (rawArraySize instanceof NullValue nullValue) arraySize = nullValue;
+                        else throw new InvalidSyntaxException("Array size must be int value");
+                    }
+
                     functionEnvironment.declareArgument(
                             callArgExpression.getId(),
+                            arraySize,
                             callArgExpression.getDataType(),
                             args.get(i),
                             callArgExpression.isConstant(),
@@ -497,10 +637,12 @@ public class EvaluationFunctions {
                         hasReturnStatement = true;
                         result = Interpreter.evaluate(statement, functionEnvironment);
                         if (result != null) {
-                            if (functionValue.getReturnDataType() != null && !functionValue.getReturnDataType().isMatches(result.getFinalValue()))
-                                throw new InvalidSyntaxException("Returned value's data type is different from specified (" + functionValue.getReturnDataType().getName() + ")");
-                            if (functionValue.getReturnDataType() == null)
-                                throw new InvalidSyntaxException("Found return statement but function must return nothing");
+                            checkReturnValue(
+                                    result.getFinalRuntimeValue(),
+                                    functionValue.getReturnDataType(),
+                                    functionValue.getArraySize(),
+                                    functionValue.getId(),
+                                    false);
                         }
                         if (i + 1 < functionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
                         break;
@@ -510,10 +652,12 @@ public class EvaluationFunctions {
                         hasReturnStatement = true;
                         result = returnInfoValue.getFinalRuntimeValue();
                         if (result.getFinalValue() != null) {
-                            if (functionValue.getReturnDataType() != null && !functionValue.getReturnDataType().isMatches(result.getFinalValue()))
-                                throw new InvalidSyntaxException("Returned value's data type is different from specified (" + functionValue.getReturnDataType().getName() + ")");
-                            if (functionValue.getReturnDataType() == null)
-                                throw new InvalidSyntaxException("Found return statement but function must return nothing");
+                            checkReturnValue(
+                                    result.getFinalRuntimeValue(),
+                                    functionValue.getReturnDataType(),
+                                    functionValue.getArraySize(),
+                                    functionValue.getId(),
+                                    false);
                         }
                         break;
                     }
@@ -532,7 +676,7 @@ public class EvaluationFunctions {
             Environment extraEnvironment = extra.length == 0 ? environment : extra[0];
 
             ArrayList<RuntimeValue<?>> args = new ArrayList<>();
-            classCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment).getFinalRuntimeValue()));
+            classCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment)));
 
             RuntimeValue<?> rawClass = Interpreter.evaluate(classCallExpression.getCaller(), environment);
 
@@ -573,8 +717,18 @@ public class EvaluationFunctions {
 
                         for (int i = 0; i < constructorValue.getArgs().size(); i++) {
                             CallArgExpression callArgExpression = constructorValue.getArgs().get(i);
+
+                            RuntimeValue<?> arraySize = null;
+                            if (callArgExpression.getArraySize() != null) {
+                                RuntimeValue<?> rawArraySize = Interpreter.evaluate(callArgExpression.getArraySize(), environment);
+                                if (rawArraySize instanceof IntValue intValue) arraySize = intValue;
+                                else if (rawArraySize instanceof NullValue nullValue) arraySize = nullValue;
+                                else throw new InvalidSyntaxException("Array size must be int value");
+                            }
+
                             constructorEnvironment.declareArgument(
                                     callArgExpression.getId(),
+                                    arraySize,
                                     callArgExpression.getDataType(),
                                     args.get(i),
                                     callArgExpression.isConstant(),
@@ -588,7 +742,7 @@ public class EvaluationFunctions {
                 }
 
                 for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
-                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalValue() == null) {
+                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call");
                     }
                 }
@@ -605,13 +759,13 @@ public class EvaluationFunctions {
                 }
 
                 defaultClassValue.getClassEnvironment().getVariables().forEach(variable -> {
-                    if (!variable.isArgument()) classEnvironment.declareVariable(variable.getId(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
-                    else classEnvironment.declareArgument(variable.getId(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
+                    if (!variable.isArgument()) classEnvironment.declareVariable(variable.getId(), variable.getArraySize(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
+                    else classEnvironment.declareArgument(variable.getId(), variable.getArraySize(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
                 });
                 defaultClassValue.getClassEnvironment().getFunctions().forEach(function -> {
                     if (function.getFunctionValue() instanceof DefaultFunctionValue defaultFunctionValue) {
                         defaultFunctionValue.setParentEnvironment(classEnvironment);
-                        classEnvironment.declareFunction(function.getId(), defaultFunctionValue);
+                        classEnvironment.declareFunction(defaultFunctionValue);
                     }
                 });
                 defaultClassValue.getClassEnvironment().getConstructors().forEach(constructor -> {
@@ -649,7 +803,7 @@ public class EvaluationFunctions {
                 }
 
                 for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
-                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalValue() == null) {
+                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call. It's probably an Addon's error");
                     }
                 }
@@ -702,7 +856,7 @@ public class EvaluationFunctions {
 
                 if (identifier instanceof FunctionIdentifier functionIdentifier) {
                     ArrayList<RuntimeValue<?>> args = new ArrayList<>();
-                    functionIdentifier.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extra[0]).getFinalRuntimeValue()));
+                    functionIdentifier.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extra[0])));
                     RuntimeValue<?> runtimeFunction = environment.getFunctionEnvironment(identifier.getId(), args).getFunction(identifier.getId(), args);
 
                     if (runtimeFunction != null) {
@@ -822,6 +976,7 @@ public class EvaluationFunctions {
         return new StringValue(result.toString());
     }
 
+    @SuppressWarnings("unchecked")
     private static RuntimeValue<?> evaluateAssignmentExpression(AssignmentExpression assignmentExpression, Environment environment) {
         if (assignmentExpression.getId() instanceof VariableIdentifier variableIdentifier) {
             if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
@@ -844,7 +999,26 @@ public class EvaluationFunctions {
             }
             throw new InvalidSyntaxException("Can't assign value to not variable");
         }
-        return null;
+        if (assignmentExpression.getId() instanceof ArrayPointerExpression arrayPointerExpression) {
+            RuntimeValue<?> object = Interpreter.evaluate(arrayPointerExpression.getObject(), environment);
+            if (object instanceof VariableValue variableValue) {
+                RuntimeVariable variable = variableValue.getParentEnvironment().getVariable(variableValue.getId());
+                if (!(variable.getValue().getFinalValue() instanceof ArrayList<?> arrayList))
+                    throw new InvalidSyntaxException("Can't assign value to member of non-array");
+                if (!(Interpreter.evaluate(arrayPointerExpression.getPos(), environment).getFinalRuntimeValue() instanceof IntValue pos))
+                    throw new InvalidSyntaxException("Position of member in array must be int");
+                if (pos.getValue() >= arrayList.size())
+                    throw new InvalidSyntaxException("Index " + pos.getValue() + " out of bounds for size " + arrayList.size());
+
+                RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
+                if (!variable.getDataType().isMatches(value.getFinalRuntimeValue()))
+                    throw new InvalidSyntaxException("Variable with id " + variable.getId() + " requires data type " + variable.getDataType().getName());
+                ((ArrayList<Object>)arrayList).set(pos.getValue(), value);
+                return value;
+            }
+            throw new InvalidSyntaxException("Can't assign value to member of non-variable value" + object);
+        }
+        throw new InvalidSyntaxException("Can't assign value to " + assignmentExpression.getId().getClass().getName());
     }
 
     private static boolean parseCondition(Expression rawCondition, Environment environment) {
@@ -853,6 +1027,41 @@ public class EvaluationFunctions {
         if (!(condition instanceof BooleanValue booleanValue)) throw new InvalidArgumentException("Condition must be boolean value");
         return booleanValue.getValue();
     }
+
+    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, IntValue arraySizeValue, String functionId, boolean isDefault) {
+        String defaultString = isDefault ? " It's probably an Addon's error" : "";
+
+        if (returnValue != null && returnDataType == null)
+            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing." + defaultString);
+        if (returnValue == null) {
+            if (returnDataType != null)
+                throw new InvalidSyntaxException("Didn't find return value but function with id " + functionId + " must return value." + defaultString);
+            return null;
+        }
+
+        if (arraySizeValue != null) {
+            if (!(returnValue.getFinalRuntimeValue() instanceof ArrayValue arrayValue))
+                throw new InvalidSyntaxException("Function with id " + functionId + " requires array value." + defaultString);
+
+            int arraySize = arraySizeValue.getValue();
+            if (arraySize == -1) arraySize = arrayValue.getValue().size();
+            if (arraySize != arrayValue.getValue().size())
+                throw new InvalidSyntaxException("Array size of function with id " + functionId + " doesn't match with assigned value." + defaultString);
+
+            for (RuntimeValue<?> runtimeValue : arrayValue.getValue()) {
+                if (!returnDataType.isMatches(runtimeValue.getFinalRuntimeValue()))
+                    throw new InvalidSyntaxException("Function with id " + functionId + " requires data type " + returnDataType.getName() + "." + defaultString);
+            }
+            return returnValue;
+        }
+        else if (returnValue instanceof ArrayValue) throw new InvalidSyntaxException("Function with id " + functionId + " can't return array value." + defaultString);
+
+        if (!returnDataType.isMatches(returnValue.getFinalRuntimeValue()))
+            throw new InvalidSyntaxException("Returned value's data type is different from specified." + defaultString);
+
+        return returnValue;
+    }
+
 
 
     private static <T extends Statement> void register(String id, Class<T> cls, EvaluationFunction<T> evaluationFunction) {

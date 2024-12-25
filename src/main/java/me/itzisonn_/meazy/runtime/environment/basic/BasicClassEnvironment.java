@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.interpreter.UnknownIdentifierException;
+import me.itzisonn_.meazy.runtime.values.ArrayValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.clazz.constructor.ConstructorValue;
 import me.itzisonn_.meazy.runtime.values.clazz.constructor.DefaultConstructorValue;
@@ -29,17 +30,17 @@ public class BasicClassEnvironment extends BasicVariableDeclarationEnvironment i
         this.constructors = new ArrayList<>();
     }
 
-    public BasicClassEnvironment(Environment parent, String id) {
-        super(parent, false);
-        this.id = id;
-        this.functions = new ArrayList<>();
-        this.constructors = new ArrayList<>();
-    }
-
-    public void declareFunction(String id, RuntimeValue<?> value) {
+    public void declareFunction(RuntimeValue<?> value) {
+        String id;
         ArrayList<CallArgExpression> args;
-        if (value instanceof FunctionValue functionValue) args = functionValue.getArgs();
-        else if (value instanceof DefaultFunctionValue defaultFunctionValue) args = defaultFunctionValue.getArgs();
+        if (value instanceof FunctionValue functionValue) {
+            id = functionValue.getId();
+            args = functionValue.getArgs();
+        }
+        else if (value instanceof DefaultFunctionValue defaultFunctionValue) {
+            id = defaultFunctionValue.getId();
+            args = defaultFunctionValue.getArgs();
+        }
         else return;
 
         main:
@@ -67,8 +68,12 @@ public class BasicClassEnvironment extends BasicVariableDeclarationEnvironment i
 
     public FunctionDeclarationEnvironment getFunctionEnvironment(String id, ArrayList<RuntimeValue<?>> args) {
         if (getFunction(id, args) != null) return this;
-        if (parent == null || !(parent instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment))
+        if (parent == null || !(parent instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
+            for (RuntimeFunction runtimeFunction : functions) {
+                if (runtimeFunction.getId().equals(id)) throw new UnknownIdentifierException("Function with id " + id + " exists but doesn't match args!");
+            }
             throw new UnknownIdentifierException("Function with id " + id + " doesn't exist!");
+        }
         return functionDeclarationEnvironment.getFunctionEnvironment(id, args);
     }
 
@@ -86,7 +91,13 @@ public class BasicClassEnvironment extends BasicVariableDeclarationEnvironment i
 
                 for (int i = 0; i < args.size(); i++) {
                     CallArgExpression callArgExpression = callArgExpressions.get(i);
-                    if (!callArgExpression.getDataType().isMatches(args.get(i))) continue main;
+                    if (callArgExpression.getArraySize() != null) {
+                        if (!(args.get(i).getFinalRuntimeValue() instanceof ArrayValue arrayValue)) continue main;
+                        for (RuntimeValue<?> runtimeValue : arrayValue.getValue()) {
+                            if (!callArgExpression.getDataType().isMatches(runtimeValue.getFinalRuntimeValue())) continue main;
+                        }
+                    }
+                    else if (!callArgExpression.getDataType().isMatches(args.get(i).getFinalRuntimeValue())) continue main;
                 }
 
                 return runtimeFunction.getFunctionValue();
@@ -124,20 +135,27 @@ public class BasicClassEnvironment extends BasicVariableDeclarationEnvironment i
 
     public RuntimeValue<?> getConstructor(ArrayList<RuntimeValue<?>> args) {
         main:
-        for (RuntimeValue<?> runtimeValue : constructors) {
+        for (RuntimeValue<?> constructor : constructors) {
             ArrayList<CallArgExpression> callArgExpressions;
-            if (runtimeValue instanceof ConstructorValue constructorValue) callArgExpressions = constructorValue.getArgs();
-            else if (runtimeValue instanceof DefaultConstructorValue defaultConstructorValue) callArgExpressions = defaultConstructorValue.getArgs();
+            if (constructor instanceof ConstructorValue constructorValue) callArgExpressions = constructorValue.getArgs();
+            else if (constructor instanceof DefaultConstructorValue defaultConstructorValue) callArgExpressions = defaultConstructorValue.getArgs();
             else continue;
 
             if (args.size() != callArgExpressions.size()) continue;
 
             for (int i = 0; i < args.size(); i++) {
                 CallArgExpression callArgExpression = callArgExpressions.get(i);
-                if (!callArgExpression.getDataType().isMatches(args.get(i))) continue main;
+                if (callArgExpression.getArraySize() != null) {
+                    if (!(args.get(i).getFinalRuntimeValue() instanceof ArrayValue arrayValue)) continue main;
+                    for (RuntimeValue<?> runtimeValue : arrayValue.getValue()) {
+                        if (!callArgExpression.getDataType().isMatches(runtimeValue.getFinalRuntimeValue())) continue main;
+                    }
+                }
+                else if (!callArgExpression.getDataType().isMatches(args.get(i).getFinalRuntimeValue())) continue main;
             }
 
-            return runtimeValue;
+
+            return constructor;
         }
 
         return null;

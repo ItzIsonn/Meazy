@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
@@ -42,13 +43,18 @@ public class FunctionDeclarationStatementConverter implements Converter<Function
                 dataType = DataTypes.parse(object.get("return_data_type").getAsString());
             }
 
+            Expression arraySize = null;
+            if (object.get("array_size") != null) {
+                arraySize = jsonDeserializationContext.deserialize(object.get("array_size"), Expression.class);
+            }
+
             if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException("FunctionDeclarationStatement doesn't have field access_modifiers");
             Set<AccessModifier> accessModifiers = new HashSet<>();
             for (JsonElement accessModifier : object.get("access_modifiers").getAsJsonArray()) {
                 accessModifiers.add(AccessModifiers.parse(accessModifier.getAsString()));
             }
 
-            return new FunctionDeclarationStatement(id, args, body, dataType, accessModifiers);
+            return new FunctionDeclarationStatement(id, args, body, dataType, arraySize, accessModifiers);
         }
 
         throw new InvalidCompiledFileException("Can't deserialize FunctionDeclarationStatement because specified type is null or doesn't match");
@@ -77,6 +83,8 @@ public class FunctionDeclarationStatementConverter implements Converter<Function
             result.addProperty("return_data_type", functionDeclarationStatement.getReturnDataType().getName());
         }
 
+        if (functionDeclarationStatement.getArraySize() != null) result.add("array_size", jsonSerializationContext.serialize(functionDeclarationStatement.getArraySize()));
+
         JsonArray accessModifiers = new JsonArray();
         for (AccessModifier accessModifier : functionDeclarationStatement.getAccessModifiers()) {
             accessModifiers.add(accessModifier.getId());
@@ -84,5 +92,10 @@ public class FunctionDeclarationStatementConverter implements Converter<Function
         result.add("access_modifiers", accessModifiers);
 
         return result;
+    }
+
+    @Override
+    public String getId() {
+        return "function_declaration_statement";
     }
 }

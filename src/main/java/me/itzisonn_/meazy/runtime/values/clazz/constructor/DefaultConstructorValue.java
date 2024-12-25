@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.values.clazz.constructor;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public abstract class DefaultConstructorValue extends RuntimeValue<Object> {
     private final ArrayList<CallArgExpression> args;
     @Setter

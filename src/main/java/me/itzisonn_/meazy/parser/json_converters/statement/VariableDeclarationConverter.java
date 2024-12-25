@@ -23,6 +23,11 @@ public class VariableDeclarationConverter implements Converter<VariableDeclarati
             if (object.get("id") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field id");
             String id = object.get("id").getAsString();
 
+            Expression arraySize = null;
+            if (object.get("array_size") != null) {
+                arraySize = jsonDeserializationContext.deserialize(object.get("array_size"), Expression.class);
+            }
+
             if (object.get("data_type") == null) throw new InvalidCompiledFileException("VariableDeclarationStatement doesn't have field data_type");
             DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
 
@@ -40,7 +45,7 @@ public class VariableDeclarationConverter implements Converter<VariableDeclarati
                 accessModifiers.add(AccessModifiers.parse(accessModifier.getAsString()));
             }
 
-            return new VariableDeclarationStatement(id, dataType, value, isConstant, accessModifiers);
+            return new VariableDeclarationStatement(id, arraySize, dataType, value, isConstant, accessModifiers);
         }
 
         throw new InvalidCompiledFileException("Can't deserialize VariableDeclarationStatement because specified type is null or doesn't match");
@@ -52,6 +57,7 @@ public class VariableDeclarationConverter implements Converter<VariableDeclarati
         result.addProperty("type", "variable_declaration_statement");
 
         result.addProperty("id", variableDeclarationStatement.getId());
+        if (variableDeclarationStatement.getArraySize() != null) result.add("array_size", jsonSerializationContext.serialize(variableDeclarationStatement.getArraySize()));
         result.addProperty("data_type", variableDeclarationStatement.getDataType().getName());
         if (variableDeclarationStatement.getValue() != null) result.add("value", jsonSerializationContext.serialize(variableDeclarationStatement.getValue()));
         result.addProperty("is_constant", variableDeclarationStatement.isConstant());
@@ -63,5 +69,10 @@ public class VariableDeclarationConverter implements Converter<VariableDeclarati
         result.add("access_modifiers", accessModifiers);
 
         return result;
+    }
+
+    @Override
+    public String getId() {
+        return "variable_declaration_statement";
     }
 }

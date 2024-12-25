@@ -45,4 +45,9 @@ public class ProgramConverter implements Converter<Program> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "program";
+    }
 }

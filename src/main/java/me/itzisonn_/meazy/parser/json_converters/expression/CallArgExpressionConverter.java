@@ -4,6 +4,7 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 
@@ -18,13 +19,18 @@ public class CallArgExpressionConverter implements Converter<CallArgExpression> 
             if (object.get("id") == null) throw new InvalidCompiledFileException("CallArgExpression doesn't have field id");
             String id = object.get("id").getAsString();
 
+            Expression arraySize = null;
+            if (object.get("array_size") != null) {
+                arraySize = jsonDeserializationContext.deserialize(object.get("array_size"), Expression.class);
+            }
+
             if (object.get("data_type") == null) throw new InvalidCompiledFileException("CallArgExpression doesn't have field data_type");
             DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
 
             if (object.get("is_constant") == null) throw new InvalidCompiledFileException("CallArgExpression doesn't have field is_constant");
             boolean isConstant = object.get("is_constant").getAsBoolean();
 
-            return new CallArgExpression(id, dataType, isConstant);
+            return new CallArgExpression(id, arraySize, dataType, isConstant);
         }
 
         throw new InvalidCompiledFileException("Can't deserialize CallArgExpression because specified type is null or doesn't match");
@@ -36,9 +42,15 @@ public class CallArgExpressionConverter implements Converter<CallArgExpression> 
         result.addProperty("type", "call_arg_expression");
 
         result.addProperty("id", callArgExpression.getId());
+        if (callArgExpression.getArraySize() != null) result.add("array_size", jsonSerializationContext.serialize(callArgExpression.getArraySize()));
         result.addProperty("data_type", callArgExpression.getDataType().getName());
         result.addProperty("is_constant", callArgExpression.isConstant());
 
         return result;
+    }
+
+    @Override
+    public String getId() {
+        return "call_arg_expression";
     }
 }

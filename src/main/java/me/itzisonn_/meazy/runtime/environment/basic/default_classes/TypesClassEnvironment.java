@@ -22,7 +22,7 @@ public class TypesClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Types");
 
 
-        declareFunction("getType", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("getType", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value == null) return new StringValue("null");
@@ -35,7 +35,7 @@ public class TypesClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction("convert", new DefaultFunctionValue(
+                declareFunction(new DefaultFunctionValue("convert",
                 new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true), new CallArgExpression("type", DataTypes.STRING(), true))),
                 DataTypes.ANY(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {

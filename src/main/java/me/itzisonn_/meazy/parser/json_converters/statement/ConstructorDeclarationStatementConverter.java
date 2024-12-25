@@ -69,4 +69,9 @@ public class ConstructorDeclarationStatementConverter implements Converter<Const
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "constructor_declaration_statement";
+    }
 }

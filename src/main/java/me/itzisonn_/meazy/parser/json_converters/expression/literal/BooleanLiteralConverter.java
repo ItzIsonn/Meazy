@@ -31,4 +31,9 @@ public class BooleanLiteralConverter implements Converter<BooleanLiteral> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "boolean_literal";
+    }
 }

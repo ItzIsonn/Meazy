@@ -40,4 +40,9 @@ public class BinaryExpressionConverter implements Converter<BinaryExpression> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "binary_expression";
+    }
 }

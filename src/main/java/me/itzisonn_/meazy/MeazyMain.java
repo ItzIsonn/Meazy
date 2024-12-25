@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.addons.AddonManager;
 import me.itzisonn_.meazy.addons.Addon;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
+import me.itzisonn_.meazy.parser.json_converters.Converters;
 import me.itzisonn_.meazy.registry.Registries;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -80,7 +81,7 @@ public final class MeazyMain {
             Registries.RUN_FUNCTION.getEntry().getValue().accept(program);
         }
         else if (extension.equals("meac")) {
-            Program program = Utils.GSON.fromJson(Utils.getLines(file), Program.class);
+            Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
             if (program == null) {
                 logger.log(Level.ERROR, "Failed to read file {}, try to run it in the same version of Meazy ({})", file.getAbsolutePath(), version);
                 return;
@@ -149,7 +150,7 @@ public final class MeazyMain {
             }
         }
 
-        String json = Utils.GSON.toJson(program, Program.class);
+        String json = Converters.getGson().toJson(program, Program.class);
 
         try (FileWriter fileWriter = new FileWriter(outputFile)) {
             fileWriter.write(json);
@@ -176,7 +177,7 @@ public final class MeazyMain {
         logger.log(Level.INFO, "Decompiling file '{}'", file.getAbsoluteFile());
 
         long startDecompileMillis = System.currentTimeMillis();
-        Program program = Utils.GSON.fromJson(Utils.getLines(file), Program.class);
+        Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
         if (program == null) {
             logger.log(Level.ERROR, "Failed to read file {}, try to decompile it in the same version of Meazy ({})", file.getAbsolutePath(), version);
             return;

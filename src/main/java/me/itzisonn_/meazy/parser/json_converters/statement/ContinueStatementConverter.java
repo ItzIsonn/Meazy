@@ -26,4 +26,9 @@ public class ContinueStatementConverter implements Converter<ContinueStatement> 
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "continue_statement";
+    }
 }

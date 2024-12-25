@@ -54,6 +54,10 @@ public class TokenTypes {
         return Registries.TOKEN_TYPE.getEntry(RegistryIdentifier.ofDefault("for")).getValue();
     }
 
+    public static TokenType IN() {
+        return Registries.TOKEN_TYPE.getEntry(RegistryIdentifier.ofDefault("in")).getValue();
+    }
+
     public static TokenType WHILE() {
         return Registries.TOKEN_TYPE.getEntry(RegistryIdentifier.ofDefault("while")).getValue();
     }
@@ -108,6 +112,14 @@ public class TokenTypes {
 
     public static TokenType RIGHT_BRACE() {
         return Registries.TOKEN_TYPE.getEntry(RegistryIdentifier.ofDefault("right_brace")).getValue();
+    }
+
+    public static TokenType LEFT_BRACKET() {
+        return Registries.TOKEN_TYPE.getEntry(RegistryIdentifier.ofDefault("left_bracket")).getValue();
+    }
+
+    public static TokenType RIGHT_BRACKET() {
+        return Registries.TOKEN_TYPE.getEntry(RegistryIdentifier.ofDefault("right_bracket")).getValue();
     }
 
     public static TokenType COLON() {
@@ -246,31 +258,31 @@ public class TokenTypes {
 
 
 
-    private static void register(TokenType tokenType) {
-        Registries.TOKEN_TYPE.register(RegistryIdentifier.ofDefault(tokenType.getId()), tokenType);
-    }
-
-
-
     /**
      * Returns TokenType whose pattern matches given string
      *
      * @param string String to match
      * @return TokenType or null if none matched
      * @throws NullPointerException When given string is null
+     * @see Registries#TOKEN_TYPE
      */
     public static TokenType parse(String string) throws NullPointerException {
         if (string == null) throw new NullPointerException("String can't be null");
 
         for (RegistryEntry<TokenType> entry : Registries.TOKEN_TYPE.getEntries()) {
-            Pattern pattern = entry.getValue().getPattern();
-            if (pattern != null && pattern.matcher(string).matches()) return entry.getValue();
+            TokenType tokenType = entry.getValue();
+            Pattern pattern = tokenType.getPattern();
+            if (pattern != null && pattern.matcher(string).matches() && tokenType.getCanMatch().test(string)) return tokenType;
         }
 
         return null;
     }
 
 
+
+    private static void register(TokenType tokenType) {
+        Registries.TOKEN_TYPE.register(RegistryIdentifier.ofDefault(tokenType.getId()), tokenType);
+    }
 
     public static void INIT() {
         if (isInit) throw new IllegalStateException("TokenTypes already initialized!");
@@ -286,6 +298,7 @@ public class TokenTypes {
         register(new TokenType("if", "if", false));
         register(new TokenType("else", "else", false));
         register(new TokenType("for", "for", false));
+        register(new TokenType("in", "in", false));
         register(new TokenType("while", "while", false));
         register(new TokenType("return", "return", false));
         register(new TokenType("continue", "continue", false));
@@ -301,6 +314,8 @@ public class TokenTypes {
         register(new TokenType("right_paren", "\\)", false));
         register(new TokenType("left_brace", "\\{", false));
         register(new TokenType("right_brace", "\\}", false));
+        register(new TokenType("left_bracket", "\\[", false));
+        register(new TokenType("right_bracket", "\\]", false));
         register(new TokenType("colon", ":", false));
         register(new TokenType("semicolon", ";", false));
         register(new TokenType("comma", ",", false));
@@ -335,13 +350,11 @@ public class TokenTypes {
         register(new TokenType("number", "(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?", false));
         register(new TokenType("string", "\"[^\"]*\"", false));
         register(new TokenType("boolean", "true|false", false));
-
-
-
-        StringBuilder keywords = new StringBuilder();
-        for (TokenType tokenType : TokenTypeSets.KEYWORDS.getTokenTypes()) {
-            keywords.append("(?<!").append(tokenType.getPattern().pattern()).append(")");
-        }
-        register(new TokenType("id", Utils.IDENTIFIER_REGEX + keywords, false));
+        register(new TokenType("id", Utils.IDENTIFIER_REGEX, false, s -> {
+            for (TokenType tokenType : TokenTypeSets.KEYWORDS.getTokenTypes()) {
+                if (tokenType.getPattern().matcher(s).matches()) return false;
+            }
+            return true;
+        }));
     }
 }

@@ -40,4 +40,9 @@ public class LogicalExpressionConverter implements Converter<LogicalExpression> 
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "logical_expression";
+    }
 }

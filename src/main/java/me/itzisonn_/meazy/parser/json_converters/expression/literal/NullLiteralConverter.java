@@ -26,4 +26,9 @@ public class NullLiteralConverter implements Converter<NullLiteral> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "null_literal";
+    }
 }

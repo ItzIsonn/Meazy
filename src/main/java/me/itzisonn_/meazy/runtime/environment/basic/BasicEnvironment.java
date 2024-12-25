@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.basic;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;

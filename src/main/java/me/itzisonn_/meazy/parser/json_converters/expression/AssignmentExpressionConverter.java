@@ -36,4 +36,9 @@ public class AssignmentExpressionConverter implements Converter<AssignmentExpres
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "assignment_expression";
+    }
 }

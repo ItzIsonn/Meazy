@@ -18,25 +18,25 @@ public class InputClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Input");
 
 
-        declareFunction("read", new DefaultFunctionValue(new ArrayList<>(), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("read", new ArrayList<>(), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(Utils.SCANNER.next());
             }
         });
 
-        declareFunction("readLine", new DefaultFunctionValue(new ArrayList<>(), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readLine", new ArrayList<>(), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(Utils.SCANNER.nextLine());
             }
         });
 
-        declareFunction("readInt", new DefaultFunctionValue(new ArrayList<>(), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readInt", new ArrayList<>(), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new IntValue(Utils.SCANNER.nextInt());
             }
         });
 
-        declareFunction("readFloat", new DefaultFunctionValue(new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readFloat", new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new DoubleValue(Utils.SCANNER.nextDouble());
             }

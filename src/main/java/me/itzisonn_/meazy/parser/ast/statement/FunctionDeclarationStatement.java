@@ -5,6 +5,8 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -15,13 +17,15 @@ public class FunctionDeclarationStatement implements Statement {
     private final ArrayList<CallArgExpression> args;
     private final ArrayList<Statement> body;
     private final DataType returnDataType;
+    private final Expression arraySize;
     private final Set<AccessModifier> accessModifiers;
 
-    public FunctionDeclarationStatement(String id, ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, Set<AccessModifier> accessModifiers) {
+    public FunctionDeclarationStatement(String id, ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, Expression arraySize, Set<AccessModifier> accessModifiers) {
         this.id = id;
         this.args = args;
         this.body = body;
         this.returnDataType = returnDataType;
+        this.arraySize = arraySize;
         this.accessModifiers = accessModifiers;
     }
 
@@ -40,11 +44,16 @@ public class FunctionDeclarationStatement implements Statement {
 
         String returnDataTypeString = returnDataType == null ? "" : ":" + returnDataType.getName();
 
+        String arrayString;
+        if (arraySize == null) arrayString = "";
+        else if (arraySize instanceof NullLiteral) arrayString = "[]";
+        else arrayString = "[" + arraySize.toCodeString(0) + "]";
+
         StringBuilder bodyBuilder = new StringBuilder();
         for (Statement statement : body) {
             bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
         }
 
-        return accessModifiersBuilder + "function " + id + "(" + argsBuilder + ")" + returnDataTypeString + " {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
+        return accessModifiersBuilder + "function " + id + "(" + argsBuilder + ")" + returnDataTypeString + arrayString + " {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
     }
 }

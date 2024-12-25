@@ -2,17 +2,12 @@ package me.itzisonn_.meazy.parser.json_converters.expression;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.*;
-import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
-import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.Pair;
+import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.registry.RegistryEntry;
 
 import java.lang.reflect.Type;
 
@@ -22,24 +17,13 @@ public class ExpressionConverter implements Converter<Expression> {
         JsonObject object = jsonElement.getAsJsonObject();
 
         if (object.get("type") != null) {
-            return jsonDeserializationContext.deserialize(jsonElement, switch (object.get("type").getAsString()) {
-                case "assignment_expression" -> AssignmentExpression.class;
-                case "binary_expression" -> BinaryExpression.class;
-                case "call_arg_expression" -> CallArgExpression.class;
-                case "comparison_expression" -> ComparisonExpression.class;
-                case "logical_expression" -> LogicalExpression.class;
-                case "member_expression" -> MemberExpression.class;
-                case "class_call_expression" -> ClassCallExpression.class;
-                case "function_call_expression" -> FunctionCallExpression.class;
-                case "class_identifier" -> ClassIdentifier.class;
-                case "function_identifier" -> FunctionIdentifier.class;
-                case "variable_identifier" -> VariableIdentifier.class;
-                case "boolean_literal" -> BooleanLiteral.class;
-                case "null_literal" -> NullLiteral.class;
-                case "number_literal" -> NumberLiteral.class;
-                case "string_literal" -> StringLiteral.class;
-                default -> throw new InvalidCompiledFileException("Can't deserialize Expression because specified type is invalid");
-            });
+            for (RegistryEntry<Pair<Class<? extends Statement>, Converter<? extends Statement>>> entry : Registries.CONVERTERS.getEntries()) {
+                if (Expression.class.isAssignableFrom(entry.getValue().getKey()) &&
+                        object.get("type").getAsString().equals(entry.getValue().getValue().getId())) {
+                    return jsonDeserializationContext.deserialize(jsonElement, entry.getValue().getKey());
+                }
+            }
+            throw new InvalidCompiledFileException("Can't deserialize Expression because specified type is invalid");
         }
 
         throw new InvalidCompiledFileException("Can't deserialize Expression because specified type is null");
@@ -48,5 +32,10 @@ public class ExpressionConverter implements Converter<Expression> {
     @Override
     public JsonElement serialize(Expression expression, Type type, JsonSerializationContext jsonSerializationContext) {
         return jsonSerializationContext.serialize(expression, expression.getClass());
+    }
+
+    @Override
+    public String getId() {
+        return "expression";
     }
 }

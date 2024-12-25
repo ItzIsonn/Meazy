@@ -50,6 +50,7 @@ public final class DataTypes {
      * @param dataType DataType's name
      * @return Existing or created DataType
      * @throws NullPointerException When given DataType's name is null
+     * @see Registries#DATA_TYPE
      */
     public static DataType parse(String dataType) throws NullPointerException {
         if (dataType == null) throw new NullPointerException("DataType's name can't be null");

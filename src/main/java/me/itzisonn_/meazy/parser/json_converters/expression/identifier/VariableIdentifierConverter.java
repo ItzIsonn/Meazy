@@ -31,4 +31,9 @@ public class VariableIdentifierConverter implements Converter<VariableIdentifier
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "variable_identifier";
+    }
 }

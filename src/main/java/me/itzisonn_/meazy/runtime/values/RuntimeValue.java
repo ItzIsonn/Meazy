@@ -1,8 +1,10 @@
 package me.itzisonn_.meazy.runtime.values;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
+@EqualsAndHashCode
 public abstract class RuntimeValue<T> {
     protected final T value;
 

@@ -34,4 +34,9 @@ public class ReturnStatementConverter implements Converter<ReturnStatement> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "return_statement";
+    }
 }

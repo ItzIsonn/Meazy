@@ -45,4 +45,9 @@ public class FunctionIdentifierConverter implements Converter<FunctionIdentifier
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "function_identifier";
+    }
 }

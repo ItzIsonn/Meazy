@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.lexer;
 
 import lombok.Getter;
 
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 @Getter
@@ -9,12 +10,22 @@ public class TokenType {
     private final String id;
     private final Pattern pattern;
     private final boolean shouldSkip;
+    private final Predicate<String> canMatch;
 
     public TokenType(String id, String regex, boolean shouldSkip) {
         this.id = id;
         if (regex == null) pattern = null;
         else this.pattern = Pattern.compile(regex, Pattern.DOTALL);
         this.shouldSkip = shouldSkip;
+        this.canMatch = s -> true;
+    }
+
+    public TokenType(String id, String regex, boolean shouldSkip, Predicate<String> canMatch) {
+        this.id = id;
+        if (regex == null) pattern = null;
+        else this.pattern = Pattern.compile(regex, Pattern.DOTALL);
+        this.shouldSkip = shouldSkip;
+        this.canMatch = canMatch;
     }
 
     @Override

@@ -12,6 +12,7 @@ public class TokenTypeSets {
             TokenTypes.IF(),
             TokenTypes.ELSE(),
             TokenTypes.FOR(),
+            TokenTypes.IN(),
             TokenTypes.WHILE(),
             TokenTypes.RETURN(),
             TokenTypes.CONTINUE(),

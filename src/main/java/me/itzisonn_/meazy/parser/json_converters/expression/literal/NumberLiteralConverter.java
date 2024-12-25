@@ -35,4 +35,9 @@ public class NumberLiteralConverter implements Converter<NumberLiteral> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "number_literal";
+    }
 }

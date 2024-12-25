@@ -12,6 +12,8 @@ import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
+import me.itzisonn_.meazy.parser.json_converters.Converter;
+import me.itzisonn_.meazy.parser.json_converters.Converters;
 import me.itzisonn_.meazy.runtime.environment.basic.*;
 import me.itzisonn_.meazy.runtime.environment.interfaces.*;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
@@ -29,7 +31,9 @@ import java.util.function.Function;
 
 public class Registries {
     public static final SingleRegistry<Function<String, ArrayList<Token>>> TOKENS_FUNCTION = new SingleRegistry<>();
+
     public static final SingleRegistry<Parser> PARSER = new SingleRegistry<>();
+    public static final PairRegistry<Class<? extends Statement>, Converter<? extends Statement>> CONVERTERS = new PairRegistry<>();
 
     public static final PairRegistry<Class<? extends Statement>, EvaluationFunction<? extends Statement>> EVALUATION_FUNCTION = new PairRegistry<>();
     public static final SingleRegistry<Consumer<Program>> RUN_FUNCTION = new SingleRegistry<>();
@@ -52,6 +56,7 @@ public class Registries {
         DataTypes.INIT();
         AccessModifiers.INIT();
         EvaluationFunctions.INIT();
+        Converters.INIT();
 
         Registries.TOKENS_FUNCTION.register(RegistryIdentifier.ofDefault("tokens_function"), lines -> {
             ArrayList<Token> tokens = new ArrayList<>();

@@ -2,10 +2,11 @@ package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.Pair;
+import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.registry.RegistryEntry;
 
 import java.lang.reflect.Type;
 
@@ -15,20 +16,12 @@ public class StatementConverter implements Converter<Statement> {
         JsonObject object = jsonElement.getAsJsonObject();
 
         if (object.get("type") != null) {
-            return jsonDeserializationContext.deserialize(jsonElement, switch (object.get("type").getAsString()) {
-                case "break_statement" -> BreakStatement.class;
-                case "class_declaration_statement" -> ClassDeclarationStatement.class;
-                case "constructor_declaration_statement" -> ConstructorDeclarationStatement.class;
-                case "continue_statement" -> ContinueStatement.class;
-                case "for_statement" -> ForStatement.class;
-                case "function_declaration_statement" -> FunctionDeclarationStatement.class;
-                case "if_statement" -> IfStatement.class;
-                case "program" -> Program.class;
-                case "return_statement" -> ReturnStatement.class;
-                case "variable_declaration_statement" -> VariableDeclarationStatement.class;
-                case "while_statement" -> WhileStatement.class;
-                default -> Expression.class;
-            });
+            for (RegistryEntry<Pair<Class<? extends Statement>, Converter<? extends Statement>>> entry : Registries.CONVERTERS.getEntries()) {
+                if (object.get("type").getAsString().equals(entry.getValue().getValue().getId())) {
+                    return jsonDeserializationContext.deserialize(jsonElement, entry.getValue().getKey());
+                }
+            }
+            throw new InvalidCompiledFileException("Can't deserialize Statement because specified type is invalid");
         }
 
         throw new InvalidCompiledFileException("Can't deserialize Statement because specified type is null");
@@ -37,5 +30,10 @@ public class StatementConverter implements Converter<Statement> {
     @Override
     public JsonElement serialize(Statement statement, Type type, JsonSerializationContext jsonSerializationContext) {
         return jsonSerializationContext.serialize(statement, statement.getClass());
+    }
+
+    @Override
+    public String getId() {
+        return "statement";
     }
 }

@@ -45,4 +45,9 @@ public class ClassDeclarationStatementConverter implements Converter<ClassDeclar
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "class_declaration_statement";
+    }
 }

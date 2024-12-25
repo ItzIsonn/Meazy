@@ -31,4 +31,9 @@ public class ClassIdentifierConverter implements Converter<ClassIdentifier> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "class_identifier";
+    }
 }

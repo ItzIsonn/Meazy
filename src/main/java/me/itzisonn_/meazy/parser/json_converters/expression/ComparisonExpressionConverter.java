@@ -40,4 +40,9 @@ public class ComparisonExpressionConverter implements Converter<ComparisonExpres
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "comparison_expression";
+    }
 }

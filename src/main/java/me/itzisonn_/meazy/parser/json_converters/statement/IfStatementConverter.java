@@ -55,4 +55,9 @@ public class IfStatementConverter implements Converter<IfStatement> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "if_statement";
+    }
 }

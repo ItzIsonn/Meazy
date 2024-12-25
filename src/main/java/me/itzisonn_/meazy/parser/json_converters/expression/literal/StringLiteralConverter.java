@@ -31,4 +31,9 @@ public class StringLiteralConverter implements Converter<StringLiteral> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "string_literal";
+    }
 }

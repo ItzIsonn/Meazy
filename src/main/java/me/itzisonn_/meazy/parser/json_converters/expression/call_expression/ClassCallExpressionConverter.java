@@ -45,4 +45,9 @@ public class ClassCallExpressionConverter implements Converter<ClassCallExpressi
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "class_call_expression";
+    }
 }

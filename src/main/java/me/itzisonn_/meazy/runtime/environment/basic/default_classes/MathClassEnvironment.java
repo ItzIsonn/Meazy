@@ -21,139 +21,128 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Math");
 
 
-        declareVariable("PI", DataTypes.FLOAT(), new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
-        declareVariable("E", DataTypes.FLOAT(), new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
+        declareVariable("PI", null, DataTypes.FLOAT(), new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
+        declareVariable("E", null, DataTypes.FLOAT(), new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
 
 
-        declareFunction("round", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("round", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof Number number) {
-                    return new IntValue((int) Math.round(number.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue doubleValue) {
+                    return new IntValue((int) Math.round(doubleValue.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't round non-number value");
             }
         });
 
-        declareFunction("floor", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("floor", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof Number number) {
-                    return new IntValue((int) Math.floor(number.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue doubleValue) {
+                    return new IntValue((int) Math.floor(doubleValue.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't round non-number value");
             }
         });
 
-        declareFunction("ceil", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("ceil", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof Number number) {
-                    return new IntValue((int) Math.ceil(number.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue doubleValue) {
+                    return new IntValue((int) Math.ceil(doubleValue.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't round non-number value");
             }
         });
 
-        declareFunction("pow", new DefaultFunctionValue(
+        declareFunction(new DefaultFunctionValue("pow",
+                new ArrayList<>(List.of(new CallArgExpression("number", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
+                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue numberValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue degreeValue) {
+                    return new DoubleValue(Math.pow(numberValue.getValue(), degreeValue.getValue()));
+                }
+                throw new InvalidSyntaxException("Can't get power non-number value");
+            }
+        });
+
+        declareFunction(new DefaultFunctionValue("abs", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue number) {
+                    return new DoubleValue(Math.abs(number.getValue()));
+                }
+                throw new InvalidSyntaxException("Can't get abs value of non-number value");
+            }
+        });
+
+        declareFunction(new DefaultFunctionValue("min",
                 new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
                 DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                Object degree = functionArgs.get(1).getFinalValue();
-                if (value instanceof Number number && degree instanceof Number degreeNumber) {
-                    return new DoubleValue(Math.pow(number.doubleValue(), degreeNumber.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue numberValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue degreeValue) {
+                    return new DoubleValue(Math.min(numberValue.getValue(), degreeValue.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't get min of non-number values");
             }
         });
 
-        declareFunction("abs", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof Number number) {
-                    return new DoubleValue(Math.abs(number.doubleValue()));
-                }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
-            }
-        });
-
-        declareFunction("min", new DefaultFunctionValue(
+        declareFunction(new DefaultFunctionValue("max",
                 new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
                 DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                Object degree = functionArgs.get(1).getFinalValue();
-                if (value instanceof Number number && degree instanceof Number degreeNumber) {
-                    return new DoubleValue(Math.min(number.doubleValue(), degreeNumber.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue numberValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue degreeValue) {
+                    return new DoubleValue(Math.max(numberValue.getValue(), degreeValue.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't get max of non-number values");
             }
         });
 
-        declareFunction("max", new DefaultFunctionValue(
-                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
-                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("randomInt", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                Object degree = functionArgs.get(1).getFinalValue();
-                if (value instanceof Number number && degree instanceof Number degreeNumber) {
-                    return new DoubleValue(Math.max(number.doubleValue(), degreeNumber.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue number) {
+                    return new IntValue(Utils.RANDOM.nextInt(number.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't get random of non-int value");
             }
         });
 
-        declareFunction("randomInt", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof Number number) {
-                    return new IntValue(Utils.RANDOM.nextInt(number.intValue()));
-                }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
-            }
-        });
-
-        declareFunction("randomInt", new DefaultFunctionValue(
+        declareFunction(new DefaultFunctionValue("randomInt",
                 new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT(), true), new CallArgExpression("end", DataTypes.INT(), true))),
                 DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object begin = functionArgs.getFirst().getFinalValue();
-                Object end = functionArgs.get(1).getFinalValue();
-                if (begin instanceof Number beginNumber && end instanceof Number endNumber) {
-                    return new IntValue(Utils.RANDOM.nextInt(beginNumber.intValue(), endNumber.intValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue beginValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof IntValue endValue) {
+                    return new IntValue(Utils.RANDOM.nextInt(beginValue.getValue(), endValue.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't get random of non-int values");
             }
         });
 
-        declareFunction("randomFloat", new DefaultFunctionValue(new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new DoubleValue(Utils.RANDOM.nextDouble());
             }
         });
 
 
-        declareFunction("randomFloat", new DefaultFunctionValue(new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof Number number) {
-                    return new DoubleValue(Utils.RANDOM.nextDouble(number.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue number) {
+                    return new DoubleValue(Utils.RANDOM.nextDouble(number.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't get random of non-number value");
             }
         });
 
-        declareFunction("randomFloat", new DefaultFunctionValue(
+        declareFunction(new DefaultFunctionValue("randomFloat",
                 new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.FLOAT(), true), new CallArgExpression("end", DataTypes.FLOAT(), true))),
                 DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object begin = functionArgs.getFirst().getFinalValue();
-                Object end = functionArgs.get(1).getFinalValue();
-                if (begin instanceof Number beginNumber && end instanceof Number endNumber) {
-                    return new DoubleValue(Utils.RANDOM.nextDouble(beginNumber.doubleValue(), endNumber.doubleValue()));
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue beginValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue endValue) {
+                    return new DoubleValue(Utils.RANDOM.nextDouble(beginValue.getValue(), endValue.getValue()));
                 }
-                throw new InvalidSyntaxException("Can't get length of non-string value");
+                throw new InvalidSyntaxException("Can't get random of non-number values");
             }
         });
     }

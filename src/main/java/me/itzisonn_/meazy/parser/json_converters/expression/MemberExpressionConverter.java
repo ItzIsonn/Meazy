@@ -36,4 +36,9 @@ public class MemberExpressionConverter implements Converter<MemberExpression> {
 
         return result;
     }
+
+    @Override
+    public String getId() {
+        return "member_expression";
+    }
 }

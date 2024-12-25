@@ -28,8 +28,9 @@ public final class AccessModifiers {
      * @return Existing AccessModifier
      * @throws NullPointerException When given AccessModifier's name is null
      * @throws IllegalArgumentException When no existing AccessModifiers doesn't have given AccessModifier's name
+     * @see Registries#ACCESS_MODIFIER
      */
-    public static AccessModifier parse(String accessModifier) throws NullPointerException {
+    public static AccessModifier parse(String accessModifier) throws NullPointerException, IllegalArgumentException {
         if (accessModifier == null) throw new NullPointerException("AccessModifier's name can't be null");
 
         RegistryEntry<AccessModifier> entry = Registries.ACCESS_MODIFIER.getEntry(RegistryIdentifier.ofDefault(accessModifier));
