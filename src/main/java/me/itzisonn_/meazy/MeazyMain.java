@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public final class MeazyMain {
     @Getter
-    private static final String version = "2.1";
+    private static final String version = "2.1.1";
     @Getter
     private static final MeazyMain instance = new MeazyMain();
     @Getter

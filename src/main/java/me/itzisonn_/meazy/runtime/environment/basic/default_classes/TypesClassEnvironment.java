@@ -35,7 +35,7 @@ public class TypesClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-                declareFunction(new DefaultFunctionValue("convert",
+        declareFunction(new DefaultFunctionValue("convert",
                 new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true), new CallArgExpression("type", DataTypes.STRING(), true))),
                 DataTypes.ANY(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {

@@ -97,6 +97,19 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
+        declareFunction(new DefaultFunctionValue("factorial", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue numberValue) {
+                    int result = 1;
+                    for (int i = 1; i <= numberValue.getValue(); i++) {
+                        result = result * i;
+                    }
+                    return new IntValue(result);
+                }
+                throw new InvalidSyntaxException("Can't get factorial of non-int value");
+            }
+        });
+
         declareFunction(new DefaultFunctionValue("randomInt", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue number) {

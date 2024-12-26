@@ -11,7 +11,7 @@ public final class Interpreter {
     private Interpreter() {}
 
     @SuppressWarnings("unchecked")
-    public static RuntimeValue<?> evaluate(Statement statement, Environment environment, Environment... extra) {
+    public static RuntimeValue<?> evaluate(Statement statement, Environment environment, Object... extra) {
         if (statement == null) throw new NullPointerException("Statement can't be null!");
 
         EvaluationFunction<Statement> evaluationFunction = (EvaluationFunction<Statement>) getEvaluationFunctionOrNull(statement.getClass());

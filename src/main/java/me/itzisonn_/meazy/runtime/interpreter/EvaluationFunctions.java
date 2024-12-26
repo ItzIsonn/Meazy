@@ -567,12 +567,15 @@ public class EvaluationFunctions {
         });
 
         register("function_call_expression", FunctionCallExpression.class, (functionCallExpression, environment, extra) -> {
-            Environment extraEnvironment = extra.length == 0 ? environment : extra[0];
+            Environment extraEnvironment;
+            if (extra.length == 0) extraEnvironment = environment;
+            else if (extra[0] instanceof Environment extraEnv) extraEnvironment = extraEnv;
+            else extraEnvironment = environment;
 
             ArrayList<RuntimeValue<?>> args = new ArrayList<>();
             functionCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment)));
 
-            RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, extraEnvironment);
+            RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, args);
 
             if (function instanceof DefaultFunctionValue defaultFunctionValue) {
                 if (defaultFunctionValue.getArgs().size() != args.size()) {
@@ -673,7 +676,10 @@ public class EvaluationFunctions {
         });
 
         register("class_call_expression", ClassCallExpression.class, (classCallExpression, environment, extra) -> {
-            Environment extraEnvironment = extra.length == 0 ? environment : extra[0];
+            Environment extraEnvironment;
+            if (extra.length == 0) extraEnvironment = environment;
+            else if (extra[0] instanceof Environment extraEnv) extraEnvironment = extraEnv;
+            else extraEnvironment = environment;
 
             ArrayList<RuntimeValue<?>> args = new ArrayList<>();
             classCallExpression.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extraEnvironment)));
@@ -838,7 +844,7 @@ public class EvaluationFunctions {
 
         register("identifier", Identifier.class, new EvaluationFunction<>() {
             @Override
-            public RuntimeValue<?> evaluateStatement(Identifier identifier, Environment environment, Environment... extra) {
+            public RuntimeValue<?> evaluateStatement(Identifier identifier, Environment environment, Object... extra) {
                 if (identifier instanceof VariableIdentifier) {
                     RuntimeVariable runtimeVariable = environment.getVariableEnvironment(identifier.getId()).getVariable(identifier.getId());
                     if (runtimeVariable != null) {
@@ -854,9 +860,16 @@ public class EvaluationFunctions {
                     throw new InvalidIdentifierException("Variable with identifier " + identifier.getId() + " doesn't exist");
                 }
 
-                if (identifier instanceof FunctionIdentifier functionIdentifier) {
+                if (identifier instanceof FunctionIdentifier) {
                     ArrayList<RuntimeValue<?>> args = new ArrayList<>();
-                    functionIdentifier.getArgs().forEach(arg -> args.add(Interpreter.evaluate(arg, extra[0])));
+                    if (extra.length == 0) throw new RuntimeException("Can't find function without args");
+                    if (extra[0] instanceof ArrayList<?> rawArgs) {
+                        for (Object object : rawArgs) {
+                            if (object instanceof RuntimeValue<?> runtimeValue) args.add(runtimeValue);
+                        }
+                    }
+                    else throw new RuntimeException("Invalid function args");
+
                     RuntimeValue<?> runtimeFunction = environment.getFunctionEnvironment(identifier.getId(), args).getFunction(identifier.getId(), args);
 
                     if (runtimeFunction != null) {

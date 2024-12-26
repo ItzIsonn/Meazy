@@ -24,7 +24,7 @@ public class ArraysClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Arrays");
 
 
-        declareFunction(new DefaultFunctionValue("size", new ArrayList<>(List.of(new CallArgExpression("array", new NullLiteral(), DataTypes.ANY(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("getSize", new ArrayList<>(List.of(new CallArgExpression("array", new NullLiteral(), DataTypes.ANY(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof ArrayList<?> arrayList) {

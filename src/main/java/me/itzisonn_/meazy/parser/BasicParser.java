@@ -657,11 +657,7 @@ public class BasicParser implements Parser {
                     (tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.DOT()) && pos != 0 && !tokens.get(pos - 1).getType().equals(TokenTypes.DOT())))
                 identifier = new ClassIdentifier(getCurrentAndRemove().getValue());
             else if (tokens.size() > pos + 1 && tokens.get(pos + 1).getType().equals(TokenTypes.LEFT_PAREN())) {
-                String value = getCurrentAndRemove().getValue();
-                int currentPos = pos;
-                ArrayList<Expression> args = parseCallArgs();
-                pos = currentPos;
-                identifier = new FunctionIdentifier(value, args);
+                identifier = new FunctionIdentifier(getCurrentAndRemove().getValue());
             }
             else identifier = new VariableIdentifier(getCurrentAndRemove().getValue());
 

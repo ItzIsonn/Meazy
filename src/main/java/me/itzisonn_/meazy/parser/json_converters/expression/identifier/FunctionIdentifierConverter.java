@@ -1,13 +1,11 @@
 package me.itzisonn_.meazy.parser.json_converters.expression.identifier;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 public class FunctionIdentifierConverter implements Converter<FunctionIdentifier> {
     @Override
@@ -18,13 +16,7 @@ public class FunctionIdentifierConverter implements Converter<FunctionIdentifier
             if (object.get("id") == null) throw new InvalidCompiledFileException("FunctionIdentifier doesn't have field id");
             String id = object.get("id").getAsString();
 
-            if (object.get("args") == null) throw new InvalidCompiledFileException("FunctionIdentifier doesn't have field args");
-            ArrayList<Expression> args = new ArrayList<>();
-            for (JsonElement arg : object.get("args").getAsJsonArray()) {
-                args.add(jsonDeserializationContext.deserialize(arg, Expression.class));
-            }
-
-            return new FunctionIdentifier(id, args);
+            return new FunctionIdentifier(id);
         }
 
         throw new InvalidCompiledFileException("Can't deserialize FunctionIdentifier because specified type is null or doesn't match");
@@ -36,12 +28,6 @@ public class FunctionIdentifierConverter implements Converter<FunctionIdentifier
         result.addProperty("type", "function_identifier");
 
         result.addProperty("id", functionIdentifier.getId());
-
-        JsonArray args = new JsonArray();
-        for (Expression arg : functionIdentifier.getArgs()) {
-            args.add(jsonSerializationContext.serialize(arg));
-        }
-        result.add("args", args);
 
         return result;
     }

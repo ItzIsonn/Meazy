@@ -201,6 +201,30 @@ public class StringClassEnvironment extends BasicClassEnvironment {
             }
         });
 
+        declareFunction(new DefaultFunctionValue("startsWith", new ArrayList<>(List.of(new CallArgExpression("target", DataTypes.STRING(), true))), DataTypes.BOOLEAN(), this, new HashSet<>()) {
+            @Override
+            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
+
+                if (value instanceof String string) {
+                    return new BooleanValue(string.startsWith(functionArgs.getFirst().getFinalValue().toString()));
+                }
+                throw new InvalidSyntaxException("Value must be string");
+            }
+        });
+
+        declareFunction(new DefaultFunctionValue("endsWith", new ArrayList<>(List.of(new CallArgExpression("target", DataTypes.STRING(), true))), DataTypes.BOOLEAN(), this, new HashSet<>()) {
+            @Override
+            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
+
+                if (value instanceof String string) {
+                    return new BooleanValue(string.endsWith(functionArgs.getFirst().getFinalValue().toString()));
+                }
+                throw new InvalidSyntaxException("Value must be string");
+            }
+        });
+
         declareFunction(new DefaultFunctionValue("repeat", new ArrayList<>(List.of(new CallArgExpression("count", DataTypes.INT(), true))), DataTypes.STRING(), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
@@ -236,30 +260,6 @@ public class StringClassEnvironment extends BasicClassEnvironment {
                     }
                     functionEnvironment.getVariableEnvironment("value").assignVariable("value", new StringValue(string.trim()));
                     return new StringValue(classEnvironment);
-                }
-                throw new InvalidSyntaxException("Value must be string");
-            }
-        });
-
-        declareFunction(new DefaultFunctionValue("startsWith", new ArrayList<>(List.of(new CallArgExpression("target", DataTypes.STRING(), true))), DataTypes.BOOLEAN(), this, new HashSet<>()) {
-            @Override
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
-
-                if (value instanceof String string) {
-                    return new BooleanValue(string.startsWith(functionArgs.getFirst().getFinalValue().toString()));
-                }
-                throw new InvalidSyntaxException("Value must be string");
-            }
-        });
-
-        declareFunction(new DefaultFunctionValue("endsWith", new ArrayList<>(List.of(new CallArgExpression("target", DataTypes.STRING(), true))), DataTypes.BOOLEAN(), this, new HashSet<>()) {
-            @Override
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionEnvironment.getVariableEnvironment("value").getVariable("value").getValue().getValue();
-
-                if (value instanceof String string) {
-                    return new BooleanValue(string.endsWith(functionArgs.getFirst().getFinalValue().toString()));
                 }
                 throw new InvalidSyntaxException("Value must be string");
             }
