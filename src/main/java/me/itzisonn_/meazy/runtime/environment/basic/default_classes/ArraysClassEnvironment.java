@@ -66,6 +66,7 @@ public class ArraysClassEnvironment extends BasicClassEnvironment {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value instanceof ArrayList<?> arrayList) {
                     StringBuilder toReturn = new StringBuilder();
+                    toReturn.append("[");
                     for (int i = 0; i < arrayList.size(); i++) {
                         Object object = arrayList.get(i);
                         if (object instanceof RuntimeValue<?> runtimeValue) {
@@ -74,6 +75,7 @@ public class ArraysClassEnvironment extends BasicClassEnvironment {
                         else toReturn.append(object);
                         if (i < arrayList.size() - 1) toReturn.append(", ");
                     }
+                    toReturn.append("]");
                     return new StringValue(toReturn.toString());
                 }
                 throw new InvalidSyntaxException("Can't get string value of non-array value");
