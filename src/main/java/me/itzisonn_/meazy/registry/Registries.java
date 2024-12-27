@@ -2,6 +2,8 @@ package me.itzisonn_.meazy.registry;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.command.Command;
+import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
@@ -31,14 +33,16 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Registries {
+    public static final SetRegistry<Command> COMMANDS = new SetRegistry<>();
+
     public static final SingleRegistry<Function<String, ArrayList<Token>>> TOKENS_FUNCTION = new SingleRegistry<>();
 
-    public static final SetRegistry<ParsingFunction<? extends Statement>> PARSING_FUNCTION = new SetRegistry<>();
+    public static final SetRegistry<ParsingFunction<? extends Statement>> PARSING_FUNCTIONS = new SetRegistry<>();
     public static final SingleRegistry<Function<ArrayList<Token>, Program>> PARSE_TOKENS_FUNCTION = new SingleRegistry<>();
 
     public static final PairRegistry<Class<? extends Statement>, Converter<? extends Statement>> CONVERTERS = new PairRegistry<>();
 
-    public static final PairRegistry<Class<? extends Statement>, EvaluationFunction<? extends Statement>> EVALUATION_FUNCTION = new PairRegistry<>();
+    public static final PairRegistry<Class<? extends Statement>, EvaluationFunction<? extends Statement>> EVALUATION_FUNCTIONS = new PairRegistry<>();
     public static final SingleRegistry<Consumer<Program>> EVALUATE_PROGRAM_FUNCTION = new SingleRegistry<>();
 
     public static final SingleRegistry<GlobalEnvironment> GLOBAL_ENVIRONMENT = new SingleRegistry<>();
@@ -48,13 +52,14 @@ public class Registries {
     public static final SingleRegistry<Class<? extends LoopEnvironment>> LOOP_ENVIRONMENT = new SingleRegistry<>();
     public static final SingleRegistry<Class<? extends Environment>> ENVIRONMENT = new SingleRegistry<>();
 
-    public static final SetRegistry<TokenType> TOKEN_TYPE = new SetRegistry<>();
-    public static final SetRegistry<DataType> DATA_TYPE = new SetRegistry<>();
-    public static final SetRegistry<AccessModifier> ACCESS_MODIFIER = new SetRegistry<>();
+    public static final SetRegistry<TokenType> TOKEN_TYPES = new SetRegistry<>();
+    public static final SetRegistry<DataType> DATA_TYPES = new SetRegistry<>();
+    public static final SetRegistry<AccessModifier> ACCESS_MODIFIERS = new SetRegistry<>();
 
 
 
     public static void INIT() {
+        Commands.INIT();
         TokenTypes.INIT();
         DataTypes.INIT();
         AccessModifiers.INIT();

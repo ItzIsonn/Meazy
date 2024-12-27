@@ -1078,6 +1078,6 @@ public class EvaluationFunctions {
 
 
     private static <T extends Statement> void register(String id, Class<T> cls, EvaluationFunction<T> evaluationFunction) {
-        Registries.EVALUATION_FUNCTION.register(RegistryIdentifier.ofDefault(id), cls, evaluationFunction);
+        Registries.EVALUATION_FUNCTIONS.register(RegistryIdentifier.ofDefault(id), cls, evaluationFunction);
     }
 }

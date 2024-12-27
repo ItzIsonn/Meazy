@@ -12,11 +12,11 @@ public final class AccessModifiers {
 
 
     public static AccessModifier PRIVATE() {
-        return Registries.ACCESS_MODIFIER.getEntry(RegistryIdentifier.ofDefault("private")).getValue();
+        return Registries.ACCESS_MODIFIERS.getEntry(RegistryIdentifier.ofDefault("private")).getValue();
     }
 
     public static AccessModifier SHARED() {
-        return Registries.ACCESS_MODIFIER.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
+        return Registries.ACCESS_MODIFIERS.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
     }
 
 
@@ -28,12 +28,12 @@ public final class AccessModifiers {
      * @return Existing AccessModifier
      * @throws NullPointerException When given AccessModifier's name is null
      * @throws IllegalArgumentException When no existing AccessModifiers doesn't have given AccessModifier's name
-     * @see Registries#ACCESS_MODIFIER
+     * @see Registries#ACCESS_MODIFIERS
      */
     public static AccessModifier parse(String accessModifier) throws NullPointerException, IllegalArgumentException {
         if (accessModifier == null) throw new NullPointerException("AccessModifier's name can't be null");
 
-        RegistryEntry<AccessModifier> entry = Registries.ACCESS_MODIFIER.getEntry(RegistryIdentifier.ofDefault(accessModifier));
+        RegistryEntry<AccessModifier> entry = Registries.ACCESS_MODIFIERS.getEntry(RegistryIdentifier.ofDefault(accessModifier));
         if (entry == null) throw new IllegalArgumentException("Unknown AccessModifier with name " + accessModifier);
 
         return entry.getValue();
@@ -42,7 +42,7 @@ public final class AccessModifiers {
 
 
     private static void register(String id) {
-        Registries.ACCESS_MODIFIER.register(RegistryIdentifier.ofDefault(id), new AccessModifier(id));
+        Registries.ACCESS_MODIFIERS.register(RegistryIdentifier.ofDefault(id), new AccessModifier(id));
     }
 
     public static void INIT() {

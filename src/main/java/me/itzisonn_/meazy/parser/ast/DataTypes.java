@@ -23,23 +23,23 @@ public final class DataTypes {
 
 
     public static DataType ANY() {
-        return Registries.DATA_TYPE.getEntry(RegistryIdentifier.ofDefault("any")).getValue();
+        return Registries.DATA_TYPES.getEntry(RegistryIdentifier.ofDefault("any")).getValue();
     }
 
     public static DataType BOOLEAN() {
-        return Registries.DATA_TYPE.getEntry(RegistryIdentifier.ofDefault("boolean")).getValue();
+        return Registries.DATA_TYPES.getEntry(RegistryIdentifier.ofDefault("boolean")).getValue();
     }
 
     public static DataType INT() {
-        return Registries.DATA_TYPE.getEntry(RegistryIdentifier.ofDefault("int")).getValue();
+        return Registries.DATA_TYPES.getEntry(RegistryIdentifier.ofDefault("int")).getValue();
     }
 
     public static DataType FLOAT() {
-        return Registries.DATA_TYPE.getEntry(RegistryIdentifier.ofDefault("float")).getValue();
+        return Registries.DATA_TYPES.getEntry(RegistryIdentifier.ofDefault("float")).getValue();
     }
 
     public static DataType STRING() {
-        return Registries.DATA_TYPE.getEntry(RegistryIdentifier.ofDefault("string")).getValue();
+        return Registries.DATA_TYPES.getEntry(RegistryIdentifier.ofDefault("string")).getValue();
     }
 
 
@@ -50,12 +50,12 @@ public final class DataTypes {
      * @param dataType DataType's name
      * @return Existing or created DataType
      * @throws NullPointerException When given DataType's name is null
-     * @see Registries#DATA_TYPE
+     * @see Registries#DATA_TYPES
      */
     public static DataType parse(String dataType) throws NullPointerException {
         if (dataType == null) throw new NullPointerException("DataType's name can't be null");
 
-        for (RegistryEntry<DataType> entry : Registries.DATA_TYPE.getEntries()) {
+        for (RegistryEntry<DataType> entry : Registries.DATA_TYPES.getEntries()) {
             if (entry.getValue().getName().equals(dataType)) {
                 return entry.getValue();
             }
@@ -73,7 +73,7 @@ public final class DataTypes {
 
 
     private static void register(String id, Predicate<Object> predicate) {
-        Registries.DATA_TYPE.register(RegistryIdentifier.ofDefault(id), new DataType(id) {
+        Registries.DATA_TYPES.register(RegistryIdentifier.ofDefault(id), new DataType(id) {
             public boolean isMatches(Object value) {
                 return predicate.test(value);
             }

@@ -70,7 +70,7 @@ public final class Parser {
     }
 
     private static ParsingFunction<? extends Statement> getParsingFunctionOrNull(RegistryIdentifier identifier) {
-        RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTION.getEntry(identifier);
+        RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTIONS.getEntry(identifier);
         if (entry == null) return null;
         return entry.getValue();
     }

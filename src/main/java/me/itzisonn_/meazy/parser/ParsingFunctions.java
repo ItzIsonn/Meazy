@@ -706,6 +706,6 @@ public class ParsingFunctions {
 
 
     private static void register(String id, ParsingFunction<? extends Statement> parsingFunction) {
-        Registries.PARSING_FUNCTION.register(RegistryIdentifier.ofDefault(id), parsingFunction);
+        Registries.PARSING_FUNCTIONS.register(RegistryIdentifier.ofDefault(id), parsingFunction);
     }
 }

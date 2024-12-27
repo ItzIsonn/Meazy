@@ -21,7 +21,7 @@ public class StatementConverter implements Converter<Statement> {
                     return jsonDeserializationContext.deserialize(jsonElement, entry.getValue().getKey());
                 }
             }
-            throw new InvalidCompiledFileException("Can't deserialize Statement because specified type is invalid");
+            throw new InvalidCompiledFileException("Can't deserialize Statement because specified type (" + object.get("type").getAsString() + ") is invalid");
         }
 
         throw new InvalidCompiledFileException("Can't deserialize Statement because specified type is null");

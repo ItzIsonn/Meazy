@@ -28,7 +28,7 @@ public final class Interpreter {
     }
 
     private static EvaluationFunction<? extends Statement> getEvaluationFunctionOrNull(Class<? extends Statement> cls) {
-        RegistryEntry<Pair<Class<? extends Statement>, EvaluationFunction<? extends Statement>>> entry = Registries.EVALUATION_FUNCTION.getEntry(cls);
+        RegistryEntry<Pair<Class<? extends Statement>, EvaluationFunction<? extends Statement>>> entry = Registries.EVALUATION_FUNCTIONS.getEntry(cls);
         if (entry == null) return null;
         return entry.getValue().getValue();
     }
