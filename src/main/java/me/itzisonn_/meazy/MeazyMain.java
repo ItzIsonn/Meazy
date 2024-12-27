@@ -77,8 +77,8 @@ public final class MeazyMain {
         long startRunMillis = System.currentTimeMillis();
         if (extension.equals("mea")) {
             ArrayList<Token> tokens = Registries.TOKENS_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
-            Program program = Registries.PARSER.getEntry().getValue().produceAST(tokens);
-            Registries.RUN_FUNCTION.getEntry().getValue().accept(program);
+            Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
+            Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
         }
         else if (extension.equals("meac")) {
             Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
@@ -94,7 +94,7 @@ public final class MeazyMain {
                 logger.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), version);
                 return;
             }
-            Registries.RUN_FUNCTION.getEntry().getValue().accept(program);
+            Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
         }
         else {
             logger.log(Level.ERROR, "Can't run file with extension {}", extension);
@@ -124,7 +124,7 @@ public final class MeazyMain {
         long startCompileMillis = System.currentTimeMillis();
         ArrayList<Token> tokens = Registries.TOKENS_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
 
-        Program program = Registries.PARSER.getEntry().getValue().produceAST(tokens);
+        Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
         long endCompileMillis = System.currentTimeMillis();
 
 

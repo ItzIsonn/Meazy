@@ -3,8 +3,9 @@ package me.itzisonn_.meazy.registry;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.lexer.*;
-import me.itzisonn_.meazy.parser.BasicParser;
 import me.itzisonn_.meazy.parser.Parser;
+import me.itzisonn_.meazy.parser.ParsingFunction;
+import me.itzisonn_.meazy.parser.ParsingFunctions;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
@@ -32,11 +33,13 @@ import java.util.function.Function;
 public class Registries {
     public static final SingleRegistry<Function<String, ArrayList<Token>>> TOKENS_FUNCTION = new SingleRegistry<>();
 
-    public static final SingleRegistry<Parser> PARSER = new SingleRegistry<>();
+    public static final SetRegistry<ParsingFunction<? extends Statement>> PARSING_FUNCTION = new SetRegistry<>();
+    public static final SingleRegistry<Function<ArrayList<Token>, Program>> PARSE_TOKENS_FUNCTION = new SingleRegistry<>();
+
     public static final PairRegistry<Class<? extends Statement>, Converter<? extends Statement>> CONVERTERS = new PairRegistry<>();
 
     public static final PairRegistry<Class<? extends Statement>, EvaluationFunction<? extends Statement>> EVALUATION_FUNCTION = new PairRegistry<>();
-    public static final SingleRegistry<Consumer<Program>> RUN_FUNCTION = new SingleRegistry<>();
+    public static final SingleRegistry<Consumer<Program>> EVALUATE_PROGRAM_FUNCTION = new SingleRegistry<>();
 
     public static final SingleRegistry<GlobalEnvironment> GLOBAL_ENVIRONMENT = new SingleRegistry<>();
     public static final SingleRegistry<Class<? extends ClassEnvironment>> CLASS_ENVIRONMENT = new SingleRegistry<>();
@@ -55,10 +58,11 @@ public class Registries {
         TokenTypes.INIT();
         DataTypes.INIT();
         AccessModifiers.INIT();
+        ParsingFunctions.INIT();
         EvaluationFunctions.INIT();
         Converters.INIT();
 
-        Registries.TOKENS_FUNCTION.register(RegistryIdentifier.ofDefault("tokens_function"), lines -> {
+        TOKENS_FUNCTION.register(RegistryIdentifier.ofDefault("tokens_function"), lines -> {
             ArrayList<Token> tokens = new ArrayList<>();
             TokenType tokenType;
             TokenType lastMatched = null;
@@ -104,9 +108,22 @@ public class Registries {
             return newTokens;
         });
 
-        Registries.PARSER.register(RegistryIdentifier.ofDefault("parser"), new BasicParser());
+        PARSE_TOKENS_FUNCTION.register(RegistryIdentifier.ofDefault("parse_tokens"), tokens -> {
+            if (tokens == null) throw new NullPointerException("Tokens can't be null!");
+            Parser.setTokens(tokens);
 
-        Registries.RUN_FUNCTION.register(RegistryIdentifier.ofDefault("run_function"), program -> {
+            Parser.moveOverOptionalNewLine();
+
+            ArrayList<Statement> body = new ArrayList<>();
+            while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
+                Statement statement = Parser.parse(RegistryIdentifier.ofDefault("global_statement"), Statement.class);
+                body.add(statement);
+            }
+
+            return new Program(MeazyMain.getVersion(), body);
+        });
+
+        EVALUATE_PROGRAM_FUNCTION.register(RegistryIdentifier.ofDefault("evaluate_program"), program -> {
             Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
 
             RuntimeValue<?> runtimeValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getFunction("main", new ArrayList<>());
