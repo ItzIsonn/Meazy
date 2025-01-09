@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.registry.RegistryEntry;
 /**
  * Registry with only one possible entry
  *
- * @param <T> Entry's value type
+ * @param <T> Entry's type
  */
 public interface SingleEntryRegistry<T> extends Registry<T> {
     /**

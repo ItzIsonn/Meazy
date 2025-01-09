@@ -9,7 +9,7 @@ import java.util.Collection;
 /**
  * Registry with many possible entries
  *
- * @param <T> Entries' value type
+ * @param <T> Entries' type
  */
 public interface MultipleEntryRegistry<T> extends Registry<T> {
     /**

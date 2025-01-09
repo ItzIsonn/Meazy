@@ -7,7 +7,7 @@ package me.itzisonn_.meazy.registry;
  * @see RegistryEntry
  * @see RegistryIdentifier
  *
- * @param <T> Entry's value type
+ * @param <T> Entry's type
  */
 public interface Registry<T> {
     /**

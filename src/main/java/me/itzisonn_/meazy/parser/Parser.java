@@ -115,14 +115,14 @@ public final class Parser {
      *
      * @throws NullPointerException If identifier or cls is null
      * @throws IllegalArgumentException If can't find ParsingFunction with given identifier
-     *         or return value type of ParsingFunction doesn't match requested
+     *         or return type of ParsingFunction doesn't match requested
      */
     @SuppressWarnings("unchecked")
     public static <T extends Statement> T parse(RegistryIdentifier identifier, Class<T> cls, Object... extra) throws NullPointerException, IllegalArgumentException {
         if (cls == null) throw new NullPointerException("Class can't be null!");
 
         Statement statement = parse(identifier, extra);
-        if (!cls.isInstance(statement)) throw new IllegalArgumentException("Return value type of ParsingFunction with identifier " + identifier + " doesn't match requested (" + cls.getName() + ")");
+        if (!cls.isInstance(statement)) throw new IllegalArgumentException("Return type of ParsingFunction with identifier " + identifier + " doesn't match requested (" + cls.getName() + ")");
 
         return (T) statement;
     }

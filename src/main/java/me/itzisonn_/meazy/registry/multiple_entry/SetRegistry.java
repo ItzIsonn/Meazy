@@ -8,13 +8,13 @@ import java.util.*;
 /**
  * Implementation of {@link MultipleEntryRegistry} with entries stored in {@link Set}
  *
- * @param <T> Entries' value type
+ * @param <T> Entries' type
  */
 public class SetRegistry<T> implements MultipleEntryRegistry<T> {
     private final Set<RegistryEntry<T>> entries = new HashSet<>();
 
     @Override
-    public void register(RegistryIdentifier identifier, T value, boolean overridable) {
+    public void register(RegistryIdentifier identifier, T value, boolean overridable) throws IllegalArgumentException {
         RegistryEntry<T> entry = getEntry(identifier);
         if (entry != null && !entry.isOverrideable()) throw new IllegalArgumentException("Entry with identifier " + identifier + " already exists!");
         entries.add(new RegistryEntry<>(identifier, value, overridable));
