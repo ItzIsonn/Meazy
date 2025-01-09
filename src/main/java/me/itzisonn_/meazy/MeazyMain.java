@@ -65,18 +65,26 @@ public final class MeazyMain {
         logger.log(Level.ERROR, "Unknown command!");
         logger.log(Level.INFO, "Available commands:");
         for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
-            logger.log(Level.INFO, "    {}", entry.getValue().toString());
+            Command command = entry.getValue();
+
+            StringBuilder argsBuilder = new StringBuilder();
+            for (int i = 0; i < command.getArgs().size(); i++) {
+                argsBuilder.append(command.getArgs().get(i));
+                if (i < command.getArgs().size() - 1) argsBuilder.append(" ");
+            }
+
+            logger.log(Level.INFO, "    {}", entry.getIdentifier().getId() + " " + argsBuilder);
         }
     }
 
     private static void loadAddons() {
         File addonsDir;
         try {
-            addonsDir = new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath() + "/addons/");
+            addonsDir = new File(new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent() + "/addons/");
             if (!addonsDir.exists() && !addonsDir.mkdirs()) throw new RuntimeException("Can't load addons folder");
         }
         catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Can't load addons folder", e);
         }
 
         AddonManager addonManager = new AddonManager();
