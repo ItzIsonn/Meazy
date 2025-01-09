@@ -4,14 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
 /**
  * Utility class
  */
-public class Utils {
+public final class Utils {
     private Utils() {}
 
     /**
@@ -25,7 +24,7 @@ public class Utils {
     public static final Scanner SCANNER = new Scanner(System.in);
 
     /**
-     * Random
+     * Random class
      */
     public static final Random RANDOM = new Random();
 
@@ -35,8 +34,10 @@ public class Utils {
      * @param string The string to count in
      * @param target The target to match
      * @return Number of target's matches in given string
+     *
+     * @throws NullPointerException When either of strings is null
      */
-    public static int countMatches(String string, String target) {
+    public static int countMatches(String string, String target) throws NullPointerException {
         if (string == null || target == null) throw new NullPointerException("Neither of strings can't be null!");
         return (string.length() - string.replace(target, "").length()) / target.length();
     }
@@ -46,6 +47,7 @@ public class Utils {
      *
      * @param file Target file
      * @return Extension of file
+     *
      * @throws NullPointerException When given file is null
      */
     public static String getExtension(File file) throws NullPointerException {
@@ -64,17 +66,18 @@ public class Utils {
      *
      * @param file Target file
      * @return Lines of file
+     *
      * @throws NullPointerException When given file is null
      */
     public static String getLines(File file) throws NullPointerException {
         if (file == null) throw new NullPointerException("File can't be null!");
 
-        ArrayList<String> lines = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
 
             while (line != null) {
-                lines.add(line.trim());
+                stringBuilder.append(line.trim()).append("\n");
                 line = reader.readLine();
             }
         }
@@ -82,11 +85,7 @@ public class Utils {
             throw new RuntimeException(e);
         }
 
-        StringBuilder string = new StringBuilder();
-        for (String line : lines) {
-            string.append(line).append("\n");
-        }
-        return string.toString();
+        return stringBuilder.toString();
     }
 
     /**
@@ -95,6 +94,7 @@ public class Utils {
      * @param version1 Version to compare
      * @param version2 Version to compare
      * @return True if version2 was released after version1, otherwise false
+     *
      * @throws NullPointerException When either of versions is null
      * @throws NumberFormatException When either of version have non-integer part
      */
@@ -123,6 +123,7 @@ public class Utils {
      *
      * @param offset Number of offsets
      * @return String offset
+     *
      * @throws IllegalArgumentException When given offset is negative
      */
     public static String getOffset(int offset) throws IllegalArgumentException {

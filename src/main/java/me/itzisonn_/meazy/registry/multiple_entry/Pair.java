@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.registry;
+package me.itzisonn_.meazy.registry.multiple_entry;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

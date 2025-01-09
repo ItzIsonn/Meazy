@@ -7,15 +7,15 @@ import lombok.Setter;
 @Setter
 public class MemberExpression implements Expression {
     private Expression object;
-    private final Expression field;
+    private final Expression member;
 
-    public MemberExpression(Expression object, Expression field) {
+    public MemberExpression(Expression object, Expression member) {
         this.object = object;
-        this.field = field;
+        this.member = member;
     }
 
     @Override
     public String toCodeString() {
-        return object.toCodeString() + "." + field.toCodeString();
+        return object.toCodeString() + "." + member.toCodeString();
     }
 }

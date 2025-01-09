@@ -6,32 +6,28 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class ArrayDeclarationExpressionConverter implements Converter<ArrayDeclarationExpression> {
+public class ArrayDeclarationExpressionConverter extends Converter<ArrayDeclarationExpression> {
     @Override
     public ArrayDeclarationExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("array_declaration_expression")) {
-            if (object.get("values") == null) throw new InvalidCompiledFileException("ArrayDeclarationExpression doesn't have field values");
-            ArrayList<Expression> values = new ArrayList<>();
-            for (JsonElement statement : object.get("values").getAsJsonArray()) {
-                values.add(jsonDeserializationContext.deserialize(statement, Expression.class));
-            }
+        if (object.get("values") == null) throw new InvalidCompiledFileException(getIdentifier(), "values");
+        List<Expression> values = object.get("values").getAsJsonArray().asList().stream().map(value ->
+                (Expression) jsonDeserializationContext.deserialize(value, Expression.class)).collect(Collectors.toList());
 
-            return new ArrayDeclarationExpression(values);
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize ArrayDeclarationExpression because specified type is null or doesn't match");
+        return new ArrayDeclarationExpression(values);
     }
 
     @Override
     public JsonElement serialize(ArrayDeclarationExpression arrayDeclarationExpression, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "array_declaration_expression");
+        JsonObject result = getJsonObject();
 
         JsonArray values = new JsonArray();
         for (Statement statement : arrayDeclarationExpression.getValues()) {
@@ -43,7 +39,7 @@ public class ArrayDeclarationExpressionConverter implements Converter<ArrayDecla
     }
 
     @Override
-    public String getId() {
-        return "array_declaration_expression";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("array_declaration_expression");
     }
 }

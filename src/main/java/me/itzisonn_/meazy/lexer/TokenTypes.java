@@ -7,7 +7,12 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.util.regex.Pattern;
 
-public class TokenTypes {
+/**
+ * All basic TokenTypes
+ *
+ * @see Registries#TOKEN_TYPES
+ */
+public final class TokenTypes {
     private static boolean isInit = false;
 
     private TokenTypes() {}
@@ -262,8 +267,10 @@ public class TokenTypes {
      * Returns TokenType whose pattern matches given string
      *
      * @param string String to match
-     * @return TokenType or null if none matched
+     * @return Matched TokenType or null if none matched
+     *
      * @throws NullPointerException When given string is null
+     *
      * @see Registries#TOKEN_TYPES
      */
     public static TokenType parse(String string) throws NullPointerException {
@@ -284,8 +291,15 @@ public class TokenTypes {
         Registries.TOKEN_TYPES.register(RegistryIdentifier.ofDefault(tokenType.getId()), tokenType);
     }
 
+    /**
+     * Initializes {@link Registries#TOKEN_TYPES} registry
+     * <p>
+     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
+     *
+     * @throws IllegalStateException If {@link Registries#TOKEN_TYPES} registry has already been initialized
+     */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("TokenTypes already initialized!");
+        if (isInit) throw new IllegalStateException("TokenTypes have already been initialized!");
         isInit = true;
 
         register(new TokenType("variable", "var|val", false));
@@ -304,7 +318,7 @@ public class TokenTypes {
         register(new TokenType("continue", "continue", false));
         register(new TokenType("break", "break", false));
 
-        register(new TokenType("new_line", "\n", false));
+        register(new TokenType("new_line", "\n+", false));
         register(new TokenType("comment", "\\/\\/[^\n]*", true));
         register(new TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", true));
         register(new TokenType("white_space", "(?!\n)\\s", true));

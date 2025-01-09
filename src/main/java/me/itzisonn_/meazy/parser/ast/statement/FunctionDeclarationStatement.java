@@ -8,19 +8,19 @@ import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 public class FunctionDeclarationStatement implements Statement {
     private final String id;
-    private final ArrayList<CallArgExpression> args;
-    private final ArrayList<Statement> body;
+    private final List<CallArgExpression> args;
+    private final List<Statement> body;
     private final DataType returnDataType;
     private final Expression arraySize;
     private final Set<AccessModifier> accessModifiers;
 
-    public FunctionDeclarationStatement(String id, ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, Expression arraySize, Set<AccessModifier> accessModifiers) {
+    public FunctionDeclarationStatement(String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType, Expression arraySize, Set<AccessModifier> accessModifiers) {
         this.id = id;
         this.args = args;
         this.body = body;

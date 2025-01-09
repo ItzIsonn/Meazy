@@ -4,14 +4,14 @@ import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class WhileStatement implements Statement {
     private final Expression condition;
-    private final ArrayList<Statement> body;
+    private final List<Statement> body;
 
-    public WhileStatement(Expression condition, ArrayList<Statement> body) {
+    public WhileStatement(Expression condition, List<Statement> body) {
         this.condition = condition;
         this.body = body;
     }

@@ -25,10 +25,10 @@ public class ArraysClassEnvironment extends BasicClassEnvironment {
 
 
         declareFunction(new DefaultFunctionValue("getSize", new ArrayList<>(List.of(new CallArgExpression("array", new NullLiteral(), DataTypes.ANY(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof ArrayList<?> arrayList) {
-                    return new IntValue(arrayList.size());
+                if (value instanceof List<?> list) {
+                    return new IntValue(list.size());
                 }
                 throw new InvalidSyntaxException("Can't get size of non-array value");
             }
@@ -37,13 +37,13 @@ public class ArraysClassEnvironment extends BasicClassEnvironment {
         declareFunction(new DefaultFunctionValue("fill",
                 new ArrayList<>(List.of(new CallArgExpression("array", new NullLiteral(), DataTypes.ANY(), true), new CallArgExpression("value", DataTypes.ANY(), true))),
                 null, this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object array = functionArgs.getFirst().getFinalValue();
                 Object value = functionArgs.get(1).getFinalRuntimeValue();
 
-                if (array instanceof ArrayList<?> arrayList) {
-                    for (int i = 0; i < arrayList.size(); i++) {
-                        ((ArrayList<Object>) arrayList).set(i, value);
+                if (array instanceof List<?> list) {
+                    for (int i = 0; i < list.size(); i++) {
+                        ((List<Object>) list).set(i, value);
                     }
                     return null;
                 }
@@ -52,28 +52,28 @@ public class ArraysClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction(new DefaultFunctionValue("copy", new ArrayList<>(List.of(new CallArgExpression("array", new NullLiteral(), DataTypes.ANY(), true))), DataTypes.ANY(), new NullValue(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof ArrayList<?> arrayList) {
-                    return new ArrayValue(new ArrayList<>((ArrayList<RuntimeValue<?>>) arrayList));
+                if (value instanceof List<?> list) {
+                    return new ArrayValue(new ArrayList<>((List<RuntimeValue<?>>) list));
                 }
                 throw new InvalidSyntaxException("Can't copy non-array value");
             }
         });
 
         declareFunction(new DefaultFunctionValue("toString", new ArrayList<>(List.of(new CallArgExpression("array", new NullLiteral(), DataTypes.ANY(), true))), DataTypes.STRING(), null, this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
-                if (value instanceof ArrayList<?> arrayList) {
+                if (value instanceof List<?> list) {
                     StringBuilder toReturn = new StringBuilder();
                     toReturn.append("[");
-                    for (int i = 0; i < arrayList.size(); i++) {
-                        Object object = arrayList.get(i);
+                    for (int i = 0; i < list.size(); i++) {
+                        Object object = list.get(i);
                         if (object instanceof RuntimeValue<?> runtimeValue) {
                             toReturn.append(runtimeValue.getFinalValue());
                         }
                         else toReturn.append(object);
-                        if (i < arrayList.size() - 1) toReturn.append(", ");
+                        if (i < list.size() - 1) toReturn.append(", ");
                     }
                     toReturn.append("]");
                     return new StringValue(toReturn.toString());

@@ -4,28 +4,25 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
-public class ClassIdentifierConverter implements Converter<ClassIdentifier> {
+public class ClassIdentifierConverter extends Converter<ClassIdentifier> {
     @Override
     public ClassIdentifier deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("class_identifier")) {
-            if (object.get("id") == null) throw new InvalidCompiledFileException("ClassIdentifier doesn't have field id");
-            String id = object.get("id").getAsString();
+        if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
+        String id = object.get("id").getAsString();
 
-            return new ClassIdentifier(id);
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize ClassIdentifier because specified type is null or doesn't match");
+        return new ClassIdentifier(id);
     }
 
     @Override
     public JsonElement serialize(ClassIdentifier classIdentifier, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "class_identifier");
+        JsonObject result = getJsonObject();
 
         result.addProperty("id", classIdentifier.getId());
 
@@ -33,7 +30,7 @@ public class ClassIdentifierConverter implements Converter<ClassIdentifier> {
     }
 
     @Override
-    public String getId() {
-        return "class_identifier";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("class_identifier");
     }
 }

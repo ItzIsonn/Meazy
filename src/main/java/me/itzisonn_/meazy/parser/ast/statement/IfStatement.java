@@ -4,15 +4,15 @@ import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class IfStatement implements Statement {
     private final Expression condition;
-    private final ArrayList<Statement> body;
+    private final List<Statement> body;
     private final IfStatement elseStatement;
 
-    public IfStatement(Expression condition, ArrayList<Statement> body, IfStatement elseStatement) {
+    public IfStatement(Expression condition, List<Statement> body, IfStatement elseStatement) {
         this.condition = condition;
         this.body = body;
         this.elseStatement = elseStatement;

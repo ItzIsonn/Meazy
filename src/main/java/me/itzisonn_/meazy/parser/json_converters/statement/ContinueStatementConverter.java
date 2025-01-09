@@ -3,32 +3,26 @@ package me.itzisonn_.meazy.parser.json_converters.statement;
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.statement.ContinueStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
-public class ContinueStatementConverter implements Converter<ContinueStatement> {
+public class ContinueStatementConverter extends Converter<ContinueStatement> {
     @Override
     public ContinueStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("continue_statement")) {
-            return new ContinueStatement();
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize ContinueStatement because specified type is null or doesn't match");
+        return new ContinueStatement();
     }
 
     @Override
     public JsonElement serialize(ContinueStatement continueStatement, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "continue_statement");
-
-        return result;
+        return getJsonObject();
     }
 
     @Override
-    public String getId() {
-        return "continue_statement";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("continue_statement");
     }
 }

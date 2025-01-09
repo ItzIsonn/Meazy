@@ -4,31 +4,28 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
-public class NumberLiteralConverter implements Converter<NumberLiteral> {
+public class NumberLiteralConverter extends Converter<NumberLiteral> {
     @Override
     public NumberLiteral deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("number_literal")) {
-            if (object.get("value") == null) throw new InvalidCompiledFileException("NumberLiteral doesn't have field value");
-            double value = object.get("value").getAsDouble();
+        if (object.get("value") == null) throw new InvalidCompiledFileException(getIdentifier(), "value");
+        double value = object.get("value").getAsDouble();
 
-            if (object.get("is_int") == null) throw new InvalidCompiledFileException("NumberLiteral doesn't have field is_int");
-            boolean isInt = object.get("is_int").getAsBoolean();
+        if (object.get("is_int") == null) throw new InvalidCompiledFileException(getIdentifier(), "is_int");
+        boolean isInt = object.get("is_int").getAsBoolean();
 
-            return new NumberLiteral(value, isInt);
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize NumberLiteral because specified type is null or doesn't match");
+        return new NumberLiteral(value, isInt);
     }
 
     @Override
     public JsonElement serialize(NumberLiteral numberLiteral, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "number_literal");
+        JsonObject result = getJsonObject();
 
         result.addProperty("value", numberLiteral.getValue());
         result.addProperty("is_int", numberLiteral.isInt());
@@ -37,7 +34,7 @@ public class NumberLiteralConverter implements Converter<NumberLiteral> {
     }
 
     @Override
-    public String getId() {
-        return "number_literal";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("number_literal");
     }
 }

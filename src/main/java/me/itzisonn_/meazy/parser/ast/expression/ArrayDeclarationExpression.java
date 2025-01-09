@@ -2,13 +2,13 @@ package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class ArrayDeclarationExpression implements Expression {
-    private final ArrayList<Expression> values;
+    private final List<Expression> values;
 
-    public ArrayDeclarationExpression(ArrayList<Expression> values) {
+    public ArrayDeclarationExpression(List<Expression> values) {
         this.values = values;
     }
 

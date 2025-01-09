@@ -143,7 +143,7 @@ public class AddonLoader {
         if (addon == null) throw new IllegalArgumentException("Addon is not associated with this AddonLoader");
 
         if (!addon.isEnabled()) {
-            MeazyMain.getInstance().getLogger().info("Enabling {}", addon.getAddonInfo().getFullName());
+            MeazyMain.getLogger().info("Enabling {}", addon.getAddonInfo().getFullName());
 
             String addonName = addon.getAddonInfo().getId();
 
@@ -155,7 +155,7 @@ public class AddonLoader {
                 addon.enable();
             }
             catch (Throwable e) {
-                MeazyMain.getInstance().getLogger().log(Level.ERROR, "Error occurred while enabling {}", addon.getAddonInfo().getFullName(), e);
+                MeazyMain.getLogger().log(Level.ERROR, "Error occurred while enabling {}", addon.getAddonInfo().getFullName(), e);
             }
         }
     }

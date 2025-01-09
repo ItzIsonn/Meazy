@@ -2,9 +2,9 @@ package me.itzisonn_.meazy.runtime.values.function;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -12,25 +12,24 @@ import me.itzisonn_.meazy.runtime.values.NullValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class FunctionValue extends RuntimeValue<Object> {
-    private final String id;
-    private final ArrayList<CallArgExpression> args;
-    private final ArrayList<Statement> body;
-    private final DataType returnDataType;
-    private final IntValue arraySize;
-    private final FunctionDeclarationEnvironment parentEnvironment;
-    private final Set<AccessModifier> accessModifiers;
+public abstract class FunctionValue extends RuntimeValue<Object> {
+    protected final String id;
+    protected final List<CallArgExpression> args;
+    protected final DataType returnDataType;
+    protected final IntValue arraySize;
+    @Setter
+    protected FunctionDeclarationEnvironment parentEnvironment;
+    protected final Set<AccessModifier> accessModifiers;
 
-    public FunctionValue(String id, ArrayList<CallArgExpression> args, ArrayList<Statement> body, DataType returnDataType, RuntimeValue<?> arraySize, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
+    public FunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, RuntimeValue<?> arraySize, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
         super(null);
         this.id = id;
         this.args = args;
-        this.body = body;
         this.returnDataType = returnDataType;
 
         switch (arraySize) {

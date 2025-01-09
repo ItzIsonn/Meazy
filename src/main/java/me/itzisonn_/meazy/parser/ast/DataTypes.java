@@ -15,6 +15,11 @@ import me.itzisonn_.meazy.runtime.values.number.NumberValue;
 
 import java.util.function.Predicate;
 
+/**
+ * All basic DataTypes
+ *
+ * @see Registries#DATA_TYPES
+ */
 public final class DataTypes {
     private static boolean isInit = false;
 
@@ -47,24 +52,26 @@ public final class DataTypes {
     /**
      * Returns existing DataType or creates new that matches classes with given name
      *
-     * @param dataType DataType's name
+     * @param name DataType's name
      * @return Existing or created DataType
-     * @throws NullPointerException When given DataType's name is null
+     *
+     * @throws NullPointerException When given name is null
+     *
      * @see Registries#DATA_TYPES
      */
-    public static DataType parse(String dataType) throws NullPointerException {
-        if (dataType == null) throw new NullPointerException("DataType's name can't be null");
+    public static DataType parse(String name) throws NullPointerException {
+        if (name == null) throw new NullPointerException("DataType's name can't be null");
 
         for (RegistryEntry<DataType> entry : Registries.DATA_TYPES.getEntries()) {
-            if (entry.getValue().getName().equals(dataType)) {
+            if (entry.getValue().getName().equals(name)) {
                 return entry.getValue();
             }
         }
 
-        return new DataType(dataType) {
+        return new DataType(name) {
             public boolean isMatches(Object value) {
-                if (value instanceof ClassValue classValue) return classValue.getId().equals(dataType);
-                if (value instanceof DefaultClassValue defaultClassValue) return defaultClassValue.getId().equals(dataType);
+                if (value instanceof ClassValue classValue) return classValue.getId().equals(name);
+                if (value instanceof InnerStringValue innerStringValue) return innerStringValue.getValue().equals(name);
                 return false;
             }
         };
@@ -80,8 +87,15 @@ public final class DataTypes {
         });
     }
 
+    /**
+     * Initializes {@link Registries#DATA_TYPES} registry
+     * <p>
+     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
+     *
+     * @throws IllegalStateException If {@link Registries#DATA_TYPES} registry has already been initialized
+     */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("DataTypes already initialized!");
+        if (isInit) throw new IllegalStateException("DataTypes have already been initialized!");
         isInit = true;
 
         register("any", o -> true);
@@ -92,7 +106,7 @@ public final class DataTypes {
         });
 
         register("int", o -> {
-            if (o instanceof Integer || o instanceof IntValue) return true;
+            if (o == null || o instanceof Integer || o instanceof IntValue) return true;
             if (o instanceof NumberLiteral numberLiteral) {
                 return numberLiteral.isInt();
             }

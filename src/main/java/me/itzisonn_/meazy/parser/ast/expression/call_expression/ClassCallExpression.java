@@ -2,10 +2,10 @@ package me.itzisonn_.meazy.parser.ast.expression.call_expression;
 
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ClassCallExpression extends CallExpression {
-    public ClassCallExpression(Expression caller, ArrayList<Expression> args) {
+    public ClassCallExpression(Expression caller, List<Expression> args) {
         super(caller, args);
     }
 

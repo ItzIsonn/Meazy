@@ -3,32 +3,26 @@ package me.itzisonn_.meazy.parser.json_converters.expression.literal;
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
-public class NullLiteralConverter implements Converter<NullLiteral> {
+public class NullLiteralConverter extends Converter<NullLiteral> {
     @Override
     public NullLiteral deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("null_literal")) {
-            return new NullLiteral();
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize NullLiteral because specified type is null or doesn't match");
+        return new NullLiteral();
     }
 
     @Override
     public JsonElement serialize(NullLiteral nullLiteral, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "null_literal");
-
-        return result;
+        return getJsonObject();
     }
 
     @Override
-    public String getId() {
-        return "null_literal";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("null_literal");
     }
 }

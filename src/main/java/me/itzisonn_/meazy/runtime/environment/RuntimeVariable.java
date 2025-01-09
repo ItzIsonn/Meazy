@@ -11,6 +11,7 @@ import me.itzisonn_.meazy.runtime.values.VariableValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -49,7 +50,7 @@ public class RuntimeVariable {
             throw new InvalidSyntaxException("Can't reassign value of constant variable " + id);
 
         if (value.getFinalRuntimeValue() instanceof NullValue && value instanceof VariableValue variableValue && arraySize != null) {
-            ArrayList<RuntimeValue<?>> emptyList = new ArrayList<>();
+            List<RuntimeValue<?>> emptyList = new ArrayList<>();
             for (int i = 0; i < arraySize.getValue(); i++) {
                 emptyList.add(new NullValue());
             }
@@ -78,7 +79,7 @@ public class RuntimeVariable {
         }
         else if (value instanceof ArrayValue) throw new InvalidSyntaxException("Variable with id " + id + " can't have array value");
 
-        if (!dataType.isMatches(value.getFinalRuntimeValue()))
+        if (!dataType.isMatches(value.getFinalRuntimeValue()) && !dataType.isMatches(value.getFinalValue()))
             throw new InvalidSyntaxException("Variable with id " + id + " requires data type " + dataType.getName());
     }
 }

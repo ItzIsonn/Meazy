@@ -5,16 +5,16 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class ForStatement implements Statement {
     private final VariableDeclarationStatement variableDeclarationStatement;
     private final Expression condition;
     private final AssignmentExpression assignmentExpression;
-    private final ArrayList<Statement> body;
+    private final List<Statement> body;
 
-    public ForStatement(VariableDeclarationStatement variableDeclarationStatement, Expression condition, AssignmentExpression assignmentExpression, ArrayList<Statement> body) {
+    public ForStatement(VariableDeclarationStatement variableDeclarationStatement, Expression condition, AssignmentExpression assignmentExpression, List<Statement> body) {
         this.variableDeclarationStatement = variableDeclarationStatement;
         this.condition = condition;
         this.assignmentExpression = assignmentExpression;

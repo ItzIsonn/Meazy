@@ -18,15 +18,11 @@ public final class MeazyMain {
     @Getter
     private static final String version = "2.2";
     @Getter
-    private static final MeazyMain instance = new MeazyMain();
-    @Getter
-    private final Logger logger = LogManager.getLogger("meazy");
+    private static final Logger logger = LogManager.getLogger("meazy");
+
+    private MeazyMain() {}
 
     public static void main(String[] args) {
-        instance.run(args);
-    }
-
-    private void run(String[] args) {
         long startLoadMillis = System.currentTimeMillis();
         Registries.INIT();
         loadAddons();
@@ -43,14 +39,14 @@ public final class MeazyMain {
                     if (i < command.getArgs().size() - 1) argsBuilder.append(" ");
                 }
 
-                logger.log(Level.INFO, "    {}", entry.getId().getId() + " " + argsBuilder);
+                logger.log(Level.INFO, "    {}", entry.getIdentifier().getId() + " " + argsBuilder);
             }
             return;
         }
 
         for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
             Command command = entry.getValue();
-            if (entry.getId().getId().equals(args[0])) {
+            if (entry.getIdentifier().getId().equals(args[0])) {
                 if (args.length - 1 != command.getArgs().size()) {
                     logger.log(Level.ERROR, "Expected {} arguments but found {}", command.getArgs().size(), args.length - 1);
                     return;
@@ -73,12 +69,10 @@ public final class MeazyMain {
         }
     }
 
-
-
-    private void loadAddons() {
+    private static void loadAddons() {
         File addonsDir;
         try {
-            addonsDir = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath() + "/addons/");
+            addonsDir = new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath() + "/addons/");
             if (!addonsDir.exists() && !addonsDir.mkdirs()) throw new RuntimeException("Can't load addons folder");
         }
         catch (URISyntaxException e) {

@@ -4,10 +4,8 @@ import lombok.Getter;
 
 /**
  * Entry used by registries
+ * @see Registry
  * @see RegistryIdentifier
- * @see SingleRegistry
- * @see SetRegistry
- * @see PairRegistry
  *
  * @param <T> Value's type
  */
@@ -16,7 +14,7 @@ public class RegistryEntry<T> {
     /**
      * Entry's id
      */
-    private final RegistryIdentifier id;
+    private final RegistryIdentifier identifier;
     /**
      * Entry's value
      */
@@ -29,24 +27,24 @@ public class RegistryEntry<T> {
     /**
      * RegistryEntry constructor
      *
-     * @param id Entry's id
+     * @param identifier Entry's id
      * @param value Entry's value
      * @param overrideable Is this entry overridable
      */
-    public RegistryEntry(RegistryIdentifier id, T value, boolean overrideable) {
-        this.id = id;
+    public RegistryEntry(RegistryIdentifier identifier, T value, boolean overrideable) {
+        this.identifier = identifier;
         this.value = value;
         this.overrideable = overrideable;
     }
 
     /**
-     * RegistryEntry constructor
+     * RegistryEntry constructor with overridable defaulted to true
      *
-     * @param id Entry's id
+     * @param identifier Entry's id
      * @param value Entry's value
      */
-    public RegistryEntry(RegistryIdentifier id, T value) {
-        this.id = id;
+    public RegistryEntry(RegistryIdentifier identifier, T value) {
+        this.identifier = identifier;
         this.value = value;
         this.overrideable = true;
     }

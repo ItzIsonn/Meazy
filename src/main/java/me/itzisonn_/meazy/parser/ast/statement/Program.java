@@ -3,14 +3,14 @@ package me.itzisonn_.meazy.parser.ast.statement;
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class Program implements Statement {
     private final String version;
-    private final ArrayList<Statement> body;
+    private final List<Statement> body;
 
-    public Program(String version, ArrayList<Statement> body) {
+    public Program(String version, List<Statement> body) {
         this.version = version;
         this.body = body;
     }

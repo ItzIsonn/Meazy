@@ -4,28 +4,25 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
-public class BooleanLiteralConverter implements Converter<BooleanLiteral> {
+public class BooleanLiteralConverter extends Converter<BooleanLiteral> {
     @Override
     public BooleanLiteral deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("boolean_literal")) {
-            if (object.get("value") == null) throw new InvalidCompiledFileException("BooleanLiteral doesn't have field value");
-            boolean value = object.get("value").getAsBoolean();
+        if (object.get("value") == null) throw new InvalidCompiledFileException(getIdentifier(), "value");
+        boolean value = object.get("value").getAsBoolean();
 
-            return new BooleanLiteral(value);
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize BooleanLiteral because specified type is null or doesn't match");
+        return new BooleanLiteral(value);
     }
 
     @Override
     public JsonElement serialize(BooleanLiteral booleanLiteral, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "boolean_literal");
+        JsonObject result = getJsonObject();
 
         result.addProperty("value", booleanLiteral.isValue());
 
@@ -33,7 +30,7 @@ public class BooleanLiteralConverter implements Converter<BooleanLiteral> {
     }
 
     @Override
-    public String getId() {
-        return "boolean_literal";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("boolean_literal");
     }
 }

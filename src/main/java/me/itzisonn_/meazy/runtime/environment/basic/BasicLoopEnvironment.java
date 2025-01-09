@@ -11,4 +11,9 @@ public class BasicLoopEnvironment extends BasicVariableDeclarationEnvironment im
     public BasicLoopEnvironment(Environment parent) {
         super(parent);
     }
+
+    @Override
+    public void clearVariables() {
+        variables.clear();
+    }
 }

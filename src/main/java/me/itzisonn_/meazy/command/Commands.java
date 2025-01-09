@@ -13,9 +13,13 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * All basic Commands
+ *
+ * @see Registries#COMMANDS
+ */
 public final class Commands {
     private static boolean isInit = false;
 
@@ -27,11 +31,18 @@ public final class Commands {
         Registries.COMMANDS.register(RegistryIdentifier.ofDefault(id), command);
     }
 
+    /**
+     * Initializes {@link Registries#COMMANDS} registry
+     * <p>
+     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
+     *
+     * @throws IllegalStateException If {@link Registries#COMMANDS} registry has already been initialized
+     */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("Commands already initialized!");
+        if (isInit) throw new IllegalStateException("Commands have already been initialized!");
         isInit = true;
 
-        final Logger logger = MeazyMain.getInstance().getLogger();
+        final Logger logger = MeazyMain.getLogger();
         final String version = MeazyMain.getVersion();
 
         register("run", new Command(List.of("<file_to_run>")) {
@@ -39,16 +50,16 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.getInstance().getLogger().log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
+                    logger.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
                     return null;
                 }
 
                 logger.log(Level.INFO, "Running file '{}'", file.getAbsoluteFile());
 
                 String extension = Utils.getExtension(file);
-                long startRunMillis = System.currentTimeMillis();
+                long startMillis = System.currentTimeMillis();
                 if (extension.equals("mea")) {
-                    ArrayList<Token> tokens = Registries.TOKENS_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
+                    List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
                     Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
                     Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
                 }
@@ -71,9 +82,9 @@ public final class Commands {
                     logger.log(Level.ERROR, "Can't run file with extension {}", extension);
                     return null;
                 }
-                long endRunMillis = System.currentTimeMillis();
+                long endMillis = System.currentTimeMillis();
 
-                return "Executed in " + ((double) endRunMillis - (double) startRunMillis) / 1000 + "s.";
+                return "Executed in " + ((double) endMillis - (double) startMillis) / 1000 + "s.";
             }
         });
 
@@ -93,11 +104,11 @@ public final class Commands {
 
                 logger.log(Level.INFO, "Compiling file '{}'", file.getAbsoluteFile());
 
-                long startCompileMillis = System.currentTimeMillis();
-                ArrayList<Token> tokens = Registries.TOKENS_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
+                long startMillis = System.currentTimeMillis();
+                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
 
                 Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
-                long endCompileMillis = System.currentTimeMillis();
+                long endMillis = System.currentTimeMillis();
 
 
                 File outputFile = new File(args[1]);
@@ -126,7 +137,7 @@ public final class Commands {
 
                 try (FileWriter fileWriter = new FileWriter(outputFile)) {
                     fileWriter.write(json);
-                    return "Compiled in " + ((double) endCompileMillis - (double) startCompileMillis) / 1000 + "s.";
+                    return "Compiled in " + ((double) endMillis - (double) startMillis) / 1000 + "s.";
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);
@@ -150,7 +161,7 @@ public final class Commands {
 
                 logger.log(Level.INFO, "Decompiling file '{}'", file.getAbsoluteFile());
 
-                long startDecompileMillis = System.currentTimeMillis();
+                long startMillis = System.currentTimeMillis();
                 Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
                 if (program == null) {
                     logger.log(Level.ERROR, "Failed to read file {}, try to decompile it in the same version of Meazy ({})", file.getAbsolutePath(), version);
@@ -163,7 +174,7 @@ public final class Commands {
                 if (!version.equals(program.getVersion())) {
                     logger.log(Level.WARN, "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), version);
                 }
-                long endDecompileMillis = System.currentTimeMillis();
+                long endMillis = System.currentTimeMillis();
 
 
                 File outputFile = new File(args[1]);
@@ -190,7 +201,7 @@ public final class Commands {
 
                 try (FileWriter fileWriter = new FileWriter(outputFile)) {
                     fileWriter.write(program.toCodeString(0));
-                    return "Decompiled in " + ((double) endDecompileMillis - (double) startDecompileMillis) / 1000 + "s.";
+                    return "Decompiled in " + ((double) endMillis - (double) startMillis) / 1000 + "s.";
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);

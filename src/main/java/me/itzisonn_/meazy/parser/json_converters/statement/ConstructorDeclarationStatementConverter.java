@@ -8,46 +8,37 @@ import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class ConstructorDeclarationStatementConverter implements Converter<ConstructorDeclarationStatement> {
+public class ConstructorDeclarationStatementConverter extends Converter<ConstructorDeclarationStatement> {
     @Override
     public ConstructorDeclarationStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("constructor_declaration_statement")) {
-            if (object.get("args") == null) throw new InvalidCompiledFileException("ConstructorDeclarationStatement doesn't have field args");
-            ArrayList<CallArgExpression> args = new ArrayList<>();
-            for (JsonElement arg : object.get("args").getAsJsonArray()) {
-                args.add(jsonDeserializationContext.deserialize(arg, CallArgExpression.class));
-            }
+        if (object.get("args") == null) throw new InvalidCompiledFileException(getIdentifier(), "args");
+        List<CallArgExpression> args = object.get("args").getAsJsonArray().asList().stream().map(arg ->
+                (CallArgExpression) jsonDeserializationContext.deserialize(arg, CallArgExpression.class)).collect(Collectors.toList());
 
-            if (object.get("body") == null) throw new InvalidCompiledFileException("ConstructorDeclarationStatement doesn't have field body");
-            ArrayList<Statement> body = new ArrayList<>();
-            for (JsonElement statement : object.get("body").getAsJsonArray()) {
-                body.add(jsonDeserializationContext.deserialize(statement, Statement.class));
-            }
+        if (object.get("body") == null) throw new InvalidCompiledFileException(getIdentifier(), "body");
+        List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
+                (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-            if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException("ConstructorDeclarationStatement doesn't have field access_modifiers");
-            Set<AccessModifier> accessModifiers = new HashSet<>();
-            for (JsonElement accessModifier : object.get("access_modifiers").getAsJsonArray()) {
-                accessModifiers.add(AccessModifiers.parse(accessModifier.getAsString()));
-            }
+        if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
+        Set<AccessModifier> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier ->
+                AccessModifiers.parse(accessModifier.getAsString())).collect(Collectors.toSet());
 
-            return new ConstructorDeclarationStatement(args, body, accessModifiers);
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize ConstructorDeclarationStatement because specified type is null or doesn't match");
+        return new ConstructorDeclarationStatement(args, body, accessModifiers);
     }
 
     @Override
     public JsonElement serialize(ConstructorDeclarationStatement constructorDeclarationStatement, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "constructor_declaration_statement");
+        JsonObject result = getJsonObject();
 
         JsonArray args = new JsonArray();
         for (CallArgExpression arg : constructorDeclarationStatement.getArgs()) {
@@ -71,7 +62,7 @@ public class ConstructorDeclarationStatementConverter implements Converter<Const
     }
 
     @Override
-    public String getId() {
-        return "constructor_declaration_statement";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("constructor_declaration_statement");
     }
 }

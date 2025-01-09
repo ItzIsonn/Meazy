@@ -5,16 +5,16 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 public class ConstructorDeclarationStatement implements Statement {
-    private final ArrayList<CallArgExpression> args;
-    private final ArrayList<Statement> body;
+    private final List<CallArgExpression> args;
+    private final List<Statement> body;
     private final Set<AccessModifier> accessModifiers;
 
-    public ConstructorDeclarationStatement(ArrayList<CallArgExpression> args, ArrayList<Statement> body, Set<AccessModifier> accessModifiers) {
+    public ConstructorDeclarationStatement(List<CallArgExpression> args, List<Statement> body, Set<AccessModifier> accessModifiers) {
         this.args = args;
         this.body = body;
         this.accessModifiers = accessModifiers;

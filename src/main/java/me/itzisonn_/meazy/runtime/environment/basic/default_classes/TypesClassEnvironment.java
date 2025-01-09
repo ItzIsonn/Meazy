@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.BooleanValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.StringValue;
-import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
+import me.itzisonn_.meazy.runtime.values.clazz.RuntimeClassValue;
 import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
@@ -23,14 +23,14 @@ public class TypesClassEnvironment extends BasicClassEnvironment {
 
 
         declareFunction(new DefaultFunctionValue("getType", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionArgs.getFirst().getFinalValue();
                 if (value == null) return new StringValue("null");
                 if (DataTypes.BOOLEAN().isMatches(value)) return new StringValue(DataTypes.BOOLEAN().getName());
                 if (DataTypes.INT().isMatches(value)) return new StringValue(DataTypes.INT().getName());
                 if (DataTypes.FLOAT().isMatches(value)) return new StringValue(DataTypes.FLOAT().getName());
                 if (DataTypes.STRING().isMatches(value)) return new StringValue(DataTypes.STRING().getName());
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof ClassValue classValue) return new StringValue(classValue.getId());
+                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof RuntimeClassValue runtimeClassValue) return new StringValue(runtimeClassValue.getId());
                 return new StringValue("???");
             }
         });
@@ -38,7 +38,7 @@ public class TypesClassEnvironment extends BasicClassEnvironment {
         declareFunction(new DefaultFunctionValue("convert",
                 new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true), new CallArgExpression("type", DataTypes.STRING(), true))),
                 DataTypes.ANY(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(ArrayList<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 String type = functionArgs.get(1).getFinalValue().toString();
 
                 Object value = functionArgs.getFirst().getFinalValue();

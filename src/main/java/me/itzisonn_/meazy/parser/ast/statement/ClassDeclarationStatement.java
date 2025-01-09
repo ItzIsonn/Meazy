@@ -3,14 +3,14 @@ package me.itzisonn_.meazy.parser.ast.statement;
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class ClassDeclarationStatement implements Statement {
     private final String id;
-    private final ArrayList<Statement> body;
+    private final List<Statement> body;
 
-    public ClassDeclarationStatement(String id, ArrayList<Statement> body) {
+    public ClassDeclarationStatement(String id, List<Statement> body) {
         this.id = id;
         this.body = body;
     }

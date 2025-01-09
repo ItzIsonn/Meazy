@@ -32,15 +32,27 @@ import java.util.Set;
 
 import static me.itzisonn_.meazy.parser.Parser.*;
 
-public class ParsingFunctions {
+/**
+ * All basic ParsingFunctions
+ *
+ * @see Registries#PARSING_FUNCTIONS
+ */
+public final class ParsingFunctions {
     private static boolean isInit = false;
 
     private ParsingFunctions() {}
 
 
 
+    /**
+     * Initializes {@link Registries#PARSING_FUNCTIONS} registry
+     * <p>
+     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
+     *
+     * @throws IllegalStateException If {@link Registries#PARSING_FUNCTIONS} registry has already been initialized
+     */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("ParsingFunctions already initialized!");
+        if (isInit) throw new IllegalStateException("ParsingFunctions have already been initialized!");
         isInit = true;
 
         register("global_statement", extra -> {
@@ -67,7 +79,7 @@ public class ParsingFunctions {
                 getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
                 moveOverOptionalNewLine();
 
-                ArrayList<Statement> body = new ArrayList<>();
+                List<Statement> body = new ArrayList<>();
                 while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
                     body.add(parse(RegistryIdentifier.ofDefault("class_body_statement")));
                 }
@@ -108,42 +120,33 @@ public class ParsingFunctions {
             getCurrentAndNext();
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
 
-            ArrayList<Expression> rawArgs = parseArgs();
-            ArrayList<CallArgExpression> args = new ArrayList<>();
-            for (Expression arg : rawArgs) {
-                if (!(arg instanceof CallArgExpression callArgExpression)) throw new UnexpectedTokenException("Expected function args", getCurrent().getLine());
-                args.add(callArgExpression);
-            }
+            List<CallArgExpression> args = parseArgs().stream().map(expression -> {
+                if (!(expression instanceof CallArgExpression callArgExpression)) throw new UnexpectedTokenException("Expected function args", getCurrent().getLine());
+                return callArgExpression;
+            }).toList();
 
             DataType dataType = null;
+            Expression arraySize = null;
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
                 if (!getCurrent().getType().equals(TokenTypes.ID()))
                     throw new InvalidStatementException("Must specify function's return data type after colon", getCurrent().getLine());
 
                 dataType = DataTypes.parse(getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue());
-            }
 
-            Expression arraySize = null;
-            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
-                getCurrentAndNext();
-                if (getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) arraySize = new NullLiteral();
-                else {
-                    arraySize = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
+                    getCurrentAndNext();
+                    if (getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) arraySize = new NullLiteral();
+                    else {
+                        arraySize = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                    }
+                    getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close array size");
                 }
-                getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close array size");
             }
 
             moveOverOptionalNewLine();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open function body");
-            moveOverOptionalNewLine();
-
-            ArrayList<Statement> body = new ArrayList<>();
-            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                body.add(parse(RegistryIdentifier.ofDefault("statement")));
-            }
-
-            moveOverOptionalNewLine();
+            List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
 
@@ -228,23 +231,14 @@ public class ParsingFunctions {
             Set<AccessModifier> accessModifiers = getAccessModifiers(extra);
             getCurrentAndNext();
 
-            ArrayList<Expression> rawArgs = parseArgs();
-            ArrayList<CallArgExpression> args = new ArrayList<>();
-            for (Expression arg : rawArgs) {
-                if (!(arg instanceof CallArgExpression callArgExpression)) throw new UnexpectedTokenException("Expected constructor args", getCurrent().getLine());
-                args.add(callArgExpression);
-            }
+            List<CallArgExpression> args = parseArgs().stream().map(expression -> {
+                if (!(expression instanceof CallArgExpression callArgExpression)) throw new UnexpectedTokenException("Expected constructor args", getCurrent().getLine());
+                return callArgExpression;
+            }).toList();
 
             moveOverOptionalNewLine();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
-            moveOverOptionalNewLine();
-
-            ArrayList<Statement> body = new ArrayList<>();
-            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                body.add(parse(RegistryIdentifier.ofDefault("statement")));
-            }
-
-            moveOverOptionalNewLine();
+            List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
 
@@ -299,7 +293,7 @@ public class ParsingFunctions {
             Expression condition = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
             getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close if condition");
 
-            ArrayList<Statement> body = new ArrayList<>();
+            List<Statement> body = new ArrayList<>();
             moveOverOptionalNewLine();
             if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
                 getCurrentAndNext();
@@ -317,7 +311,7 @@ public class ParsingFunctions {
                     elseStatement = parse(RegistryIdentifier.ofDefault("if_statement"), IfStatement.class);
                 }
                 else {
-                    ArrayList<Statement> elseBody = new ArrayList<>();
+                    List<Statement> elseBody = new ArrayList<>();
                     moveOverOptionalNewLine();
                     if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
                         getCurrentAndNext();
@@ -356,7 +350,7 @@ public class ParsingFunctions {
 
                 moveOverOptionalNewLine();
                 getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
-                ArrayList<Statement> body = parseBody();
+                List<Statement> body = parseBody();
                 getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
 
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the for statement");
@@ -386,7 +380,7 @@ public class ParsingFunctions {
 
             moveOverOptionalNewLine();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
-            ArrayList<Statement> body = parseBody();
+            List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
 
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the for statement");
@@ -403,7 +397,7 @@ public class ParsingFunctions {
 
             moveOverOptionalNewLine();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open while body");
-            ArrayList<Statement> body = parseBody();
+            List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close while body");
 
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the while statement");
@@ -460,7 +454,7 @@ public class ParsingFunctions {
         register("array_expression", extra -> {
             if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
                 getCurrentAndNext();
-                ArrayList<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_BRACE() ? new ArrayList<>() : parseCallArgsList();
+                List<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_BRACE() ? new ArrayList<>() : parseCallArgsList();
                 getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close array declaration");
                 return new ArrayDeclarationExpression(args);
             }
@@ -588,7 +582,7 @@ public class ParsingFunctions {
 
             if (getCurrent().getType() == TokenTypes.LEFT_PAREN()) {
                 getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
-                ArrayList<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_PAREN() ? new ArrayList<>() : parseCallArgsList();
+                List<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_PAREN() ? new ArrayList<>() : parseCallArgsList();
                 getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
                 return new FunctionCallExpression(expression, args);
             }
@@ -643,7 +637,7 @@ public class ParsingFunctions {
                 return null;
             }
 
-            throw new UnsupportedTokenException(tokenType.getId());
+            throw new InvalidStatementException("Can't parse token with type " + tokenType.getId());
         });
     }
 
@@ -663,9 +657,9 @@ public class ParsingFunctions {
         return accessModifiers;
     }
 
-    private static ArrayList<Expression> parseArgs() {
+    private static List<Expression> parseArgs() {
         getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis");
-        ArrayList<Expression> args = new ArrayList<>();
+        List<Expression> args = new ArrayList<>();
         if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN())) {
             args.add(parse(RegistryIdentifier.ofDefault("function_arg"), Expression.class));
 
@@ -673,15 +667,13 @@ public class ParsingFunctions {
                 getCurrentAndNext();
                 args.add(parse(RegistryIdentifier.ofDefault("function_arg"), Expression.class));
             }
-
-            return args;
         }
         getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
         return args;
     }
 
-    private static ArrayList<Statement> parseBody() {
-        ArrayList<Statement> body = new ArrayList<>();
+    private static List<Statement> parseBody() {
+        List<Statement> body = new ArrayList<>();
         moveOverOptionalNewLine();
 
         while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
@@ -692,8 +684,8 @@ public class ParsingFunctions {
         return body;
     }
 
-    private static ArrayList<Expression> parseCallArgsList() {
-        ArrayList<Expression> args = new ArrayList<>(List.of(parse(RegistryIdentifier.ofDefault("expression"), Expression.class)));
+    private static List<Expression> parseCallArgsList() {
+        List<Expression> args = new ArrayList<>(List.of(parse(RegistryIdentifier.ofDefault("expression"), Expression.class)));
 
         while (getCurrent().getType().equals(TokenTypes.COMMA())) {
             getCurrentAndNext();

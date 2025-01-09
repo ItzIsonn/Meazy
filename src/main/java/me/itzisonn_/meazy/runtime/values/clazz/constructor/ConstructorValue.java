@@ -3,26 +3,23 @@ package me.itzisonn_.meazy.runtime.values.clazz.constructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class ConstructorValue extends RuntimeValue<Object> {
-    private final ArrayList<CallArgExpression> args;
-    private final ArrayList<Statement> body;
-    private final ConstructorDeclarationEnvironment parentEnvironment;
-    private final Set<AccessModifier> accessModifiers;
+public abstract class ConstructorValue extends RuntimeValue<Object> {
+    protected final List<CallArgExpression> args;
+    protected final ConstructorDeclarationEnvironment parentEnvironment;
+    protected final Set<AccessModifier> accessModifiers;
 
-    public ConstructorValue(ArrayList<CallArgExpression> args, ArrayList<Statement> body, ConstructorDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
+    public ConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
         super(null);
         this.args = args;
-        this.body = body;
         this.parentEnvironment = parentEnvironment;
         this.accessModifiers = accessModifiers;
     }

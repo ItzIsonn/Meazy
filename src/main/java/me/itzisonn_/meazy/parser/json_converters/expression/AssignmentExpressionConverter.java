@@ -5,31 +5,28 @@ import me.itzisonn_.meazy.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
 
-public class AssignmentExpressionConverter implements Converter<AssignmentExpression> {
+public class AssignmentExpressionConverter extends Converter<AssignmentExpression> {
     @Override
     public AssignmentExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("assignment_expression")) {
-            if (object.get("id") == null) throw new InvalidCompiledFileException("AssignmentExpression doesn't have field id");
-            Expression id = jsonDeserializationContext.deserialize(object.get("id"), Expression.class);
+        if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
+        Expression id = jsonDeserializationContext.deserialize(object.get("id"), Expression.class);
 
-            if (object.get("value") == null) throw new InvalidCompiledFileException("AssignmentExpression doesn't have field value");
-            Expression value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);
+        if (object.get("value") == null) throw new InvalidCompiledFileException(getIdentifier(), "value");
+        Expression value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);
 
-            return new AssignmentExpression(id, value);
-        }
-
-        throw new InvalidCompiledFileException("Can't deserialize AssignmentExpression because specified type is null or doesn't match");
+        return new AssignmentExpression(id, value);
     }
 
     @Override
     public JsonElement serialize(AssignmentExpression assignmentExpression, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "assignment_expression");
+        JsonObject result = getJsonObject();
 
         result.add("id", jsonSerializationContext.serialize(assignmentExpression.getId()));
         result.add("value", jsonSerializationContext.serialize(assignmentExpression.getValue()));
@@ -38,7 +35,7 @@ public class AssignmentExpressionConverter implements Converter<AssignmentExpres
     }
 
     @Override
-    public String getId() {
-        return "assignment_expression";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("assignment_expression");
     }
 }

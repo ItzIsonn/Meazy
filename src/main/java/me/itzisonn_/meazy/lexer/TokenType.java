@@ -1,31 +1,84 @@
 package me.itzisonn_.meazy.lexer;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.registry.Registries;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+/**
+ * TokenType
+ *
+ * @see Registries#TOKEN_TYPES
+ */
 @Getter
 public class TokenType {
+    /**
+     * Id that matches {@link Utils#IDENTIFIER_REGEX}
+     */
     private final String id;
+    /**
+     * Pattern that is used to match tokens
+     */
     private final Pattern pattern;
+    /**
+     * Should {@link Token}s with this type be skipped (not added in list)
+     */
     private final boolean shouldSkip;
+    /**
+     * Predicate that checks can string match this TokenType
+     */
     private final Predicate<String> canMatch;
 
-    public TokenType(String id, String regex, boolean shouldSkip) {
-        this.id = id;
-        if (regex == null) pattern = null;
-        else this.pattern = Pattern.compile(regex, Pattern.DOTALL);
-        this.shouldSkip = shouldSkip;
-        this.canMatch = s -> true;
+    /**
+     * TokenType constructor
+     *
+     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * @param regex Regex that is converted into {@link Pattern}
+     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
+     *
+     * @throws NullPointerException If given id is null
+     * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
+     */
+    public TokenType(String id, String regex, boolean shouldSkip) throws NullPointerException, IllegalArgumentException {
+        this(id, regex, shouldSkip, s -> true);
     }
 
-    public TokenType(String id, String regex, boolean shouldSkip, Predicate<String> canMatch) {
+    /**
+     * TokenType constructor
+     *
+     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * @param regex Regex that is converted into {@link Pattern}
+     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
+     * @param canMatch Predicate that checks can string match this TokenType
+     *
+     * @throws NullPointerException If given id is null
+     * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
+     */
+    public TokenType(String id, String regex, boolean shouldSkip, Predicate<String> canMatch) throws NullPointerException, IllegalArgumentException {
+        this(id, regex == null ? null : Pattern.compile(regex, Pattern.DOTALL), shouldSkip, canMatch);
+    }
+
+    /**
+     * TokenType constructor
+     *
+     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * @param pattern Pattern that is used to match tokens
+     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
+     * @param canMatch Predicate that checks can string match this TokenType
+     *
+     * @throws NullPointerException If given id is null
+     * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
+     */
+    public TokenType(String id, Pattern pattern, boolean shouldSkip, Predicate<String> canMatch) throws NullPointerException, IllegalArgumentException {
+        if (id == null) throw new NullPointerException("Id can't be null");
+        if (!id.matches(Utils.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid id");
+
         this.id = id;
-        if (regex == null) pattern = null;
-        else this.pattern = Pattern.compile(regex, Pattern.DOTALL);
+        this.pattern = pattern;
         this.shouldSkip = shouldSkip;
-        this.canMatch = canMatch;
+        this.canMatch = canMatch == null ? s -> true : canMatch;
     }
 
     @Override
@@ -41,18 +94,14 @@ public class TokenType {
         if (!(o instanceof TokenType other)) {
             return false;
         }
-        String this$id = getId();
-        String other$id = other.getId();
-        if (this$id == null) return other$id == null;
-        else return this$id.equals(other$id);
+        String thisId = getId();
+        String otherId = other.getId();
+        if (thisId == null) return otherId == null;
+        else return thisId.equals(otherId);
     }
 
     @Override
     public int hashCode() {
-        int result = 1;
-        result = result * 59 + (isShouldSkip() ? 79 : 97);
-        Object pattern = getPattern();
-        result = result * 59 + (pattern == null ? 43 : pattern.hashCode());
-        return result;
+        return id.hashCode();
     }
 }

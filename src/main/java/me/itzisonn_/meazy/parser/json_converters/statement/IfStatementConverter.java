@@ -6,40 +6,36 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.IfStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class IfStatementConverter implements Converter<IfStatement> {
+public class IfStatementConverter extends Converter<IfStatement> {
     @Override
     public IfStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
+        checkType(object);
 
-        if (object.get("type") != null && object.get("type").getAsString().equals("if_statement")) {
-            if (object.get("condition") == null) throw new InvalidCompiledFileException("IfStatement doesn't have field condition");
-            Expression condition = jsonDeserializationContext.deserialize(object.get("condition"), Expression.class);
+        if (object.get("condition") == null) throw new InvalidCompiledFileException(getIdentifier(), "condition");
+        Expression condition = jsonDeserializationContext.deserialize(object.get("condition"), Expression.class);
 
-            if (object.get("body") == null) throw new InvalidCompiledFileException("IfStatement doesn't have field body");
-            ArrayList<Statement> body = new ArrayList<>();
-            for (JsonElement statement : object.get("body").getAsJsonArray()) {
-                body.add(jsonDeserializationContext.deserialize(statement, Statement.class));
-            }
+        if (object.get("body") == null) throw new InvalidCompiledFileException(getIdentifier(), "body");
+        List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
+                (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-            IfStatement elseStatement = null;
-            if (object.get("else_statement") != null) {
-                elseStatement = jsonDeserializationContext.deserialize(object.get("else_statement"), IfStatement.class);
-            }
-
-            return new IfStatement(condition, body, elseStatement);
+        IfStatement elseStatement = null;
+        if (object.get("else_statement") != null) {
+            elseStatement = jsonDeserializationContext.deserialize(object.get("else_statement"), IfStatement.class);
         }
 
-        throw new InvalidCompiledFileException("Can't deserialize IfStatement because specified type is null or doesn't match");
+        return new IfStatement(condition, body, elseStatement);
     }
 
     @Override
     public JsonElement serialize(IfStatement ifStatement, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject result = new JsonObject();
-        result.addProperty("type", "if_statement");
+        JsonObject result = getJsonObject();
 
         result.add("condition", jsonSerializationContext.serialize(ifStatement.getCondition()));
 
@@ -57,7 +53,7 @@ public class IfStatementConverter implements Converter<IfStatement> {
     }
 
     @Override
-    public String getId() {
-        return "if_statement";
+    public RegistryIdentifier getIdentifier() {
+        return RegistryIdentifier.ofDefault("if_statement");
     }
 }
