@@ -12,7 +12,7 @@ public class ReturnStatement implements Statement {
     }
 
     @Override
-    public String toCodeString(int offset) {
+    public String toCodeString(int offset) throws IllegalArgumentException {
         if (value == null) return "return";
         return "return " + value.toCodeString(0);
     }

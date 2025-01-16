@@ -10,6 +10,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class ArrayPointerExpressionConverter extends Converter<ArrayPointerExpression> {
+    public ArrayPointerExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("array_pointer_expression"));
+    }
+
     @Override
     public ArrayPointerExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -32,10 +36,5 @@ public class ArrayPointerExpressionConverter extends Converter<ArrayPointerExpre
         result.add("pos", jsonSerializationContext.serialize(arrayDeclarationExpression.getPos()));
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("array_pointer_expression");
     }
 }

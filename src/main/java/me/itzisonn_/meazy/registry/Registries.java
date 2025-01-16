@@ -59,6 +59,11 @@ public final class Registries {
     public static final SetRegistry<TokenType> TOKEN_TYPES = new SetRegistry<>();
 
     /**
+     * Registry for all TokenTypesSets
+     */
+    public static final SetRegistry<TokenTypeSet> TOKEN_TYPE_SETS = new SetRegistry<>();
+
+    /**
      * Registry for tokenization function that is used to tokenize given string
      *
      * @see Token
@@ -158,7 +163,7 @@ public final class Registries {
     /**
      * Initializes all registries
      * <p>
-     * <i>Don't use this method because it's called once at Meazy startup</i>
+     * <i>Don't use this method because it's called once at Meazy initialization</i>
      *
      * @throws IllegalStateException If registries have already been initialized
      */
@@ -168,6 +173,7 @@ public final class Registries {
 
         Commands.INIT();
         TokenTypes.INIT();
+        TokenTypeSets.INIT();
         DataTypes.INIT();
         AccessModifiers.INIT();
         ParsingFunctions.INIT();

@@ -19,6 +19,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FunctionDeclarationStatementConverter extends Converter<FunctionDeclarationStatement> {
+    public FunctionDeclarationStatementConverter() {
+        super(RegistryIdentifier.ofDefault("function_declaration_statement"));
+    }
+
     @Override
     public FunctionDeclarationStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -83,10 +87,5 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         result.add("access_modifiers", accessModifiers);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("function_declaration_statement");
     }
 }

@@ -9,6 +9,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class FunctionIdentifierConverter extends Converter<FunctionIdentifier> {
+    public FunctionIdentifierConverter() {
+        super(RegistryIdentifier.ofDefault("function_identifier"));
+    }
+
     @Override
     public FunctionIdentifier deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -27,10 +31,5 @@ public class FunctionIdentifierConverter extends Converter<FunctionIdentifier> {
         result.addProperty("id", functionIdentifier.getId());
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("function_identifier");
     }
 }

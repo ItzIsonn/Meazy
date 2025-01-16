@@ -16,6 +16,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ConstructorDeclarationStatementConverter extends Converter<ConstructorDeclarationStatement> {
+    public ConstructorDeclarationStatementConverter() {
+        super(RegistryIdentifier.ofDefault("constructor_declaration_statement"));
+    }
+
     @Override
     public ConstructorDeclarationStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -59,10 +63,5 @@ public class ConstructorDeclarationStatementConverter extends Converter<Construc
         result.add("access_modifiers", accessModifiers);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("constructor_declaration_statement");
     }
 }

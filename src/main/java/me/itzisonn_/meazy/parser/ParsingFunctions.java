@@ -93,7 +93,7 @@ public final class ParsingFunctions {
 
         register("class_body_statement", extra -> {
             Set<AccessModifier> accessModifiers = new HashSet<>();
-            while (TokenTypeSets.ACCESS_MODIFIERS.contains(getCurrent().getType())) {
+            while (TokenTypeSets.ACCESS_MODIFIERS().contains(getCurrent().getType())) {
                 TokenType current = getCurrentAndNext().getType();
                 if (current.equals(TokenTypes.PRIVATE())) accessModifiers.add(AccessModifiers.PRIVATE());
                 if (current.equals(TokenTypes.SHARED())) accessModifiers.add(AccessModifiers.SHARED());
@@ -439,7 +439,7 @@ public final class ParsingFunctions {
                 Expression value = parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class);
                 return new AssignmentExpression(left, value);
             }
-            else if (TokenTypeSets.OPERATOR_ASSIGN.contains(getCurrent().getType())) {
+            else if (TokenTypeSets.OPERATOR_ASSIGN().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
                 Expression value = new BinaryExpression(
                         left,
@@ -531,7 +531,7 @@ public final class ParsingFunctions {
         register("postfix_expression", extra -> {
             Expression left = parse(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
 
-            if (TokenTypeSets.OPERATOR_POSTFIX.contains(getCurrent().getType())) {
+            if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
                 Expression value = new BinaryExpression(left, new NumberLiteral(1, true), token.getValue().substring(1));
                 return new AssignmentExpression(left, value);

@@ -10,6 +10,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class ComparisonExpressionConverter extends Converter<ComparisonExpression> {
+    public ComparisonExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("comparison_expression"));
+    }
+
     @Override
     public ComparisonExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -36,10 +40,5 @@ public class ComparisonExpressionConverter extends Converter<ComparisonExpressio
         result.addProperty("operator", comparisonExpression.getOperator());
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("comparison_expression");
     }
 }

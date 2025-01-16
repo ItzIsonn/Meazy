@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 public final class MeazyMain {
     @Getter
-    private static final String version = "2.2";
+    private static final String version = "2.3";
     @Getter
     private static final Logger logger = LogManager.getLogger("meazy");
 
@@ -54,7 +54,6 @@ public final class MeazyMain {
 
                 String message = command.execute(Arrays.copyOfRange(args, 1, args.length));
                 if (message != null) {
-                    System.out.println();
                     logger.log(Level.INFO, "Loaded in {}s. {}", ((double) endLoadMillis - (double) startLoadMillis) / 1000, message);
                 }
                 return;

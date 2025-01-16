@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProgramConverter extends Converter<Program> {
+    public ProgramConverter() {
+        super(RegistryIdentifier.ofDefault("program"));
+    }
+
     @Override
     public Program deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -40,10 +44,5 @@ public class ProgramConverter extends Converter<Program> {
         result.add("body", body);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("program");
     }
 }

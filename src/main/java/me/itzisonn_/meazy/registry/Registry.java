@@ -16,9 +16,10 @@ public interface Registry<T> {
      * @param identifier Identifier to register
      * @param value Value to register
      *
-     * @throws IllegalArgumentException When not overridable entry is already registered
+     * @throws NullPointerException If given identifier or value is null
+     * @throws IllegalArgumentException When not overridable entry with given identifier is already registered
      */
-    default void register(RegistryIdentifier identifier, T value) throws IllegalArgumentException {
+    default void register(RegistryIdentifier identifier, T value) throws NullPointerException, IllegalArgumentException {
         register(identifier, value, true);
     }
 
@@ -29,9 +30,10 @@ public interface Registry<T> {
      * @param value Value to register
      * @param overridable Is this entry overridable
      *
-     * @throws IllegalArgumentException When not overridable entry is already registered
+     * @throws NullPointerException If given identifier or value is null
+     * @throws IllegalArgumentException When not overridable entry with given identifier is already registered
      */
-    void register(RegistryIdentifier identifier, T value, boolean overridable) throws IllegalArgumentException;
+    void register(RegistryIdentifier identifier, T value, boolean overridable) throws NullPointerException, IllegalArgumentException;
 
     /**
      * Registers new entry in given registry
@@ -40,9 +42,11 @@ public interface Registry<T> {
      * @param identifier Identifier to register
      * @param value Value to register
      *
-     * @throws IllegalArgumentException When not overridable entry is already registered
+     * @throws NullPointerException If given registry, identifier or value is null
+     * @throws IllegalArgumentException When not overridable entry with given identifier is already registered
      */
-    static <T> void register(Registry<T> registry, RegistryIdentifier identifier, T value) throws IllegalArgumentException {
+    static <T> void register(Registry<T> registry, RegistryIdentifier identifier, T value) throws NullPointerException, IllegalArgumentException {
+        if (registry == null) throw new NullPointerException("Registry can't be null");
         registry.register(identifier, value);
     }
 
@@ -54,9 +58,11 @@ public interface Registry<T> {
      * @param value Value to register
      * @param overridable Is this entry overridable
      *
-     * @throws IllegalArgumentException When not overridable entry is already registered
+     * @throws NullPointerException If given registry, identifier or value is null
+     * @throws IllegalArgumentException When not overridable entry with given identifier is already registered
      */
-    static <T> void register(Registry<T> registry, RegistryIdentifier identifier, T value, boolean overridable) throws IllegalArgumentException {
+    static <T> void register(Registry<T> registry, RegistryIdentifier identifier, T value, boolean overridable) throws NullPointerException, IllegalArgumentException {
+        if (registry == null) throw new NullPointerException("Registry can't be null");
         registry.register(identifier, value, overridable);
     }
 }

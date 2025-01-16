@@ -19,7 +19,7 @@ public class IfStatement implements Statement {
     }
 
     @Override
-    public String toCodeString(int offset) {
+    public String toCodeString(int offset) throws IllegalArgumentException {
         String conditionString = condition == null ? "" : "if (" + condition.toCodeString(0) + ") ";
 
         StringBuilder bodyBuilder = new StringBuilder();

@@ -21,7 +21,7 @@ public class ConstructorDeclarationStatement implements Statement {
     }
 
     @Override
-    public String toCodeString(int offset) {
+    public String toCodeString(int offset) throws IllegalArgumentException {
         StringBuilder accessModifiersBuilder = new StringBuilder();
         for (AccessModifier accessModifier : accessModifiers) {
             accessModifiersBuilder.append(accessModifier.getId()).append(" ");

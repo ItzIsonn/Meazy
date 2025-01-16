@@ -28,8 +28,15 @@ public class Token {
      * @param line Line on which this Token is located
      * @param type TokenType of this Token
      * @param value String that matches this Token's type
+     *
+     * @throws IllegalArgumentException If line is negative
+     * @throws NullPointerException If either type or value is null
      */
-    public Token(int line, TokenType type, String value) {
+    public Token(int line, TokenType type, String value) throws IllegalArgumentException, NullPointerException {
+        if (line < 0) throw new IllegalArgumentException("Line can't be negative");
+        if (type == null) throw new NullPointerException("Type can't be null");
+        if (value == null) throw new NullPointerException("Value can't be null");
+
         this.line = line;
         this.type = type;
         this.value = value;

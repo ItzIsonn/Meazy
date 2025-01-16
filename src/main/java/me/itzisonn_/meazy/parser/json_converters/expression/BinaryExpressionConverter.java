@@ -10,6 +10,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class BinaryExpressionConverter extends Converter<BinaryExpression> {
+    public BinaryExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("binary_expression"));
+    }
+
     @Override
     public BinaryExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -36,10 +40,5 @@ public class BinaryExpressionConverter extends Converter<BinaryExpression> {
         result.addProperty("operator", binaryExpression.getOperator());
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("binary_expression");
     }
 }

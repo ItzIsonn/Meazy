@@ -10,6 +10,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class AssignmentExpressionConverter extends Converter<AssignmentExpression> {
+    public AssignmentExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("assignment_expression"));
+    }
+
     @Override
     public AssignmentExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -32,10 +36,5 @@ public class AssignmentExpressionConverter extends Converter<AssignmentExpressio
         result.add("value", jsonSerializationContext.serialize(assignmentExpression.getValue()));
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("assignment_expression");
     }
 }

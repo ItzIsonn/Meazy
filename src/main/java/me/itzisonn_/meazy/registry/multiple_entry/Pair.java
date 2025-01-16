@@ -26,8 +26,12 @@ public class Pair<K, V> {
      *
      * @param key Key
      * @param value Value
+     *
+     * @throws NullPointerException If key is null
      */
-    public Pair(K key, V value) {
+    public Pair(K key, V value) throws NullPointerException {
+        if (key == null) throw new NullPointerException("Key can't be null");
+
         this.key = key;
         this.value = value;
     }

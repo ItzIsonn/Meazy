@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FunctionCallExpressionConverter extends Converter<FunctionCallExpression> {
+    public FunctionCallExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("function_call_expression"));
+    }
+
     @Override
     public FunctionCallExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -40,10 +44,5 @@ public class FunctionCallExpressionConverter extends Converter<FunctionCallExpre
         result.add("args", args);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("function_call_expression");
     }
 }

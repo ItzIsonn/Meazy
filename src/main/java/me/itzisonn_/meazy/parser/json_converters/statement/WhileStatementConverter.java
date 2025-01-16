@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class WhileStatementConverter extends Converter<WhileStatement> {
+    public WhileStatementConverter() {
+        super(RegistryIdentifier.ofDefault("while_statement"));
+    }
+
     @Override
     public WhileStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -41,10 +45,5 @@ public class WhileStatementConverter extends Converter<WhileStatement> {
         result.add("body", body);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("while_statement");
     }
 }

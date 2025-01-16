@@ -8,6 +8,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class NullLiteralConverter extends Converter<NullLiteral> {
+    public NullLiteralConverter() {
+        super(RegistryIdentifier.ofDefault("null_literal"));
+    }
+
     @Override
     public NullLiteral deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -19,10 +23,5 @@ public class NullLiteralConverter extends Converter<NullLiteral> {
     @Override
     public JsonElement serialize(NullLiteral nullLiteral, Type type, JsonSerializationContext jsonSerializationContext) {
         return getJsonObject();
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("null_literal");
     }
 }

@@ -365,7 +365,7 @@ public final class TokenTypes {
         register(new TokenType("string", "\"[^\"]*\"", false));
         register(new TokenType("boolean", "true|false", false));
         register(new TokenType("id", Utils.IDENTIFIER_REGEX, false, s -> {
-            for (TokenType tokenType : TokenTypeSets.KEYWORDS.getTokenTypes()) {
+            for (TokenType tokenType : TokenTypeSets.KEYWORDS().getTokenTypes()) {
                 if (tokenType.getPattern().matcher(s).matches()) return false;
             }
             return true;

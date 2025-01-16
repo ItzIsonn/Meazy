@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class IfStatementConverter extends Converter<IfStatement> {
+    public IfStatementConverter() {
+        super(RegistryIdentifier.ofDefault("if_statement"));
+    }
+
     @Override
     public IfStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -50,10 +54,5 @@ public class IfStatementConverter extends Converter<IfStatement> {
         }
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("if_statement");
     }
 }

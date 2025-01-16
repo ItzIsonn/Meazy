@@ -14,7 +14,10 @@ public class SetRegistry<T> implements MultipleEntryRegistry<T> {
     private final Set<RegistryEntry<T>> entries = new HashSet<>();
 
     @Override
-    public void register(RegistryIdentifier identifier, T value, boolean overridable) throws IllegalArgumentException {
+    public void register(RegistryIdentifier identifier, T value, boolean overridable) throws NullPointerException, IllegalArgumentException {
+        if (identifier == null) throw new NullPointerException("Identifier can't be null");
+        if (value == null) throw new NullPointerException("Value can't be null");
+
         RegistryEntry<T> entry = getEntry(identifier);
         if (entry != null && !entry.isOverrideable()) throw new IllegalArgumentException("Entry with identifier " + identifier + " already exists!");
         entries.add(new RegistryEntry<>(identifier, value, overridable));
@@ -27,6 +30,8 @@ public class SetRegistry<T> implements MultipleEntryRegistry<T> {
 
     @Override
     public RegistryEntry<T> getEntry(RegistryIdentifier identifier) {
+        if (identifier == null) throw new NullPointerException("Identifier can't be null");
+
         for (RegistryEntry<T> entry : entries) {
             if (entry.getIdentifier().equals(identifier)) return entry;
         }
@@ -36,6 +41,8 @@ public class SetRegistry<T> implements MultipleEntryRegistry<T> {
 
     @Override
     public RegistryEntry<T> getEntry(T value) {
+        if (value == null) throw new NullPointerException("Value can't be null");
+
         for (RegistryEntry<T> entry : entries) {
             if (entry.getValue().equals(value)) return entry;
         }

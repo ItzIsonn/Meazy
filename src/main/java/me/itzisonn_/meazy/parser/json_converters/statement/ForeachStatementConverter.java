@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ForeachStatementConverter extends Converter<ForeachStatement> {
+    public ForeachStatementConverter() {
+        super(RegistryIdentifier.ofDefault("foreach_statement"));
+    }
+
     @Override
     public ForeachStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -46,10 +50,5 @@ public class ForeachStatementConverter extends Converter<ForeachStatement> {
         result.add("body", body);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("foreach_statement");
     }
 }

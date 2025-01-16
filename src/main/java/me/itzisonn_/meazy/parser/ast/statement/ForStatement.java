@@ -22,7 +22,7 @@ public class ForStatement implements Statement {
     }
 
     @Override
-    public String toCodeString(int offset) {
+    public String toCodeString(int offset) throws IllegalArgumentException {
         String variableDeclarationString = variableDeclarationStatement == null ? "" : variableDeclarationStatement.toCodeString(0);
         String conditionString = condition == null ? "" : " " + condition.toCodeString(0);
         String assignmentExpressionString = assignmentExpression == null ? "" : " " + assignmentExpression.toCodeString(0);

@@ -10,6 +10,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class MemberExpressionConverter extends Converter<MemberExpression> {
+    public MemberExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("member_expression"));
+    }
+
     @Override
     public MemberExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -32,10 +36,5 @@ public class MemberExpressionConverter extends Converter<MemberExpression> {
         result.add("member", jsonSerializationContext.serialize(memberExpression.getMember()));
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("member_expression");
     }
 }

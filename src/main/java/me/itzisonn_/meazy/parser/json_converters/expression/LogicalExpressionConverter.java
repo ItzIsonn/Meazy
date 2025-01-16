@@ -10,6 +10,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class LogicalExpressionConverter extends Converter<LogicalExpression> {
+    public LogicalExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("logical_expression"));
+    }
+
     @Override
     public LogicalExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -36,10 +40,5 @@ public class LogicalExpressionConverter extends Converter<LogicalExpression> {
         result.addProperty("operator", logicalExpression.getOperator());
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("logical_expression");
     }
 }

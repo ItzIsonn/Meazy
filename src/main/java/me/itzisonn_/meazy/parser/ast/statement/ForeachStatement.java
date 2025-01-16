@@ -19,7 +19,7 @@ public class ForeachStatement implements Statement {
     }
 
     @Override
-    public String toCodeString(int offset) {
+    public String toCodeString(int offset) throws IllegalArgumentException {
         String variableDeclarationString = variableDeclarationStatement == null ? "" : variableDeclarationStatement.toCodeString(0);
 
         StringBuilder bodyBuilder = new StringBuilder();

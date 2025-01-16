@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.lexer;
 
 import lombok.EqualsAndHashCode;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -22,7 +23,7 @@ public class TokenTypeSet {
      */
     public TokenTypeSet(Set<TokenType> tokenTypes) throws NullPointerException {
         if (tokenTypes == null) throw new NullPointerException("TokenTypes can't be null");
-        this.tokenTypes = tokenTypes;
+        this.tokenTypes = new HashSet<>(tokenTypes);
     }
 
     /**
@@ -32,16 +33,24 @@ public class TokenTypeSet {
      *
      * @throws NullPointerException If given array is null
      */
-    public TokenTypeSet(TokenType... tokenTypes) {
+    public TokenTypeSet(TokenType... tokenTypes) throws NullPointerException {
         this(tokenTypes == null ? null : Set.of(tokenTypes));
     }
-
 
     /**
      * @return Copy of TokenType Set
      */
     public Set<TokenType> getTokenTypes() {
         return Set.copyOf(tokenTypes);
+    }
+
+    /**
+     * @param tokenType TokenType
+     * @return This TokenTypeSet to allow chaining
+     */
+    public TokenTypeSet add(TokenType tokenType) throws IllegalArgumentException {
+        if (!tokenTypes.add(tokenType)) throw new IllegalArgumentException("Given TokenType has already been added to this set");
+        return this;
     }
 
     /**

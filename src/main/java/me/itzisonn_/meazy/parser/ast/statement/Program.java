@@ -16,7 +16,7 @@ public class Program implements Statement {
     }
 
     @Override
-    public String toCodeString(int offset) {
+    public String toCodeString(int offset) throws IllegalArgumentException {
         StringBuilder bodyBuilder = new StringBuilder();
         for (int i = 0; i < body.size(); i++) {
             bodyBuilder.append(Utils.getOffset(offset)).append(body.get(i).toCodeString(offset + 1));

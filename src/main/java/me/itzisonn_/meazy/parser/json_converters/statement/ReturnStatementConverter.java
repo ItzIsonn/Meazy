@@ -9,6 +9,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class ReturnStatementConverter extends Converter<ReturnStatement> {
+    public ReturnStatementConverter() {
+        super(RegistryIdentifier.ofDefault("return_statement"));
+    }
+
     @Override
     public ReturnStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -29,10 +33,5 @@ public class ReturnStatementConverter extends Converter<ReturnStatement> {
         if (returnStatement.getValue() != null) result.add("value", jsonSerializationContext.serialize(returnStatement.getValue()));
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("return_statement");
     }
 }

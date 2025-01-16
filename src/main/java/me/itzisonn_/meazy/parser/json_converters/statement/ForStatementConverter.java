@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ForStatementConverter extends Converter<ForStatement> {
+    public ForStatementConverter() {
+        super(RegistryIdentifier.ofDefault("for_statement"));
+    }
+
     @Override
     public ForStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -60,10 +64,5 @@ public class ForStatementConverter extends Converter<ForStatement> {
         result.add("body", body);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("for_statement");
     }
 }

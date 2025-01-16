@@ -12,6 +12,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class CallArgExpressionConverter extends Converter<CallArgExpression> {
+    public CallArgExpressionConverter() {
+        super(RegistryIdentifier.ofDefault("call_arg_expression"));
+    }
+
     @Override
     public CallArgExpression deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -44,10 +48,5 @@ public class CallArgExpressionConverter extends Converter<CallArgExpression> {
         result.addProperty("is_constant", callArgExpression.isConstant());
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("call_arg_expression");
     }
 }

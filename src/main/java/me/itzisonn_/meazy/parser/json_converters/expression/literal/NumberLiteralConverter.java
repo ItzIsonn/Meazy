@@ -9,6 +9,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class NumberLiteralConverter extends Converter<NumberLiteral> {
+    public NumberLiteralConverter() {
+        super(RegistryIdentifier.ofDefault("number_literal"));
+    }
+
     @Override
     public NumberLiteral deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -31,10 +35,5 @@ public class NumberLiteralConverter extends Converter<NumberLiteral> {
         result.addProperty("is_int", numberLiteral.isInt());
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("number_literal");
     }
 }

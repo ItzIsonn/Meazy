@@ -16,7 +16,7 @@ public class ClassDeclarationStatement implements Statement {
     }
 
     @Override
-    public String toCodeString(int offset) {
+    public String toCodeString(int offset) throws IllegalArgumentException {
         StringBuilder bodyBuilder = new StringBuilder();
         for (Statement statement : body) {
             bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");

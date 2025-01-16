@@ -4,6 +4,7 @@ import lombok.Getter;
 
 /**
  * Entry used by registries
+ *
  * @see Registry
  * @see RegistryIdentifier
  *
@@ -30,22 +31,27 @@ public class RegistryEntry<T> {
      * @param identifier Entry's id
      * @param value Entry's value
      * @param overrideable Is this entry overridable
+     *
+     * @throws NullPointerException If given identifier or value is null
      */
-    public RegistryEntry(RegistryIdentifier identifier, T value, boolean overrideable) {
+    public RegistryEntry(RegistryIdentifier identifier, T value, boolean overrideable) throws NullPointerException {
+        if (identifier == null) throw new NullPointerException("Identifier can't be null");
+        if (value == null) throw new NullPointerException("Value can't be null");
+
         this.identifier = identifier;
         this.value = value;
         this.overrideable = overrideable;
     }
 
     /**
-     * RegistryEntry constructor with overridable defaulted to true
+     * RegistryEntry constructor with overridable param defaulted to true
      *
      * @param identifier Entry's id
      * @param value Entry's value
+     *
+     * @throws NullPointerException If given identifier or value is null
      */
     public RegistryEntry(RegistryIdentifier identifier, T value) {
-        this.identifier = identifier;
-        this.value = value;
-        this.overrideable = true;
+        this(identifier, value, true);
     }
 }

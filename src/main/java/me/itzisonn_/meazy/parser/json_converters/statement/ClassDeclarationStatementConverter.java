@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClassDeclarationStatementConverter extends Converter<ClassDeclarationStatement> {
+    public ClassDeclarationStatementConverter() {
+        super(RegistryIdentifier.ofDefault("class_declaration_statement"));
+    }
+
     @Override
     public ClassDeclarationStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -40,10 +44,5 @@ public class ClassDeclarationStatementConverter extends Converter<ClassDeclarati
         result.add("body", body);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("class_declaration_statement");
     }
 }

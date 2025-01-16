@@ -9,6 +9,10 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import java.lang.reflect.Type;
 
 public class BooleanLiteralConverter extends Converter<BooleanLiteral> {
+    public BooleanLiteralConverter() {
+        super(RegistryIdentifier.ofDefault("boolean_literal"));
+    }
+
     @Override
     public BooleanLiteral deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -27,10 +31,5 @@ public class BooleanLiteralConverter extends Converter<BooleanLiteral> {
         result.addProperty("value", booleanLiteral.isValue());
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("boolean_literal");
     }
 }

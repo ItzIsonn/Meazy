@@ -16,6 +16,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class VariableDeclarationConverter extends Converter<VariableDeclarationStatement> {
+    public VariableDeclarationConverter() {
+        super(RegistryIdentifier.ofDefault("variable_declaration_statement"));
+    }
+
     @Override
     public VariableDeclarationStatement deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
@@ -64,10 +68,5 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         result.add("access_modifiers", accessModifiers);
 
         return result;
-    }
-
-    @Override
-    public RegistryIdentifier getIdentifier() {
-        return RegistryIdentifier.ofDefault("variable_declaration_statement");
     }
 }
