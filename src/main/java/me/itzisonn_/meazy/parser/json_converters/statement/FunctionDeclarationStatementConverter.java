@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
@@ -44,16 +43,11 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
             dataType = DataTypes.parse(object.get("return_data_type").getAsString());
         }
 
-        Expression arraySize = null;
-        if (object.get("array_size") != null) {
-            arraySize = jsonDeserializationContext.deserialize(object.get("array_size"), Expression.class);
-        }
-
         if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
         Set<AccessModifier> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier ->
                 AccessModifiers.parse(accessModifier.getAsString())).collect(Collectors.toSet());
 
-        return new FunctionDeclarationStatement(id, args, body, dataType, arraySize, accessModifiers);
+        return new FunctionDeclarationStatement(id, args, body, dataType, accessModifiers);
     }
 
     @Override
@@ -77,8 +71,6 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         if (functionDeclarationStatement.getReturnDataType() != null) {
             result.addProperty("return_data_type", functionDeclarationStatement.getReturnDataType().getName());
         }
-
-        if (functionDeclarationStatement.getArraySize() != null) result.add("array_size", jsonSerializationContext.serialize(functionDeclarationStatement.getArraySize()));
 
         JsonArray accessModifiers = new JsonArray();
         for (AccessModifier accessModifier : functionDeclarationStatement.getAccessModifiers()) {

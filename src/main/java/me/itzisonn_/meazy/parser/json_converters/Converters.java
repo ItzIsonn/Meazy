@@ -87,8 +87,6 @@ public final class Converters {
         register(new NumberLiteralConverter());
         register(new StringLiteralConverter());
 
-        register(new ArrayDeclarationExpressionConverter());
-        register(new ArrayPointerExpressionConverter());
         register(new AssignmentExpressionConverter());
         register(new BinaryExpressionConverter());
         register(new CallArgExpressionConverter());

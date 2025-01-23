@@ -126,22 +126,12 @@ public final class ParsingFunctions {
             }).toList();
 
             DataType dataType = null;
-            Expression arraySize = null;
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
                 if (!getCurrent().getType().equals(TokenTypes.ID()))
                     throw new InvalidStatementException("Must specify function's return data type after colon", getCurrent().getLine());
 
                 dataType = DataTypes.parse(getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue());
-
-                if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
-                    getCurrentAndNext();
-                    if (getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) arraySize = new NullLiteral();
-                    else {
-                        arraySize = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-                    }
-                    getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close array size");
-                }
             }
 
             moveOverOptionalNewLine();
@@ -150,7 +140,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
 
-            return new FunctionDeclarationStatement(id, args, body, dataType, arraySize, accessModifiers);
+            return new FunctionDeclarationStatement(id, args, body, dataType, accessModifiers);
         });
 
         register("function_arg", extra -> {
@@ -158,16 +148,6 @@ public final class ParsingFunctions {
                 throw new UnexpectedTokenException("Expected variable keyword at the beginning of function arg", getCurrent().getLine());
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
-
-            Expression arraySize = null;
-            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
-                getCurrentAndNext();
-                if (getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) arraySize = new NullLiteral();
-                else {
-                    arraySize = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-                }
-                getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close array size");
-            }
 
             DataType argDataType = null;
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
@@ -177,7 +157,7 @@ public final class ParsingFunctions {
                 argDataType = DataTypes.parse(getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue());
             }
 
-            return new CallArgExpression(id, arraySize, argDataType, isConstant);
+            return new CallArgExpression(id, argDataType, isConstant);
         });
 
         register("variable_declaration", extra -> {
@@ -188,16 +168,6 @@ public final class ParsingFunctions {
 
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword").getValue();
-
-            Expression arraySize = null;
-            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
-                getCurrentAndNext();
-                if (getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) arraySize = new NullLiteral();
-                else {
-                    arraySize = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-                }
-                getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close array size");
-            }
 
             DataType dataType = null;
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
@@ -210,17 +180,16 @@ public final class ParsingFunctions {
 
             if (!getCurrent().getType().equals(TokenTypes.ASSIGN())) {
                 if (canWithoutValue) {
-                    return new VariableDeclarationStatement(id, arraySize, dataType, null, isConstant, accessModifiers);
+                    return new VariableDeclarationStatement(id, dataType, null, isConstant, accessModifiers);
                 }
                 if (isConstant) throw new InvalidStatementException("Can't declare a constant variable without a value", getCurrent().getLine());
-                return new VariableDeclarationStatement(id, arraySize, dataType, new NullLiteral(), false, accessModifiers);
+                return new VariableDeclarationStatement(id, dataType, new NullLiteral(), false, accessModifiers);
             }
 
             getCurrentAndNext(TokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
 
             return new VariableDeclarationStatement(
                     id,
-                    arraySize,
                     dataType,
                     parse(RegistryIdentifier.ofDefault("expression"), Expression.class),
                     isConstant,
@@ -432,7 +401,7 @@ public final class ParsingFunctions {
         register("expression", extra -> parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class));
 
         register("assignment_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("array_expression"), Expression.class);
+            Expression left = parse(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
 
             if (getCurrent().getType() == TokenTypes.ASSIGN()) {
                 getCurrentAndNext();
@@ -449,16 +418,6 @@ public final class ParsingFunctions {
             }
 
             return left;
-        });
-
-        register("array_expression", extra -> {
-            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
-                getCurrentAndNext();
-                List<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_BRACE() ? new ArrayList<>() : parseCallArgsList();
-                getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close array declaration");
-                return new ArrayDeclarationExpression(args);
-            }
-            else return parse(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
         });
 
         register("logical_expression", extra -> {
@@ -602,13 +561,6 @@ public final class ParsingFunctions {
                     identifier = new FunctionIdentifier(getCurrentAndNext().getValue());
                 }
                 else identifier = new VariableIdentifier(getCurrentAndNext().getValue());
-
-                if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
-                    getCurrentAndNext();
-                    Expression arraySize = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-                    getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close array size");
-                    return new ArrayPointerExpression(identifier, arraySize);
-                }
 
                 return identifier;
             }

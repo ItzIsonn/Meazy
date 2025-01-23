@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.environment.interfaces.declaration;
 
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
-import me.itzisonn_.meazy.runtime.values.ArrayValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.clazz.constructor.ConstructorValue;
 
@@ -32,13 +31,7 @@ public interface ConstructorDeclarationEnvironment extends Environment {
 
             for (int i = 0; i < args.size(); i++) {
                 CallArgExpression callArgExpression = callArgExpressions.get(i);
-                if (callArgExpression.getArraySize() != null) {
-                    if (!(args.get(i).getFinalRuntimeValue() instanceof ArrayValue arrayValue)) continue main;
-                    for (RuntimeValue<?> runtimeValue : arrayValue.getValue()) {
-                        if (!callArgExpression.getDataType().isMatches(runtimeValue.getFinalRuntimeValue())) continue main;
-                    }
-                }
-                else if (!callArgExpression.getDataType().isMatches(args.get(i).getFinalRuntimeValue())) continue main;
+                if (!callArgExpression.getDataType().isMatches(args.get(i).getFinalRuntimeValue())) continue main;
             }
 
 

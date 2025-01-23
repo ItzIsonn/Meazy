@@ -6,8 +6,8 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.StringClassEnvironment;
 import me.itzisonn_.meazy.runtime.values.BooleanValue;
-import me.itzisonn_.meazy.runtime.values.InnerStringValue;
 import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
 import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
@@ -71,7 +71,7 @@ public final class DataTypes {
         return new DataType(name) {
             public boolean isMatches(Object value) {
                 if (value instanceof ClassValue classValue) return classValue.getId().equals(name);
-                if (value instanceof InnerStringValue innerStringValue) return innerStringValue.getValue().equals(name);
+                if (value instanceof StringClassEnvironment.InnerStringValue innerStringValue) return innerStringValue.getValue().equals(name);
                 return false;
             }
         };
@@ -132,7 +132,7 @@ public final class DataTypes {
 
         register("string", o -> {
             if (o instanceof DefaultClassValue defaultClassValue) return defaultClassValue.getId().equals("string");
-            return o instanceof String || o instanceof StringLiteral || o instanceof InnerStringValue;
+            return o instanceof String || o instanceof StringLiteral || o instanceof StringClassEnvironment.InnerStringValue;
         });
     }
 }

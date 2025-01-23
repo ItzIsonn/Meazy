@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @EqualsAndHashCode
-public abstract class RuntimeValue<T> {
+public class RuntimeValue<T> {
     /**
      * Value
      */
@@ -21,7 +21,7 @@ public abstract class RuntimeValue<T> {
      *
      * @param value Value to store
      */
-    protected RuntimeValue(T value) {
+    public RuntimeValue(T value) {
         this.value = value;
     }
 

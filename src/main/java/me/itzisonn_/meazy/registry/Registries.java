@@ -182,12 +182,11 @@ public final class Registries {
 
         TOKENIZATION_FUNCTION.register(RegistryIdentifier.ofDefault("tokens_function"), lines -> {
             List<Token> tokens = new ArrayList<>();
-            TokenType tokenType;
             int lineNumber = 1;
 
             for (int i = 0; i < lines.length(); i++) {
                 if (i == lines.length() - 1) {
-                    tokenType = TokenTypes.parse(String.valueOf(lines.charAt(i)));
+                    TokenType tokenType = TokenTypes.parse(String.valueOf(lines.charAt(i)));
                     if (tokenType != null && !tokenType.isShouldSkip()) tokens.add(new Token(lineNumber, tokenType, String.valueOf(lines.charAt(i))));
                     break;
                 }
@@ -197,7 +196,7 @@ public final class Registries {
                 int lastFound = -1;
                 for (int j = i; j < lines.length(); j++) {
                     lastString += lines.charAt(j);
-                    tokenType = TokenTypes.parse(lastString);
+                    TokenType tokenType = TokenTypes.parse(lastString);
 
                     if (lastMatched != null && tokenType == null) {
                         break;

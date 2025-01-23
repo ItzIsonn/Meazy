@@ -1,10 +1,13 @@
 package me.itzisonn_.meazy;
 
+import me.itzisonn_.meazy.runtime.values.RuntimeValue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -22,11 +25,6 @@ public final class Utils {
      * System.in Scanner
      */
     public static final Scanner SCANNER = new Scanner(System.in);
-
-    /**
-     * Random class
-     */
-    public static final Random RANDOM = new Random();
 
     /**
      * Counts number of target's matches in given string
@@ -130,5 +128,19 @@ public final class Utils {
         if (offset < 0) throw new IllegalArgumentException("Offset can't be negative");
 
         return "\t".repeat(offset);
+    }
+
+    /**
+     * Iterates over given list and uses {@link RuntimeValue#getFinalValue()} function on all elements.
+     *
+     * @param list List of RuntimeValues
+     * @return Unpacked list
+     */
+    public static List<Object> unpackRuntimeValuesList(List<RuntimeValue<?>> list) {
+        List<Object> unpackedList = new ArrayList<>();
+        for (RuntimeValue<?> runtimeValue : list) {
+            unpackedList.add(runtimeValue.getFinalValue());
+        }
+        return unpackedList;
     }
 }

@@ -28,11 +28,6 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
         String id = object.get("id").getAsString();
 
-        Expression arraySize = null;
-        if (object.get("array_size") != null) {
-            arraySize = jsonDeserializationContext.deserialize(object.get("array_size"), Expression.class);
-        }
-
         if (object.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
         DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
 
@@ -48,7 +43,7 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         Set<AccessModifier> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier ->
                 AccessModifiers.parse(accessModifier.getAsString())).collect(Collectors.toSet());
 
-        return new VariableDeclarationStatement(id, arraySize, dataType, value, isConstant, accessModifiers);
+        return new VariableDeclarationStatement(id, dataType, value, isConstant, accessModifiers);
     }
 
     @Override
@@ -56,7 +51,6 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         JsonObject result = getJsonObject();
 
         result.addProperty("id", variableDeclarationStatement.getId());
-        if (variableDeclarationStatement.getArraySize() != null) result.add("array_size", jsonSerializationContext.serialize(variableDeclarationStatement.getArraySize()));
         result.addProperty("data_type", variableDeclarationStatement.getDataType().getName());
         if (variableDeclarationStatement.getValue() != null) result.add("value", jsonSerializationContext.serialize(variableDeclarationStatement.getValue()));
         result.addProperty("is_constant", variableDeclarationStatement.isConstant());

@@ -7,7 +7,6 @@ import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
 import java.util.List;
 import java.util.Set;
@@ -17,8 +16,8 @@ import java.util.Set;
 public class RuntimeFunctionValue extends FunctionValue {
     private final List<Statement> body;
 
-    public RuntimeFunctionValue(String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType, RuntimeValue<?> arraySize, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
-        super(id, args, returnDataType, arraySize, parentEnvironment, accessModifiers);
+    public RuntimeFunctionValue(String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
+        super(id, args, returnDataType, parentEnvironment, accessModifiers);
         this.body = body;
     }
 }
