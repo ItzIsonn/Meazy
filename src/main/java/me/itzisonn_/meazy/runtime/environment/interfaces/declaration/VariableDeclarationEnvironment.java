@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
 import java.util.List;
@@ -18,25 +17,23 @@ public interface VariableDeclarationEnvironment extends Environment {
      * Declares variable with given data in this environment
      *
      * @param id Variable's id
-     * @param arraySize Variable's array size
      * @param dataType Variable's DataType
      * @param value Variable's value
      * @param isConstant Whether is this variable constant
      * @param accessModifiers Variable's AccessModifiers
      */
-    void declareVariable(String id, RuntimeValue<?> arraySize, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers);
+    void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers);
 
     /**
      * Declares argument with given data in this environment
      *
      * @param id Argument's id
-     * @param arraySize Argument's array size
      * @param dataType Argument's DataType
      * @param value Argument's value
      * @param isConstant Whether is this argument constant
      * @param accessModifiers Argument's AccessModifiers
      */
-    void declareArgument(String id, RuntimeValue<?> arraySize, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers);
+    void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers);
 
     /**
      * Assigns value to existing non-constant variable
@@ -68,8 +65,7 @@ public interface VariableDeclarationEnvironment extends Environment {
     @Override
     default VariableDeclarationEnvironment getVariableDeclarationEnvironment(String id) {
         if (getVariable(id) != null) return this;
-        if (getParent() == null || !(getParent() instanceof VariableDeclarationEnvironment variableDeclarationEnvironment))
-            throw new InvalidIdentifierException("Variable with id " + id + " doesn't exist!");
+        if (getParent() == null || !(getParent() instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) return null;
         return variableDeclarationEnvironment.getVariableDeclarationEnvironment(id);
     }
 }

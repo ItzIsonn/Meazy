@@ -3,18 +3,14 @@ package me.itzisonn_.meazy.runtime.environment.basic;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.ArraysClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.InputClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.MathClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.TypesClassEnvironment;
+import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.*;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.ArrayValue;
-import me.itzisonn_.meazy.runtime.values.NullValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
 import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
@@ -94,47 +90,21 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
     private void init() {
         declareFunction(new DefaultFunctionValue("print", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), null, this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object arg = functionArgs.getFirst().getFinalValue();
-                if (arg instanceof List<?> list) {
-                    StringBuilder toPrint = new StringBuilder();
-                    for (int i = 0; i < list.size(); i++) {
-                        Object object = list.get(i);
-                        if (object instanceof RuntimeValue<?> runtimeValue) {
-                            toPrint.append(runtimeValue.getFinalValue());
-                        }
-                        else toPrint.append(object);
-                        if (i < list.size() - 1) toPrint.append(", ");
-                    }
-                    System.out.print(toPrint);
-                }
-                else System.out.print(arg);
+                System.out.print(functionArgs.getFirst().getFinalValue());
                 return null;
             }
         });
 
         declareFunction( new DefaultFunctionValue("println", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), null, this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object arg = functionArgs.getFirst().getFinalValue();
-                if (arg instanceof ArrayList<?> arrayList) {
-                    StringBuilder toPrint = new StringBuilder();
-                    for (int i = 0; i < arrayList.size(); i++) {
-                        Object object = arrayList.get(i);
-                        if (object instanceof RuntimeValue<?> runtimeValue) {
-                            toPrint.append(runtimeValue.getFinalValue());
-                        }
-                        else toPrint.append(object);
-                        if (i < arrayList.size() - 1) toPrint.append(", ");
-                    }
-                    System.out.println(toPrint);
-                }
-                else System.out.println(arg);
+                System.out.println(functionArgs.getFirst().getFinalValue());
                 return null;
             }
         });
 
         declareFunction(new DefaultFunctionValue("range",
                 new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT(), true), new CallArgExpression("end", DataTypes.INT(), true))),
-                DataTypes.INT(), new NullValue(), this, new HashSet<>()) {
+                DataTypes.parse("List"), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 int begin;
@@ -153,14 +123,15 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
                 for (int i = begin; i < end; i++) {
                     list.add(new IntValue(i));
                 }
-                return new ArrayValue(list);
+                return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
             }
         });
 
 
         declareClass("Input", new DefaultClassValue(new InputClassEnvironment(this)));
         declareClass("Types", new DefaultClassValue(new TypesClassEnvironment(this)));
+        declareClass("List", new DefaultClassValue(new ListClassEnvironment(this)));
         declareClass("Math", new DefaultClassValue(new MathClassEnvironment(this)));
-        declareClass("Arrays", new DefaultClassValue(new ArraysClassEnvironment(this)));
+        declareClass("Random", new DefaultClassValue(new RandomClassEnvironment(this)));
     }
 }

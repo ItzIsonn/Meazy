@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
@@ -11,6 +10,7 @@ import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
+import me.itzisonn_.meazy.runtime.values.number.NumberValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,34 +21,28 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Math");
 
 
-        declareVariable("PI", null, DataTypes.FLOAT(), new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
-        declareVariable("E", null, DataTypes.FLOAT(), new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
+        declareVariable("PI", DataTypes.FLOAT(), new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
+        declareVariable("E", DataTypes.FLOAT(), new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
 
 
         declareFunction(new DefaultFunctionValue("round", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue doubleValue) {
-                    return new IntValue((int) Math.round(doubleValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't round non-number value");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
+                return new IntValue((int) Math.round(numberValue.getValue().doubleValue()));
             }
         });
 
         declareFunction(new DefaultFunctionValue("floor", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue doubleValue) {
-                    return new IntValue((int) Math.floor(doubleValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't round non-number value");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
+                return new IntValue((int) Math.floor(numberValue.getValue().doubleValue()));
             }
         });
 
         declareFunction(new DefaultFunctionValue("ceil", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue doubleValue) {
-                    return new IntValue((int) Math.ceil(doubleValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't round non-number value");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
+                return new IntValue((int) Math.ceil(numberValue.getValue().doubleValue()));
             }
         });
 
@@ -56,20 +50,16 @@ public class MathClassEnvironment extends BasicClassEnvironment {
                 new ArrayList<>(List.of(new CallArgExpression("number", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
                 DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue numberValue &&
-                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue degreeValue) {
-                    return new DoubleValue(Math.pow(numberValue.getValue(), degreeValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get power non-number value");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> degreeValue)) throw new InvalidSyntaxException("Can't get power non-number values");
+                return new DoubleValue(Math.pow(numberValue.getValue().doubleValue(), degreeValue.getValue().doubleValue()));
             }
         });
 
         declareFunction(new DefaultFunctionValue("abs", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue number) {
-                    return new DoubleValue(Math.abs(number.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get abs value of non-number value");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> number)) throw new InvalidSyntaxException("Can't get abs value of non-number value");
+                return new DoubleValue(Math.abs(number.getValue().doubleValue()));
             }
         });
 
@@ -77,11 +67,9 @@ public class MathClassEnvironment extends BasicClassEnvironment {
                 new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
                 DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue numberValue &&
-                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue degreeValue) {
-                    return new DoubleValue(Math.min(numberValue.getValue(), degreeValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get min of non-number values");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> firstValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> secondValue)) throw new InvalidSyntaxException("Can't get min of non-number values");
+                return new DoubleValue(Math.min(firstValue.getValue().doubleValue(), secondValue.getValue().doubleValue()));
             }
         });
 
@@ -89,73 +77,20 @@ public class MathClassEnvironment extends BasicClassEnvironment {
                 new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
                 DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue numberValue &&
-                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue degreeValue) {
-                    return new DoubleValue(Math.max(numberValue.getValue(), degreeValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get max of non-number values");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> firstValue &&
+                        functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> secondValue)) throw new InvalidSyntaxException("Can't get max of non-number values");
+                return new DoubleValue(Math.max(firstValue.getValue().doubleValue(), secondValue.getValue().doubleValue()));
             }
         });
 
         declareFunction(new DefaultFunctionValue("factorial", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue numberValue) {
-                    int result = 1;
-                    for (int i = 1; i <= numberValue.getValue(); i++) {
-                        result = result * i;
-                    }
-                    return new IntValue(result);
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue numberValue)) throw new InvalidSyntaxException("Can't get factorial of non-int value");
+                int result = 1;
+                for (int i = 1; i <= numberValue.getValue(); i++) {
+                    result = result * i;
                 }
-                throw new InvalidSyntaxException("Can't get factorial of non-int value");
-            }
-        });
-
-        declareFunction(new DefaultFunctionValue("randomInt", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue number) {
-                    return new IntValue(Utils.RANDOM.nextInt(number.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get random of non-int value");
-            }
-        });
-
-        declareFunction(new DefaultFunctionValue("randomInt",
-                new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT(), true), new CallArgExpression("end", DataTypes.INT(), true))),
-                DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue beginValue &&
-                        functionArgs.get(1).getFinalRuntimeValue() instanceof IntValue endValue) {
-                    return new IntValue(Utils.RANDOM.nextInt(beginValue.getValue(), endValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get random of non-int values");
-            }
-        });
-
-        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                return new DoubleValue(Utils.RANDOM.nextDouble());
-            }
-        });
-
-
-        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue number) {
-                    return new DoubleValue(Utils.RANDOM.nextDouble(number.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get random of non-number value");
-            }
-        });
-
-        declareFunction(new DefaultFunctionValue("randomFloat",
-                new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.FLOAT(), true), new CallArgExpression("end", DataTypes.FLOAT(), true))),
-                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof DoubleValue beginValue &&
-                        functionArgs.get(1).getFinalRuntimeValue() instanceof DoubleValue endValue) {
-                    return new DoubleValue(Utils.RANDOM.nextDouble(beginValue.getValue(), endValue.getValue()));
-                }
-                throw new InvalidSyntaxException("Can't get random of non-number values");
+                return new IntValue(result);
             }
         });
     }

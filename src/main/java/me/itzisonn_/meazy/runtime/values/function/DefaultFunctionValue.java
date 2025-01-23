@@ -13,12 +13,8 @@ import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 public abstract class DefaultFunctionValue extends FunctionValue {
-    public DefaultFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, RuntimeValue<?> arraySize, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
-        super(id, args, returnDataType, arraySize, parentEnvironment, accessModifiers);
-    }
-
     public DefaultFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
-        super(id, args, returnDataType, null, parentEnvironment, accessModifiers);
+        super(id, args, returnDataType, parentEnvironment, accessModifiers);
     }
 
     public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);

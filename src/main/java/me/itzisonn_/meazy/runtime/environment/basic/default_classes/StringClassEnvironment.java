@@ -3,12 +3,14 @@ package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.*;
+import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.clazz.constructor.DefaultConstructorValue;
 import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
@@ -23,7 +25,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
         super(parent, false, "string");
 
 
-        declareVariable("value", null, DataTypes.STRING(), new InnerStringValue(value), false, Set.of(AccessModifiers.PRIVATE()));
+        declareVariable("value", DataTypes.STRING(), new InnerStringValue(value), false, Set.of(AccessModifiers.PRIVATE()));
         declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of(AccessModifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
@@ -135,20 +137,14 @@ public class StringClassEnvironment extends BasicClassEnvironment {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue().getValue();
 
-                int pos;
-                try {
-                    pos = Integer.parseInt(functionArgs.getFirst().getFinalValue().toString().replaceAll("\\.0$", ""));
-                }
-                catch (NumberFormatException ignore) {
-                    throw new InvalidArgumentException("Position must be int");
-                }
-
                 if (value instanceof String string) {
-                    try {
-                        return new StringValue(String.valueOf(string.charAt(pos)));
-                    }
-                    catch (IndexOutOfBoundsException ignore) {
-                        throw new InvalidArgumentException("Index " + pos + "out of bounds " + (string.length() - 1));
+                    if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue intValue) {
+                        try {
+                            return new StringValue(String.valueOf(string.charAt(intValue.getValue())));
+                        }
+                        catch (IndexOutOfBoundsException ignore) {
+                            throw new InvalidArgumentException("Index " + intValue.getValue() + "out of bounds " + (string.length() - 1));
+                        }
                     }
                 }
                 throw new InvalidSyntaxException("Value must be string");
@@ -307,7 +303,7 @@ public class StringClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("split", new ArrayList<>(List.of(new CallArgExpression("regex", DataTypes.STRING(), true))), DataTypes.STRING(), new NullValue(), this, new HashSet<>()) {
+        declareFunction(new DefaultFunctionValue("split", new ArrayList<>(List.of(new CallArgExpression("regex", DataTypes.STRING(), true))), DataTypes.STRING(), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue().getValue();
@@ -318,10 +314,16 @@ public class StringClassEnvironment extends BasicClassEnvironment {
                     for (String str : splitString) {
                         list.add(new StringValue(str));
                     }
-                    return new ArrayValue(list);
+                    return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
                 }
                 throw new InvalidSyntaxException("Value must be string");
             }
         });
+    }
+
+    public static class InnerStringValue extends RuntimeValue<String> {
+        private InnerStringValue(String value) {
+            super(value);
+        }
     }
 }

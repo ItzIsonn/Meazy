@@ -26,17 +26,15 @@ public class BasicVariableDeclarationEnvironment extends BasicEnvironment implem
     }
 
     @Override
-    public void declareVariable(String id, RuntimeValue<?> arraySize, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers) {
-        RuntimeVariable runtimeVariable = getVariable(id);
-        if (runtimeVariable != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
-        variables.add(new RuntimeVariable(id, arraySize, dataType, value, isConstant, accessModifiers, false));
+    public void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers) {
+        if (getVariableDeclarationEnvironment(id) != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
+        variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, false));
     }
 
     @Override
-    public void declareArgument(String id, RuntimeValue<?> arraySize, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers) {
-        RuntimeVariable runtimeVariable = getVariable(id);
-        if (runtimeVariable != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
-        variables.add(new RuntimeVariable(id, arraySize, dataType, value, isConstant, accessModifiers, true));
+    public void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers) {
+        if (getVariable(id) != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
+        variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, true));
     }
 
     @Override

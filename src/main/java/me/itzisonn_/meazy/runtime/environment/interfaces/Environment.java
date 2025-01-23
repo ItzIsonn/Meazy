@@ -49,11 +49,11 @@ public interface Environment {
      * Searches for variable with given id in this environment and all parents
      *
      * @param id Variable's id
-     * @return VariableDeclarationEnvironment that has requested variable
+     * @return VariableDeclarationEnvironment that has requested variable or null
      */
     default VariableDeclarationEnvironment getVariableDeclarationEnvironment(String id) {
         Environment parent = getParent();
-        if (parent == null) throw new InvalidIdentifierException("Variable with id " + id + " doesn't exist!");
+        if (parent == null) return null;
         return parent.getVariableDeclarationEnvironment(id);
     }
 
