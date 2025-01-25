@@ -42,8 +42,18 @@ public class RandomClassEnvironment extends BasicClassEnvironment {
             }
         });
 
+        declareFunction(new DefaultFunctionValue("setSeed", new ArrayList<>(List.of(new CallArgExpression("seed", DataTypes.INT(), true))), null, this, Set.of()) {
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
+                if (!(value instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Can't set seed to non-random value");
 
-        declareFunction(new DefaultFunctionValue("randomInt", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue intValue)) throw new InvalidSyntaxException("Can't set seed to non-int value");
+                randomValue.getValue().setSeed(intValue.getValue());
+                return null;
+            }
+        });
+
+        declareFunction(new DefaultFunctionValue("randomInt", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of()) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Can't get random from non-random value");
@@ -55,7 +65,7 @@ public class RandomClassEnvironment extends BasicClassEnvironment {
 
         declareFunction(new DefaultFunctionValue("randomInt",
                 new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT(), true), new CallArgExpression("end", DataTypes.INT(), true))),
-                DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+                DataTypes.INT(), this, Set.of()) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Can't get random from non-random value");
@@ -66,7 +76,7 @@ public class RandomClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(), DataTypes.FLOAT(), this, Set.of()) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Can't get random from non-random value");
@@ -76,7 +86,7 @@ public class RandomClassEnvironment extends BasicClassEnvironment {
         });
 
 
-        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("randomFloat", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of()) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Can't get random from non-random value");
@@ -88,7 +98,7 @@ public class RandomClassEnvironment extends BasicClassEnvironment {
 
         declareFunction(new DefaultFunctionValue("randomFloat",
                 new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.FLOAT(), true), new CallArgExpression("end", DataTypes.FLOAT(), true))),
-                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+                DataTypes.FLOAT(), this, Set.of()) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerRandomValue randomValue)) throw new InvalidSyntaxException("Can't get random from non-random value");

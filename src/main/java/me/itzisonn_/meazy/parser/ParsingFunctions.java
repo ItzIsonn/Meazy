@@ -620,6 +620,7 @@ public final class ParsingFunctions {
 
         while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             body.add(parse(RegistryIdentifier.ofDefault("statement")));
+            moveOverOptionalNewLines();
         }
 
         moveOverOptionalNewLines();
