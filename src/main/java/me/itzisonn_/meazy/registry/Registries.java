@@ -26,7 +26,7 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.*;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.function.RuntimeFunctionValue;
+import me.itzisonn_.meazy.runtime.values.functions.RuntimeFunctionValue;
 import me.itzisonn_.meazy.runtime.values.statement_info.ReturnInfoValue;
 import org.apache.logging.log4j.Level;
 
@@ -226,7 +226,7 @@ public final class Registries {
             if (tokens == null) throw new NullPointerException("Tokens can't be null!");
             Parser.setTokens(tokens);
 
-            Parser.moveOverOptionalNewLine();
+            Parser.moveOverOptionalNewLines();
 
             List<Statement> body = new ArrayList<>();
             while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
@@ -234,7 +234,7 @@ public final class Registries {
                 body.add(statement);
             }
 
-            return new Program(MeazyMain.getVersion(), body);
+            return new Program(MeazyMain.VERSION, body);
         });
 
         EVALUATE_PROGRAM_FUNCTION.register(RegistryIdentifier.ofDefault("evaluate_program"), program -> {
@@ -242,7 +242,7 @@ public final class Registries {
 
             RuntimeValue<?> runtimeValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getFunction("main", new ArrayList<>());
             if (runtimeValue == null) {
-                MeazyMain.getLogger().log(Level.WARN, "File doesn't contain main function");
+                MeazyMain.LOGGER.log(Level.WARN, "File doesn't contain main function");
                 return;
             }
 
@@ -275,14 +275,16 @@ public final class Registries {
                     }
                 }
             }
-            else MeazyMain.getLogger().log(Level.WARN, "File contains invalid main function");
+            else MeazyMain.LOGGER.log(Level.WARN, "File contains invalid main function");
         });
 
-        Registries.GLOBAL_ENVIRONMENT.register(RegistryIdentifier.ofDefault("global_environment"), new BasicGlobalEnvironment());
-        Registries.CLASS_ENVIRONMENT.register(RegistryIdentifier.ofDefault("class_environment"), BasicClassEnvironment.class);
-        Registries.FUNCTION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("function_environment"), BasicFunctionEnvironment.class);
-        Registries.VARIABLE_DECLARATION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("variable_declaration_environment"), BasicVariableDeclarationEnvironment.class);
-        Registries.LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), BasicLoopEnvironment.class);
-        Registries.ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), BasicEnvironment.class);
+        BasicGlobalEnvironment globalEnvironment = new BasicGlobalEnvironment();
+        GLOBAL_ENVIRONMENT.register(RegistryIdentifier.ofDefault("global_environment"), globalEnvironment);
+        globalEnvironment.init();
+        CLASS_ENVIRONMENT.register(RegistryIdentifier.ofDefault("class_environment"), BasicClassEnvironment.class);
+        FUNCTION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("function_environment"), BasicFunctionEnvironment.class);
+        VARIABLE_DECLARATION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("variable_declaration_environment"), BasicVariableDeclarationEnvironment.class);
+        LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), BasicLoopEnvironment.class);
+        ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), BasicEnvironment.class);
     }
 }

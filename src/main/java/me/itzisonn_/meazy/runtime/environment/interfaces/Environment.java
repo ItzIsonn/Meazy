@@ -31,6 +31,19 @@ public interface Environment {
     }
 
     /**
+     * Returns environment that matches given predicate as a parent in this environment and all parents
+     *
+     * @param predicate Predicate that matches parent environment
+     * @return Requested parent or null
+     */
+    default Environment getParent(Predicate<Environment> predicate) {
+        Environment parent = getParent();
+        if (predicate.test(parent)) return parent;
+        if (parent != null) return parent.getParent(predicate);
+        return null;
+    }
+
+    /**
      * Searches for environment that matches given predicate as a parent in this environment and all parents
      *
      * @param predicate Predicate that matches parent environment

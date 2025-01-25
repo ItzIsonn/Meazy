@@ -10,9 +10,9 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.*;
-import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.values.clazz.constructor.DefaultConstructorValue;
-import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
+import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 
 import java.util.ArrayList;

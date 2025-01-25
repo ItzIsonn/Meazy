@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime.values.clazz.constructor;
+package me.itzisonn_.meazy.runtime.values.classes.constructors;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,6 +10,9 @@ import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * ClassValue represents runtime constructor value
+ */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class ConstructorValue extends RuntimeValue<Object> {
@@ -17,6 +20,13 @@ public abstract class ConstructorValue extends RuntimeValue<Object> {
     protected final ConstructorDeclarationEnvironment parentEnvironment;
     protected final Set<AccessModifier> accessModifiers;
 
+    /**
+     * ConstructorValue constructor
+     *
+     * @param args Args of this ConstructorValue
+     * @param parentEnvironment Parent of this ConstructorValue
+     * @param accessModifiers AccessModifiers of this ConstructorValue
+     */
     public ConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
         super(null);
         this.args = args;

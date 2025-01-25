@@ -60,7 +60,8 @@ public final class TokenTypeSets {
                 TokenTypes.CONTINUE(),
                 TokenTypes.BREAK(),
                 TokenTypes.NULL(),
-                TokenTypes.BOOLEAN()));
+                TokenTypes.BOOLEAN(),
+                TokenTypes.THIS()));
 
         register("operator_assign", new TokenTypeSet(
                 TokenTypes.PLUS_ASSIGN(),

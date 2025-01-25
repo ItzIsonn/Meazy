@@ -16,10 +16,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
@@ -75,16 +72,16 @@ public final class ParsingFunctions {
                 getCurrentAndNext();
                 String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after class keyword").getValue();
 
-                moveOverOptionalNewLine();
+                moveOverOptionalNewLines();
                 getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
-                moveOverOptionalNewLine();
+                moveOverOptionalNewLines();
 
                 List<Statement> body = new ArrayList<>();
                 while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
                     body.add(parse(RegistryIdentifier.ofDefault("class_body_statement")));
                 }
 
-                moveOverOptionalNewLine();
+                moveOverOptionalNewLines();
                 getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
 
@@ -134,7 +131,7 @@ public final class ParsingFunctions {
                 dataType = DataTypes.parse(getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue());
             }
 
-            moveOverOptionalNewLine();
+            moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open function body");
             List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
@@ -205,7 +202,7 @@ public final class ParsingFunctions {
                 return callArgExpression;
             }).toList();
 
-            moveOverOptionalNewLine();
+            moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
             List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
@@ -228,28 +225,11 @@ public final class ParsingFunctions {
             if (getCurrent().getType().equals(TokenTypes.CONTINUE())) return parse(RegistryIdentifier.ofDefault("continue_statement"));
             if (getCurrent().getType().equals(TokenTypes.BREAK())) return parse(RegistryIdentifier.ofDefault("break_statement"));
 
-            if (getCurrent().getType().equals(TokenTypes.ID()) && getTokens().size() > getPos() + 1 && getTokens().get(getPos() + 1).getType().equals(TokenTypes.LEFT_PAREN())) {
-                Expression callMemberExpression = parse(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
-                if (callMemberExpression instanceof FunctionCallExpression) {
-                    getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the call statement");
-                    return callMemberExpression;
-                }
-            }
-
-            if (getCurrent().getType().equals(TokenTypes.NEW())) {
-                Expression classCallExpression = parse(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
-                if (classCallExpression instanceof ClassCallExpression) {
-                    getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class call statement");
-                    return classCallExpression;
-                }
-            }
-
-            if (getCurrent().getType().equals(TokenTypes.ID())) {
-                Expression assignmentExpression = parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class);
-                if (assignmentExpression instanceof AssignmentExpression || assignmentExpression instanceof MemberExpression) {
-                    getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the assignment statement");
-                    return assignmentExpression;
-                }
+            Expression expression  = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+            if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression ||
+                    expression instanceof AssignmentExpression || expression instanceof MemberExpression) {
+                getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of expression");
+                return expression;
             }
 
             throw new InvalidStatementException("Invalid statement found", getCurrent().getLine());
@@ -263,7 +243,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close if condition");
 
             List<Statement> body = new ArrayList<>();
-            moveOverOptionalNewLine();
+            moveOverOptionalNewLines();
             if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
                 getCurrentAndNext();
                 body = parseBody();
@@ -281,7 +261,7 @@ public final class ParsingFunctions {
                 }
                 else {
                     List<Statement> elseBody = new ArrayList<>();
-                    moveOverOptionalNewLine();
+                    moveOverOptionalNewLines();
                     if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
                         getCurrentAndNext();
                         elseBody = parseBody();
@@ -317,7 +297,7 @@ public final class ParsingFunctions {
 
                 getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close for condition");
 
-                moveOverOptionalNewLine();
+                moveOverOptionalNewLines();
                 getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
                 List<Statement> body = parseBody();
                 getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
@@ -347,7 +327,7 @@ public final class ParsingFunctions {
             }
             getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close for condition");
 
-            moveOverOptionalNewLine();
+            moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open for body");
             List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close for body");
@@ -364,7 +344,7 @@ public final class ParsingFunctions {
             Expression condition = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
             getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close while condition");
 
-            moveOverOptionalNewLine();
+            moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open while body");
             List<Statement> body = parseBody();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close while body");
@@ -476,15 +456,24 @@ public final class ParsingFunctions {
         });
 
         register("power_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class);
+            Expression left = parse(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
 
             while (getCurrent().getType() == TokenTypes.POWER()) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class);
+                Expression right = parse(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
                 left = new BinaryExpression(left, right, operator);
             }
 
             return left;
+        });
+
+        register("inversion_expression", extra -> {
+            if (getCurrent().getType() == TokenTypes.INVERSION()) {
+                getCurrentAndNext();
+                return new InversionExpression(parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class));
+            }
+
+            return parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class);
         });
 
         register("postfix_expression", extra -> {
@@ -553,16 +542,13 @@ public final class ParsingFunctions {
             TokenType tokenType = getCurrent().getType();
 
             if (tokenType == TokenTypes.ID()) {
-                Identifier identifier;
                 if ((getPos() != 0 && getTokens().get(getPos() - 1).getType().equals(TokenTypes.NEW())) ||
                         (getTokens().size() > getPos() + 1 && getTokens().get(getPos() + 1).getType().equals(TokenTypes.DOT()) && getPos() != 0 && !getTokens().get(getPos() - 1).getType().equals(TokenTypes.DOT())))
-                    identifier = new ClassIdentifier(getCurrentAndNext().getValue());
+                    return new ClassIdentifier(getCurrentAndNext().getValue());
                 else if (getTokens().size() > getPos() + 1 && getTokens().get(getPos() + 1).getType().equals(TokenTypes.LEFT_PAREN())) {
-                    identifier = new FunctionIdentifier(getCurrentAndNext().getValue());
+                    return new FunctionIdentifier(getCurrentAndNext().getValue());
                 }
-                else identifier = new VariableIdentifier(getCurrentAndNext().getValue());
-
-                return identifier;
+                else return new VariableIdentifier(getCurrentAndNext().getValue());
             }
             if (tokenType == TokenTypes.NULL()) {
                 getCurrentAndNext();
@@ -577,13 +563,17 @@ public final class ParsingFunctions {
                 String value = getCurrentAndNext().getValue();
                 return new StringLiteral(value.substring(1, value.length() - 1));
             }
+            if (tokenType == TokenTypes.BOOLEAN()) return new BooleanLiteral(Boolean.parseBoolean(getCurrentAndNext().getValue()));
+            if (tokenType == TokenTypes.THIS()) {
+                getCurrentAndNext();
+                return new ThisLiteral();
+            }
             if (tokenType == TokenTypes.LEFT_PAREN()) {
                 getCurrentAndNext();
                 Expression value = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
                 getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis inside expression");
                 return value;
             }
-            if (tokenType == TokenTypes.BOOLEAN()) return new BooleanLiteral(Boolean.parseBoolean(getCurrentAndNext().getValue()));
             if (tokenType == TokenTypes.NEW_LINE()) {
                 getCurrentAndNext();
                 return null;
@@ -626,13 +616,13 @@ public final class ParsingFunctions {
 
     private static List<Statement> parseBody() {
         List<Statement> body = new ArrayList<>();
-        moveOverOptionalNewLine();
+        moveOverOptionalNewLines();
 
         while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             body.add(parse(RegistryIdentifier.ofDefault("statement")));
         }
 
-        moveOverOptionalNewLine();
+        moveOverOptionalNewLines();
         return body;
     }
 

@@ -10,10 +10,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
@@ -28,13 +25,13 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.Constructor
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.*;
-import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
-import me.itzisonn_.meazy.runtime.values.clazz.RuntimeClassValue;
-import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.values.clazz.constructor.RuntimeConstructorValue;
-import me.itzisonn_.meazy.runtime.values.clazz.constructor.DefaultConstructorValue;
-import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.function.RuntimeFunctionValue;
+import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.RuntimeClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.RuntimeConstructorValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
+import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.values.functions.RuntimeFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 import me.itzisonn_.meazy.runtime.values.number.NumberValue;
@@ -514,6 +511,12 @@ public final class EvaluationFunctions {
             }
         });
 
+        register("inversion_expression", InversionExpression.class, (inversionExpression, environment, extra) -> {
+            RuntimeValue<?> value = Interpreter.evaluate(inversionExpression.getExpression(), environment).getFinalRuntimeValue();
+            if (!(value instanceof BooleanValue booleanValue)) throw new InvalidSyntaxException("Can't invert non-boolean value " + value);
+            return new BooleanValue(!booleanValue.getValue());
+        });
+
         register("function_call_expression", FunctionCallExpression.class, (functionCallExpression, environment, extra) -> {
             Environment extraEnvironment;
             if (extra.length == 0) extraEnvironment = environment;
@@ -823,6 +826,12 @@ public final class EvaluationFunctions {
         register("string_literal", StringLiteral.class, (stringLiteral, environment, extra) -> new StringValue(stringLiteral.getValue()));
 
         register("boolean_literal", BooleanLiteral.class, (booleanLiteral, environment, extra) -> new BooleanValue(booleanLiteral.isValue()));
+
+        register("this_literal", ThisLiteral.class, (thisLiteral, environment, extra) -> {
+            Environment parent = environment.getParent(env -> env instanceof ClassEnvironment);
+            if (!(parent instanceof ClassEnvironment classEnvironment)) throw new RuntimeException("Can't use 'this' keyword not inside a class");
+            return new DefaultClassValue(classEnvironment);
+        });
     }
 
 

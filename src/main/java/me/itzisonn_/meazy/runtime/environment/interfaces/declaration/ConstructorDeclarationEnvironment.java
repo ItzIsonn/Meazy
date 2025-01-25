@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime.environment.interfaces.declaration;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.clazz.constructor.ConstructorValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.ConstructorValue;
 
 import java.util.List;
 

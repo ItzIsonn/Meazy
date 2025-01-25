@@ -9,8 +9,8 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.clazz.constructor.ConstructorValue;
-import me.itzisonn_.meazy.runtime.values.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.ConstructorValue;
+import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
 
 import java.util.ArrayList;
 import java.util.List;

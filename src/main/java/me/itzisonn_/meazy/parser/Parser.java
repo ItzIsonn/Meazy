@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypes;
@@ -23,6 +24,7 @@ public final class Parser {
      * Position of current element in {@link Parser#tokens}
      */
     @Getter
+    @Setter
     private static int pos = 0;
 
     private Parser() {}
@@ -79,10 +81,10 @@ public final class Parser {
     }
 
     /**
-     * If current token's type is {@link TokenTypes#NEW_LINE()}, increments position by 1
+     * While current token's type is {@link TokenTypes#NEW_LINE()}, increments position by 1
      */
-    public static void moveOverOptionalNewLine() {
-        if (getCurrent().getType().equals(TokenTypes.NEW_LINE())) pos++;
+    public static void moveOverOptionalNewLines() {
+        while (getCurrent().getType().equals(TokenTypes.NEW_LINE())) pos++;
     }
 
     /**

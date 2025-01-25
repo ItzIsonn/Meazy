@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.json_converters.Converters;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,19 +41,16 @@ public final class Commands {
         if (isInit) throw new IllegalStateException("Commands have already been initialized!");
         isInit = true;
 
-        final Logger logger = MeazyMain.getLogger();
-        final String version = MeazyMain.getVersion();
-
         register("run", new Command(List.of("<file_to_run>")) {
             @Override
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    logger.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
+                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
                     return null;
                 }
 
-                logger.log(Level.INFO, "Running file '{}'", file.getAbsoluteFile());
+                MeazyMain.LOGGER.log(Level.INFO, "Running file '{}'", file.getAbsoluteFile());
 
                 String extension = Utils.getExtension(file);
                 long startMillis = System.currentTimeMillis();
@@ -66,20 +62,20 @@ public final class Commands {
                 else if (extension.equals("meac")) {
                     Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
                     if (program == null) {
-                        logger.log(Level.ERROR, "Failed to read file {}, try to run it in the same version of Meazy ({})", file.getAbsolutePath(), version);
+                        MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}, try to run it in the same version of Meazy ({})", file.getAbsolutePath(), MeazyMain.VERSION);
                         return null;
                     }
-                    if (Utils.isVersionAfter(version, program.getVersion())) {
-                        logger.log(Level.ERROR, "Can't run file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), version);
+                    if (Utils.isVersionAfter(MeazyMain.VERSION, program.getVersion())) {
+                        MeazyMain.LOGGER.log(Level.ERROR, "Can't run file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
                         return null;
                     }
-                    if (!version.equals(program.getVersion())) {
-                        logger.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), version);
+                    if (!MeazyMain.VERSION.equals(program.getVersion())) {
+                        MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
                     }
                     Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
                 }
                 else {
-                    logger.log(Level.ERROR, "Can't run file with extension {}", extension);
+                    MeazyMain.LOGGER.log(Level.ERROR, "Can't run file with extension {}", extension);
                     return null;
                 }
                 long endMillis = System.currentTimeMillis();
@@ -93,16 +89,16 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    logger.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
+                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
                     return null;
                 }
 
                 if (!Utils.getExtension(file).equals("mea")) {
-                    logger.log(Level.ERROR, "Can't compile file with extension {}", Utils.getExtension(file));
+                    MeazyMain.LOGGER.log(Level.ERROR, "Can't compile file with extension {}", Utils.getExtension(file));
                     return null;
                 }
 
-                logger.log(Level.INFO, "Compiling file '{}'", file.getAbsoluteFile());
+                MeazyMain.LOGGER.log(Level.INFO, "Compiling file '{}'", file.getAbsoluteFile());
 
                 long startMillis = System.currentTimeMillis();
                 List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
@@ -113,22 +109,22 @@ public final class Commands {
 
                 File outputFile = new File(args[1]);
                 if (file.isDirectory()) {
-                    logger.log(Level.ERROR, "Output file can't be directory");
+                    MeazyMain.LOGGER.log(Level.ERROR, "Output file can't be directory");
                     return null;
                 }
                 if (!outputFile.getParentFile().exists()) {
                     if (outputFile.getParentFile().mkdirs()) {
                         try {
-                            if (outputFile.createNewFile()) logger.log(Level.INFO, "Created file '{}'", args[1]);
-                            else logger.log(Level.INFO, "File '{}' already exists", args[1]);
+                            if (outputFile.createNewFile()) MeazyMain.LOGGER.log(Level.INFO, "Created file '{}'", args[1]);
+                            else MeazyMain.LOGGER.log(Level.INFO, "File '{}' already exists", args[1]);
                         }
                         catch (Exception e) {
-                            logger.log(Level.ERROR, "Can't create file '{}'", args[1]);
+                            MeazyMain.LOGGER.log(Level.ERROR, "Can't create file '{}'", args[1]);
                             return null;
                         }
                     }
                     else {
-                        logger.log(Level.ERROR, "Can't create parent file");
+                        MeazyMain.LOGGER.log(Level.ERROR, "Can't create parent file");
                         return null;
                     }
                 }
@@ -150,51 +146,51 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    logger.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
+                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
                     return null;
                 }
 
                 if (!Utils.getExtension(file).equals("meac")) {
-                    logger.log(Level.ERROR, "Can't decompile file with extension {}", Utils.getExtension(file));
+                    MeazyMain.LOGGER.log(Level.ERROR, "Can't decompile file with extension {}", Utils.getExtension(file));
                     return null;
                 }
 
-                logger.log(Level.INFO, "Decompiling file '{}'", file.getAbsoluteFile());
+                MeazyMain.LOGGER.log(Level.INFO, "Decompiling file '{}'", file.getAbsoluteFile());
 
                 long startMillis = System.currentTimeMillis();
                 Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
                 if (program == null) {
-                    logger.log(Level.ERROR, "Failed to read file {}, try to decompile it in the same version of Meazy ({})", file.getAbsolutePath(), version);
+                    MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}, try to decompile it in the same version of Meazy ({})", file.getAbsolutePath(), MeazyMain.VERSION);
                     return null;
                 }
-                if (Utils.isVersionAfter(version, program.getVersion())) {
-                    logger.log(Level.ERROR, "Can't decompile file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), version);
+                if (Utils.isVersionAfter(MeazyMain.VERSION, program.getVersion())) {
+                    MeazyMain.LOGGER.log(Level.ERROR, "Can't decompile file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
                     return null;
                 }
-                if (!version.equals(program.getVersion())) {
-                    logger.log(Level.WARN, "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), version);
+                if (!MeazyMain.VERSION.equals(program.getVersion())) {
+                    MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
                 }
                 long endMillis = System.currentTimeMillis();
 
 
                 File outputFile = new File(args[1]);
                 if (file.isDirectory()) {
-                    logger.log(Level.ERROR, "Output file can't be directory");
+                    MeazyMain.LOGGER.log(Level.ERROR, "Output file can't be directory");
                     return null;
                 }
                 if (!outputFile.getParentFile().exists()) {
                     if (outputFile.getParentFile().mkdirs()) {
                         try {
-                            if (outputFile.createNewFile()) logger.log(Level.INFO, "Created file '{}'", args[1]);
-                            else logger.log(Level.INFO, "File '{}' already exists", args[1]);
+                            if (outputFile.createNewFile()) MeazyMain.LOGGER.log(Level.INFO, "Created file '{}'", args[1]);
+                            else MeazyMain.LOGGER.log(Level.INFO, "File '{}' already exists", args[1]);
                         }
                         catch (Exception e) {
-                            logger.log(Level.ERROR, "Can't create file '{}'", args[1]);
+                            MeazyMain.LOGGER.log(Level.ERROR, "Can't create file '{}'", args[1]);
                             return null;
                         }
                     }
                     else {
-                        logger.log(Level.ERROR, "Can't create parent file");
+                        MeazyMain.LOGGER.log(Level.ERROR, "Can't create parent file");
                         return null;
                     }
                 }

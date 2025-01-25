@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime.values.clazz.constructor;
+package me.itzisonn_.meazy.runtime.values.classes.constructors;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,11 +10,22 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.Constructor
 import java.util.List;
 import java.util.Set;
 
+/**
+ * RuntimeConstructorValue represents runtime constructor value created at runtime
+ */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class RuntimeConstructorValue extends ConstructorValue {
     private final List<Statement> body;
 
+    /**
+     * RuntimeConstructorValue constructor
+     *
+     * @param args Args of this RuntimeConstructorValue
+     * @param parentEnvironment Parent of this RuntimeConstructorValue
+     * @param accessModifiers AccessModifiers of this RuntimeConstructorValue
+     * @param body Body of this RuntimeConstructorValue
+     */
     public RuntimeConstructorValue(List<CallArgExpression> args, List<Statement> body, ConstructorDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
         super(args, parentEnvironment, accessModifiers);
         this.body = body;

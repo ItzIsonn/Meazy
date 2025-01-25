@@ -82,15 +82,17 @@ public final class Converters {
         register(new VariableDeclarationConverter());
         register(new WhileStatementConverter());
 
-        register(new BooleanLiteralConverter());
         register(new NullLiteralConverter());
         register(new NumberLiteralConverter());
         register(new StringLiteralConverter());
+        register(new BooleanLiteralConverter());
+        register(new ThisLiteralConverter());
 
         register(new AssignmentExpressionConverter());
         register(new BinaryExpressionConverter());
         register(new CallArgExpressionConverter());
         register(new ComparisonExpressionConverter());
+        register(new InversionExpressionConverter());
         register(new LogicalExpressionConverter());
         register(new MemberExpressionConverter());
         register(new ClassCallExpressionConverter());
