@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
 
 import java.util.List;
 

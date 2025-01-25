@@ -207,6 +207,10 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("or")).getValue();
     }
 
+    public static TokenType INVERSION() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("inversion")).getValue();
+    }
+
     public static TokenType EQUALS() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("equals")).getValue();
     }
@@ -233,10 +237,6 @@ public final class TokenTypes {
 
 
 
-    public static TokenType ID() {
-        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("id")).getValue();
-    }
-
     public static TokenType NULL() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("null")).getValue();
     }
@@ -251,6 +251,14 @@ public final class TokenTypes {
 
     public static TokenType BOOLEAN() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("boolean")).getValue();
+    }
+
+    public static TokenType THIS() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("this")).getValue();
+    }
+
+    public static TokenType ID() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("id")).getValue();
     }
 
 
@@ -295,7 +303,7 @@ public final class TokenTypes {
         isInit = true;
 
         register(new TokenType("variable", "var|val", false));
-        register(new TokenType("function", "fn|func|function", false));
+        register(new TokenType("function", "fun|function", false));
         register(new TokenType("class", "class", false));
         register(new TokenType("constructor", "constructor", false));
         register(new TokenType("new", "new", false));
@@ -311,7 +319,7 @@ public final class TokenTypes {
         register(new TokenType("break", "break", false));
 
         register(new TokenType("new_line", "\n+", false));
-        register(new TokenType("comment", "\\/\\/[^\n]*\n?", true));
+        register(new TokenType("comment", "\\/\\/[^\n]*", true));
         register(new TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", true));
         register(new TokenType("white_space", "(?!\n)\\s", true));
         register(new TokenType("end_of_file", null, false));
@@ -343,6 +351,7 @@ public final class TokenTypes {
 
         register(new TokenType("and", "&&", false));
         register(new TokenType("or", "\\|\\|", false));
+        register(new TokenType("inversion", "!", false));
         register(new TokenType("equals", "==", false));
         register(new TokenType("not_equals", "!=", false));
         register(new TokenType("greater", ">", false));
@@ -354,6 +363,7 @@ public final class TokenTypes {
         register(new TokenType("number", "(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?", false));
         register(new TokenType("string", "\"[^\"]*\"", false));
         register(new TokenType("boolean", "true|false", false));
+        register(new TokenType("this", "this", false));
         register(new TokenType("id", Utils.IDENTIFIER_REGEX, false, s -> {
             for (TokenType tokenType : TokenTypeSets.KEYWORDS().getTokenTypes()) {
                 if (tokenType.getPattern().matcher(s).matches()) return false;

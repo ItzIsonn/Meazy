@@ -12,10 +12,10 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
-import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 
 import java.util.*;
@@ -28,7 +28,6 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         super(null, false);
         this.functions = new ArrayList<>();
         this.classes = new ArrayList<>();
-        init();
     }
 
     @Override
@@ -85,9 +84,7 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         return isShared;
     }
 
-
-
-    private void init() {
+    public void init() {
         declareFunction(new DefaultFunctionValue("print", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), null, this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.print(functionArgs.getFirst().getFinalValue());
@@ -133,5 +130,6 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         declareClass("List", new DefaultClassValue(new ListClassEnvironment(this)));
         declareClass("Math", new DefaultClassValue(new MathClassEnvironment(this)));
         declareClass("Random", new DefaultClassValue(new RandomClassEnvironment(this)));
+        declareClass("Meazy", new DefaultClassValue(new MeazyClassEnvironment(this)));
     }
 }

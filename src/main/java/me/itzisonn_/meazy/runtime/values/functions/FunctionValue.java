@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime.values.function;
+package me.itzisonn_.meazy.runtime.values.functions;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,6 +12,9 @@ import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * FunctionValue represents runtime function value
+ */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class FunctionValue extends RuntimeValue<Object> {
@@ -22,6 +25,15 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
     protected FunctionDeclarationEnvironment parentEnvironment;
     protected final Set<AccessModifier> accessModifiers;
 
+    /**
+     * FunctionValue constructor
+     *
+     * @param id Id of this FunctionValue
+     * @param args Args of this FunctionValue
+     * @param returnDataType Which DataType should this FunctionValue return
+     * @param parentEnvironment Parent of this FunctionValue
+     * @param accessModifiers AccessModifiers of this FunctionValue
+     */
     public FunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
         super(null);
         this.id = id;

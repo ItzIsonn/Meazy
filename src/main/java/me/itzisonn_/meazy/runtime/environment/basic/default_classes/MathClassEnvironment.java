@@ -7,7 +7,8 @@ import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
+import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 import me.itzisonn_.meazy.runtime.values.number.NumberValue;
@@ -23,6 +24,12 @@ public class MathClassEnvironment extends BasicClassEnvironment {
 
         declareVariable("PI", DataTypes.FLOAT(), new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
         declareVariable("E", DataTypes.FLOAT(), new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
+
+
+        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of(AccessModifiers.PRIVATE())) {
+            @Override
+            public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
+        });
 
 
         declareFunction(new DefaultFunctionValue("round", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {

@@ -8,8 +8,8 @@ import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.basic.default_classes.StringClassEnvironment;
 import me.itzisonn_.meazy.runtime.values.BooleanValue;
-import me.itzisonn_.meazy.runtime.values.clazz.ClassValue;
-import me.itzisonn_.meazy.runtime.values.clazz.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 import me.itzisonn_.meazy.runtime.values.number.NumberValue;
 
@@ -101,12 +101,14 @@ public final class DataTypes {
         register("any", o -> true);
 
         register("boolean", o -> {
+            if (o == null) return true;
             if (o instanceof Boolean || o instanceof BooleanLiteral || o instanceof BooleanValue) return true;
             return o.toString().equals("true") || o.toString().equals("false");
         });
 
         register("int", o -> {
-            if (o == null || o instanceof Integer || o instanceof IntValue) return true;
+            if (o == null) return true;
+            if (o instanceof Integer || o instanceof IntValue) return true;
             if (o instanceof NumberLiteral numberLiteral) {
                 return numberLiteral.isInt();
             }
@@ -120,6 +122,7 @@ public final class DataTypes {
         });
 
         register("float", o -> {
+            if (o == null) return true;
             if (o instanceof Float || o instanceof NumberLiteral || o instanceof NumberValue) return true;
             try {
                 Float.parseFloat(o.toString());
@@ -131,6 +134,7 @@ public final class DataTypes {
         });
 
         register("string", o -> {
+            if (o == null) return true;
             if (o instanceof DefaultClassValue defaultClassValue) return defaultClassValue.getId().equals("string");
             return o instanceof String || o instanceof StringLiteral || o instanceof StringClassEnvironment.InnerStringValue;
         });

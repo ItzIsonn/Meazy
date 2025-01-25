@@ -8,8 +8,9 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.BooleanValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.StringValue;
-import me.itzisonn_.meazy.runtime.values.clazz.RuntimeClassValue;
-import me.itzisonn_.meazy.runtime.values.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.values.classes.RuntimeClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
+import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 
@@ -20,6 +21,12 @@ import java.util.Set;
 public class TypesClassEnvironment extends BasicClassEnvironment {
     public TypesClassEnvironment(Environment parent) {
         super(parent, true, "Types");
+
+
+        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of(AccessModifiers.PRIVATE())) {
+            @Override
+            public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
+        });
 
 
         declareFunction(new DefaultFunctionValue("getType", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {

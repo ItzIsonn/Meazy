@@ -64,24 +64,24 @@ public final class AddonManager {
                 addonInfo = loader.getAddonInfo(file);
                 String name = addonInfo.getId();
                 if (name.equalsIgnoreCase("meazy")) {
-                    MeazyMain.getLogger().log(Level.ERROR, "Couldn't load '{}' in folder '{}': Restricted Name",
+                    MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}': Restricted Name",
                             file.getPath(), directory.getPath());
                     continue;
                 }
                 else if (addonInfo.getId().indexOf(' ') != -1) {
-                    MeazyMain.getLogger().log(Level.WARN, "Addon `{}' uses the space-character (0x20) in its name `{}' - this is discouraged",
+                    MeazyMain.LOGGER.log(Level.WARN, "Addon `{}' uses the space-character (0x20) in its name `{}' - this is discouraged",
                         addonInfo.getFullName(), addonInfo.getId());
                 }
             }
             catch (InvalidAddonInfoException e) {
-                MeazyMain.getLogger().log(Level.ERROR, "Couldn't load '{}' in folder '{}'",
+                MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'",
                         file.getPath(), directory.getPath(), e);
                 continue;
             }
 
             File replacedFile = addons.put(addonInfo.getId(), file);
             if (replacedFile != null) {
-                MeazyMain.getLogger().log(Level.ERROR, "Ambiguous addon name `{}' for files `{}' and `{}' in `{}'",
+                MeazyMain.LOGGER.log(Level.ERROR, "Ambiguous addon name `{}' for files `{}' and `{}' in `{}'",
                     addonInfo.getId(), file.getPath(), replacedFile.getPath(), directory.getPath());
             }
 
@@ -138,7 +138,7 @@ public final class AddonManager {
                             softDependencies.remove(addon);
                             dependencies.remove(addon);
 
-                            MeazyMain.getLogger().log(Level.ERROR, "Couldn't load '{}' in folder '{}'",
+                            MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'",
                                     file.getPath(), directory.getPath(), new UnknownDependencyException(dependency));
                             break;
                         }
@@ -166,7 +166,7 @@ public final class AddonManager {
                         loadedAddons.add(addon);
                     }
                     catch (InvalidAddonException e) {
-                        MeazyMain.getLogger().log(Level.ERROR, "Couldn't load '{}' in folder '{}'", file.getPath(), directory.getPath(), e);
+                        MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'", file.getPath(), directory.getPath(), e);
                     }
                 }
             }
@@ -189,7 +189,7 @@ public final class AddonManager {
                             break;
                         }
                         catch (InvalidAddonException e) {
-                            MeazyMain.getLogger().log(Level.ERROR, "Couldn't load '{}' in folder '{}'", file.getPath(), directory.getPath(), e);
+                            MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'", file.getPath(), directory.getPath(), e);
                         }
                     }
                 }
@@ -202,7 +202,7 @@ public final class AddonManager {
                     while (failedAddonIterator.hasNext()) {
                         File file = failedAddonIterator.next();
                         failedAddonIterator.remove();
-                        MeazyMain.getLogger().log(Level.ERROR, "Couldn't load '{}' in folder '{}': circular dependency detected",
+                        MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}': circular dependency detected",
                                 file.getPath(), directory.getPath());
                     }
                 }
@@ -294,7 +294,7 @@ public final class AddonManager {
                 addon.getAddonLoader().enableAddon(addon);
             }
             catch (Throwable e) {
-                MeazyMain.getLogger().log(Level.ERROR, "Error occurred (in the addon loader) while enabling {}", addon.getAddonInfo().getFullName(), e);
+                MeazyMain.LOGGER.log(Level.ERROR, "Error occurred (in the addon loader) while enabling {}", addon.getAddonInfo().getFullName(), e);
             }
         }
     }
