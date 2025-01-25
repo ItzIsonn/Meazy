@@ -41,6 +41,14 @@ public final class Commands {
         if (isInit) throw new IllegalStateException("Commands have already been initialized!");
         isInit = true;
 
+        register("version", new Command(List.of()) {
+            @Override
+            public String execute(String[] args) {
+                MeazyMain.LOGGER.log(Level.INFO, "Meazy version {}", MeazyMain.VERSION);
+                return null;
+            }
+        });
+
         register("run", new Command(List.of("<file_to_run>")) {
             @Override
             public String execute(String[] args) {

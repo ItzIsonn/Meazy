@@ -26,7 +26,7 @@ public abstract class Command {
      */
     public Command(List<String> args) throws NullPointerException, IllegalArgumentException {
         if (args == null) throw new NullPointerException("Arg's can't be null");
-        if (args.stream().allMatch(arg -> arg.matches(Utils.IDENTIFIER_REGEX))) throw new IllegalArgumentException("Invalid arg's name");
+        if (!args.isEmpty() && args.stream().allMatch(arg -> arg.matches(Utils.IDENTIFIER_REGEX))) throw new IllegalArgumentException("Invalid arg's name");
         this.args = args;
     }
 
