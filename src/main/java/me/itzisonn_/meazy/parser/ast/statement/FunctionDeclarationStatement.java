@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.parser.ast.statement;
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.List;
@@ -14,10 +13,10 @@ public class FunctionDeclarationStatement implements Statement {
     private final String id;
     private final List<CallArgExpression> args;
     private final List<Statement> body;
-    private final DataType returnDataType;
+    private final String returnDataType;
     private final Set<AccessModifier> accessModifiers;
 
-    public FunctionDeclarationStatement(String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType, Set<AccessModifier> accessModifiers) {
+    public FunctionDeclarationStatement(String id, List<CallArgExpression> args, List<Statement> body, String returnDataType, Set<AccessModifier> accessModifiers) {
         this.id = id;
         this.args = args;
         this.body = body;
@@ -38,7 +37,7 @@ public class FunctionDeclarationStatement implements Statement {
             if (i != args.size() - 1) argsBuilder.append(", ");
         }
 
-        String returnDataTypeString = returnDataType == null ? "" : ":" + returnDataType.getName();
+        String returnDataTypeString = returnDataType == null ? "" : ":" + returnDataType;
 
         StringBuilder bodyBuilder = new StringBuilder();
         for (Statement statement : body) {

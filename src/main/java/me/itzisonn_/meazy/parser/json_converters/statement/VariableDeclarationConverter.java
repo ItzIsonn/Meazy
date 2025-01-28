@@ -3,8 +3,6 @@ package me.itzisonn_.meazy.parser.json_converters.statement;
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
@@ -29,7 +27,7 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         String id = object.get("id").getAsString();
 
         if (object.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
-        DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
+        String dataType = object.get("data_type").getAsString();
 
         Expression value = null;
         if (object.get("value") != null) {
@@ -51,7 +49,7 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         JsonObject result = getJsonObject();
 
         result.addProperty("id", variableDeclarationStatement.getId());
-        result.addProperty("data_type", variableDeclarationStatement.getDataType().getName());
+        result.addProperty("data_type", variableDeclarationStatement.getDataType());
         if (variableDeclarationStatement.getValue() != null) result.add("value", jsonSerializationContext.serialize(variableDeclarationStatement.getValue()));
         result.addProperty("is_constant", variableDeclarationStatement.isConstant());
 

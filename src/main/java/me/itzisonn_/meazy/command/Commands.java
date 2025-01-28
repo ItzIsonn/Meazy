@@ -64,6 +64,7 @@ public final class Commands {
                 long startMillis = System.currentTimeMillis();
                 if (extension.equals("mea")) {
                     List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
+                    System.out.println(tokens);
                     Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
                     Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
                 }

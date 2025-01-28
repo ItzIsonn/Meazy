@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.values.functions;
 
 import lombok.EqualsAndHashCode;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
@@ -21,11 +20,11 @@ public abstract class DefaultFunctionValue extends FunctionValue {
      *
      * @param id Id of this DefaultFunctionValue
      * @param args Args of this DefaultFunctionValue
-     * @param returnDataType Which DataType should this DefaultFunctionValue return
+     * @param returnDataType Which datatype should this DefaultFunctionValue return
      * @param parentEnvironment Parent of this DefaultFunctionValue
      * @param accessModifiers AccessModifiers of this DefaultFunctionValue
      */
-    public DefaultFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
+    public DefaultFunctionValue(String id, List<CallArgExpression> args, String returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
         super(id, args, returnDataType, parentEnvironment, accessModifiers);
     }
 

@@ -10,8 +10,6 @@ import me.itzisonn_.meazy.parser.ParsingFunction;
 import me.itzisonn_.meazy.parser.ParsingFunctions;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
@@ -35,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 
 /**
  * All basic Registries
@@ -72,10 +71,6 @@ public final class Registries {
     public static final SingleEntryRegistry<Function<String, List<Token>>> TOKENIZATION_FUNCTION = new SingleEntryRegistryImpl<>();
 
 
-    /**
-     * Registry for all custom DataTypes
-     */
-    public static final SetRegistry<DataType> DATA_TYPES = new SetRegistry<>();
 
     /**
      * Registry for all AccessModifiers
@@ -174,7 +169,6 @@ public final class Registries {
         Commands.INIT();
         TokenTypes.INIT();
         TokenTypeSets.INIT();
-        DataTypes.INIT();
         AccessModifiers.INIT();
         ParsingFunctions.INIT();
         EvaluationFunctions.INIT();
@@ -191,34 +185,35 @@ public final class Registries {
                     break;
                 }
 
-                TokenType lastMatched = null;
-                String lastString = "";
-                int lastFound = -1;
-                for (int j = i; j < lines.length(); j++) {
-                    lastString += lines.charAt(j);
-                    TokenType tokenType = TokenTypes.parse(lastString);
+                String string = lines.substring(i);
+                Token token = null;
+                for (RegistryEntry<TokenType> entry : Registries.TOKEN_TYPES.getEntries()) {
+                    TokenType tokenType = entry.getValue();
+                    if (tokenType.getPattern() == null) continue;
 
-                    if (lastMatched != null && tokenType == null) {
-                        break;
-                    }
+                    Matcher matcher = tokenType.getPattern().matcher(string);
+                    if (matcher.find()) {
+                        int end = matcher.end();
+                        String matched = string.substring(0, end);
+                        if (!tokenType.getCanMatch().test(matched)) continue;
 
-                    if (tokenType != null) {
-                        lastFound = j + 1;
-                        lastMatched = tokenType;
+                        if (token == null || token.getValue().length() < matched.length()) {
+                            token = new Token(lineNumber, tokenType, matched);
+                        }
                     }
                 }
 
-                if (lastFound == -1) {
-                    throw new UnknownTokenException("At line " + lineNumber + ": " + lastString.replaceAll("\n", "\\\\n"));
+                if (token != null) {
+                    if (!token.getType().isShouldSkip()) tokens.add(token);
+                    if (token.getType() == TokenTypes.NEW_LINE()) lineNumber += token.getValue().length();
+                    else if (token.getType() == TokenTypes.MULTI_LINE_COMMENT()) lineNumber += Utils.countMatches(token.getValue(), "\n");
+                    i += token.getValue().length() - 1;
                 }
+                else throw new UnknownTokenException("At line " + lineNumber + ": " + string.replaceAll("\n", "\\\\n"));
 
-                if (!lastMatched.isShouldSkip()) tokens.add(new Token(lineNumber, lastMatched, lines.substring(i, lastFound)));
-                if (lastMatched == TokenTypes.NEW_LINE()) lineNumber += lines.substring(i, lastFound).length();
-                else if (lastMatched == TokenTypes.MULTI_LINE_COMMENT()) lineNumber += Utils.countMatches(lines.substring(i, lastFound), "\n");
-                i = lastFound - 1;
             }
-            tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE(), ""));
 
+            tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE(), ""));
             return tokens;
         });
 

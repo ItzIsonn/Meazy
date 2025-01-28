@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.values.classes;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.StringClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
@@ -22,6 +23,19 @@ public abstract class ClassValue extends RuntimeValue<Object> {
         super(null);
         this.classEnvironment = classEnvironment;
         this.id = classEnvironment.getId();
+    }
+
+    /**
+     * @param value Value to check
+     * @return Whether given value matches this class value
+     */
+    public boolean isMatches(Object value) {
+        if (value instanceof ClassValue classValue) return classValue.getId().equals(getId());
+        if (value instanceof StringClassEnvironment.InnerStringValue innerStringValue) {
+            System.out.println("!!!!!!!!!!! CLASS VALUE");
+            return innerStringValue.getValue().equals(getId());
+        }
+        return false;
     }
 
     @Override

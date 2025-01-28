@@ -19,7 +19,7 @@ public interface ClassDeclarationEnvironment extends Environment {
 
     /**
      * @param id Class's id
-     * @return Declared class with given id
+     * @return Declared class with given id or null
      */
     default ClassValue getClass(String id) {
         for (ClassValue classValue : getClasses()) {
