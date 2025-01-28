@@ -1,8 +1,6 @@
 package me.itzisonn_.meazy.parser.json_converters.expression;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
@@ -24,7 +22,7 @@ public class CallArgExpressionConverter extends Converter<CallArgExpression> {
         String id = object.get("id").getAsString();
 
         if (object.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
-        DataType dataType = DataTypes.parse(object.get("data_type").getAsString());
+        String dataType = object.get("data_type").getAsString();
 
         if (object.get("is_constant") == null) throw new InvalidCompiledFileException(getIdentifier(), "is_constant");
         boolean isConstant = object.get("is_constant").getAsBoolean();
@@ -37,7 +35,7 @@ public class CallArgExpressionConverter extends Converter<CallArgExpression> {
         JsonObject result = getJsonObject();
 
         result.addProperty("id", callArgExpression.getId());
-        result.addProperty("data_type", callArgExpression.getDataType().getName());
+        result.addProperty("data_type", callArgExpression.getDataType());
         result.addProperty("is_constant", callArgExpression.isConstant());
 
         return result;

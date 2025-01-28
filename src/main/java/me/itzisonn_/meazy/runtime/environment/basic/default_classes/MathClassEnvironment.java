@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
@@ -22,8 +21,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Math");
 
 
-        declareVariable("PI", DataTypes.FLOAT(), new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
-        declareVariable("E", DataTypes.FLOAT(), new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
+        declareVariable("PI", "float", new DoubleValue(Math.PI), true, Set.of(AccessModifiers.SHARED()));
+        declareVariable("E", "float", new DoubleValue(Math.E), true, Set.of(AccessModifiers.SHARED()));
 
 
         declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of(AccessModifiers.PRIVATE())) {
@@ -32,21 +31,21 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
 
-        declareFunction(new DefaultFunctionValue("round", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("round", new ArrayList<>(List.of(new CallArgExpression("value", "float", true))), "int", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
                 return new IntValue((int) Math.round(numberValue.getValue().doubleValue()));
             }
         });
 
-        declareFunction(new DefaultFunctionValue("floor", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("floor", new ArrayList<>(List.of(new CallArgExpression("value", "float", true))), "int", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
                 return new IntValue((int) Math.floor(numberValue.getValue().doubleValue()));
             }
         });
 
-        declareFunction(new DefaultFunctionValue("ceil", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("ceil", new ArrayList<>(List.of(new CallArgExpression("value", "float", true))), "int", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't round non-number value");
                 return new IntValue((int) Math.ceil(numberValue.getValue().doubleValue()));
@@ -54,8 +53,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction(new DefaultFunctionValue("pow",
-                new ArrayList<>(List.of(new CallArgExpression("number", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
-                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+                new ArrayList<>(List.of(new CallArgExpression("number", "float", true), new CallArgExpression("degree", "float", true))),
+                "float", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> numberValue &&
                         functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> degreeValue)) throw new InvalidSyntaxException("Can't get power non-number values");
@@ -63,7 +62,7 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("abs", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true))), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("abs", new ArrayList<>(List.of(new CallArgExpression("value", "float", true))), "float", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> number)) throw new InvalidSyntaxException("Can't get abs value of non-number value");
                 return new DoubleValue(Math.abs(number.getValue().doubleValue()));
@@ -71,8 +70,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction(new DefaultFunctionValue("min",
-                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
-                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+                new ArrayList<>(List.of(new CallArgExpression("value", "float", true), new CallArgExpression("degree", "float", true))),
+                "float", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> firstValue &&
                         functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> secondValue)) throw new InvalidSyntaxException("Can't get min of non-number values");
@@ -81,8 +80,8 @@ public class MathClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction(new DefaultFunctionValue("max",
-                new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.FLOAT(), true), new CallArgExpression("degree", DataTypes.FLOAT(), true))),
-                DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+                new ArrayList<>(List.of(new CallArgExpression("value", "float", true), new CallArgExpression("degree", "float", true))),
+                "float", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof NumberValue<?> firstValue &&
                         functionArgs.get(1).getFinalRuntimeValue() instanceof NumberValue<?> secondValue)) throw new InvalidSyntaxException("Can't get max of non-number values");
@@ -90,7 +89,7 @@ public class MathClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("factorial", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.INT(), true))), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("factorial", new ArrayList<>(List.of(new CallArgExpression("value", "int", true))), "int", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue numberValue)) throw new InvalidSyntaxException("Can't get factorial of non-int value");
                 int result = 1;

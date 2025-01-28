@@ -74,6 +74,9 @@ public class TokenType {
     public TokenType(String id, Pattern pattern, boolean shouldSkip, Predicate<String> canMatch) throws NullPointerException, IllegalArgumentException {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (!id.matches(Utils.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid id");
+        if (pattern != null && !pattern.pattern().startsWith("^")) {
+            pattern = Pattern.compile("^(" + pattern.pattern() + ")", pattern.flags());
+        }
 
         this.id = id;
         this.pattern = pattern;

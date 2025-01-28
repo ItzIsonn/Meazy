@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.interpreter;
 
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
@@ -939,7 +938,7 @@ public final class EvaluationFunctions {
         return booleanValue.getValue();
     }
 
-    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, boolean isDefault) {
+    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, String returnDataType, String functionId, boolean isDefault) {
         String defaultString = isDefault ? " It's probably an Addon's error" : "";
 
         if (returnValue != null && returnDataType == null)
@@ -950,7 +949,8 @@ public final class EvaluationFunctions {
             return null;
         }
 
-        if (!returnDataType.isMatches(returnValue.getFinalRuntimeValue()))
+        ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(returnDataType);
+        if (classValue == null || !classValue.isMatches(returnValue.getFinalRuntimeValue()))
             throw new InvalidSyntaxException("Returned value's data type is different from specified." + defaultString);
 
         return returnValue;

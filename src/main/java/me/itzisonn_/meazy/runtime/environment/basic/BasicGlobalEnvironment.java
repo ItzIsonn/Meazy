@@ -1,8 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment.basic;
 
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.basic.default_classes.*;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
@@ -11,12 +12,14 @@ import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDec
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
+import me.itzisonn_.meazy.runtime.values.BooleanValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
+import me.itzisonn_.meazy.runtime.values.number.NumberValue;
 
 import java.util.*;
 
@@ -85,14 +88,66 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
     }
 
     public void init() {
-        declareFunction(new DefaultFunctionValue("print", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), null, this, Set.of(AccessModifiers.SHARED())) {
+        declareClass("any", new DefaultClassValue(new EmptyClassEnvironment(this, "any")) {
+            @Override
+            public boolean isMatches(Object value) {
+                return true;
+            }
+        });
+
+        declareClass("boolean", new DefaultClassValue(new EmptyClassEnvironment(this, "boolean")) {
+            @Override
+            public boolean isMatches(Object value) {
+                if (value == null) return true;
+                if (value instanceof Boolean || value instanceof BooleanLiteral || value instanceof BooleanValue) return true;
+                return value.toString().equals("true") || value.toString().equals("false");
+            }
+        });
+
+        declareClass("int", new DefaultClassValue(new EmptyClassEnvironment(this, "int")) {
+            @Override
+            public boolean isMatches(Object value) {
+                if (value == null) return true;
+                if (value instanceof Integer || value instanceof IntValue) return true;
+                if (value instanceof NumberLiteral numberLiteral) {
+                    return numberLiteral.isInt();
+                }
+                try {
+                    Integer.parseInt(value.toString());
+                    return true;
+                }
+                catch (NumberFormatException ignore) {
+                    return false;
+                }
+            }
+        });
+
+        declareClass("float", new DefaultClassValue(new EmptyClassEnvironment(this, "float")) {
+            @Override
+            public boolean isMatches(Object value) {
+                if (value == null) return true;
+                if (value instanceof Float || value instanceof NumberLiteral || value instanceof NumberValue) return true;
+                try {
+                    Float.parseFloat(value.toString());
+                    return true;
+                }
+                catch (NumberFormatException ignore) {
+                    return false;
+                }
+            }
+        });
+
+        declareClass("string", new DefaultClassValue(new EmptyClassEnvironment(this, "string")));
+
+
+        declareFunction(new DefaultFunctionValue("print", new ArrayList<>(List.of(new CallArgExpression("value", "any", true))), null, this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.print(functionArgs.getFirst().getFinalValue());
                 return null;
             }
         });
 
-        declareFunction( new DefaultFunctionValue("println", new ArrayList<>(List.of(new CallArgExpression("value", DataTypes.ANY(), true))), null, this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction( new DefaultFunctionValue("println", new ArrayList<>(List.of(new CallArgExpression("value", "any", true))), null, this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.println(functionArgs.getFirst().getFinalValue());
                 return null;
@@ -100,8 +155,8 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         });
 
         declareFunction(new DefaultFunctionValue("range",
-                new ArrayList<>(List.of(new CallArgExpression("begin", DataTypes.INT(), true), new CallArgExpression("end", DataTypes.INT(), true))),
-                DataTypes.parse("List"), this, new HashSet<>()) {
+                new ArrayList<>(List.of(new CallArgExpression("begin", "int", true), new CallArgExpression("end", "int", true))),
+                "List", this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 int begin;
@@ -126,7 +181,6 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
 
 
         declareClass("Input", new DefaultClassValue(new InputClassEnvironment(this)));
-        declareClass("Types", new DefaultClassValue(new TypesClassEnvironment(this)));
         declareClass("List", new DefaultClassValue(new ListClassEnvironment(this)));
         declareClass("Math", new DefaultClassValue(new MathClassEnvironment(this)));
         declareClass("Random", new DefaultClassValue(new RandomClassEnvironment(this)));

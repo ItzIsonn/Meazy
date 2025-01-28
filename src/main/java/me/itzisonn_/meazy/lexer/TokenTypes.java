@@ -303,7 +303,7 @@ public final class TokenTypes {
         isInit = true;
 
         register(new TokenType("variable", "var|val", false));
-        register(new TokenType("function", "fun|function", false));
+        register(new TokenType("function", "function|fun", false));
         register(new TokenType("class", "class", false));
         register(new TokenType("constructor", "constructor", false));
         register(new TokenType("new", "new", false));
@@ -337,13 +337,13 @@ public final class TokenTypes {
         register(new TokenType("plus", "\\+", false));
         register(new TokenType("minus", "-", false));
         register(new TokenType("multiply", "\\*", false));
-        register(new TokenType("divide", "/", false));
+        register(new TokenType("divide", "\\/", false));
         register(new TokenType("percent", "%", false));
         register(new TokenType("power", "\\^", false));
         register(new TokenType("plus_assign", "\\+=", false));
         register(new TokenType("minus_assign", "-=", false));
         register(new TokenType("multiply_assign", "\\*=", false));
-        register(new TokenType("divide_assign", "/=", false));
+        register(new TokenType("divide_assign", "\\/=", false));
         register(new TokenType("percent_assign", "%=", false));
         register(new TokenType("power_assign", "\\^=", false));
         register(new TokenType("double_plus", "\\+\\+", false));

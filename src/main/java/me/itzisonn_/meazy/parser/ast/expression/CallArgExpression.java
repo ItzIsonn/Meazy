@@ -1,19 +1,17 @@
 package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 
 @Getter
 public class CallArgExpression implements Expression {
     private final String id;
-    private final DataType dataType;
+    private final String dataType;
     private final boolean isConstant;
 
-    public CallArgExpression(String id, DataType dataType, boolean isConstant) {
+    public CallArgExpression(String id, String dataType, boolean isConstant) {
         this.id = id;
         if (dataType != null) this.dataType = dataType;
-        else this.dataType = DataTypes.ANY();
+        else this.dataType = "any";
         this.isConstant = isConstant;
     }
 
@@ -21,6 +19,6 @@ public class CallArgExpression implements Expression {
     public String toCodeString() {
         String declareString = isConstant ? "val" : "var";
 
-        return declareString + " " + id + ":" + dataType.getName();
+        return declareString + " " + id + ":" + dataType;
     }
 }

@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
@@ -25,25 +24,25 @@ public class InputClassEnvironment extends BasicClassEnvironment {
         });
 
 
-        declareFunction(new DefaultFunctionValue("read", new ArrayList<>(), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("read", new ArrayList<>(), "string", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(Utils.SCANNER.next());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readLine", new ArrayList<>(), DataTypes.STRING(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readLine", new ArrayList<>(), "string", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(Utils.SCANNER.nextLine());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readInt", new ArrayList<>(), DataTypes.INT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readInt", new ArrayList<>(), "string", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new IntValue(Utils.SCANNER.nextInt());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readFloat", new ArrayList<>(), DataTypes.FLOAT(), this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("readFloat", new ArrayList<>(), "string", this, Set.of(AccessModifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new DoubleValue(Utils.SCANNER.nextDouble());
             }

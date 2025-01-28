@@ -6,8 +6,6 @@ import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.CallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
@@ -122,13 +120,13 @@ public final class ParsingFunctions {
                 return callArgExpression;
             }).toList();
 
-            DataType dataType = null;
+            String dataType = null;
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
                 if (!getCurrent().getType().equals(TokenTypes.ID()))
                     throw new InvalidStatementException("Must specify function's return data type after colon", getCurrent().getLine());
 
-                dataType = DataTypes.parse(getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue());
+                dataType = getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue();
             }
 
             moveOverOptionalNewLines();
@@ -146,12 +144,12 @@ public final class ParsingFunctions {
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
 
-            DataType argDataType = null;
+            String argDataType = null;
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
                 if (!getCurrent().getType().equals(TokenTypes.ID())) throw new InvalidStatementException("Must specify arg's data type after colon", getCurrent().getLine());
 
-                argDataType = DataTypes.parse(getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue());
+                argDataType = getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue();
             }
 
             return new CallArgExpression(id, argDataType, isConstant);
@@ -166,13 +164,13 @@ public final class ParsingFunctions {
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword").getValue();
 
-            DataType dataType = null;
+            String dataType = null;
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
                 if (!getCurrent().getType().equals(TokenTypes.ID()))
                     throw new InvalidStatementException("Must specify variable's data type after colon", getCurrent().getLine());
 
-                dataType = DataTypes.parse(getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue());
+                dataType = getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue();
             }
 
             if (!getCurrent().getType().equals(TokenTypes.ASSIGN())) {

@@ -3,8 +3,6 @@ package me.itzisonn_.meazy.parser.json_converters.statement;
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.AccessModifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.parser.ast.DataTypes;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
@@ -38,9 +36,9 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        DataType dataType = null;
+        String dataType = null;
         if (object.get("return_data_type") != null) {
-            dataType = DataTypes.parse(object.get("return_data_type").getAsString());
+            dataType = object.get("return_data_type").getAsString();
         }
 
         if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
@@ -69,7 +67,7 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         result.add("body", body);
 
         if (functionDeclarationStatement.getReturnDataType() != null) {
-            result.addProperty("return_data_type", functionDeclarationStatement.getReturnDataType().getName());
+            result.addProperty("return_data_type", functionDeclarationStatement.getReturnDataType());
         }
 
         JsonArray accessModifiers = new JsonArray();
