@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.values.classes.constructors;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -18,16 +17,16 @@ import java.util.Set;
 public abstract class ConstructorValue extends RuntimeValue<Object> {
     protected final List<CallArgExpression> args;
     protected final ConstructorDeclarationEnvironment parentEnvironment;
-    protected final Set<AccessModifier> accessModifiers;
+    protected final Set<String> accessModifiers;
 
     /**
      * ConstructorValue constructor
      *
      * @param args Args of this ConstructorValue
      * @param parentEnvironment Parent of this ConstructorValue
-     * @param accessModifiers AccessModifiers of this ConstructorValue
+     * @param accessModifiers Access modifiers of this ConstructorValue
      */
-    public ConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
+    public ConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
         super(null);
         this.args = args;
         this.parentEnvironment = parentEnvironment;

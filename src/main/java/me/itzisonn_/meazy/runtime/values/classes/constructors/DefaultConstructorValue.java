@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.values.classes.constructors;
 
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.ConstructorDeclarationEnvironment;
@@ -18,9 +17,9 @@ public abstract class DefaultConstructorValue extends ConstructorValue {
      *
      * @param args Args of this DefaultConstructorValue
      * @param parentEnvironment Parent of this DefaultConstructorValue
-     * @param accessModifiers AccessModifiers of this DefaultConstructorValue
+     * @param accessModifiers Access modifiers of this DefaultConstructorValue
      */
-    public DefaultConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<AccessModifier> accessModifiers) {
+    public DefaultConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
         super(args, parentEnvironment, accessModifiers);
     }
 

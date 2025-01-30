@@ -4,8 +4,6 @@ import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
-import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.CallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
@@ -88,11 +86,9 @@ public final class ParsingFunctions {
         });
 
         register("class_body_statement", extra -> {
-            Set<AccessModifier> accessModifiers = new HashSet<>();
+            Set<String> accessModifiers = new HashSet<>();
             while (TokenTypeSets.ACCESS_MODIFIERS().contains(getCurrent().getType())) {
-                TokenType current = getCurrentAndNext().getType();
-                if (current.equals(TokenTypes.PRIVATE())) accessModifiers.add(AccessModifiers.PRIVATE());
-                if (current.equals(TokenTypes.SHARED())) accessModifiers.add(AccessModifiers.SHARED());
+                accessModifiers.add(getCurrentAndNext().getType().getId());
             }
 
             if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
@@ -111,7 +107,7 @@ public final class ParsingFunctions {
         });
 
         register("function_declaration", extra -> {
-            Set<AccessModifier> accessModifiers = getAccessModifiers(extra);
+            Set<String> accessModifiers = getAccessModifiers(extra);
 
             getCurrentAndNext();
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
@@ -136,7 +132,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close function body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
 
-            return new FunctionDeclarationStatement(id, args, body, dataType, accessModifiers);
+            return new FunctionDeclarationStatement(accessModifiers, id, args, body, dataType);
         });
 
         register("function_arg", extra -> {
@@ -145,7 +141,7 @@ public final class ParsingFunctions {
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
 
-            String argDataType = "any";
+            String argDataType = "Any";
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
                 if (!getCurrent().getType().equals(TokenTypes.ID())) throw new InvalidStatementException("Must specify arg's data type after colon", getCurrent().getLine());
@@ -157,7 +153,7 @@ public final class ParsingFunctions {
         });
 
         register("variable_declaration", extra -> {
-            Set<AccessModifier> accessModifiers = getAccessModifiers(extra);
+            Set<String> accessModifiers = getAccessModifiers(extra);
 
             if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
             if (!(extra[1] instanceof Boolean canWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
@@ -176,7 +172,7 @@ public final class ParsingFunctions {
         });
 
         register("constructor_declaration", extra -> {
-            Set<AccessModifier> accessModifiers = getAccessModifiers(extra);
+            Set<String> accessModifiers = getAccessModifiers(extra);
             getCurrentAndNext();
 
             List<CallArgExpression> args = parseArgs().stream().map(expression -> {
@@ -190,7 +186,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
 
-            return new ConstructorDeclarationStatement(args, body, accessModifiers);
+            return new ConstructorDeclarationStatement(accessModifiers, args, body);
         });
 
         register("statement", extra -> {
@@ -401,19 +397,30 @@ public final class ParsingFunctions {
         });
 
         register("comparison_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
+            Expression left = parse(RegistryIdentifier.ofDefault("is_expression"), Expression.class);
 
             TokenType current = getCurrent().getType();
             while (current == TokenTypes.EQUALS() || current == TokenTypes.NOT_EQUALS() || current == TokenTypes.GREATER() ||
                     current == TokenTypes.GREATER_OR_EQUALS() || current == TokenTypes.LESS() || current == TokenTypes.LESS_OR_EQUALS()) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
+                Expression right = parse(RegistryIdentifier.ofDefault("is_expression"), Expression.class);
                 left = new ComparisonExpression(left, right, operator);
 
                 current = getCurrent().getType();
             }
 
             return left;
+        });
+
+        register("is_expression", extra -> {
+            Expression value = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
+
+            if (getCurrent().getType() == TokenTypes.IS()) {
+                getCurrentAndNext();
+                return new IsExpression(value, getCurrentAndNext(TokenTypes.ID(), "Must specify data type after is keyword").getValue());
+            }
+
+            return value;
         });
 
         register("addition_expression", extra -> {
@@ -579,15 +586,15 @@ public final class ParsingFunctions {
 
 
     @SuppressWarnings("unchecked")
-    private static Set<AccessModifier> getAccessModifiers(Object[] extra) {
-        if (extra.length == 0) throw new IllegalArgumentException("Expected Set<AccessModifiers> as extra argument");
-        if (!(extra[0] instanceof Set<?> set)) throw new IllegalArgumentException("Expected Set<AccessModifiers> as extra argument");
-        Set<AccessModifier> accessModifiers;
+    private static Set<String> getAccessModifiers(Object[] extra) {
+        if (extra.length == 0) throw new IllegalArgumentException("Expected Set of access modifiers as extra argument");
+        if (!(extra[0] instanceof Set<?> set)) throw new IllegalArgumentException("Expected Set of access modifiers as extra argument");
+        Set<String> accessModifiers;
         try {
-            accessModifiers = (Set<AccessModifier>) set;
+            accessModifiers = (Set<String>) set;
         }
         catch (ClassCastException e) {
-            throw new IllegalArgumentException("Expected Set<AccessModifiers> as extra argument");
+            throw new IllegalArgumentException("Expected Set of access modifiers as extra argument");
         }
         return accessModifiers;
     }
@@ -623,10 +630,10 @@ public final class ParsingFunctions {
     private static VariableDeclarationStatement.VariableDeclarationInfo parseVariableDeclarationInfo(boolean isConstant, boolean canWithoutValue) {
         String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
 
-        String dataType = "any";
+        String dataType = "Any";
         if (getCurrent().getType().equals(TokenTypes.COLON())) {
             getCurrentAndNext();
-            dataType = getCurrentAndNext(TokenTypes.ID(), "Must specify variable's datatype after colon").getValue();
+            dataType = getCurrentAndNext(TokenTypes.ID(), "Must specify variable's data type after colon").getValue();
         }
 
         if (!getCurrent().getType().equals(TokenTypes.ASSIGN())) {

@@ -59,6 +59,7 @@ public final class TokenTypeSets {
                 TokenTypes.RETURN(),
                 TokenTypes.CONTINUE(),
                 TokenTypes.BREAK(),
+                TokenTypes.IS(),
                 TokenTypes.NULL(),
                 TokenTypes.BOOLEAN(),
                 TokenTypes.THIS()));

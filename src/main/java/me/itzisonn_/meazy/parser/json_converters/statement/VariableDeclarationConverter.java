@@ -1,12 +1,11 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
-import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -25,14 +24,18 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         checkType(object);
 
         if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
-        Set<AccessModifier> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier ->
-                AccessModifiers.parse(accessModifier.getAsString())).collect(Collectors.toSet());
+        Set<String> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
+            if (Registries.ACCESS_MODIFIERS.hasEntry(accessModifier.getAsString())) {
+                throw new InvalidCompiledFileException("Unknown access modifier with id " + accessModifier.getAsString());
+            }
+            return accessModifier.getAsString();
+        }).collect(Collectors.toSet());
 
         if (object.get("is_constant") == null) throw new InvalidCompiledFileException(getIdentifier(), "is_constant");
         boolean isConstant = object.get("is_constant").getAsBoolean();
 
         if (object.get("declaration_infos") == null) throw new InvalidCompiledFileException(getIdentifier(), "declaration_infos");
-        List<VariableDeclarationStatement.VariableDeclarationInfo> declarationInfos = object.get("declarationInfos").getAsJsonArray().asList().stream().map(element -> {
+        List<VariableDeclarationStatement.VariableDeclarationInfo> declarationInfos = object.get("declaration_infos").getAsJsonArray().asList().stream().map(element -> {
             JsonObject declarationObject = element.getAsJsonObject();
 
             if (declarationObject.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
@@ -57,8 +60,8 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         JsonObject result = getJsonObject();
 
         JsonArray accessModifiers = new JsonArray();
-        for (AccessModifier accessModifier : variableDeclarationStatement.getAccessModifiers()) {
-            accessModifiers.add(accessModifier.getId());
+        for (String accessModifier : variableDeclarationStatement.getAccessModifiers()) {
+            accessModifiers.add(accessModifier);
         }
         result.add("access_modifiers", accessModifiers);
 

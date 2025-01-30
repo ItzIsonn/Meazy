@@ -1,11 +1,10 @@
 package me.itzisonn_.meazy.parser.ast;
 
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 /**
- * All basic AccessModifiers
+ * All basic access modifiers
  *
  * @see Registries#ACCESS_MODIFIERS
  */
@@ -16,40 +15,8 @@ public final class AccessModifiers {
 
 
 
-    public static AccessModifier PRIVATE() {
-        return Registries.ACCESS_MODIFIERS.getEntry(RegistryIdentifier.ofDefault("private")).getValue();
-    }
-
-    public static AccessModifier SHARED() {
-        return Registries.ACCESS_MODIFIERS.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
-    }
-
-
-
-    /**
-     * Returns existing AccessModifier with given name
-     *
-     * @param name AccessModifier's name
-     * @return Existing AccessModifier
-     *
-     * @throws NullPointerException When given name is null
-     * @throws IllegalArgumentException When no existing AccessModifiers have given name
-     *
-     * @see Registries#ACCESS_MODIFIERS
-     */
-    public static AccessModifier parse(String name) throws NullPointerException, IllegalArgumentException {
-        if (name == null) throw new NullPointerException("AccessModifier's name can't be null");
-
-        RegistryEntry<AccessModifier> entry = Registries.ACCESS_MODIFIERS.getEntry(RegistryIdentifier.ofDefault(name));
-        if (entry == null) throw new IllegalArgumentException("Unknown AccessModifier with name " + name);
-
-        return entry.getValue();
-    }
-
-
-
     private static void register(String id) {
-        Registries.ACCESS_MODIFIERS.register(RegistryIdentifier.ofDefault(id), new AccessModifier(id));
+        Registries.ACCESS_MODIFIERS.register(RegistryIdentifier.ofDefault(id), id);
     }
 
     /**

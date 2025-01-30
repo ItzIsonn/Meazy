@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.List;
@@ -10,25 +9,25 @@ import java.util.Set;
 
 @Getter
 public class FunctionDeclarationStatement implements Statement {
+    private final Set<String> accessModifiers;
     private final String id;
     private final List<CallArgExpression> args;
     private final List<Statement> body;
     private final String returnDataType;
-    private final Set<AccessModifier> accessModifiers;
 
-    public FunctionDeclarationStatement(String id, List<CallArgExpression> args, List<Statement> body, String returnDataType, Set<AccessModifier> accessModifiers) {
+    public FunctionDeclarationStatement(Set<String> accessModifiers, String id, List<CallArgExpression> args, List<Statement> body, String returnDataType) {
+        this.accessModifiers = accessModifiers;
         this.id = id;
         this.args = args;
         this.body = body;
         this.returnDataType = returnDataType;
-        this.accessModifiers = accessModifiers;
     }
 
     @Override
     public String toCodeString(int offset) throws IllegalArgumentException {
         StringBuilder accessModifiersBuilder = new StringBuilder();
-        for (AccessModifier accessModifier : accessModifiers) {
-            accessModifiersBuilder.append(accessModifier.getId()).append(" ");
+        for (String accessModifier : accessModifiers) {
+            accessModifiersBuilder.append(accessModifier).append(" ");
         }
 
         StringBuilder argsBuilder = new StringBuilder();

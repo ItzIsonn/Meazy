@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -15,10 +14,10 @@ public class RuntimeVariable {
     private final String dataType;
     private RuntimeValue<?> value;
     private final boolean isConstant;
-    private final Set<AccessModifier> accessModifiers;
+    private final Set<String> accessModifiers;
     private final boolean isArgument;
 
-    public RuntimeVariable(String id, String dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers, boolean isArgument) {
+    public RuntimeVariable(String id, String dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers, boolean isArgument) {
         this.id = id;
         this.dataType = dataType;
 
