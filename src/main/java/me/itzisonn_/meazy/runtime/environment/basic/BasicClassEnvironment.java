@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.basic;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
 import me.itzisonn_.meazy.runtime.environment.interfaces.ClassEnvironment;
@@ -36,7 +35,7 @@ public class BasicClassEnvironment extends BasicVariableDeclarationEnvironment i
     }
 
     @Override
-    public void declareVariable(String id, String dataType, RuntimeValue<?> value, boolean isConstant, Set<AccessModifier> accessModifiers) {
+    public void declareVariable(String id, String dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers) {
         if (getVariable(id) != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
         variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, false));
     }

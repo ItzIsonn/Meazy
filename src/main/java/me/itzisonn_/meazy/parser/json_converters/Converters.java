@@ -94,6 +94,7 @@ public final class Converters {
         register(new ComparisonExpressionConverter());
         register(new InversionExpressionConverter());
         register(new LogicalExpressionConverter());
+        register(new IsExpressionConverter());
         register(new MemberExpressionConverter());
         register(new ClassCallExpressionConverter());
         register(new FunctionCallExpressionConverter());

@@ -1,11 +1,14 @@
 package me.itzisonn_.meazy.runtime.environment.basic;
 
-import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.basic.default_classes.*;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.BooleanClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.AnyClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.FloatClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.IntClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
@@ -88,14 +91,14 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
     }
 
     public void init() {
-        declareClass("any", new DefaultClassValue(new EmptyClassEnvironment(this, "any")) {
+        declareClass("Any", new DefaultClassValue(new AnyClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 return true;
             }
         });
 
-        declareClass("boolean", new DefaultClassValue(new EmptyClassEnvironment(this, "boolean")) {
+        declareClass("Boolean", new DefaultClassValue(new BooleanClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
@@ -104,7 +107,7 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
             }
         });
 
-        declareClass("int", new DefaultClassValue(new EmptyClassEnvironment(this, "int")) {
+        declareClass("Int", new DefaultClassValue(new IntClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
@@ -122,7 +125,7 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
             }
         });
 
-        declareClass("float", new DefaultClassValue(new EmptyClassEnvironment(this, "float")) {
+        declareClass("Float", new DefaultClassValue(new FloatClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
@@ -137,17 +140,17 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
             }
         });
 
-        declareClass("string", new DefaultClassValue(new EmptyClassEnvironment(this, "string")));
+        declareClass("String", new DefaultClassValue(new StringClassEnvironment(this, null)));
 
 
-        declareFunction(new DefaultFunctionValue("print", new ArrayList<>(List.of(new CallArgExpression("value", "any", true))), null, this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("print", new ArrayList<>(List.of(new CallArgExpression("value", "Any", true))), null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.print(functionArgs.getFirst().getFinalValue());
                 return null;
             }
         });
 
-        declareFunction( new DefaultFunctionValue("println", new ArrayList<>(List.of(new CallArgExpression("value", "any", true))), null, this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction( new DefaultFunctionValue("println", new ArrayList<>(List.of(new CallArgExpression("value", "Any", true))), null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.println(functionArgs.getFirst().getFinalValue());
                 return null;
@@ -155,7 +158,7 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         });
 
         declareFunction(new DefaultFunctionValue("range",
-                new ArrayList<>(List.of(new CallArgExpression("begin", "int", true), new CallArgExpression("end", "int", true))),
+                new ArrayList<>(List.of(new CallArgExpression("begin", "Int", true), new CallArgExpression("end", "Int", true))),
                 "List", this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {

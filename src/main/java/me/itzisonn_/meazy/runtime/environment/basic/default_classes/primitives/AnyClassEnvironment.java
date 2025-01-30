@@ -1,6 +1,5 @@
-package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
+package me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives;
 
-import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -10,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class EmptyClassEnvironment extends BasicClassEnvironment {
-    public EmptyClassEnvironment(Environment parent, String id) {
-        super(parent, true, id);
+public class AnyClassEnvironment extends BasicClassEnvironment {
+    public AnyClassEnvironment(Environment parent) {
+        super(parent, true, "Any");
 
 
-        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of(AccessModifiers.PRIVATE())) {
+        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of("private")) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });

@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.AccessModifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
 import java.util.List;
@@ -10,11 +9,11 @@ import java.util.stream.Collectors;
 
 @Getter
 public class VariableDeclarationStatement implements Statement {
-    private final Set<AccessModifier> accessModifiers;
+    private final Set<String> accessModifiers;
     private final boolean isConstant;
     private final List<VariableDeclarationInfo> declarationInfos;
 
-    public VariableDeclarationStatement(Set<AccessModifier> accessModifiers, boolean isConstant, List<VariableDeclarationInfo> declarationInfos) {
+    public VariableDeclarationStatement(Set<String> accessModifiers, boolean isConstant, List<VariableDeclarationInfo> declarationInfos) {
         this.accessModifiers = accessModifiers;
         this.isConstant = isConstant;
         this.declarationInfos = declarationInfos;
@@ -23,8 +22,8 @@ public class VariableDeclarationStatement implements Statement {
     @Override
     public String toCodeString(int offset) throws IllegalArgumentException {
         StringBuilder accessModifiersBuilder = new StringBuilder();
-        for (AccessModifier accessModifier : accessModifiers) {
-            accessModifiersBuilder.append(accessModifier.getId()).append(" ");
+        for (String accessModifier : accessModifiers) {
+            accessModifiersBuilder.append(accessModifier).append(" ");
         }
 
         String keywordString = isConstant ? "val" : "var";

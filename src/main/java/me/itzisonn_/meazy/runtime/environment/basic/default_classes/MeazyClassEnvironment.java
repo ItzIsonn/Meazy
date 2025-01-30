@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addons.Addon;
-import me.itzisonn_.meazy.parser.ast.AccessModifiers;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
@@ -21,14 +20,14 @@ public class MeazyClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Meazy");
 
 
-        declareVariable("VERSION", "string", new StringValue(MeazyMain.VERSION), true, Set.of(AccessModifiers.SHARED()));
-        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of(AccessModifiers.PRIVATE())) {
+        declareVariable("VERSION", "String", new StringValue(MeazyMain.VERSION), true, Set.of("shared"));
+        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of("private")) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
 
-        declareFunction(new DefaultFunctionValue("getAddons", new ArrayList<>(), "List", this, Set.of(AccessModifiers.SHARED())) {
+        declareFunction(new DefaultFunctionValue("getAddons", new ArrayList<>(), "List", this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 List<RuntimeValue<?>> addons = new ArrayList<>();
                 for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {

@@ -79,6 +79,10 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("break")).getValue();
     }
 
+    public static TokenType IS() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("is")).getValue();
+    }
+
 
 
     public static TokenType NEW_LINE() {
@@ -317,6 +321,7 @@ public final class TokenTypes {
         register(new TokenType("return", "return", false));
         register(new TokenType("continue", "continue", false));
         register(new TokenType("break", "break", false));
+        register(new TokenType("is", "is", false));
 
         register(new TokenType("new_line", "\n+", false));
         register(new TokenType("comment", "\\/\\/[^\n]*", true));
