@@ -17,13 +17,15 @@ public final class MeazyMain {
     public static final String VERSION = "2.3";
     public static final Logger LOGGER = LogManager.getLogger("meazy");
     public static final AddonManager ADDON_MANAGER = new AddonManager();
+    private static boolean isInit = false;
 
     private MeazyMain() {}
 
+
+
     public static void main(String[] args) {
         long startLoadMillis = System.currentTimeMillis();
-        Registries.INIT();
-        loadAddons();
+        INIT();
         long endLoadMillis = System.currentTimeMillis();
 
         if (args.length == 0) {
@@ -91,5 +93,12 @@ public final class MeazyMain {
         int addons = ADDON_MANAGER.getAddons().length;
         if (addons == 1) LOGGER.log(Level.INFO, "1 addon loaded");
         else LOGGER.log(Level.INFO, "{} addons loaded", addons);
+    }
+
+    public static void INIT() {
+        if (isInit) throw new IllegalStateException("MeazyMain have already been initialized!");
+        isInit = true;
+        Registries.INIT();
+        loadAddons();
     }
 }

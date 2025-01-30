@@ -136,12 +136,16 @@ public final class EvaluationFunctions {
             Set<AccessModifier> accessModifiers = new HashSet<>(variableDeclarationStatement.getAccessModifiers());
             if (!accessModifiers.contains(AccessModifiers.SHARED()) && environment.isShared()) accessModifiers.add(AccessModifiers.SHARED());
 
-            variableDeclarationEnvironment.declareVariable(
-                    variableDeclarationStatement.getId(),
-                    variableDeclarationStatement.getDataType(),
-                    new VariableValue(variableDeclarationStatement.getValue() == null ? null : Interpreter.evaluate(variableDeclarationStatement.getValue(), environment), variableDeclarationEnvironment, variableDeclarationStatement.getId()),
-                    variableDeclarationStatement.isConstant(),
-                    accessModifiers);
+            variableDeclarationStatement.getDeclarationInfos().forEach(variableDeclarationInfo ->
+                    variableDeclarationEnvironment.declareVariable(
+                            variableDeclarationInfo.getId(),
+                            variableDeclarationInfo.getDataType(),
+                            new VariableValue(variableDeclarationInfo.getValue() == null ?
+                                    null :
+                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment), variableDeclarationEnvironment, variableDeclarationInfo.getId()),
+                            variableDeclarationStatement.isConstant(),
+                            accessModifiers)
+            );
             return null;
         });
 
@@ -216,9 +220,10 @@ public final class EvaluationFunctions {
             main:
             for (RuntimeValue<?> runtimeValue : list) {
                 foreachEnvironment.clearVariables();
+
                 foreachEnvironment.declareVariable(
-                        foreachStatement.getVariableDeclarationStatement().getId(),
-                        foreachStatement.getVariableDeclarationStatement().getDataType(),
+                        foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getId(),
+                        foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getDataType(),
                         runtimeValue,
                         foreachStatement.getVariableDeclarationStatement().isConstant(),
                         new HashSet<>());
@@ -265,12 +270,16 @@ public final class EvaluationFunctions {
                 throw new RuntimeException(e);
             }
 
-            forEnvironment.declareVariable(
-                    forStatement.getVariableDeclarationStatement().getId(),
-                    forStatement.getVariableDeclarationStatement().getDataType(),
-                    Interpreter.evaluate(forStatement.getVariableDeclarationStatement().getValue(), forEnvironment),
-                    forStatement.getVariableDeclarationStatement().isConstant(),
-                    new HashSet<>());
+            forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
+                    forEnvironment.declareVariable(
+                            variableDeclarationInfo.getId(),
+                            variableDeclarationInfo.getDataType(),
+                            new VariableValue(variableDeclarationInfo.getValue() == null ?
+                                    null :
+                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment), forEnvironment, variableDeclarationInfo.getId()),
+                            forStatement.getVariableDeclarationStatement().isConstant(),
+                            Set.of())
+            );
 
             main:
             while (parseCondition(forStatement.getCondition(), forEnvironment)) {
@@ -303,15 +312,20 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                RuntimeVariable runtimeVariable = forEnvironment.getVariable(forStatement.getVariableDeclarationStatement().getId());
+                List<RuntimeVariable> runtimeVariables = new ArrayList<>();
+                forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
+                        runtimeVariables.add(forEnvironment.getVariable(variableDeclarationInfo.getId())));
+
                 forEnvironment.clearVariables();
-                forEnvironment.declareVariable(
-                        runtimeVariable.getId(),
-                        runtimeVariable.getDataType(),
-                        runtimeVariable.getValue(),
-                        runtimeVariable.isConstant(),
-                        new HashSet<>());
-                forEnvironment.assignVariable(runtimeVariable.getId(), evaluateAssignmentExpression(forStatement.getAssignmentExpression(), forEnvironment));
+                for (RuntimeVariable runtimeVariable : runtimeVariables) {
+                    forEnvironment.declareVariable(
+                            runtimeVariable.getId(),
+                            runtimeVariable.getDataType(),
+                            runtimeVariable.getValue(),
+                            runtimeVariable.isConstant(),
+                            new HashSet<>());
+                }
+                evaluateAssignmentExpression(forStatement.getAssignmentExpression(), forEnvironment);
             }
 
             return null;

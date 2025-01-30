@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser;
 
 import lombok.Getter;
-import lombok.Setter;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypes;
@@ -20,14 +19,24 @@ import java.util.List;
  */
 public final class Parser {
     private static List<Token> tokens;
+
     /**
      * Position of current element in {@link Parser#tokens}
      */
     @Getter
-    @Setter
     private static int pos = 0;
 
     private Parser() {}
+
+
+
+    /**
+     * Resets all data
+     */
+    public static void reset() {
+        tokens = null;
+        pos = 0;
+    }
 
     /**
      * @return Copy of tokens list

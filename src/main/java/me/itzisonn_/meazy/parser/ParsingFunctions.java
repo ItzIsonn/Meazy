@@ -63,6 +63,7 @@ public final class ParsingFunctions {
             if (getCurrent().getType().equals(TokenTypes.CLASS())) {
                 return parse(RegistryIdentifier.ofDefault("class_declaration"), ClassDeclarationStatement.class);
             }
+
             throw new InvalidStatementException("At global environment you only can declare variable, function or class", getCurrent().getLine());
         });
 
@@ -144,7 +145,7 @@ public final class ParsingFunctions {
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
 
-            String argDataType = null;
+            String argDataType = "any";
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
                 if (!getCurrent().getType().equals(TokenTypes.ID())) throw new InvalidStatementException("Must specify arg's data type after colon", getCurrent().getLine());
@@ -162,33 +163,16 @@ public final class ParsingFunctions {
             if (!(extra[1] instanceof Boolean canWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
 
             boolean isConstant = getCurrentAndNext().getValue().equals("val");
-            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword").getValue();
 
-            String dataType = null;
-            if (getCurrent().getType().equals(TokenTypes.COLON())) {
+            List<VariableDeclarationStatement.VariableDeclarationInfo> declarations = new ArrayList<>();
+            declarations.add(parseVariableDeclarationInfo(isConstant, canWithoutValue));
+
+            while (getCurrent().getType().equals(TokenTypes.COMMA())) {
                 getCurrentAndNext();
-                if (!getCurrent().getType().equals(TokenTypes.ID()))
-                    throw new InvalidStatementException("Must specify variable's data type after colon", getCurrent().getLine());
-
-                dataType = getCurrentAndNext(TokenTypes.ID(), "Expected data type's id").getValue();
+                declarations.add(parseVariableDeclarationInfo(isConstant, canWithoutValue));
             }
 
-            if (!getCurrent().getType().equals(TokenTypes.ASSIGN())) {
-                if (canWithoutValue) {
-                    return new VariableDeclarationStatement(id, dataType, null, isConstant, accessModifiers);
-                }
-                if (isConstant) throw new InvalidStatementException("Can't declare a constant variable without a value", getCurrent().getLine());
-                return new VariableDeclarationStatement(id, dataType, new NullLiteral(), false, accessModifiers);
-            }
-
-            getCurrentAndNext(TokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
-
-            return new VariableDeclarationStatement(
-                    id,
-                    dataType,
-                    parse(RegistryIdentifier.ofDefault("expression"), Expression.class),
-                    isConstant,
-                    accessModifiers);
+            return new VariableDeclarationStatement(accessModifiers, isConstant, declarations);
         });
 
         register("constructor_declaration", extra -> {
@@ -290,6 +274,9 @@ public final class ParsingFunctions {
                             getTokens().get(getPos() + 4) != null && getTokens().get(getPos() + 4).getType().equals(TokenTypes.IN())
                     ))) {
                 VariableDeclarationStatement variableDeclarationStatement = parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, new HashSet<>(), true);
+                if (variableDeclarationStatement.getDeclarationInfos().size() > 1) {
+                    throw new InvalidSyntaxException("Foreach statement can declare only one variable");
+                }
                 getCurrentAndNext(TokenTypes.IN(), "Expected IN after variable declaration");
                 Expression collection = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
 
@@ -528,7 +515,15 @@ public final class ParsingFunctions {
 
             if (getCurrent().getType() == TokenTypes.LEFT_PAREN()) {
                 getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
-                List<Expression> args = getCurrent().getType() == TokenTypes.RIGHT_PAREN() ? new ArrayList<>() : parseCallArgsList();
+                List<Expression> args = new ArrayList<>();
+                if (getCurrent().getType() != TokenTypes.RIGHT_PAREN()) {
+                    args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+
+                    while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                        getCurrentAndNext();
+                        args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+                    }
+                }
                 getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
                 return new FunctionCallExpression(expression, args);
             }
@@ -625,15 +620,26 @@ public final class ParsingFunctions {
         return body;
     }
 
-    private static List<Expression> parseCallArgsList() {
-        List<Expression> args = new ArrayList<>(List.of(parse(RegistryIdentifier.ofDefault("expression"), Expression.class)));
+    private static VariableDeclarationStatement.VariableDeclarationInfo parseVariableDeclarationInfo(boolean isConstant, boolean canWithoutValue) {
+        String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
 
-        while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+        String dataType = "any";
+        if (getCurrent().getType().equals(TokenTypes.COLON())) {
             getCurrentAndNext();
-            args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+            dataType = getCurrentAndNext(TokenTypes.ID(), "Must specify variable's datatype after colon").getValue();
         }
 
-        return args;
+        if (!getCurrent().getType().equals(TokenTypes.ASSIGN())) {
+            if (canWithoutValue) {
+                return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, null);
+            }
+            if (isConstant) throw new InvalidStatementException("Can't declare a constant variable without a value", getCurrent().getLine());
+            return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, new NullLiteral());
+        }
+
+        getCurrentAndNext(TokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
+
+        return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
     }
 
 

@@ -10,6 +10,7 @@ import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,41 +24,56 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
-        String id = object.get("id").getAsString();
-
-        if (object.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
-        String dataType = object.get("data_type").getAsString();
-
-        Expression value = null;
-        if (object.get("value") != null) {
-            value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);
-        }
-
-        if (object.get("is_constant") == null) throw new InvalidCompiledFileException(getIdentifier(), "is_constant");
-        boolean isConstant = object.get("is_constant").getAsBoolean();
-
         if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
         Set<AccessModifier> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier ->
                 AccessModifiers.parse(accessModifier.getAsString())).collect(Collectors.toSet());
 
-        return new VariableDeclarationStatement(id, dataType, value, isConstant, accessModifiers);
+        if (object.get("is_constant") == null) throw new InvalidCompiledFileException(getIdentifier(), "is_constant");
+        boolean isConstant = object.get("is_constant").getAsBoolean();
+
+        if (object.get("declaration_infos") == null) throw new InvalidCompiledFileException(getIdentifier(), "declaration_infos");
+        List<VariableDeclarationStatement.VariableDeclarationInfo> declarationInfos = object.get("declarationInfos").getAsJsonArray().asList().stream().map(element -> {
+            JsonObject declarationObject = element.getAsJsonObject();
+
+            if (declarationObject.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
+            String id = declarationObject.get("id").getAsString();
+
+            if (declarationObject.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
+            String dataType = declarationObject.get("data_type").getAsString();
+
+            Expression value = null;
+            if (declarationObject.get("value") != null) {
+                value = jsonDeserializationContext.deserialize(declarationObject.get("value"), Expression.class);
+            }
+
+            return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, value);
+        }).toList();
+
+        return new VariableDeclarationStatement(accessModifiers, isConstant, declarationInfos);
     }
 
     @Override
     public JsonElement serialize(VariableDeclarationStatement variableDeclarationStatement, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject result = getJsonObject();
 
-        result.addProperty("id", variableDeclarationStatement.getId());
-        result.addProperty("data_type", variableDeclarationStatement.getDataType());
-        if (variableDeclarationStatement.getValue() != null) result.add("value", jsonSerializationContext.serialize(variableDeclarationStatement.getValue()));
-        result.addProperty("is_constant", variableDeclarationStatement.isConstant());
-
         JsonArray accessModifiers = new JsonArray();
         for (AccessModifier accessModifier : variableDeclarationStatement.getAccessModifiers()) {
             accessModifiers.add(accessModifier.getId());
         }
         result.add("access_modifiers", accessModifiers);
+
+        result.addProperty("is_constant", variableDeclarationStatement.isConstant());
+
+        JsonArray declarationInfos = new JsonArray();
+        for (VariableDeclarationStatement.VariableDeclarationInfo declarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
+            JsonObject declarationObject = new JsonObject();
+            declarationObject.addProperty("id", declarationInfo.getId());
+            declarationObject.addProperty("data_type", declarationInfo.getDataType());
+            if (declarationInfo.getValue() != null) declarationObject.add("value", jsonSerializationContext.serialize(declarationInfo.getValue()));
+            declarationInfos.add(declarationObject);
+        }
+        result.add("declaration_infos", declarationInfos);
+
 
         return result;
     }

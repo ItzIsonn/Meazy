@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 @Getter
 public class CallArgExpression implements Expression {
@@ -8,10 +9,9 @@ public class CallArgExpression implements Expression {
     private final String dataType;
     private final boolean isConstant;
 
-    public CallArgExpression(String id, String dataType, boolean isConstant) {
+    public CallArgExpression(String id, @NonNull String dataType, boolean isConstant) {
         this.id = id;
-        if (dataType != null) this.dataType = dataType;
-        else this.dataType = "any";
+        this.dataType = dataType;
         this.isConstant = isConstant;
     }
 

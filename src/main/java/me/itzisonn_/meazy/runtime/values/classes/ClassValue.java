@@ -31,10 +31,7 @@ public abstract class ClassValue extends RuntimeValue<Object> {
      */
     public boolean isMatches(Object value) {
         if (value instanceof ClassValue classValue) return classValue.getId().equals(getId());
-        if (value instanceof StringClassEnvironment.InnerStringValue innerStringValue) {
-            System.out.println("!!!!!!!!!!! CLASS VALUE");
-            return innerStringValue.getValue().equals(getId());
-        }
+        if (value instanceof StringClassEnvironment.InnerStringValue innerStringValue) return innerStringValue.getValue().equals(getId());
         return false;
     }
 
