@@ -37,7 +37,7 @@ public abstract class Command {
      * @param args Args
      * @return Success message that will be logged or null
      */
-    public abstract String execute(String[] args);
+    public abstract String execute(String... args);
 
     /**
      * @return Copy of command's args' names

@@ -26,6 +26,24 @@ public final class Commands {
 
 
 
+    public static Command VERSION() {
+        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("version")).getValue();
+    }
+
+    public static Command RUN() {
+        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("run")).getValue();
+    }
+
+    public static Command COMPILE() {
+        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("compile")).getValue();
+    }
+
+    public static Command DECOMPILE() {
+        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("decompile")).getValue();
+    }
+
+
+
     private static void register(String id, Command command) {
         Registries.COMMANDS.register(RegistryIdentifier.ofDefault(id), command);
     }
@@ -64,7 +82,6 @@ public final class Commands {
                 long startMillis = System.currentTimeMillis();
                 if (extension.equals("mea")) {
                     List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
-                    System.out.println(tokens);
                     Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
                     Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
                 }
