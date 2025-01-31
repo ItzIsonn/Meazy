@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.basic;
 
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
@@ -143,14 +144,18 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         declareClass("String", new DefaultClassValue(new StringClassEnvironment(this, null)));
 
 
-        declareFunction(new DefaultFunctionValue("print", new ArrayList<>(List.of(new CallArgExpression("value", "Any", true))), null, this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("print", List.of(
+                new CallArgExpression("value", new DataType("Any", true), true)),
+                null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.print(functionArgs.getFirst().getFinalValue());
                 return null;
             }
         });
 
-        declareFunction( new DefaultFunctionValue("println", new ArrayList<>(List.of(new CallArgExpression("value", "Any", true))), null, this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("println", List.of(
+                new CallArgExpression("value", new DataType("Any", true), true)),
+                null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 System.out.println(functionArgs.getFirst().getFinalValue());
                 return null;
@@ -158,8 +163,8 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         });
 
         declareFunction(new DefaultFunctionValue("range",
-                new ArrayList<>(List.of(new CallArgExpression("begin", "Int", true), new CallArgExpression("end", "Int", true))),
-                "List", this, new HashSet<>()) {
+                List.of(new CallArgExpression("begin", new DataType("Int", false), true), new CallArgExpression("end", new DataType("Int", false), true)),
+                new DataType("List", false), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 int begin;

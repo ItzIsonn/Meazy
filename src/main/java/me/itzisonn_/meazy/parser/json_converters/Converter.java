@@ -57,4 +57,28 @@ public abstract class Converter<T extends Statement> implements JsonDeserializer
 
         return result;
     }
+
+    /**
+     * @param object JsonObject
+     * @param id Id of JsonElement
+     * @return JsonElement of given object with given id
+     *
+     * @throws InvalidCompiledFileException If JsonElement with given id doesn't exist
+     */
+    protected JsonElement getElement(JsonObject object, String id) throws InvalidCompiledFileException {
+        return getElement(object, id, id);
+    }
+
+    /**
+     * @param object JsonObject
+     * @param id Id of JsonElement
+     * @param exceptionId Id that will be used in InvalidCompiledFileException
+     * @return JsonElement of given object with given id
+     *
+     * @throws InvalidCompiledFileException If JsonElement with given id doesn't exist
+     */
+    protected JsonElement getElement(JsonObject object, String id, String exceptionId) throws InvalidCompiledFileException {
+        if (object.get(id) == null) throw new InvalidCompiledFileException(getIdentifier(), exceptionId);
+        return object.get(id);
+    }
 }

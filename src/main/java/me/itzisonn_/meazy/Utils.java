@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -25,6 +27,15 @@ public final class Utils {
      * System.in Scanner
      */
     public static final Scanner SCANNER = new Scanner(System.in);
+
+    /**
+     * NumberFormat
+     */
+    public static final NumberFormat NUMBER_FORMAT = new DecimalFormat();
+
+    static {
+        NUMBER_FORMAT.setGroupingUsed(false);
+    }
 
     /**
      * Counts number of target's matches in given string

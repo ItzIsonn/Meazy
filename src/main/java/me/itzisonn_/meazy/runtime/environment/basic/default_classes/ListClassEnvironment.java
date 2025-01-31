@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
@@ -24,15 +25,17 @@ public class ListClassEnvironment extends BasicClassEnvironment {
         super(parent, false, "List");
 
 
-        declareVariable("value", "Any", new InnerListValue(list), false, Set.of("private"));
+        declareVariable("value", new DataType("Any", false), new InnerListValue(list), false, Set.of("private"));
 
 
-        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of()) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of()) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
-        declareConstructor(new DefaultConstructorValue(new ArrayList<>(List.of(new CallArgExpression("value", "Any", true))), this, Set.of()) {
+        declareConstructor(new DefaultConstructorValue(List.of(
+                new CallArgExpression("value", new DataType("Any", true), true)),
+                this, Set.of()) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
                 RuntimeValue<?> value = constructorEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -43,7 +46,7 @@ public class ListClassEnvironment extends BasicClassEnvironment {
         });
 
 
-        declareFunction(new DefaultFunctionValue("getSize", new ArrayList<>(), "Int", this, new HashSet<>()) {
+        declareFunction(new DefaultFunctionValue("getSize", List.of(), new DataType("Int", false), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -54,7 +57,9 @@ public class ListClassEnvironment extends BasicClassEnvironment {
         });
 
 
-        declareFunction(new DefaultFunctionValue("add", new ArrayList<>(List.of(new CallArgExpression("element", "Any", true))), null, this, new HashSet<>()) {
+        declareFunction(new DefaultFunctionValue("add", List.of(
+                new CallArgExpression("element", new DataType("Any", true), true)),
+                null, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -66,7 +71,7 @@ public class ListClassEnvironment extends BasicClassEnvironment {
         });
 
         declareFunction(new DefaultFunctionValue("add",
-                new ArrayList<>(List.of(new CallArgExpression("element", "Any", true), new CallArgExpression("pos", "Int", true))),
+                List.of(new CallArgExpression("element", new DataType("Any", true), true), new CallArgExpression("pos", new DataType("Int", false), true)),
                 null, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
@@ -79,7 +84,9 @@ public class ListClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("remove", new ArrayList<>(List.of(new CallArgExpression("pos", "Int", true))), null, this, new HashSet<>()) {
+        declareFunction(new DefaultFunctionValue("remove", List.of(
+                new CallArgExpression("pos", new DataType("Int", false), true)),
+                null, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -91,7 +98,9 @@ public class ListClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("remove", new ArrayList<>(List.of(new CallArgExpression("element", "Any", true))), null, this, new HashSet<>()) {
+        declareFunction(new DefaultFunctionValue("remove", List.of(
+                new CallArgExpression("element", new DataType("Any", true), true)),
+                null, this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -102,7 +111,9 @@ public class ListClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("get", new ArrayList<>(List.of(new CallArgExpression("pos", "Int", true))), "Any", this, new HashSet<>()) {
+        declareFunction(new DefaultFunctionValue("get", List.of(
+                new CallArgExpression("pos", new DataType("Int", false), true)),
+                new DataType("Any", true), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
@@ -113,7 +124,7 @@ public class ListClassEnvironment extends BasicClassEnvironment {
             }
         });
 
-        declareFunction(new DefaultFunctionValue("toString", new ArrayList<>(), "String", this, new HashSet<>()) {
+        declareFunction(new DefaultFunctionValue("toString", List.of(), new DataType("String", false), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();

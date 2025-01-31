@@ -4,7 +4,6 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -21,11 +20,9 @@ public class ClassCallExpressionConverter extends Converter<ClassCallExpression>
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("caller") == null) throw new InvalidCompiledFileException(getIdentifier(), "caller");
-        Expression caller = jsonDeserializationContext.deserialize(object.get("caller"), Expression.class);
+        Expression caller = jsonDeserializationContext.deserialize(getElement(object, "caller"), Expression.class);
 
-        if (object.get("args") == null) throw new InvalidCompiledFileException(getIdentifier(), "args");
-        List<Expression> args = object.get("args").getAsJsonArray().asList().stream().map(arg ->
+        List<Expression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
                 (Expression) jsonDeserializationContext.deserialize(arg, Expression.class)).collect(Collectors.toList());
 
         return new ClassCallExpression(caller, args);

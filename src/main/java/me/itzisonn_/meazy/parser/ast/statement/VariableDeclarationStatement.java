@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
 import java.util.List;
@@ -39,10 +40,10 @@ public class VariableDeclarationStatement implements Statement {
     @Getter
     public static class VariableDeclarationInfo {
         private final String id;
-        private final String dataType;
+        private final DataType dataType;
         private final Expression value;
 
-        public VariableDeclarationInfo(String id, String dataType, Expression value) {
+        public VariableDeclarationInfo(String id, DataType dataType, Expression value) {
             this.id = id;
             this.dataType = dataType;
             this.value = value;

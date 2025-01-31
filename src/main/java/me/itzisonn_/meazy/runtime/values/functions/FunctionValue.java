@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.runtime.values.functions;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -18,7 +19,7 @@ import java.util.Set;
 public abstract class FunctionValue extends RuntimeValue<Object> {
     protected final String id;
     protected final List<CallArgExpression> args;
-    protected final String returnDataType;
+    protected final DataType returnDataType;
     @Setter
     protected FunctionDeclarationEnvironment parentEnvironment;
     protected final Set<String> accessModifiers;
@@ -28,11 +29,11 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
      *
      * @param id Id of this FunctionValue
      * @param args Args of this FunctionValue
-     * @param returnDataType Which data type should this FunctionValue return
+     * @param returnDataType Which DataType should this FunctionValue return
      * @param parentEnvironment Parent of this FunctionValue
      * @param accessModifiers Access modifiers of this FunctionValue
      */
-    public FunctionValue(String id, List<CallArgExpression> args, String returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
+    public FunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
         super(null);
         this.id = id;
         this.args = args;
