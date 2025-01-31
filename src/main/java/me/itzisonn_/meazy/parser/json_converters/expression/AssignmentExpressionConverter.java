@@ -4,7 +4,6 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.AssignmentExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -19,11 +18,8 @@ public class AssignmentExpressionConverter extends Converter<AssignmentExpressio
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
-        Expression id = jsonDeserializationContext.deserialize(object.get("id"), Expression.class);
-
-        if (object.get("value") == null) throw new InvalidCompiledFileException(getIdentifier(), "value");
-        Expression value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);
+        Expression id = jsonDeserializationContext.deserialize(getElement(object, "id"), Expression.class);
+        Expression value = jsonDeserializationContext.deserialize(getElement(object, "value"), Expression.class);
 
         return new AssignmentExpression(id, value);
     }

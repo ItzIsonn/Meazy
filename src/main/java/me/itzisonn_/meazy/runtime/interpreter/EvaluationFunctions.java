@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
@@ -951,20 +952,22 @@ public final class EvaluationFunctions {
         return booleanValue.getValue();
     }
 
-    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, String returnDataType, String functionId, boolean isDefault) {
+    private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, boolean isDefault) {
         String defaultString = isDefault ? " It's probably an Addon's error" : "";
 
-        if (returnValue != null && returnDataType == null)
-            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing." + defaultString);
         if (returnValue == null) {
-            if (returnDataType != null)
+            if (returnDataType != null) {
                 throw new InvalidSyntaxException("Didn't find return value but function with id " + functionId + " must return value." + defaultString);
+            }
             return null;
         }
+        if (returnDataType == null) {
+            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing." + defaultString);
+        }
 
-        ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(returnDataType);
-        if (classValue == null || !classValue.isMatches(returnValue.getFinalRuntimeValue()))
-            throw new InvalidSyntaxException("Returned value's data type is different from specified." + defaultString);
+        if (!returnDataType.isMatches(returnValue)) {
+            throw new InvalidSyntaxException("Returned value's data type is different from specified (" + returnDataType.getId() + ")." + defaultString);
+        }
 
         return returnValue;
     }

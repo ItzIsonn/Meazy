@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives;
 
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
@@ -9,7 +10,6 @@ import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -18,13 +18,15 @@ public class BooleanClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Boolean");
 
 
-        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of("private")) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of("private")) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
 
-        declareFunction(new DefaultFunctionValue("valueOf", new ArrayList<>(List.of(new CallArgExpression("object", "Any", true))), "Boolean", this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("valueOf", List.of(
+                new CallArgExpression("object", new DataType("Any", false), true)),
+                new DataType("Boolean", false), this, Set.of("shared")) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 String value = functionArgs.getFirst().getFinalValue().toString();

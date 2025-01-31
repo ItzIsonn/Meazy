@@ -4,7 +4,6 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.InversionExpression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -19,10 +18,7 @@ public class InversionExpressionConverter extends Converter<InversionExpression>
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("expression") == null) throw new InvalidCompiledFileException(getIdentifier(), "expression");
-        Expression expression = jsonDeserializationContext.deserialize(object.get("expression"), Expression.class);
-
-        return new InversionExpression(expression);
+        return new InversionExpression(jsonDeserializationContext.deserialize(getElement(object, "expression"), Expression.class));
     }
 
     @Override

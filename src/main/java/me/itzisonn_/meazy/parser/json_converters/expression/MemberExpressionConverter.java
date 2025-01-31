@@ -4,7 +4,6 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -19,11 +18,8 @@ public class MemberExpressionConverter extends Converter<MemberExpression> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("object") == null) throw new InvalidCompiledFileException(getIdentifier(), "object");
-        Expression objectExpression = jsonDeserializationContext.deserialize(object.get("object"), Expression.class);
-
-        if (object.get("member") == null) throw new InvalidCompiledFileException(getIdentifier(), "member");
-        Expression member = jsonDeserializationContext.deserialize(object.get("member"), Expression.class);
+        Expression objectExpression = jsonDeserializationContext.deserialize(getElement(object, "object"), Expression.class);
+        Expression member = jsonDeserializationContext.deserialize(getElement(object, "member"), Expression.class);
 
         return new MemberExpression(objectExpression, member);
     }

@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.parser.json_converters.expression;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -18,14 +18,14 @@ public class CallArgExpressionConverter extends Converter<CallArgExpression> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
-        String id = object.get("id").getAsString();
+        String id = getElement(object, "id").getAsString();
 
-        if (object.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
-        String dataType = object.get("data_type").getAsString();
+        JsonObject dataTypeObject = getElement(object, "data_type").getAsJsonObject();
+        String dataTypeId = getElement(dataTypeObject, "id", "data_type.id").getAsString();
+        boolean dataTypeIsNullable = getElement(dataTypeObject, "is_nullable", "data_type.is_nullable").getAsBoolean();
+        DataType dataType = new DataType(dataTypeId, dataTypeIsNullable);
 
-        if (object.get("is_constant") == null) throw new InvalidCompiledFileException(getIdentifier(), "is_constant");
-        boolean isConstant = object.get("is_constant").getAsBoolean();
+        boolean isConstant = getElement(object, "is_constant").getAsBoolean();
 
         return new CallArgExpression(id, dataType, isConstant);
     }
@@ -35,7 +35,12 @@ public class CallArgExpressionConverter extends Converter<CallArgExpression> {
         JsonObject result = getJsonObject();
 
         result.addProperty("id", callArgExpression.getId());
-        result.addProperty("data_type", callArgExpression.getDataType());
+
+        JsonObject dataTypeObject = new JsonObject();
+        dataTypeObject.addProperty("id", callArgExpression.getDataType().getId());
+        dataTypeObject.addProperty("is_nullable", callArgExpression.getDataType().isNullable());
+        result.add("data_type", dataTypeObject);
+
         result.addProperty("is_constant", callArgExpression.isConstant());
 
         return result;

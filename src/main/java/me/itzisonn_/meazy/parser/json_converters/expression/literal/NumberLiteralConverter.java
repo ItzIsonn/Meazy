@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.json_converters.expression.literal;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
@@ -31,7 +32,7 @@ public class NumberLiteralConverter extends Converter<NumberLiteral> {
     public JsonElement serialize(NumberLiteral numberLiteral, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject result = getJsonObject();
 
-        result.addProperty("value", numberLiteral.getValue());
+        result.addProperty("value", Utils.NUMBER_FORMAT.format(numberLiteral.getValue()));
         result.addProperty("is_int", numberLiteral.isInt());
 
         return result;

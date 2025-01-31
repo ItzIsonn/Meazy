@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
@@ -23,33 +24,29 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
-        Set<String> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
+        Set<String> accessModifiers = getElement(object, "access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
             if (Registries.ACCESS_MODIFIERS.hasEntry(accessModifier.getAsString())) {
                 throw new InvalidCompiledFileException("Unknown access modifier with id " + accessModifier.getAsString());
             }
             return accessModifier.getAsString();
         }).collect(Collectors.toSet());
 
-        if (object.get("is_constant") == null) throw new InvalidCompiledFileException(getIdentifier(), "is_constant");
-        boolean isConstant = object.get("is_constant").getAsBoolean();
+        boolean isConstant = getElement(object, "is_constant").getAsBoolean();
 
-        if (object.get("declaration_infos") == null) throw new InvalidCompiledFileException(getIdentifier(), "declaration_infos");
-        List<VariableDeclarationStatement.VariableDeclarationInfo> declarationInfos = object.get("declaration_infos").getAsJsonArray().asList().stream().map(element -> {
+        List<VariableDeclarationStatement.VariableDeclarationInfo> declarationInfos = getElement(object, "declaration_infos").getAsJsonArray().asList().stream().map(element -> {
             JsonObject declarationObject = element.getAsJsonObject();
+            String id = getElement(declarationObject, "id").getAsString();
 
-            if (declarationObject.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
-            String id = declarationObject.get("id").getAsString();
-
-            if (declarationObject.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
-            String dataType = declarationObject.get("data_type").getAsString();
+            JsonObject dataTypeObject = getElement(declarationObject, "data_type").getAsJsonObject();
+            String dataTypeId = getElement(dataTypeObject, "id", "data_type.id").getAsString();
+            boolean dataTypeIsNullable = getElement(dataTypeObject, "is_nullable", "data_type.is_nullable").getAsBoolean();
 
             Expression value = null;
             if (declarationObject.get("value") != null) {
                 value = jsonDeserializationContext.deserialize(declarationObject.get("value"), Expression.class);
             }
 
-            return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, value);
+            return new VariableDeclarationStatement.VariableDeclarationInfo(id, new DataType(dataTypeId, dataTypeIsNullable), value);
         }).toList();
 
         return new VariableDeclarationStatement(accessModifiers, isConstant, declarationInfos);
@@ -71,8 +68,13 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         for (VariableDeclarationStatement.VariableDeclarationInfo declarationInfo : variableDeclarationStatement.getDeclarationInfos()) {
             JsonObject declarationObject = new JsonObject();
             declarationObject.addProperty("id", declarationInfo.getId());
-            declarationObject.addProperty("data_type", declarationInfo.getDataType());
             if (declarationInfo.getValue() != null) declarationObject.add("value", jsonSerializationContext.serialize(declarationInfo.getValue()));
+
+            JsonObject dataTypeObject = new JsonObject();
+            dataTypeObject.addProperty("id", declarationInfo.getDataType().getId());
+            dataTypeObject.addProperty("is_nullable", declarationInfo.getDataType().isNullable());
+            declarationObject.add("data_type", dataTypeObject);
+
             declarationInfos.add(declarationObject);
         }
         result.add("declaration_infos", declarationInfos);

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.interfaces.declaration;
 
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -15,23 +16,23 @@ public interface VariableDeclarationEnvironment extends Environment {
      * Declares variable with given data in this environment
      *
      * @param id Variable's id
-     * @param dataType Variable's data type
+     * @param dataType Variable's DataType
      * @param value Variable's value
      * @param isConstant Whether is this variable constant
      * @param accessModifiers Variable's access modifiers
      */
-    void declareVariable(String id, String dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
+    void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
 
     /**
      * Declares argument with given data in this environment
      *
      * @param id Argument's id
-     * @param dataType Argument's data type
+     * @param dataType Argument's DataType
      * @param value Argument's value
      * @param isConstant Whether is this argument constant
      * @param accessModifiers Argument's access modifiers
      */
-    void declareArgument(String id, String dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
+    void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
 
     /**
      * Assigns value to existing non-constant variable

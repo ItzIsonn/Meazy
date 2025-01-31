@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
@@ -24,29 +25,29 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
-        Set<String> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
+        Set<String> accessModifiers = getElement(object, "access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
             if (Registries.ACCESS_MODIFIERS.hasEntry(accessModifier.getAsString())) {
                 throw new InvalidCompiledFileException("Unknown access modifier with id " + accessModifier.getAsString());
             }
             return accessModifier.getAsString();
         }).collect(Collectors.toSet());
 
-        if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
-        String id = object.get("id").getAsString();
+        String id = getElement(object, "id").getAsString();
 
-        if (object.get("args") == null) throw new InvalidCompiledFileException(getIdentifier(), "args");
-        List<CallArgExpression> args = object.get("args").getAsJsonArray().asList().stream().map(arg ->
+        List<CallArgExpression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
                 (CallArgExpression) jsonDeserializationContext.deserialize(arg, CallArgExpression.class)).collect(Collectors.toList());
 
-        if (object.get("body") == null) throw new InvalidCompiledFileException(getIdentifier(), "body");
-        List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
+        List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        String dataType = null;
+        DataType dataType;
         if (object.get("return_data_type") != null) {
-            dataType = object.get("return_data_type").getAsString();
+            JsonObject dataTypeObject = getElement(object, "return_data_type").getAsJsonObject();
+            String dataTypeId = getElement(dataTypeObject, "id", "return_data_type.id").getAsString();
+            boolean dataTypeIsNullable = getElement(dataTypeObject, "is_nullable", "return_data_type.is_nullable").getAsBoolean();
+            dataType = new DataType(dataTypeId, dataTypeIsNullable);
         }
+        else dataType = null;
 
         return new FunctionDeclarationStatement(accessModifiers, id, args, body, dataType);
     }
@@ -76,7 +77,10 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         result.add("body", body);
 
         if (functionDeclarationStatement.getReturnDataType() != null) {
-            result.addProperty("return_data_type", functionDeclarationStatement.getReturnDataType());
+            JsonObject dataTypeObject = new JsonObject();
+            dataTypeObject.addProperty("id", functionDeclarationStatement.getReturnDataType().getId());
+            dataTypeObject.addProperty("is_nullable", functionDeclarationStatement.getReturnDataType().isNullable());
+            result.add("data_type", dataTypeObject);
         }
 
         return result;

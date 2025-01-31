@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.List;
@@ -13,9 +14,9 @@ public class FunctionDeclarationStatement implements Statement {
     private final String id;
     private final List<CallArgExpression> args;
     private final List<Statement> body;
-    private final String returnDataType;
+    private final DataType returnDataType;
 
-    public FunctionDeclarationStatement(Set<String> accessModifiers, String id, List<CallArgExpression> args, List<Statement> body, String returnDataType) {
+    public FunctionDeclarationStatement(Set<String> accessModifiers, String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType) {
         this.accessModifiers = accessModifiers;
         this.id = id;
         this.args = args;

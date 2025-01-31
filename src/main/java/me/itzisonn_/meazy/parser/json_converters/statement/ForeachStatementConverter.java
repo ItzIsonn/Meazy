@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.parser.ast.statement.ForeachStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -23,17 +22,14 @@ public class ForeachStatementConverter extends Converter<ForeachStatement> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("variable_declaration") == null) throw new InvalidCompiledFileException(getIdentifier(), "variable_declaration");
-        VariableDeclarationStatement variableDeclarationStatement = jsonDeserializationContext.deserialize(object.get("variable_declaration"), VariableDeclarationStatement.class);
+        VariableDeclarationStatement variableDeclaration = jsonDeserializationContext.deserialize(getElement(object, "variable_declaration"), VariableDeclarationStatement.class);
 
-        if (object.get("collection") == null) throw new InvalidCompiledFileException(getIdentifier(), "collection");
-        Expression collection = jsonDeserializationContext.deserialize(object.get("collection"), Expression.class);
+        Expression collection = jsonDeserializationContext.deserialize(getElement(object, "collection"), Expression.class);
 
-        if (object.get("body") == null) throw new InvalidCompiledFileException(getIdentifier(), "body");
-        List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
+        List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        return new ForeachStatement(variableDeclarationStatement, collection, body);
+        return new ForeachStatement(variableDeclaration, collection, body);
     }
 
     @Override

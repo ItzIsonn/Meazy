@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.values.functions;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
@@ -22,12 +23,12 @@ public class RuntimeFunctionValue extends FunctionValue {
      *
      * @param id Id of this RuntimeFunctionValue
      * @param args Args of this RuntimeFunctionValue
-     * @param returnDataType Which data type should this RuntimeFunctionValue return
+     * @param returnDataType Which DataType should this RuntimeFunctionValue return
      * @param parentEnvironment Parent of this RuntimeFunctionValue
      * @param accessModifiers Access modifiers of this RuntimeFunctionValue
      * @param body Body of this RuntimeFunctionValue
      */
-    public RuntimeFunctionValue(String id, List<CallArgExpression> args, List<Statement> body, String returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
+    public RuntimeFunctionValue(String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
         super(id, args, returnDataType, parentEnvironment, accessModifiers);
         this.body = body;
     }

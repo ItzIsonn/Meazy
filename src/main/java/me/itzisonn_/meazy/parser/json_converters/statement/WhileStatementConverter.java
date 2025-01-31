@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.WhileStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -22,11 +21,9 @@ public class WhileStatementConverter extends Converter<WhileStatement> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("condition") == null) throw new InvalidCompiledFileException(getIdentifier(), "condition");
-        Expression condition = jsonDeserializationContext.deserialize(object.get("condition"), Expression.class);
+        Expression condition = jsonDeserializationContext.deserialize(getElement(object, "condition"), Expression.class);
 
-        if (object.get("body") == null) throw new InvalidCompiledFileException(getIdentifier(), "body");
-        List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
+        List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
         return new WhileStatement(condition, body);

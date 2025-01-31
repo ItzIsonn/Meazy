@@ -24,20 +24,17 @@ public class ConstructorDeclarationStatementConverter extends Converter<Construc
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("access_modifiers") == null) throw new InvalidCompiledFileException(getIdentifier(), "access_modifiers");
-        Set<String> accessModifiers = object.get("access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
+        Set<String> accessModifiers = getElement(object, "access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
             if (Registries.ACCESS_MODIFIERS.hasEntry(accessModifier.getAsString())) {
                 throw new InvalidCompiledFileException("Unknown access modifier with id " + accessModifier.getAsString());
             }
             return accessModifier.getAsString();
         }).collect(Collectors.toSet());
 
-        if (object.get("args") == null) throw new InvalidCompiledFileException(getIdentifier(), "args");
-        List<CallArgExpression> args = object.get("args").getAsJsonArray().asList().stream().map(arg ->
+        List<CallArgExpression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
                 (CallArgExpression) jsonDeserializationContext.deserialize(arg, CallArgExpression.class)).collect(Collectors.toList());
 
-        if (object.get("body") == null) throw new InvalidCompiledFileException(getIdentifier(), "body");
-        List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
+        List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
         return new ConstructorDeclarationStatement(accessModifiers, args, body);

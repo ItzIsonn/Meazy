@@ -4,7 +4,6 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.IsExpression;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -19,11 +18,8 @@ public class IsExpressionConverter extends Converter<IsExpression> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("value") == null) throw new InvalidCompiledFileException(getIdentifier(), "value");
-        Expression value = jsonDeserializationContext.deserialize(object.get("value"), Expression.class);
-
-        if (object.get("data_type") == null) throw new InvalidCompiledFileException(getIdentifier(), "data_type");
-        String dataType = object.get("data_type").getAsString();
+        Expression value = jsonDeserializationContext.deserialize(getElement(object, "value"), Expression.class);
+        String dataType = getElement(object, "data_type").getAsString();
 
         return new IsExpression(value, dataType);
     }

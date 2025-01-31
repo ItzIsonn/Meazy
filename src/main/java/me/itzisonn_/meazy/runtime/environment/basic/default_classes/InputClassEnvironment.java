@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
 
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
@@ -17,31 +18,31 @@ public class InputClassEnvironment extends BasicClassEnvironment {
         super(parent, true, "Input");
 
 
-        declareConstructor(new DefaultConstructorValue(new ArrayList<>(), this, Set.of("private")) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of("private")) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
 
-        declareFunction(new DefaultFunctionValue("read", new ArrayList<>(), "String", this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("read", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(Utils.SCANNER.next());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readLine", new ArrayList<>(), "String", this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("readLine", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(Utils.SCANNER.nextLine());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readInt", new ArrayList<>(), "String", this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("readInt", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new IntValue(Utils.SCANNER.nextInt());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readFloat", new ArrayList<>(), "String", this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("readFloat", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new DoubleValue(Utils.SCANNER.nextDouble());
             }

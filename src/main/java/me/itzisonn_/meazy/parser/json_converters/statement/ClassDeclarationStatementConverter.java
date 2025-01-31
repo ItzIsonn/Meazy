@@ -4,7 +4,6 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.statement.ClassDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -21,11 +20,9 @@ public class ClassDeclarationStatementConverter extends Converter<ClassDeclarati
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        if (object.get("id") == null) throw new InvalidCompiledFileException(getIdentifier(), "id");
-        String id = object.get("id").getAsString();
+        String id = getElement(object, "id").getAsString();
 
-        if (object.get("body") == null) throw new InvalidCompiledFileException(getIdentifier(), "body");
-        List<Statement> body = object.get("body").getAsJsonArray().asList().stream().map(statement ->
+        List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
         return new ClassDeclarationStatement(id, body);
