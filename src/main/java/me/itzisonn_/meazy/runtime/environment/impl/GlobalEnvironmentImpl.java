@@ -150,7 +150,7 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
                 null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
-                Interpreter.OUTPUT.append(value).append("\n");
+                Interpreter.OUTPUT.append(value);
                 System.out.print(value);
                 return null;
             }
@@ -161,7 +161,7 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
                 null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
-                Interpreter.OUTPUT.append(value);
+                Interpreter.OUTPUT.append(value).append("\n");
                 System.out.println(value);
                 return null;
             }
