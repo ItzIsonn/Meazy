@@ -74,7 +74,6 @@ public final class Parser {
         return token;
     }
 
-
     /**
      * Returns token at current position and increments position by 1
      *
@@ -95,6 +94,18 @@ public final class Parser {
     public static void moveOverOptionalNewLines() {
         while (getCurrent().getType().equals(TokenTypes.NEW_LINE())) pos++;
     }
+
+    public static boolean currentLineHasToken(TokenType tokenType) {
+        for (int i = pos; i < tokens.size(); i++) {
+            TokenType current = tokens.get(i).getType();
+            if (current.equals(TokenTypes.NEW_LINE())) return false;
+            if (current.equals(tokenType)) return true;
+        }
+
+        return false;
+    }
+
+
 
     /**
      * Executes ParsingFunction with given identifier
