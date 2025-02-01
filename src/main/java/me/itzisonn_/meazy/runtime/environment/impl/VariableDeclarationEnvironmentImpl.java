@@ -1,9 +1,8 @@
-package me.itzisonn_.meazy.runtime.environment.basic;
+package me.itzisonn_.meazy.runtime.environment.impl;
 
 import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
@@ -11,15 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class BasicVariableDeclarationEnvironment extends BasicEnvironment implements VariableDeclarationEnvironment {
+public class VariableDeclarationEnvironmentImpl extends EnvironmentImpl implements VariableDeclarationEnvironment {
     protected final List<RuntimeVariable> variables;
 
-    public BasicVariableDeclarationEnvironment(Environment parent, boolean isShared) {
+    public VariableDeclarationEnvironmentImpl(Environment parent, boolean isShared) {
         super(parent, isShared);
         this.variables = new ArrayList<>();
     }
 
-    public BasicVariableDeclarationEnvironment(Environment parent) {
+    public VariableDeclarationEnvironmentImpl(Environment parent) {
         super(parent);
         this.variables = new ArrayList<>();
     }

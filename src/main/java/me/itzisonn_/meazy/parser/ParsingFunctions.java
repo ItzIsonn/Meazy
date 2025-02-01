@@ -349,7 +349,7 @@ public final class ParsingFunctions {
         register("expression", extra -> parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class));
 
         register("assignment_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
+            Expression left = parse(RegistryIdentifier.ofDefault("null_check_expression"), Expression.class);
 
             if (getCurrent().getType() == TokenTypes.ASSIGN()) {
                 getCurrentAndNext();
@@ -366,6 +366,18 @@ public final class ParsingFunctions {
             }
 
             return left;
+        });
+
+        register("null_check_expression", extra -> {
+            Expression checkExpression = parse(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
+
+            if (getCurrent().getType() == TokenTypes.QUESTION_COLON()) {
+                getCurrentAndNext();
+                Expression nullExpression = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                return new NullCheckExpression(checkExpression, nullExpression);
+            }
+
+            return checkExpression;
         });
 
         register("logical_expression", extra -> {
@@ -456,15 +468,15 @@ public final class ParsingFunctions {
         });
 
         register("postfix_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
+            Expression id = parse(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
 
             if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
-                Expression value = new BinaryExpression(left, new NumberLiteral(1, true), token.getValue().substring(1));
-                return new AssignmentExpression(left, value);
+                Expression value = new BinaryExpression(id, new NumberLiteral(1, true), token.getValue().substring(1));
+                return new AssignmentExpression(id, value);
             }
 
-            return left;
+            return id;
         });
 
         register("class_call_expression", extra -> {
@@ -493,12 +505,13 @@ public final class ParsingFunctions {
         register("member_expression", extra -> {
             Expression object = parse(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
 
-            while (getCurrent().getType() == TokenTypes.DOT()) {
-                getCurrentAndNext();
-                Expression property = parse(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
-                if (!(property instanceof Identifier) && !(property instanceof CallExpression) && getCurrent().getType() == TokenTypes.DOT())
+            while (TokenTypeSets.MEMBER_ACCESS().contains(getCurrent().getType())) {
+                boolean isNullSafe = getCurrentAndNext().getType().equals(TokenTypes.QUESTION_DOT());
+                Expression member = parse(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
+                if (!(member instanceof Identifier) && !(member instanceof CallExpression)) {
                     throw new UnexpectedTokenException("Right side must be either Identifier or Call", getCurrent().getLine());
-                object = new MemberExpression(object, property);
+                }
+                object = new MemberExpression(object, member, isNullSafe);
             }
 
             return object;

@@ -143,6 +143,14 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("question")).getValue();
     }
 
+    public static TokenType QUESTION_DOT() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("question_dot")).getValue();
+    }
+
+    public static TokenType QUESTION_COLON() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("question_colon")).getValue();
+    }
+
 
 
     public static TokenType ASSIGN() {
@@ -342,6 +350,8 @@ public final class TokenTypes {
         register(new TokenType("comma", ",", false));
         register(new TokenType("dot", "\\.", false));
         register(new TokenType("question", "\\?", false));
+        register(new TokenType("question_dot", "\\?\\.", false));
+        register(new TokenType("question_colon", "\\?:", false));
 
         register(new TokenType("assign", "=", false));
         register(new TokenType("plus", "\\+", false));

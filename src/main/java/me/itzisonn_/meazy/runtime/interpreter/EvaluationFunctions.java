@@ -12,16 +12,15 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
-import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.ListClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.LoopEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.ClassDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.ConstructorDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.ListClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
+import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
+import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.*;
 import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.RuntimeClassValue;
@@ -212,7 +211,7 @@ public final class EvaluationFunctions {
             List<RuntimeValue<?>> list;
             if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getId().equals("List")))
                 throw new InvalidSyntaxException("Can't get members of non-list value");
-            RuntimeVariable variable = classValue.getClassEnvironment().getVariable("value");
+            VariableDeclarationEnvironment.RuntimeVariable variable = classValue.getClassEnvironment().getVariable("value");
             if (variable == null) throw new InvalidSyntaxException("Can't get members of non-list value");
             if (!(variable.getValue() instanceof ListClassEnvironment.InnerListValue listValue)) throw new InvalidSyntaxException("Can't get members of non-list value");
             list = listValue.getValue();
@@ -312,12 +311,12 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                List<RuntimeVariable> runtimeVariables = new ArrayList<>();
+                List<VariableDeclarationEnvironment.RuntimeVariable> runtimeVariables = new ArrayList<>();
                 forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
                         runtimeVariables.add(forEnvironment.getVariable(variableDeclarationInfo.getId())));
 
                 forEnvironment.clearVariables();
-                for (RuntimeVariable runtimeVariable : runtimeVariables) {
+                for (VariableDeclarationEnvironment.RuntimeVariable runtimeVariable : runtimeVariables) {
                     forEnvironment.declareVariable(
                             runtimeVariable.getId(),
                             runtimeVariable.getDataType(),
@@ -427,6 +426,15 @@ public final class EvaluationFunctions {
             }
 
             throw new InvalidSyntaxException("Logical expression must contain only boolean values");
+        });
+
+        register("null_check_expression", NullCheckExpression.class, (nullCheckExpression, environment, extra) -> {
+            RuntimeValue<?> checkValue = Interpreter.evaluate(nullCheckExpression.getCheckExpression(), environment).getFinalRuntimeValue();
+
+            if (checkValue instanceof NullValue) {
+                return Interpreter.evaluate(nullCheckExpression.getNullExpression(), environment).getFinalRuntimeValue();
+            }
+            return checkValue;
         });
 
         register("comparison_expression", ComparisonExpression.class, (comparisonExpression, environment, extra) -> {
@@ -695,7 +703,7 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
+                for (VariableDeclarationEnvironment.RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
                     if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call");
                     }
@@ -755,7 +763,7 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
+                for (VariableDeclarationEnvironment.RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
                     if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call. It's probably an Addon's error");
                     }
@@ -770,18 +778,23 @@ public final class EvaluationFunctions {
         register("member_expression", MemberExpression.class, (memberExpression, environment, extra) -> {
             RuntimeValue<?> value = Interpreter.evaluate(memberExpression.getObject(), environment).getFinalRuntimeValue();
 
+            if (value instanceof NullValue) {
+                if (memberExpression.isNullSafe()) return value;
+                else throw new InvalidSyntaxException("Can't get member of null value");
+            }
+
             if (value instanceof ClassValue classValue) {
                 return Interpreter.evaluate(memberExpression.getMember(), classValue.getClassEnvironment(), environment);
             }
 
-            throw new InvalidSyntaxException("Can't get members of " + value + " because it's not a class");
+            throw new InvalidSyntaxException("Can't get member of " + value + " because it's not a class");
         });
 
         register("identifier", Identifier.class, new EvaluationFunction<>() {
             @Override
             public RuntimeValue<?> evaluate(Identifier identifier, Environment environment, Object... extra) {
                 if (identifier instanceof VariableIdentifier) {
-                    RuntimeVariable runtimeVariable = environment.getVariableDeclarationEnvironment(identifier.getId()).getVariable(identifier.getId());
+                    VariableDeclarationEnvironment.RuntimeVariable runtimeVariable = environment.getVariableDeclarationEnvironment(identifier.getId()).getVariable(identifier.getId());
                     if (runtimeVariable != null) {
                         if (runtimeVariable.getAccessModifiers().contains("private") &&
                                 !environment.hasParent(environment.getVariableDeclarationEnvironment(identifier.getId())))

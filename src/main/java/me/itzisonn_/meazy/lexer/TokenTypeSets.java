@@ -26,6 +26,10 @@ public final class TokenTypeSets {
         return Registries.TOKEN_TYPE_SETS.getEntry(RegistryIdentifier.ofDefault("access_modifiers")).getValue();
     }
 
+    public static TokenTypeSet MEMBER_ACCESS() {
+        return Registries.TOKEN_TYPE_SETS.getEntry(RegistryIdentifier.ofDefault("member_access")).getValue();
+    }
+
 
 
     private static void register(String id, TokenTypeSet tokenTypeSet) {
@@ -79,5 +83,10 @@ public final class TokenTypeSets {
         register("access_modifiers", new TokenTypeSet(
                 TokenTypes.PRIVATE(),
                 TokenTypes.SHARED()));
+
+        register("member_access", new TokenTypeSet(
+                TokenTypes.DOT(),
+                TokenTypes.QUESTION_DOT()
+        ));
     }
 }

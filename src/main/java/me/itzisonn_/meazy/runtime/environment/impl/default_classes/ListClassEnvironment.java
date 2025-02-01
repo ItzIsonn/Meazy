@@ -1,10 +1,10 @@
-package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
+package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
+import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.*;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ListClassEnvironment extends BasicClassEnvironment {
+public class ListClassEnvironment extends ClassEnvironmentImpl {
     public ListClassEnvironment(Environment parent) {
         this(parent, new ArrayList<>());
     }

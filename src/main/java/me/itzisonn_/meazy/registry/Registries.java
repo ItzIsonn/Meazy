@@ -18,9 +18,9 @@ import me.itzisonn_.meazy.registry.multiple_entry.PairRegistry;
 import me.itzisonn_.meazy.registry.multiple_entry.SetRegistry;
 import me.itzisonn_.meazy.registry.single_entry.SingleEntryRegistry;
 import me.itzisonn_.meazy.registry.single_entry.SingleEntryRegistryImpl;
-import me.itzisonn_.meazy.runtime.environment.basic.*;
-import me.itzisonn_.meazy.runtime.environment.interfaces.*;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy.runtime.environment.impl.*;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.functions.RuntimeFunctionValue;
@@ -272,13 +272,13 @@ public final class Registries {
             else MeazyMain.LOGGER.log(Level.WARN, "File contains invalid main function");
         });
 
-        BasicGlobalEnvironment globalEnvironment = new BasicGlobalEnvironment();
+        GlobalEnvironmentImpl globalEnvironment = new GlobalEnvironmentImpl();
         GLOBAL_ENVIRONMENT.register(RegistryIdentifier.ofDefault("global_environment"), globalEnvironment);
         globalEnvironment.init();
-        CLASS_ENVIRONMENT.register(RegistryIdentifier.ofDefault("class_environment"), BasicClassEnvironment.class);
-        FUNCTION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("function_environment"), BasicFunctionEnvironment.class);
-        VARIABLE_DECLARATION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("variable_declaration_environment"), BasicVariableDeclarationEnvironment.class);
-        LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), BasicLoopEnvironment.class);
-        ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), BasicEnvironment.class);
+        CLASS_ENVIRONMENT.register(RegistryIdentifier.ofDefault("class_environment"), ClassEnvironmentImpl.class);
+        FUNCTION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("function_environment"), FunctionEnvironmentImpl.class);
+        VARIABLE_DECLARATION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("variable_declaration_environment"), VariableDeclarationEnvironmentImpl.class);
+        LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), LoopEnvironmentImpl.class);
+        ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), EnvironmentImpl.class);
     }
 }

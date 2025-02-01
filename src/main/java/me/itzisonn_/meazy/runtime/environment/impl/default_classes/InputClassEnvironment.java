@@ -1,9 +1,8 @@
-package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
+package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
+import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
 import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -13,7 +12,9 @@ import me.itzisonn_.meazy.runtime.values.number.IntValue;
 
 import java.util.*;
 
-public class InputClassEnvironment extends BasicClassEnvironment {
+public class InputClassEnvironment extends ClassEnvironmentImpl {
+    private static final Scanner SCANNER = new Scanner(System.in);
+
     public InputClassEnvironment(Environment parent) {
         super(parent, true, "Input");
 
@@ -26,25 +27,25 @@ public class InputClassEnvironment extends BasicClassEnvironment {
 
         declareFunction(new DefaultFunctionValue("read", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                return new StringValue(Utils.SCANNER.next());
+                return new StringValue(SCANNER.next());
             }
         });
 
         declareFunction(new DefaultFunctionValue("readLine", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                return new StringValue(Utils.SCANNER.nextLine());
+                return new StringValue(SCANNER.nextLine());
             }
         });
 
         declareFunction(new DefaultFunctionValue("readInt", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                return new IntValue(Utils.SCANNER.nextInt());
+                return new IntValue(SCANNER.nextInt());
             }
         });
 
         declareFunction(new DefaultFunctionValue("readFloat", List.of(), new DataType("String", false), this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                return new DoubleValue(Utils.SCANNER.nextDouble());
+                return new DoubleValue(SCANNER.nextDouble());
             }
         });
     }

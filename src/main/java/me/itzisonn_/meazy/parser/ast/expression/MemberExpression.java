@@ -8,14 +8,17 @@ import lombok.Setter;
 public class MemberExpression implements Expression {
     private Expression object;
     private final Expression member;
+    private final boolean isNullSafe;
 
-    public MemberExpression(Expression object, Expression member) {
+    public MemberExpression(Expression object, Expression member, boolean isNullSafe) {
         this.object = object;
         this.member = member;
+        this.isNullSafe = isNullSafe;
     }
 
     @Override
     public String toCodeString() {
-        return object.toCodeString() + "." + member.toCodeString();
+        String accessString = isNullSafe ? "?." : ".";
+        return object.toCodeString() + accessString + member.toCodeString();
     }
 }
