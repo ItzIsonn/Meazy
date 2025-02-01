@@ -13,6 +13,11 @@ import me.itzisonn_.meazy.runtime.values.*;
  * @see Registries#EVALUATION_FUNCTIONS
  */
 public final class Interpreter {
+    /**
+     * Output of the program
+     */
+    public static final StringBuilder OUTPUT = new StringBuilder();
+
     private Interpreter() {}
 
     /**
