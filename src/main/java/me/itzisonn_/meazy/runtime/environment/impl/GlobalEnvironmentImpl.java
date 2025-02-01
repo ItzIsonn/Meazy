@@ -13,6 +13,7 @@ import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.In
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -148,7 +149,9 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
                 new CallArgExpression("value", new DataType("Any", true), true)),
                 null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                System.out.print(functionArgs.getFirst().getFinalRuntimeValue());
+                RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
+                Interpreter.OUTPUT.append(value).append("\n");
+                System.out.print(value);
                 return null;
             }
         });
@@ -157,7 +160,9 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
                 new CallArgExpression("value", new DataType("Any", true), true)),
                 null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                System.out.println(functionArgs.getFirst().getFinalRuntimeValue());
+                RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
+                Interpreter.OUTPUT.append(value);
+                System.out.println(value);
                 return null;
             }
         });
