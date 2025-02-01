@@ -1,7 +1,6 @@
-package me.itzisonn_.meazy.runtime.environment.interfaces.declaration;
+package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;

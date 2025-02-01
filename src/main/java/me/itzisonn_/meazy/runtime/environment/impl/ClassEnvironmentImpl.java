@@ -1,11 +1,10 @@
-package me.itzisonn_.meazy.runtime.environment.basic;
+package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
-import me.itzisonn_.meazy.runtime.environment.interfaces.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.ConstructorValue;
@@ -15,20 +14,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class BasicClassEnvironment extends BasicVariableDeclarationEnvironment implements ClassEnvironment {
+public class ClassEnvironmentImpl extends VariableDeclarationEnvironmentImpl implements ClassEnvironment {
     @Getter
     private final String id;
     private final List<FunctionValue> functions;
     private final List<ConstructorValue> constructors;
 
-    public BasicClassEnvironment(Environment parent, boolean isShared, String id) {
+    public ClassEnvironmentImpl(Environment parent, boolean isShared, String id) {
         super(parent, isShared);
         this.id = id;
         this.functions = new ArrayList<>();
         this.constructors = new ArrayList<>();
     }
 
-    public BasicClassEnvironment(Environment parent, String id) {
+    public ClassEnvironmentImpl(Environment parent, String id) {
         super(parent, false);
         this.id = id;
         this.functions = new ArrayList<>();

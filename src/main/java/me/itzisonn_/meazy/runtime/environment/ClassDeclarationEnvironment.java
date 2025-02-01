@@ -1,6 +1,5 @@
-package me.itzisonn_.meazy.runtime.environment.interfaces.declaration;
+package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
 import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
 
 import java.util.List;

@@ -1,6 +1,4 @@
-package me.itzisonn_.meazy.runtime.environment.interfaces;
-
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
+package me.itzisonn_.meazy.runtime.environment;
 
 /**
  * LoopEnvironment represents environment for loops

@@ -10,7 +10,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Utility class
@@ -22,11 +21,6 @@ public final class Utils {
      * Regex used by all identifiers
      */
     public static final String IDENTIFIER_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*";
-
-    /**
-     * System.in Scanner
-     */
-    public static final Scanner SCANNER = new Scanner(System.in);
 
     /**
      * NumberFormat

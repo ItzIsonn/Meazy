@@ -1,10 +1,10 @@
-package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
+package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
+import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class StringClassEnvironment extends BasicClassEnvironment {
+public class StringClassEnvironment extends ClassEnvironmentImpl {
     public StringClassEnvironment(Environment parent, String value) {
         super(parent, false, "String");
 

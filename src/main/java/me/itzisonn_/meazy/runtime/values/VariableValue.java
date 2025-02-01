@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.values;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)

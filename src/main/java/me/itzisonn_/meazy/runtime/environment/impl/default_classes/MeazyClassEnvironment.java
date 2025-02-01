@@ -1,11 +1,11 @@
-package me.itzisonn_.meazy.runtime.environment.basic.default_classes;
+package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addons.Addon;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.runtime.environment.basic.BasicClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
+import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.StringValue;
 import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class MeazyClassEnvironment extends BasicClassEnvironment {
+public class MeazyClassEnvironment extends ClassEnvironmentImpl {
     public MeazyClassEnvironment(Environment parent) {
         super(parent, true, "Meazy");
 

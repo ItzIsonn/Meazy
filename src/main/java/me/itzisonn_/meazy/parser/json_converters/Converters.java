@@ -96,6 +96,7 @@ public final class Converters {
         register(new LogicalExpressionConverter());
         register(new IsExpressionConverter());
         register(new MemberExpressionConverter());
+        register(new NullCheckExpressionConverter());
         register(new ClassCallExpressionConverter());
         register(new FunctionCallExpressionConverter());
         register(new ClassIdentifierConverter());

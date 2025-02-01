@@ -3,8 +3,8 @@ package me.itzisonn_.meazy.runtime.values.functions;
 import lombok.EqualsAndHashCode;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
 import java.util.List;

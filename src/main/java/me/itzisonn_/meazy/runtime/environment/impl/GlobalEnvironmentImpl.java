@@ -1,18 +1,18 @@
-package me.itzisonn_.meazy.runtime.environment.basic;
+package me.itzisonn_.meazy.runtime.environment.impl;
 
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.*;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.BooleanClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.AnyClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.FloatClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.basic.default_classes.primitives.IntClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.Environment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.GlobalEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.*;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.BooleanClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.AnyClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.FloatClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.IntClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -27,11 +27,11 @@ import me.itzisonn_.meazy.runtime.values.number.NumberValue;
 
 import java.util.*;
 
-public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment implements GlobalEnvironment {
+public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl implements GlobalEnvironment {
     private final List<FunctionValue> functions;
     private final List<ClassValue> classes;
 
-    public BasicGlobalEnvironment() {
+    public GlobalEnvironmentImpl() {
         super(null, false);
         this.functions = new ArrayList<>();
         this.classes = new ArrayList<>();
@@ -86,11 +86,6 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
         return new ArrayList<>(functions);
     }
 
-    @Override
-    public boolean isShared() {
-        return isShared;
-    }
-
     public void init() {
         declareClass("Any", new DefaultClassValue(new AnyClassEnvironment(this)) {
             @Override
@@ -103,7 +98,8 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
-                if (value instanceof Boolean || value instanceof BooleanLiteral || value instanceof BooleanValue) return true;
+                if (value instanceof Boolean || value instanceof BooleanLiteral || value instanceof BooleanValue)
+                    return true;
                 return value.toString().equals("true") || value.toString().equals("false");
             }
         });
@@ -119,8 +115,7 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
                 try {
                     Integer.parseInt(value.toString());
                     return true;
-                }
-                catch (NumberFormatException ignore) {
+                } catch (NumberFormatException ignore) {
                     return false;
                 }
             }
@@ -130,25 +125,30 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
-                if (value instanceof Float || value instanceof NumberLiteral || value instanceof NumberValue) return true;
+                if (value instanceof Float || value instanceof NumberLiteral || value instanceof NumberValue)
+                    return true;
                 try {
                     Float.parseFloat(value.toString());
                     return true;
-                }
-                catch (NumberFormatException ignore) {
+                } catch (NumberFormatException ignore) {
                     return false;
                 }
             }
         });
 
         declareClass("String", new DefaultClassValue(new StringClassEnvironment(this, null)));
+        declareClass("Input", new DefaultClassValue(new InputClassEnvironment(this)));
+        declareClass("List", new DefaultClassValue(new ListClassEnvironment(this)));
+        declareClass("Math", new DefaultClassValue(new MathClassEnvironment(this)));
+        declareClass("Random", new DefaultClassValue(new RandomClassEnvironment(this)));
+        declareClass("Meazy", new DefaultClassValue(new MeazyClassEnvironment(this)));
 
 
         declareFunction(new DefaultFunctionValue("print", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
                 null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                System.out.print(functionArgs.getFirst().getFinalValue());
+                System.out.print(functionArgs.getFirst().getFinalRuntimeValue());
                 return null;
             }
         });
@@ -157,7 +157,7 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
                 new CallArgExpression("value", new DataType("Any", true), true)),
                 null, this, Set.of("shared")) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                System.out.println(functionArgs.getFirst().getFinalValue());
+                System.out.println(functionArgs.getFirst().getFinalRuntimeValue());
                 return null;
             }
         });
@@ -186,12 +186,5 @@ public class BasicGlobalEnvironment extends BasicVariableDeclarationEnvironment 
                 return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
             }
         });
-
-
-        declareClass("Input", new DefaultClassValue(new InputClassEnvironment(this)));
-        declareClass("List", new DefaultClassValue(new ListClassEnvironment(this)));
-        declareClass("Math", new DefaultClassValue(new MathClassEnvironment(this)));
-        declareClass("Random", new DefaultClassValue(new RandomClassEnvironment(this)));
-        declareClass("Meazy", new DefaultClassValue(new MeazyClassEnvironment(this)));
     }
 }

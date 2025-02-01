@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.values.classes;
 
 import lombok.EqualsAndHashCode;
-import me.itzisonn_.meazy.runtime.environment.interfaces.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 
 /**
  * DefaultClassValue represents runtime class value created directly in code

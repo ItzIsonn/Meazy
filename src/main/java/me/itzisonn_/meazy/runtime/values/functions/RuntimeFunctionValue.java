@@ -5,7 +5,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 
 import java.util.List;
 import java.util.Set;

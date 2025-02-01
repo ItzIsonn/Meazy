@@ -1,7 +1,5 @@
-package me.itzisonn_.meazy.runtime.environment.interfaces;
+package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.interfaces.declaration.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
