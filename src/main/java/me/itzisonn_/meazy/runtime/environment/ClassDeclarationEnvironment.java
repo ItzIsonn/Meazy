@@ -11,10 +11,9 @@ public interface ClassDeclarationEnvironment extends Environment {
     /**
      * Declares given class in this environment
      *
-     * @param id Class's id
      * @param value Class value
      */
-    void declareClass(String id, ClassValue value);
+    void declareClass(ClassValue value);
 
     /**
      * @param id Class's id

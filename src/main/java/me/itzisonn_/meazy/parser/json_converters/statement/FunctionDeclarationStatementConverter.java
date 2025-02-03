@@ -80,7 +80,7 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
             JsonObject dataTypeObject = new JsonObject();
             dataTypeObject.addProperty("id", functionDeclarationStatement.getReturnDataType().getId());
             dataTypeObject.addProperty("is_nullable", functionDeclarationStatement.getReturnDataType().isNullable());
-            result.add("data_type", dataTypeObject);
+            result.add("return_data_type", dataTypeObject);
         }
 
         return result;

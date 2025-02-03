@@ -34,9 +34,9 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
     }
 
     @Override
-    public void declareClass(String id, ClassValue value) {
-        ClassValue classValue = getClass(id);
-        if (classValue != null) throw new InvalidSyntaxException("Class with id " + id + " already exists!");
+    public void declareClass(ClassValue value) {
+        ClassValue classValue = getClass(value.getId());
+        if (classValue != null) throw new InvalidSyntaxException("Class with id " + value.getId() + " already exists!");
         classes.add(value);
     }
 
@@ -46,14 +46,14 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
     }
 
     public void init() {
-        declareClass("Any", new DefaultClassValue(new AnyClassEnvironment(this)) {
+        declareClass(new DefaultClassValue(new AnyClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 return true;
             }
         });
 
-        declareClass("Boolean", new DefaultClassValue(new BooleanClassEnvironment(this)) {
+        declareClass(new DefaultClassValue(new BooleanClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
@@ -62,7 +62,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             }
         });
 
-        declareClass("Int", new DefaultClassValue(new IntClassEnvironment(this)) {
+        declareClass(new DefaultClassValue(new IntClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
@@ -80,7 +80,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             }
         });
 
-        declareClass("Float", new DefaultClassValue(new FloatClassEnvironment(this)) {
+        declareClass(new DefaultClassValue(new FloatClassEnvironment(this)) {
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
@@ -96,12 +96,12 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             }
         });
 
-        declareClass("String", new DefaultClassValue(new StringClassEnvironment(this, null)));
-        declareClass("Input", new DefaultClassValue(new InputClassEnvironment(this)));
-        declareClass("List", new DefaultClassValue(new ListClassEnvironment(this)));
-        declareClass("Math", new DefaultClassValue(new MathClassEnvironment(this)));
-        declareClass("Random", new DefaultClassValue(new RandomClassEnvironment(this)));
-        declareClass("Meazy", new DefaultClassValue(new MeazyClassEnvironment(this)));
+        declareClass(new DefaultClassValue(new StringClassEnvironment(this, null)));
+        declareClass(new DefaultClassValue(new InputClassEnvironment(this)));
+        declareClass(new DefaultClassValue(new ListClassEnvironment(this)));
+        declareClass(new DefaultClassValue(new MathClassEnvironment(this)));
+        declareClass(new DefaultClassValue(new RandomClassEnvironment(this)));
+        declareClass(new DefaultClassValue(new MeazyClassEnvironment(this)));
 
 
         declareFunction(new DefaultFunctionValue("print", List.of(
