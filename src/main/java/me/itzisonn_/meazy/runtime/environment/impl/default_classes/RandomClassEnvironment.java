@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
+import me.itzisonn_.meazy.runtime.values.VariableValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
@@ -21,7 +22,14 @@ public class RandomClassEnvironment extends ClassEnvironmentImpl {
         super(parent, true, "Random");
 
 
-        declareVariable("value", new DataType("Any", false), new InnerRandomValue(new Random()), false, Set.of("private"));
+        declareVariable(new VariableValue(
+                "value",
+                new DataType("Any", false),
+                new InnerRandomValue(new Random()),
+                false,
+                Set.of("private"),
+                false,
+                this));
 
 
         declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of()) {

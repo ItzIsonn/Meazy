@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.StringValue;
+import me.itzisonn_.meazy.runtime.values.VariableValue;
 import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
@@ -21,7 +22,16 @@ public class MeazyClassEnvironment extends ClassEnvironmentImpl {
         super(parent, true, "Meazy");
 
 
-        declareVariable("VERSION", new DataType("String", false), new StringValue(MeazyMain.VERSION), true, Set.of("shared"));
+        declareVariable(new VariableValue(
+                "VERSION",
+                new DataType("String", false),
+                new StringValue(MeazyMain.VERSION),
+                true,
+                Set.of("shared"),
+                false,
+                this));
+
+
         declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of("private")) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}

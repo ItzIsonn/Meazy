@@ -54,6 +54,6 @@ public class RuntimeValue<T> {
 
     @Override
     public String toString() {
-        return String.valueOf(value);
+        return String.valueOf(getValue());
     }
 }

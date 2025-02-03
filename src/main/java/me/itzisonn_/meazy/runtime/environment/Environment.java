@@ -1,11 +1,10 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
+import me.itzisonn_.meazy.runtime.values.VariableValue;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -68,24 +67,9 @@ public interface Environment {
     /**
      * Declares variable with given data in this environment
      *
-     * @param id Variable's id
-     * @param dataType Variable's DataType
-     * @param value Variable's value
-     * @param isConstant Whether is this variable constant
-     * @param accessModifiers Variable's access modifiers
+     * @param value Variable value
      */
-    void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
-
-    /**
-     * Declares argument with given data in this environment
-     *
-     * @param id Argument's id
-     * @param dataType Argument's DataType
-     * @param value Argument's value
-     * @param isConstant Whether is this argument constant
-     * @param accessModifiers Argument's access modifiers
-     */
-    void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
+    void declareVariable(VariableValue value);
 
     /**
      * Assigns value to existing non-constant variable
@@ -101,9 +85,9 @@ public interface Environment {
      * @param id Variable's id
      * @return Declared variable with given id
      */
-    default RuntimeVariable getVariable(String id) {
-        for (RuntimeVariable runtimeVariable : getVariables()) {
-            if (runtimeVariable.getId().equals(id)) return runtimeVariable;
+    default VariableValue getVariable(String id) {
+        for (VariableValue variableValue : getVariables()) {
+            if (variableValue.getId().equals(id)) return variableValue;
         }
 
         return null;
@@ -112,7 +96,7 @@ public interface Environment {
     /**
      * @return All declared variables
      */
-    List<RuntimeVariable> getVariables();
+    List<VariableValue> getVariables();
 
 
 

@@ -25,7 +25,14 @@ public class ListClassEnvironment extends ClassEnvironmentImpl {
         super(parent, false, "List");
 
 
-        declareVariable("value", new DataType("Any", false), new InnerListValue(list), false, Set.of("private"));
+        declareVariable(new VariableValue(
+                "value",
+                new DataType("Any", false),
+                new InnerListValue(list),
+                false,
+                Set.of("private"),
+                false,
+                this));
 
 
         declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of()) {

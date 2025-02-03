@@ -1,18 +1,15 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
+import me.itzisonn_.meazy.runtime.values.VariableValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.ConstructorValue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements ClassEnvironment {
     @Getter
@@ -30,9 +27,9 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     }
 
     @Override
-    public void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers) {
-        if (getVariable(id) != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
-        variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, false));
+    public void declareVariable(VariableValue value) {
+        if (getVariable(value.getId()) != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
+        variables.add(value);
     }
 
     @Override

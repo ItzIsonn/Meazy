@@ -1,21 +1,18 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.RuntimeVariable;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
+import me.itzisonn_.meazy.runtime.values.VariableValue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class EnvironmentImpl implements Environment {
     @Getter
     protected final Environment parent;
     protected boolean isShared;
-    protected final List<RuntimeVariable> variables;
+    protected final List<VariableValue> variables;
 
     public EnvironmentImpl(Environment parent, boolean isShared) {
         this.parent = parent;
@@ -34,19 +31,20 @@ public class EnvironmentImpl implements Environment {
     }
 
     @Override
-    public void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers) {
-        if (getVariableDeclarationEnvironment(id) != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
-        variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, false));
+    public void declareVariable(VariableValue value) {
+        if (value.isArgument()) {
+            if (getVariable(value.getId()) != null) {
+                throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists!");
+            }
+        }
+        else if (getVariableDeclarationEnvironment(value.getId()) != null) {
+            throw new InvalidSyntaxException("Variable with id " + value.getId() + " already exists!");
+        }
+        variables.add(value);
     }
 
     @Override
-    public void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers) {
-        if (getVariable(id) != null) throw new InvalidSyntaxException("Variable with id " + id + " already exists!");
-        variables.add(new RuntimeVariable(id, dataType, value, isConstant, accessModifiers, true));
-    }
-
-    @Override
-    public List<RuntimeVariable> getVariables() {
+    public List<VariableValue> getVariables() {
         return new ArrayList<>(variables);
     }
 }

@@ -35,4 +35,25 @@ public abstract class DefaultFunctionValue extends FunctionValue {
      * @param functionEnvironment Unique Environment of this DefaultFunctionValue
      */
     public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);
+
+    /**
+     * Copies this DefaultFunctionValue with given parent environment
+     *
+     * @param parentEnvironment New parent of this DefaultFunctionValue
+     * @return Copy of this DefaultFunctionValue
+     */
+    public final DefaultFunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
+        RunFunction runFunction = this::run;
+
+        return new DefaultFunctionValue(id, args, returnDataType, parentEnvironment, accessModifiers) {
+            @Override
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                return runFunction.run(functionArgs, functionEnvironment);
+            }
+        };
+    }
+
+    private interface RunFunction {
+        RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);
+    }
 }
