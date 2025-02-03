@@ -12,30 +12,25 @@ import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.Fl
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.IntClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
-import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.BooleanValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 import me.itzisonn_.meazy.runtime.values.number.NumberValue;
 
 import java.util.*;
 
-public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl implements GlobalEnvironment {
-    private final List<FunctionValue> functions;
+public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements GlobalEnvironment {
     private final List<ClassValue> classes;
 
     public GlobalEnvironmentImpl() {
         super(null, false);
-        this.functions = new ArrayList<>();
-        this.classes = new ArrayList<>();
+        classes = new ArrayList<>();
     }
 
     @Override
@@ -50,43 +45,6 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
         return new ArrayList<>(classes);
     }
 
-    @Override
-    public void declareFunction(FunctionValue value) {
-        List<CallArgExpression> args = value.getArgs();
-
-        main:
-        for (FunctionValue functionValue : functions) {
-            if (functionValue.getId().equals(value.getId())) {
-                List<CallArgExpression> callArgExpressions = functionValue.getArgs();
-
-                if (args.size() != callArgExpressions.size()) continue;
-
-                for (int i = 0; i < args.size(); i++) {
-                    CallArgExpression callArgExpression = callArgExpressions.get(i);
-                    if (!callArgExpression.getDataType().equals(args.get(i).getDataType())) continue main;
-                }
-
-                throw new InvalidSyntaxException("Function with id " + value.getId() + " already exists!");
-            }
-        }
-
-        functions.add(value);
-    }
-
-    @Override
-    public FunctionDeclarationEnvironment getFunctionDeclarationEnvironment(String id, List<RuntimeValue<?>> args) {
-        if (getFunction(id, args) != null) return this;
-        for (FunctionValue functionValue : functions) {
-            if (functionValue.getId().equals(id)) throw new InvalidIdentifierException("Function with id " + id + " exists but doesn't match args!");
-        }
-        throw new InvalidIdentifierException("Function with id " + id + " doesn't exist!");
-    }
-
-    @Override
-    public List<FunctionValue> getFunctions() {
-        return new ArrayList<>(functions);
-    }
-
     public void init() {
         declareClass("Any", new DefaultClassValue(new AnyClassEnvironment(this)) {
             @Override
@@ -99,8 +57,7 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
-                if (value instanceof Boolean || value instanceof BooleanLiteral || value instanceof BooleanValue)
-                    return true;
+                if (value instanceof Boolean || value instanceof BooleanLiteral || value instanceof BooleanValue) return true;
                 return value.toString().equals("true") || value.toString().equals("false");
             }
         });
@@ -116,7 +73,8 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
                 try {
                     Integer.parseInt(value.toString());
                     return true;
-                } catch (NumberFormatException ignore) {
+                }
+                catch (NumberFormatException ignore) {
                     return false;
                 }
             }
@@ -131,7 +89,8 @@ public class GlobalEnvironmentImpl extends VariableDeclarationEnvironmentImpl im
                 try {
                     Float.parseFloat(value.toString());
                     return true;
-                } catch (NumberFormatException ignore) {
+                }
+                catch (NumberFormatException ignore) {
                     return false;
                 }
             }

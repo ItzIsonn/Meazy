@@ -1,9 +1,11 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -57,15 +59,73 @@ public interface Environment {
 
 
     /**
+     * @return Whether is this environment shared
+     */
+    boolean isShared();
+
+
+
+    /**
+     * Declares variable with given data in this environment
+     *
+     * @param id Variable's id
+     * @param dataType Variable's DataType
+     * @param value Variable's value
+     * @param isConstant Whether is this variable constant
+     * @param accessModifiers Variable's access modifiers
+     */
+    void declareVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
+
+    /**
+     * Declares argument with given data in this environment
+     *
+     * @param id Argument's id
+     * @param dataType Argument's DataType
+     * @param value Argument's value
+     * @param isConstant Whether is this argument constant
+     * @param accessModifiers Argument's access modifiers
+     */
+    void declareArgument(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers);
+
+    /**
+     * Assigns value to existing non-constant variable
+     *
+     * @param id Variable's id
+     * @param value Variable's new value
+     */
+    default void assignVariable(String id, RuntimeValue<?> value) {
+        getVariable(id).setValue(value);
+    }
+
+    /**
+     * @param id Variable's id
+     * @return Declared variable with given id
+     */
+    default RuntimeVariable getVariable(String id) {
+        for (RuntimeVariable runtimeVariable : getVariables()) {
+            if (runtimeVariable.getId().equals(id)) return runtimeVariable;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return All declared variables
+     */
+    List<RuntimeVariable> getVariables();
+
+
+
+    /**
      * Searches for variable with given id in this environment and all parents
      *
      * @param id Variable's id
      * @return VariableDeclarationEnvironment that has requested variable or null
      */
-    default VariableDeclarationEnvironment getVariableDeclarationEnvironment(String id) {
-        Environment parent = getParent();
-        if (parent == null) return null;
-        return parent.getVariableDeclarationEnvironment(id);
+    default Environment getVariableDeclarationEnvironment(String id) {
+        if (getVariable(id) != null) return this;
+        if (getParent() == null) return null;
+        return getParent().getVariableDeclarationEnvironment(id);
     }
 
     /**
@@ -79,11 +139,4 @@ public interface Environment {
         if (parent == null) throw new InvalidIdentifierException("Function with id " + id + " doesn't exist!");
         return parent.getFunctionDeclarationEnvironment(id, args);
     }
-
-
-
-    /**
-     * @return Whether is this environment shared
-     */
-    boolean isShared();
 }
