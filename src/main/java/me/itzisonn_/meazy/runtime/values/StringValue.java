@@ -15,7 +15,7 @@ public class StringValue extends DefaultClassValue {
 
     @Override
     public String getValue() {
-        return getClassEnvironment().getVariable("value").getValue().getFinalValue().toString();
+        return getEnvironment().getVariable("value").getValue().getFinalValue().toString();
     }
 
     @Override

@@ -106,7 +106,7 @@ public final class Commands {
                 }
                 long endMillis = System.currentTimeMillis();
 
-                return "Executed in " + ((double) endMillis - (double) startMillis) / 1000 + "s.";
+                return "Executed in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
             }
         });
 
@@ -159,7 +159,7 @@ public final class Commands {
 
                 try (FileWriter fileWriter = new FileWriter(outputFile)) {
                     fileWriter.write(json);
-                    return "Compiled in " + ((double) endMillis - (double) startMillis) / 1000 + "s.";
+                    return "Compiled in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);
@@ -223,7 +223,7 @@ public final class Commands {
 
                 try (FileWriter fileWriter = new FileWriter(outputFile)) {
                     fileWriter.write(program.toCodeString(0));
-                    return "Decompiled in " + ((double) endMillis - (double) startMillis) / 1000 + "s.";
+                    return "Decompiled in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);

@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.values.classes;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.StringClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 
@@ -12,17 +11,15 @@ import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class ClassValue extends RuntimeValue<Object> {
-    protected final ClassEnvironment classEnvironment;
-    protected final String id;
+    protected final ClassEnvironment environment;
 
     /**
      * ClassValue constructor
-     * @param classEnvironment ClassEnvironment of this ClassValue
+     * @param environment ClassEnvironment of this ClassValue
      */
-    public ClassValue(ClassEnvironment classEnvironment) {
+    public ClassValue(ClassEnvironment environment) {
         super(null);
-        this.classEnvironment = classEnvironment;
-        this.id = classEnvironment.getId();
+        this.environment = environment;
     }
 
     /**
@@ -31,12 +28,18 @@ public abstract class ClassValue extends RuntimeValue<Object> {
      */
     public boolean isMatches(Object value) {
         if (value instanceof ClassValue classValue) return classValue.getId().equals(getId());
-        if (value instanceof StringClassEnvironment.InnerStringValue innerStringValue) return innerStringValue.getValue().equals(getId());
         return false;
+    }
+
+    /**
+     * @return Id of this ClassValue's environment
+     */
+    public String getId() {
+        return environment.getId();
     }
 
     @Override
     public String toString() {
-        return "Class(" + id + ")";
+        return "Class(" + getId() + ")";
     }
 }

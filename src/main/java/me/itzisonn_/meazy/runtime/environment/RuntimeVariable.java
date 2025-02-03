@@ -19,9 +19,7 @@ public class RuntimeVariable {
     public RuntimeVariable(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers, boolean isArgument) {
         this.id = id;
         this.dataType = dataType;
-
         setValue(value);
-
         this.isConstant = isConstant;
         this.accessModifiers = accessModifiers;
         this.isArgument = isArgument;

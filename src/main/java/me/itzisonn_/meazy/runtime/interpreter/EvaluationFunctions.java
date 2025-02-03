@@ -80,7 +80,7 @@ public final class EvaluationFunctions {
                 }
 
                 RuntimeClassValue runtimeClassValue = new RuntimeClassValue(classEnvironment, classDeclarationStatement.getBody());
-                classDeclarationEnvironment.declareClass(classDeclarationStatement.getId(), runtimeClassValue);
+                classDeclarationEnvironment.declareClass(runtimeClassValue);
                 return null;
             }
 
@@ -202,7 +202,7 @@ public final class EvaluationFunctions {
             if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getId().equals("List")))
                 throw new InvalidSyntaxException("Can't get members of non-list value");
 
-            RuntimeVariable variable = classValue.getClassEnvironment().getVariable("value");
+            RuntimeVariable variable = classValue.getEnvironment().getVariable("value");
             if (variable == null) throw new InvalidSyntaxException("Can't get members of non-list value");
             if (!(variable.getValue() instanceof ListClassEnvironment.InnerListValue listValue)) throw new InvalidSyntaxException("Can't get members of non-list value");
 
@@ -738,17 +738,17 @@ public final class EvaluationFunctions {
                     throw new RuntimeException(e);
                 }
 
-                defaultClassValue.getClassEnvironment().getVariables().forEach(variable -> {
+                defaultClassValue.getEnvironment().getVariables().forEach(variable -> {
                     if (!variable.isArgument()) classEnvironment.declareVariable(variable.getId(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
                     else classEnvironment.declareArgument(variable.getId(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
                 });
-                defaultClassValue.getClassEnvironment().getFunctions().forEach(function -> {
+                defaultClassValue.getEnvironment().getFunctions().forEach(function -> {
                     if (function instanceof DefaultFunctionValue defaultFunctionValue) {
                         defaultFunctionValue.setParentEnvironment(classEnvironment);
                         classEnvironment.declareFunction(defaultFunctionValue);
                     }
                 });
-                defaultClassValue.getClassEnvironment().getConstructors().forEach(constructor -> {
+                defaultClassValue.getEnvironment().getConstructors().forEach(constructor -> {
                     if (constructor instanceof DefaultConstructorValue defaultConstructorValue) {
                         classEnvironment.declareConstructor(defaultConstructorValue.copy(classEnvironment));
                     }
@@ -802,7 +802,7 @@ public final class EvaluationFunctions {
             }
 
             if (value instanceof ClassValue classValue) {
-                return Interpreter.evaluate(memberExpression.getMember(), classValue.getClassEnvironment(), environment);
+                return Interpreter.evaluate(memberExpression.getMember(), classValue.getEnvironment(), environment);
             }
 
             throw new InvalidSyntaxException("Can't get member of " + value + " because it's not a class");
