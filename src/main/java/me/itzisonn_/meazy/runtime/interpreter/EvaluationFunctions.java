@@ -127,15 +127,17 @@ public final class EvaluationFunctions {
             if (!accessModifiers.contains("shared") && environment.isShared()) accessModifiers.add("shared");
 
             variableDeclarationStatement.getDeclarationInfos().forEach(variableDeclarationInfo ->
-                    environment.declareVariable(
+                    environment.declareVariable(new VariableValue(
                             variableDeclarationInfo.getId(),
                             variableDeclarationInfo.getDataType(),
-                            new VariableValue(variableDeclarationInfo.getValue() == null ?
+                            variableDeclarationInfo.getValue() == null ?
                                     null :
-                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment), environment, variableDeclarationInfo.getId()),
+                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment),
                             variableDeclarationStatement.isConstant(),
-                            accessModifiers)
-            );
+                            accessModifiers,
+                            false,
+                            environment)
+            ));
             return null;
         });
 
@@ -202,7 +204,7 @@ public final class EvaluationFunctions {
             if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getId().equals("List")))
                 throw new InvalidSyntaxException("Can't get members of non-list value");
 
-            RuntimeVariable variable = classValue.getEnvironment().getVariable("value");
+            VariableValue variable = classValue.getEnvironment().getVariable("value");
             if (variable == null) throw new InvalidSyntaxException("Can't get members of non-list value");
             if (!(variable.getValue() instanceof ListClassEnvironment.InnerListValue listValue)) throw new InvalidSyntaxException("Can't get members of non-list value");
 
@@ -210,12 +212,14 @@ public final class EvaluationFunctions {
             for (RuntimeValue<?> runtimeValue : listValue.getValue()) {
                 foreachEnvironment.clearVariables();
 
-                foreachEnvironment.declareVariable(
+                foreachEnvironment.declareVariable(new VariableValue(
                         foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getId(),
                         foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getDataType(),
                         runtimeValue,
                         foreachStatement.getVariableDeclarationStatement().isConstant(),
-                        new HashSet<>());
+                        new HashSet<>(),
+                        false,
+                        foreachEnvironment));
 
                 for (int i = 0; i < foreachStatement.getBody().size(); i++) {
                     Statement statement = foreachStatement.getBody().get(i);
@@ -260,14 +264,16 @@ public final class EvaluationFunctions {
             }
 
             forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
-                    forEnvironment.declareVariable(
+                    forEnvironment.declareVariable(new VariableValue(
                             variableDeclarationInfo.getId(),
                             variableDeclarationInfo.getDataType(),
-                            new VariableValue(variableDeclarationInfo.getValue() == null ?
+                            variableDeclarationInfo.getValue() == null ?
                                     null :
-                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment), forEnvironment, variableDeclarationInfo.getId()),
+                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment),
                             forStatement.getVariableDeclarationStatement().isConstant(),
-                            Set.of())
+                            Set.of(),
+                            false,
+                            forEnvironment))
             );
 
             main:
@@ -301,18 +307,20 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                List<RuntimeVariable> runtimeVariables = new ArrayList<>();
+                List<VariableValue> variableValues = new ArrayList<>();
                 forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
-                        runtimeVariables.add(forEnvironment.getVariable(variableDeclarationInfo.getId())));
+                        variableValues.add(forEnvironment.getVariable(variableDeclarationInfo.getId())));
 
                 forEnvironment.clearVariables();
-                for (RuntimeVariable runtimeVariable : runtimeVariables) {
-                    forEnvironment.declareVariable(
-                            runtimeVariable.getId(),
-                            runtimeVariable.getDataType(),
-                            runtimeVariable.getValue(),
-                            runtimeVariable.isConstant(),
-                            new HashSet<>());
+                for (VariableValue variableValue : variableValues) {
+                    forEnvironment.declareVariable(new VariableValue(
+                            variableValue.getId(),
+                            variableValue.getDataType(),
+                            variableValue.getValue(),
+                            variableValue.isConstant(),
+                            new HashSet<>(),
+                            false,
+                            forEnvironment));
                 }
                 evaluateAssignmentExpression(forStatement.getAssignmentExpression(), forEnvironment);
             }
@@ -611,12 +619,14 @@ public final class EvaluationFunctions {
                 for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
                     CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
 
-                    functionEnvironment.declareArgument(
+                    functionEnvironment.declareVariable(new VariableValue(
                             callArgExpression.getId(),
                             callArgExpression.getDataType(),
                             args.get(i),
                             callArgExpression.isConstant(),
-                            new HashSet<>());
+                            new HashSet<>(),
+                            true,
+                            functionEnvironment));
                 }
 
                 RuntimeValue<?> result = null;
@@ -707,12 +717,14 @@ public final class EvaluationFunctions {
                         for (int i = 0; i < runtimeConstructorValue.getArgs().size(); i++) {
                             CallArgExpression callArgExpression = runtimeConstructorValue.getArgs().get(i);
 
-                            constructorEnvironment.declareArgument(
+                            constructorEnvironment.declareVariable(new VariableValue(
                                     callArgExpression.getId(),
                                     callArgExpression.getDataType(),
                                     args.get(i),
                                     callArgExpression.isConstant(),
-                                    new HashSet<>());
+                                    new HashSet<>(),
+                                    true,
+                                    constructorEnvironment));
                         }
 
                         for (Statement statement : runtimeConstructorValue.getBody()) {
@@ -721,8 +733,8 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
-                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
+                for (VariableValue variableValue : classEnvironment.getVariables()) {
+                    if (variableValue.isConstant() && variableValue.getValue() == null) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call");
                     }
                 }
@@ -738,14 +750,17 @@ public final class EvaluationFunctions {
                     throw new RuntimeException(e);
                 }
 
-                defaultClassValue.getEnvironment().getVariables().forEach(variable -> {
-                    if (!variable.isArgument()) classEnvironment.declareVariable(variable.getId(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
-                    else classEnvironment.declareArgument(variable.getId(), variable.getDataType(), variable.getValue(), variable.isConstant(), variable.getAccessModifiers());
-                });
+                defaultClassValue.getEnvironment().getVariables().forEach(variable -> classEnvironment.declareVariable(new VariableValue(
+                        variable.getId(),
+                        variable.getDataType(),
+                        variable.getValue(),
+                        variable.isConstant(),
+                        variable.getAccessModifiers(),
+                        variable.isArgument(),
+                        classEnvironment)));
                 defaultClassValue.getEnvironment().getFunctions().forEach(function -> {
                     if (function instanceof DefaultFunctionValue defaultFunctionValue) {
-                        defaultFunctionValue.setParentEnvironment(classEnvironment);
-                        classEnvironment.declareFunction(defaultFunctionValue);
+                        classEnvironment.declareFunction(defaultFunctionValue.copy(classEnvironment));
                     }
                 });
                 defaultClassValue.getEnvironment().getConstructors().forEach(constructor -> {
@@ -781,8 +796,8 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
-                    if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
+                for (VariableValue variableValue : classEnvironment.getVariables()) {
+                    if (variableValue.isConstant() && variableValue.getValue() == null) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call. It's probably an Addon's error");
                     }
                 }
@@ -812,15 +827,15 @@ public final class EvaluationFunctions {
             @Override
             public RuntimeValue<?> evaluate(Identifier identifier, Environment environment, Object... extra) {
                 if (identifier instanceof VariableIdentifier) {
-                    RuntimeVariable runtimeVariable = environment.getVariableDeclarationEnvironment(identifier.getId()).getVariable(identifier.getId());
-                    if (runtimeVariable != null) {
-                        if (runtimeVariable.getAccessModifiers().contains("private") &&
+                    VariableValue variableValue = environment.getVariableDeclarationEnvironment(identifier.getId()).getVariable(identifier.getId());
+                    if (variableValue != null) {
+                        if (variableValue.getAccessModifiers().contains("private") &&
                                 !environment.hasParent(environment.getVariableDeclarationEnvironment(identifier.getId())))
                             throw new InvalidAccessException("Can't access variable " + identifier.getId() + " because it's private");
-                        if (!runtimeVariable.getAccessModifiers().contains("shared") && environment.isShared() && !runtimeVariable.isArgument())
+                        if (!variableValue.getAccessModifiers().contains("shared") && environment.isShared() && !variableValue.isArgument())
                             throw new InvalidAccessException("Can't access variable " + identifier.getId() + " because it's not shared");
 
-                        return runtimeVariable.getValue();
+                        return variableValue;
                     }
 
                     throw new InvalidIdentifierException("Variable with identifier " + identifier.getId() + " doesn't exist");
@@ -883,9 +898,6 @@ public final class EvaluationFunctions {
     private static RuntimeValue<?> evaluateAssignmentExpression(AssignmentExpression assignmentExpression, Environment environment) {
         if (assignmentExpression.getId() instanceof VariableIdentifier variableIdentifier) {
             RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
-            if (!(value instanceof VariableValue)) value = new VariableValue(value,
-                    environment.getVariableDeclarationEnvironment(variableIdentifier.getId()),
-                    variableIdentifier.getId());
             environment.getVariableDeclarationEnvironment(variableIdentifier.getId()).assignVariable(variableIdentifier.getId(), value);
             return value;
         }
@@ -893,11 +905,10 @@ public final class EvaluationFunctions {
             RuntimeValue<?> memberExpressionValue = Interpreter.evaluate(memberExpression, environment);
             if (memberExpressionValue instanceof VariableValue variableValue) {
                 RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
-                if (!(value instanceof VariableValue)) value = new VariableValue(value, variableValue.getParentEnvironment(), variableValue.getId());
                 variableValue.getParentEnvironment().assignVariable(variableValue.getId(), value);
                 return value;
             }
-            throw new InvalidSyntaxException("Can't assign value to not variable");
+            throw new InvalidSyntaxException("Can't assign value to not variable " + memberExpressionValue);
         }
         throw new InvalidSyntaxException("Can't assign value to " + assignmentExpression.getId().getClass().getName());
     }

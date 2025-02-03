@@ -36,10 +36,10 @@ public class DataType {
      * @return Whether given value matches this DataType
      */
     public boolean isMatches(RuntimeValue<?> value) {
+        if (value == null) return true;
+
         value = value.getFinalRuntimeValue();
-        if (value instanceof NullValue) {
-            return isNullable;
-        }
+        if (value instanceof NullValue) return isNullable;
 
         ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(id);
         return classValue != null && classValue.isMatches(value);

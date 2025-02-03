@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.values.functions;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
@@ -20,8 +19,7 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
     protected final String id;
     protected final List<CallArgExpression> args;
     protected final DataType returnDataType;
-    @Setter
-    protected FunctionDeclarationEnvironment parentEnvironment;
+    protected final FunctionDeclarationEnvironment parentEnvironment;
     protected final Set<String> accessModifiers;
 
     /**

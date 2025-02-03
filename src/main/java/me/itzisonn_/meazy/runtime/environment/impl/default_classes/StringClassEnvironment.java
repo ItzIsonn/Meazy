@@ -24,7 +24,16 @@ public class StringClassEnvironment extends ClassEnvironmentImpl {
         super(parent, false, "String");
 
 
-        declareVariable("value", new DataType("Any", false), new InnerStringValue(value), false, Set.of("private"));
+        declareVariable(new VariableValue(
+                "value",
+                new DataType("Any", false),
+                new InnerStringValue(value),
+                false,
+                Set.of("private"),
+                false,
+                this));
+
+
         declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of("private")) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
