@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 public final class MeazyMain {
-    public static final String VERSION = "2.3";
+    public static final String VERSION = "2.4";
     public static final Logger LOGGER = LogManager.getLogger("meazy");
     public static final AddonManager ADDON_MANAGER = new AddonManager();
     private static boolean isInit = false;

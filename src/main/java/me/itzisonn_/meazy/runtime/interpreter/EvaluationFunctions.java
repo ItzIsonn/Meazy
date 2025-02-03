@@ -12,15 +12,8 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.ListClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.*;
 import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.RuntimeClassValue;
@@ -130,18 +123,16 @@ public final class EvaluationFunctions {
         });
 
         register("variable_declaration_statement", VariableDeclarationStatement.class, (variableDeclarationStatement, environment, extra) -> {
-            if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) throw new InvalidSyntaxException("Can't declare variable in this environment!");
-
             Set<String> accessModifiers = new HashSet<>(variableDeclarationStatement.getAccessModifiers());
             if (!accessModifiers.contains("shared") && environment.isShared()) accessModifiers.add("shared");
 
             variableDeclarationStatement.getDeclarationInfos().forEach(variableDeclarationInfo ->
-                    variableDeclarationEnvironment.declareVariable(
+                    environment.declareVariable(
                             variableDeclarationInfo.getId(),
                             variableDeclarationInfo.getDataType(),
                             new VariableValue(variableDeclarationInfo.getValue() == null ?
                                     null :
-                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment), variableDeclarationEnvironment, variableDeclarationInfo.getId()),
+                                    Interpreter.evaluate(variableDeclarationInfo.getValue(), environment), environment, variableDeclarationInfo.getId()),
                             variableDeclarationStatement.isConstant(),
                             accessModifiers)
             );
@@ -159,7 +150,7 @@ public final class EvaluationFunctions {
 
                 Environment ifEnvironment;
                 try {
-                    ifEnvironment = Registries.VARIABLE_DECLARATION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
+                    ifEnvironment = Registries.ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
                 }
                 catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e);
@@ -208,16 +199,15 @@ public final class EvaluationFunctions {
             }
 
             RuntimeValue<?> rawCollectionValue = Interpreter.evaluate(foreachStatement.getCollection(), foreachEnvironment);
-            List<RuntimeValue<?>> list;
             if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getId().equals("List")))
                 throw new InvalidSyntaxException("Can't get members of non-list value");
-            VariableDeclarationEnvironment.RuntimeVariable variable = classValue.getClassEnvironment().getVariable("value");
+
+            RuntimeVariable variable = classValue.getClassEnvironment().getVariable("value");
             if (variable == null) throw new InvalidSyntaxException("Can't get members of non-list value");
             if (!(variable.getValue() instanceof ListClassEnvironment.InnerListValue listValue)) throw new InvalidSyntaxException("Can't get members of non-list value");
-            list = listValue.getValue();
 
             main:
-            for (RuntimeValue<?> runtimeValue : list) {
+            for (RuntimeValue<?> runtimeValue : listValue.getValue()) {
                 foreachEnvironment.clearVariables();
 
                 foreachEnvironment.declareVariable(
@@ -311,12 +301,12 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                List<VariableDeclarationEnvironment.RuntimeVariable> runtimeVariables = new ArrayList<>();
+                List<RuntimeVariable> runtimeVariables = new ArrayList<>();
                 forStatement.getVariableDeclarationStatement().getDeclarationInfos().forEach(variableDeclarationInfo ->
                         runtimeVariables.add(forEnvironment.getVariable(variableDeclarationInfo.getId())));
 
                 forEnvironment.clearVariables();
-                for (VariableDeclarationEnvironment.RuntimeVariable runtimeVariable : runtimeVariables) {
+                for (RuntimeVariable runtimeVariable : runtimeVariables) {
                     forEnvironment.declareVariable(
                             runtimeVariable.getId(),
                             runtimeVariable.getDataType(),
@@ -381,12 +371,12 @@ public final class EvaluationFunctions {
                 if (returnStatement.getValue() == null) return null;
                 return Interpreter.evaluate(returnStatement.getValue(), environment);
             }
-            if (returnStatement.getValue() == null &&
-                    (environment instanceof VariableDeclarationEnvironment || environment.hasParent(parent -> parent instanceof VariableDeclarationEnvironment))) {
+
+            if (returnStatement.getValue() == null) {
                 return null;
             }
 
-            throw new InvalidSyntaxException("Can only use return statement inside a function or if/for/while statements");
+            throw new InvalidSyntaxException("Can't return value not inside a function");
         });
 
         register("continue_statement", ContinueStatement.class, (continueStatement, environment, extra) -> {
@@ -394,7 +384,7 @@ public final class EvaluationFunctions {
                 return null;
             }
 
-            throw new InvalidSyntaxException("Can only use continue statement inside for/while statements");
+            throw new InvalidSyntaxException("Can't use continue statement outside of for/while statements");
         });
 
         register("break_statement", BreakStatement.class, (breakStatement, environment, extra) -> {
@@ -402,7 +392,7 @@ public final class EvaluationFunctions {
                 return null;
             }
 
-            throw new InvalidSyntaxException("Can only use break statement inside for/while statements");
+            throw new InvalidSyntaxException("Can't use break statement outside of for/while statements");
         });
 
         register("assignment_expression", AssignmentExpression.class, (assignmentExpression, environment, extra) -> evaluateAssignmentExpression(assignmentExpression, environment));
@@ -412,20 +402,17 @@ public final class EvaluationFunctions {
             RuntimeValue<?> right = Interpreter.evaluate(logicalExpression.getRight(), environment).getFinalRuntimeValue();
 
             if (left instanceof BooleanValue leftValue && right instanceof BooleanValue rightValue) {
-                boolean result;
                 boolean leftBoolean = leftValue.getValue();
                 boolean rightBoolean = rightValue.getValue();
 
-                switch (logicalExpression.getOperator()) {
-                    case "&&" -> result = leftBoolean && rightBoolean;
-                    case "||" -> result = leftBoolean || rightBoolean;
+                return new BooleanValue(switch (logicalExpression.getOperator()) {
+                    case "&&" -> leftBoolean && rightBoolean;
+                    case "||" -> leftBoolean || rightBoolean;
                     default -> throw new UnsupportedOperatorException(logicalExpression.getOperator());
-                }
-
-                return new BooleanValue(result);
+                });
             }
 
-            throw new InvalidSyntaxException("Logical expression must contain only boolean values");
+            throw new InvalidSyntaxException("Logical expression can't contain non-boolean values");
         });
 
         register("null_check_expression", NullCheckExpression.class, (nullCheckExpression, environment, extra) -> {
@@ -442,82 +429,67 @@ public final class EvaluationFunctions {
             RuntimeValue<?> right = Interpreter.evaluate(comparisonExpression.getRight(), environment).getFinalRuntimeValue();
 
             if (left instanceof NumberValue<?> leftValue && right instanceof NumberValue<?> rightValue) {
-                boolean result;
                 double leftNumber = leftValue.getValue().doubleValue();
                 double rightNumber = rightValue.getValue().doubleValue();
 
-                switch (comparisonExpression.getOperator()) {
-                    case "==" -> result = leftNumber == rightNumber;
-                    case "!=" -> result = leftNumber != rightNumber;
-                    case ">" -> result = leftNumber > rightNumber;
-                    case ">=" -> result = leftNumber >= rightNumber;
-                    case "<" -> result = leftNumber < rightNumber;
-                    case "<=" -> result = leftNumber <= rightNumber;
+                return new BooleanValue(switch (comparisonExpression.getOperator()) {
+                    case "==" -> leftNumber == rightNumber;
+                    case "!=" -> leftNumber != rightNumber;
+                    case ">" -> leftNumber > rightNumber;
+                    case ">=" -> leftNumber >= rightNumber;
+                    case "<" -> leftNumber < rightNumber;
+                    case "<=" -> leftNumber <= rightNumber;
                     default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                }
-
-                return new BooleanValue(result);
+                });
             }
 
             if (left instanceof StringValue leftValue && right instanceof StringValue rightValue) {
-                boolean result;
-                String leftNumber = leftValue.getValue();
-                String rightNumber = rightValue.getValue();
+                String leftString = leftValue.getValue();
+                String rightString = rightValue.getValue();
 
-                switch (comparisonExpression.getOperator()) {
-                    case "==" -> result = leftNumber.equals(rightNumber);
-                    case "!=" -> result = !leftNumber.equals(rightNumber);
-                    case ">" -> result = leftNumber.length() > rightNumber.length();
-                    case ">=" -> result = leftNumber.length() >= rightNumber.length();
-                    case "<" -> result = leftNumber.length() < rightNumber.length();
-                    case "<=" -> result = leftNumber.length() <= rightNumber.length();
+                return new BooleanValue(switch (comparisonExpression.getOperator()) {
+                    case "==" -> leftString.equals(rightString);
+                    case "!=" -> !leftString.equals(rightString);
+                    case ">" -> leftString.length() > rightString.length();
+                    case ">=" -> leftString.length() >= rightString.length();
+                    case "<" -> leftString.length() < rightString.length();
+                    case "<=" -> leftString.length() <= rightString.length();
                     default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                }
-
-                return new BooleanValue(result);
+                });
             }
 
             if (left instanceof BooleanValue leftValue && right instanceof BooleanValue rightValue) {
-                boolean result;
                 boolean leftBoolean = leftValue.getValue();
                 boolean rightBoolean = rightValue.getValue();
 
-                switch (comparisonExpression.getOperator()) {
-                    case "==" -> result = leftBoolean == rightBoolean;
-                    case "!=" -> result = leftBoolean != rightBoolean;
+                return new BooleanValue(switch (comparisonExpression.getOperator()) {
+                    case "==" -> leftBoolean == rightBoolean;
+                    case "!=" -> leftBoolean != rightBoolean;
                     default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                }
-
-                return new BooleanValue(result);
+                });
             }
 
             if (left instanceof NullValue) {
-                boolean result;
                 Object rightObject = right.getValue();
 
-                switch (comparisonExpression.getOperator()) {
-                    case "==" -> result = null == rightObject;
-                    case "!=" -> result = null != rightObject;
+                return new BooleanValue(switch (comparisonExpression.getOperator()) {
+                    case "==" -> rightObject == null;
+                    case "!=" -> rightObject != null;
                     default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                }
-
-                return new BooleanValue(result);
+                });
             }
 
             if (right instanceof NullValue) {
-                boolean result;
                 Object leftObject = left.getValue();
 
-                switch (comparisonExpression.getOperator()) {
-                    case "==" -> result = leftObject == null;
-                    case "!=" -> result = leftObject != null;
+                return new BooleanValue(switch (comparisonExpression.getOperator()) {
+                    case "==" -> leftObject == null;
+                    case "!=" -> leftObject != null;
                     default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                }
-
-                return new BooleanValue(result);
+                });
             }
 
-            throw new InvalidSyntaxException("Can't compare two different values" + left + " " + right);
+            throw new InvalidSyntaxException("Can't compare different values (" + left + " " + right + ")");
         });
 
         register("is_expression", IsExpression.class, (isExpression, environment, extra) -> {
@@ -533,12 +505,58 @@ public final class EvaluationFunctions {
             RuntimeValue<?> left = Interpreter.evaluate(binaryExpression.getLeft(), environment).getFinalRuntimeValue();
             RuntimeValue<?> right = Interpreter.evaluate(binaryExpression.getRight(), environment).getFinalRuntimeValue();
 
+            if (left instanceof IntValue leftValue && right instanceof IntValue rightValue) {
+                int leftNumber = leftValue.getValue();
+                int rightNumber = rightValue.getValue();
+
+                return new IntValue(switch (binaryExpression.getOperator()) {
+                    case "+" -> leftNumber + rightNumber;
+                    case "-" -> leftNumber - rightNumber;
+                    case "*" -> leftNumber * rightNumber;
+                    case "/" -> leftNumber / rightNumber;
+                    case "%" -> leftNumber % rightNumber;
+                    case "^" -> (int) Math.pow(leftNumber, rightNumber);
+                    default -> throw new UnsupportedOperatorException(binaryExpression.getOperator());
+                });
+            }
+
             if (left instanceof NumberValue<?> leftValue && right instanceof NumberValue<?> rightValue) {
-                return evaluateNumericBinaryExpression(leftValue, rightValue, binaryExpression.getOperator());
+                double leftNumber = leftValue.getValue().doubleValue();
+                double rightNumber = rightValue.getValue().doubleValue();
+
+                return new DoubleValue(switch (binaryExpression.getOperator()) {
+                    case "+" -> leftNumber + rightNumber;
+                    case "-" -> leftNumber - rightNumber;
+                    case "*" -> leftNumber * rightNumber;
+                    case "/" -> leftNumber / rightNumber;
+                    case "%" -> leftNumber % rightNumber;
+                    case "^" -> Math.pow(leftNumber, rightNumber);
+                    default -> throw new UnsupportedOperatorException(binaryExpression.getOperator());
+                });
             }
-            else {
-                return evaluateStringBinaryExpression(left, right, binaryExpression.getOperator());
-            }
+
+            return new StringValue(switch (binaryExpression.getOperator()) {
+                case "+" -> String.valueOf(left.getValue()) + right.getValue();
+                case "*" -> {
+                    String string;
+                    int amount;
+
+                    if (left instanceof StringValue stringValue && right instanceof IntValue numberValue) {
+                        string = stringValue.getValue();
+                        amount = numberValue.getValue();
+                    }
+                    else if (right instanceof StringValue stringValue && left instanceof IntValue numberValue) {
+                        string = stringValue.getValue();
+                        amount = numberValue.getValue();
+                    }
+                    else throw new InvalidSyntaxException("Can't multiply non-number values");
+
+                    if (amount < 0) throw new InvalidSyntaxException("Can't multiply string by a negative int");
+
+                    yield new StringBuilder().repeat(string, amount).toString();
+                }
+                default -> throw new UnsupportedOperatorException(binaryExpression.getOperator());
+            });
         });
 
         register("inversion_expression", InversionExpression.class, (inversionExpression, environment, extra) -> {
@@ -678,9 +696,9 @@ public final class EvaluationFunctions {
                             throw new InvalidCallException("Requested constructor has private access");
                         }
 
-                        VariableDeclarationEnvironment constructorEnvironment;
+                        Environment constructorEnvironment;
                         try {
-                            constructorEnvironment = Registries.VARIABLE_DECLARATION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(classEnvironment);
+                            constructorEnvironment = Registries.ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(classEnvironment);
                         }
                         catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                             throw new RuntimeException(e);
@@ -703,7 +721,7 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                for (VariableDeclarationEnvironment.RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
+                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
                     if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call");
                     }
@@ -750,9 +768,9 @@ public final class EvaluationFunctions {
                             throw new InvalidCallException("Requested constructor has private access");
                         }
 
-                        VariableDeclarationEnvironment constructorEnvironment;
+                        Environment constructorEnvironment;
                         try {
-                            constructorEnvironment = Registries.VARIABLE_DECLARATION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(classEnvironment);
+                            constructorEnvironment = Registries.ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(classEnvironment);
                         }
                         catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                                NoSuchMethodException e) {
@@ -763,7 +781,7 @@ public final class EvaluationFunctions {
                     }
                 }
 
-                for (VariableDeclarationEnvironment.RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
+                for (RuntimeVariable runtimeVariable : classEnvironment.getVariables()) {
                     if (runtimeVariable.isConstant() && runtimeVariable.getValue().getFinalRuntimeValue() instanceof NullValue) {
                         throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call. It's probably an Addon's error");
                     }
@@ -794,7 +812,7 @@ public final class EvaluationFunctions {
             @Override
             public RuntimeValue<?> evaluate(Identifier identifier, Environment environment, Object... extra) {
                 if (identifier instanceof VariableIdentifier) {
-                    VariableDeclarationEnvironment.RuntimeVariable runtimeVariable = environment.getVariableDeclarationEnvironment(identifier.getId()).getVariable(identifier.getId());
+                    RuntimeVariable runtimeVariable = environment.getVariableDeclarationEnvironment(identifier.getId()).getVariable(identifier.getId());
                     if (runtimeVariable != null) {
                         if (runtimeVariable.getAccessModifiers().contains("private") &&
                                 !environment.hasParent(environment.getVariableDeclarationEnvironment(identifier.getId())))
@@ -862,87 +880,13 @@ public final class EvaluationFunctions {
 
 
 
-    private static NumberValue<?> evaluateNumericBinaryExpression(NumberValue<?> leftValue, NumberValue<?> rightValue, String operator) {
-        if (leftValue instanceof IntValue leftIntValue && rightValue instanceof IntValue rightIntValue) {
-            int result;
-
-            int left = leftIntValue.getValue();
-            int right = rightIntValue.getValue();
-
-            switch (operator) {
-                case "+" -> result = left + right;
-                case "-" -> result = left - right;
-                case "*" -> result = left * right;
-                case "/" -> result = left / right;
-                case "%" -> result = left % right;
-                case "^" -> result = (int) Math.pow(left, right);
-                default -> throw new UnsupportedOperatorException(operator);
-            }
-
-            return new IntValue(result);
-        }
-
-        double result;
-
-        double left = leftValue.getValue().doubleValue();
-        double right = rightValue.getValue().doubleValue();
-
-        switch (operator) {
-            case "+" -> result = left + right;
-            case "-" -> result = left - right;
-            case "*" -> result = left * right;
-            case "/" -> result = left / right;
-            case "%" -> result = left % right;
-            case "^" -> result = Math.pow(left, right);
-            default -> throw new UnsupportedOperatorException(operator);
-        }
-
-        return new DoubleValue(result);
-    }
-
-    private static StringValue evaluateStringBinaryExpression(RuntimeValue<?> leftValue, RuntimeValue<?> rightValue, String operator) {
-        StringBuilder result = new StringBuilder();
-
-        switch (operator) {
-            case "+" -> {
-                String left = leftValue.getValue() == null ? "null" : leftValue.getValue().toString();
-                String right = rightValue.getValue() == null ? "null" : rightValue.getValue().toString();
-                result.append(left).append(right);
-            }
-            case "*" -> {
-                String string;
-                int number;
-
-                if (leftValue instanceof StringValue stringValue && rightValue instanceof IntValue numberValue) {
-                    string = stringValue.getValue();
-                    number = numberValue.getValue();
-                }
-                else if (rightValue instanceof StringValue stringValue && leftValue instanceof IntValue numberValue) {
-                    string = stringValue.getValue();
-                    number = numberValue.getValue();
-                }
-                else throw new InvalidSyntaxException("Can only multiply string by a integer value");
-
-                if (number < 0) throw new InvalidSyntaxException("Can't multiply string by a negative integer");
-
-                result.repeat(string, number);
-            }
-            default -> throw new UnsupportedOperatorException(operator);
-        }
-
-        return new StringValue(result.toString());
-    }
-
     private static RuntimeValue<?> evaluateAssignmentExpression(AssignmentExpression assignmentExpression, Environment environment) {
         if (assignmentExpression.getId() instanceof VariableIdentifier variableIdentifier) {
-            if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
-                throw new InvalidSyntaxException("Can't assign value not in variable declaration environment");
-            }
             RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
             if (!(value instanceof VariableValue)) value = new VariableValue(value,
-                    variableDeclarationEnvironment.getVariableDeclarationEnvironment(variableIdentifier.getId()),
+                    environment.getVariableDeclarationEnvironment(variableIdentifier.getId()),
                     variableIdentifier.getId());
-            variableDeclarationEnvironment.getVariableDeclarationEnvironment(variableIdentifier.getId()).assignVariable(variableIdentifier.getId(), value);
+            environment.getVariableDeclarationEnvironment(variableIdentifier.getId()).assignVariable(variableIdentifier.getId(), value);
             return value;
         }
         if (assignmentExpression.getId() instanceof MemberExpression memberExpression) {
@@ -966,20 +910,20 @@ public final class EvaluationFunctions {
     }
 
     private static RuntimeValue<?> checkReturnValue(RuntimeValue<?> returnValue, DataType returnDataType, String functionId, boolean isDefault) {
-        String defaultString = isDefault ? " It's probably an Addon's error" : "";
+        String defaultString = isDefault ? ". It's probably an Addon's error" : "";
 
         if (returnValue == null) {
             if (returnDataType != null) {
-                throw new InvalidSyntaxException("Didn't find return value but function with id " + functionId + " must return value." + defaultString);
+                throw new InvalidSyntaxException("Didn't find return value but function with id " + functionId + " must return value" + defaultString);
             }
             return null;
         }
         if (returnDataType == null) {
-            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing." + defaultString);
+            throw new InvalidSyntaxException("Found return value but function with id " + functionId + " must return nothing" + defaultString);
         }
 
         if (!returnDataType.isMatches(returnValue)) {
-            throw new InvalidSyntaxException("Returned value's data type is different from specified (" + returnDataType.getId() + ")." + defaultString);
+            throw new InvalidSyntaxException("Returned value's data type is different from specified (" + returnDataType.getId() + ")" + defaultString);
         }
 
         return returnValue;
