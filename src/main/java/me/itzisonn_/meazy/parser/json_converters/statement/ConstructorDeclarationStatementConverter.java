@@ -1,12 +1,13 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.Modifier;
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
-import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -24,11 +25,12 @@ public class ConstructorDeclarationStatementConverter extends Converter<Construc
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        Set<String> accessModifiers = getElement(object, "access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
-            if (Registries.ACCESS_MODIFIERS.hasEntry(accessModifier.getAsString())) {
-                throw new InvalidCompiledFileException("Unknown access modifier with id " + accessModifier.getAsString());
+        Set<Modifier> modifiers = getElement(object, "modifiers").getAsJsonArray().asList().stream().map(element -> {
+            Modifier modifier = Modifiers.parse(element.getAsString());
+            if (modifier == null) {
+                throw new InvalidCompiledFileException("Unknown Modifier with id " + element.getAsString());
             }
-            return accessModifier.getAsString();
+            return modifier;
         }).collect(Collectors.toSet());
 
         List<CallArgExpression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
@@ -37,18 +39,18 @@ public class ConstructorDeclarationStatementConverter extends Converter<Construc
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        return new ConstructorDeclarationStatement(accessModifiers, args, body);
+        return new ConstructorDeclarationStatement(modifiers, args, body);
     }
 
     @Override
     public JsonElement serialize(ConstructorDeclarationStatement constructorDeclarationStatement, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject result = getJsonObject();
 
-        JsonArray accessModifiers = new JsonArray();
-        for (String accessModifier : constructorDeclarationStatement.getAccessModifiers()) {
-            accessModifiers.add(accessModifier);
+        JsonArray modifiers = new JsonArray();
+        for (Modifier modifier : constructorDeclarationStatement.getModifiers()) {
+            modifiers.add(modifier.getId());
         }
-        result.add("access_modifiers", accessModifiers);
+        result.add("modifiers", modifiers);
 
         JsonArray args = new JsonArray();
         for (CallArgExpression arg : constructorDeclarationStatement.getArgs()) {

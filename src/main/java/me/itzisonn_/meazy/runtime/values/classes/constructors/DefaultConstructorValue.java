@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.values.classes.constructors;
 
+import me.itzisonn_.meazy.parser.ast.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
@@ -17,10 +18,10 @@ public abstract class DefaultConstructorValue extends ConstructorValue {
      *
      * @param args Args of this DefaultConstructorValue
      * @param parentEnvironment Parent of this DefaultConstructorValue
-     * @param accessModifiers Access modifiers of this DefaultConstructorValue
+     * @param modifiers AccessModifiers of this DefaultConstructorValue
      */
-    public DefaultConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
-        super(args, parentEnvironment, accessModifiers);
+    public DefaultConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
+        super(args, parentEnvironment, modifiers);
     }
 
     /**
@@ -40,7 +41,7 @@ public abstract class DefaultConstructorValue extends ConstructorValue {
     public final DefaultConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment) {
         RunFunction runFunction = this::run;
 
-        return new DefaultConstructorValue(args, parentEnvironment, accessModifiers) {
+        return new DefaultConstructorValue(args, parentEnvironment, modifiers) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
                 runFunction.run(constructorArgs, constructorEnvironment);

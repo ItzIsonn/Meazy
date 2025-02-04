@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addons.Addon;
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
@@ -27,18 +28,17 @@ public class MeazyClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("String", false),
                 new StringValue(MeazyMain.VERSION),
                 true,
-                Set.of("shared"),
-                false,
-                this));
+                Set.of(Modifiers.SHARED()),
+                false));
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of("private")) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(Modifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
 
-        declareFunction(new DefaultFunctionValue("getAddons", List.of(), new DataType("List", false), this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("getAddons", List.of(), new DataType("List", false), this, Set.of(Modifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 List<RuntimeValue<?>> addons = new ArrayList<>();
                 for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {

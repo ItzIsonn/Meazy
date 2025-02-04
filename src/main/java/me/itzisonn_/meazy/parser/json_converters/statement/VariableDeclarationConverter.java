@@ -1,12 +1,13 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.Modifier;
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
-import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -24,11 +25,12 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        Set<String> accessModifiers = getElement(object, "access_modifiers").getAsJsonArray().asList().stream().map(accessModifier -> {
-            if (Registries.ACCESS_MODIFIERS.hasEntry(accessModifier.getAsString())) {
-                throw new InvalidCompiledFileException("Unknown access modifier with id " + accessModifier.getAsString());
+        Set<Modifier> modifiers = getElement(object, "modifiers").getAsJsonArray().asList().stream().map(element -> {
+            Modifier modifier = Modifiers.parse(element.getAsString());
+            if (modifier == null) {
+                throw new InvalidCompiledFileException("Unknown Modifier with id " + element.getAsString());
             }
-            return accessModifier.getAsString();
+            return modifier;
         }).collect(Collectors.toSet());
 
         boolean isConstant = getElement(object, "is_constant").getAsBoolean();
@@ -49,18 +51,18 @@ public class VariableDeclarationConverter extends Converter<VariableDeclarationS
             return new VariableDeclarationStatement.VariableDeclarationInfo(id, new DataType(dataTypeId, dataTypeIsNullable), value);
         }).toList();
 
-        return new VariableDeclarationStatement(accessModifiers, isConstant, declarationInfos);
+        return new VariableDeclarationStatement(modifiers, isConstant, declarationInfos);
     }
 
     @Override
     public JsonElement serialize(VariableDeclarationStatement variableDeclarationStatement, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject result = getJsonObject();
 
-        JsonArray accessModifiers = new JsonArray();
-        for (String accessModifier : variableDeclarationStatement.getAccessModifiers()) {
-            accessModifiers.add(accessModifier);
+        JsonArray modifiers = new JsonArray();
+        for (Modifier modifier : variableDeclarationStatement.getModifiers()) {
+            modifiers.add(modifier.getId());
         }
-        result.add("access_modifiers", accessModifiers);
+        result.add("modifiers", modifiers);
 
         result.addProperty("is_constant", variableDeclarationStatement.isConstant());
 
