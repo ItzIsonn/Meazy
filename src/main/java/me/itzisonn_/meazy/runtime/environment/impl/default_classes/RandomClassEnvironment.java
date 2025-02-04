@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
@@ -27,9 +28,8 @@ public class RandomClassEnvironment extends ClassEnvironmentImpl {
                 new DataType("Any", false),
                 new InnerRandomValue(new Random()),
                 false,
-                Set.of("private"),
-                false,
-                this));
+                Set.of(Modifiers.PRIVATE()),
+                false));
 
 
         declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of()) {

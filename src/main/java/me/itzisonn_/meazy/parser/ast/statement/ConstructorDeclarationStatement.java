@@ -2,29 +2,25 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.ast.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.List;
 import java.util.Set;
 
 @Getter
-public class ConstructorDeclarationStatement implements Statement {
-    private final Set<String> accessModifiers;
+public class ConstructorDeclarationStatement extends ModifierStatement implements Statement {
     private final List<CallArgExpression> args;
     private final List<Statement> body;
 
-    public ConstructorDeclarationStatement(Set<String> accessModifiers, List<CallArgExpression> args, List<Statement> body) {
-        this.accessModifiers = accessModifiers;
+    public ConstructorDeclarationStatement(Set<Modifier> modifiers, List<CallArgExpression> args, List<Statement> body) {
+        super(modifiers);
         this.args = args;
         this.body = body;
     }
 
     @Override
     public String toCodeString(int offset) throws IllegalArgumentException {
-        StringBuilder accessModifiersBuilder = new StringBuilder();
-        for (String accessModifier : accessModifiers) {
-            accessModifiersBuilder.append(accessModifier).append(" ");
-        }
 
         StringBuilder argsBuilder = new StringBuilder();
         for (int i = 0; i < args.size(); i++) {
@@ -37,6 +33,6 @@ public class ConstructorDeclarationStatement implements Statement {
             bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
         }
 
-        return accessModifiersBuilder + "constructor(" + argsBuilder + ") {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
+        return super.toCodeString(0) + "constructor(" + argsBuilder + ") {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
     }
 }

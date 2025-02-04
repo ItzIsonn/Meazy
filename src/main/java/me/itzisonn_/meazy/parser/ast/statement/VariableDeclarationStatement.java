@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.Modifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
@@ -9,24 +10,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-public class VariableDeclarationStatement implements Statement {
-    private final Set<String> accessModifiers;
+public class VariableDeclarationStatement extends ModifierStatement implements Statement {
     private final boolean isConstant;
     private final List<VariableDeclarationInfo> declarationInfos;
 
-    public VariableDeclarationStatement(Set<String> accessModifiers, boolean isConstant, List<VariableDeclarationInfo> declarationInfos) {
-        this.accessModifiers = accessModifiers;
+    public VariableDeclarationStatement(Set<Modifier> modifiers, boolean isConstant, List<VariableDeclarationInfo> declarationInfos) {
+        super(modifiers);
         this.isConstant = isConstant;
         this.declarationInfos = declarationInfos;
     }
 
     @Override
     public String toCodeString(int offset) throws IllegalArgumentException {
-        StringBuilder accessModifiersBuilder = new StringBuilder();
-        for (String accessModifier : accessModifiers) {
-            accessModifiersBuilder.append(accessModifier).append(" ");
-        }
-
         String keywordString = isConstant ? "val" : "var";
 
         String declarationString = declarationInfos.stream().map(variableDeclarationInfo -> {
@@ -34,7 +29,7 @@ public class VariableDeclarationStatement implements Statement {
             return variableDeclarationInfo.getId() + ":" + variableDeclarationInfo.getDataType() + value;
         }).collect(Collectors.joining(", "));
 
-        return accessModifiersBuilder + keywordString + " " + declarationString;
+        return super.toCodeString(0) + keywordString + " " + declarationString;
     }
 
     @Getter

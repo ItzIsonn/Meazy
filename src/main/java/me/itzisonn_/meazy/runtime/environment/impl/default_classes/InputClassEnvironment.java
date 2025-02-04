@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -19,31 +20,31 @@ public class InputClassEnvironment extends ClassEnvironmentImpl {
         super(parent, true, "Input");
 
 
-        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of("private")) {
+        declareConstructor(new DefaultConstructorValue(List.of(), this, Set.of(Modifiers.PRIVATE())) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {}
         });
 
 
-        declareFunction(new DefaultFunctionValue("read", List.of(), new DataType("String", false), this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("read", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(SCANNER.next());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readLine", List.of(), new DataType("String", false), this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("readLine", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new StringValue(SCANNER.nextLine());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readInt", List.of(), new DataType("String", false), this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("readInt", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new IntValue(SCANNER.nextInt());
             }
         });
 
-        declareFunction(new DefaultFunctionValue("readFloat", List.of(), new DataType("String", false), this, Set.of("shared")) {
+        declareFunction(new DefaultFunctionValue("readFloat", List.of(), new DataType("String", false), this, Set.of(Modifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return new DoubleValue(SCANNER.nextDouble());
             }

@@ -4,6 +4,8 @@ import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.lexer.TokenTypes;
+import me.itzisonn_.meazy.parser.ast.Modifier;
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.CallExpression;
@@ -50,65 +52,78 @@ public final class ParsingFunctions {
         isInit = true;
 
         register("global_statement", extra -> {
+            Set<Modifier> modifiers = new HashSet<>();
+            while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
+                String id = getCurrentAndNext().getValue();
+                Modifier modifier = Modifiers.parse(id);
+                if (modifier == null) throw new InvalidStatementException("AccessModifier with id " + id + " doesn't exist");
+                modifiers.add(modifier);
+            }
+
             if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-                return parse(RegistryIdentifier.ofDefault("function_declaration"), FunctionDeclarationStatement.class, new HashSet<>());
+                return parse(RegistryIdentifier.ofDefault("function_declaration"), FunctionDeclarationStatement.class, modifiers);
             }
             if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, new HashSet<>(), false);
+                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 return variableDeclarationStatement;
             }
             if (getCurrent().getType().equals(TokenTypes.CLASS())) {
-                return parse(RegistryIdentifier.ofDefault("class_declaration"), ClassDeclarationStatement.class);
+                return parse(RegistryIdentifier.ofDefault("class_declaration"), ClassDeclarationStatement.class, modifiers);
             }
 
             throw new InvalidStatementException("At global environment you only can declare variable, function or class", getCurrent().getLine());
         });
 
         register("class_declaration", extra -> {
-                getCurrentAndNext();
-                String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after class keyword").getValue();
+            Set<Modifier> modifiers = getModifiers(extra);
 
-                moveOverOptionalNewLines();
-                getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
-                moveOverOptionalNewLines();
+            getCurrentAndNext();
+            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after class keyword").getValue();
 
-                List<Statement> body = new ArrayList<>();
-                while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                    body.add(parse(RegistryIdentifier.ofDefault("class_body_statement")));
-                }
+            moveOverOptionalNewLines();
+            getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
+            moveOverOptionalNewLines();
 
-                moveOverOptionalNewLines();
-                getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
-                getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
+            List<Statement> body = new ArrayList<>();
+            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
+                body.add(parse(RegistryIdentifier.ofDefault("class_body_statement")));
+            }
 
-                return new ClassDeclarationStatement(id, body);
+            moveOverOptionalNewLines();
+            getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
+            getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
+
+            return new ClassDeclarationStatement(modifiers, id, body);
         });
 
         register("class_body_statement", extra -> {
-            Set<String> accessModifiers = new HashSet<>();
-            while (TokenTypeSets.ACCESS_MODIFIERS().contains(getCurrent().getType())) {
-                accessModifiers.add(getCurrentAndNext().getType().getId());
+            Set<Modifier> modifiers = new HashSet<>();
+            while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
+                String id = getCurrentAndNext().getValue();
+                Modifier modifier = Modifiers.parse(id);
+                if (modifier == null) throw new InvalidStatementException("AccessModifier with id " + id + " doesn't exist");
+                modifiers.add(modifier);
             }
 
             if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-                return parse(RegistryIdentifier.ofDefault("function_declaration"), FunctionDeclarationStatement.class, accessModifiers);
+                return parse(RegistryIdentifier.ofDefault("function_declaration"), FunctionDeclarationStatement.class, modifiers);
             }
             if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, accessModifiers, true);
+                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, modifiers, true);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 return variableDeclarationStatement;
             }
             if (getCurrent().getType().equals(TokenTypes.CONSTRUCTOR())) {
-                return parse(RegistryIdentifier.ofDefault("constructor_declaration"), ConstructorDeclarationStatement.class, accessModifiers);
+                return parse(RegistryIdentifier.ofDefault("constructor_declaration"), ConstructorDeclarationStatement.class, modifiers);
             }
             throw new InvalidStatementException("Invalid statement found", getCurrent().getLine());
         });
 
         register("function_declaration", extra -> {
-            Set<String> accessModifiers = getAccessModifiers(extra);
+            Set<Modifier> modifiers = getModifiers(extra);
 
             getCurrentAndNext();
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
@@ -133,7 +148,7 @@ public final class ParsingFunctions {
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
             }
 
-            return new FunctionDeclarationStatement(accessModifiers, id, args, body, dataType);
+            return new FunctionDeclarationStatement(modifiers, id, args, body, dataType);
         });
 
         register("function_arg", extra -> {
@@ -147,7 +162,7 @@ public final class ParsingFunctions {
         });
 
         register("variable_declaration", extra -> {
-            Set<String> accessModifiers = getAccessModifiers(extra);
+            Set<Modifier> modifiers = getModifiers(extra);
 
             if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
             if (!(extra[1] instanceof Boolean canWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
@@ -162,11 +177,11 @@ public final class ParsingFunctions {
                 declarations.add(parseVariableDeclarationInfo(isConstant, canWithoutValue));
             }
 
-            return new VariableDeclarationStatement(accessModifiers, isConstant, declarations);
+            return new VariableDeclarationStatement(modifiers, isConstant, declarations);
         });
 
         register("constructor_declaration", extra -> {
-            Set<String> accessModifiers = getAccessModifiers(extra);
+            Set<Modifier> modifiers = getModifiers(extra);
             getCurrentAndNext();
 
             List<CallArgExpression> args = parseArgs().stream().map(expression -> {
@@ -180,16 +195,26 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
 
-            return new ConstructorDeclarationStatement(accessModifiers, args, body);
+            return new ConstructorDeclarationStatement(modifiers, args, body);
         });
 
         register("statement", extra -> {
+            Set<Modifier> modifiers = new HashSet<>();
+            while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
+                String id = getCurrentAndNext().getValue();
+                Modifier modifier = Modifiers.parse(id);
+                if (modifier == null) throw new InvalidStatementException("Modifier with id " + id + " doesn't exist");
+                modifiers.add(modifier);
+            }
+
             if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, new HashSet<>(), false);
+                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 return variableDeclarationStatement;
             }
+            if (!modifiers.isEmpty()) throw new InvalidStatementException("Unexpected Modifier found", getCurrent().getLine());
+
             if (getCurrent().getType().equals(TokenTypes.IF())) return parse(RegistryIdentifier.ofDefault("if_statement"));
             if (getCurrent().getType().equals(TokenTypes.FOR())) return parse(RegistryIdentifier.ofDefault("for_statement"));
             if (getCurrent().getType().equals(TokenTypes.WHILE())) return parse(RegistryIdentifier.ofDefault("while_statement"));
@@ -197,7 +222,7 @@ public final class ParsingFunctions {
             if (getCurrent().getType().equals(TokenTypes.CONTINUE())) return parse(RegistryIdentifier.ofDefault("continue_statement"));
             if (getCurrent().getType().equals(TokenTypes.BREAK())) return parse(RegistryIdentifier.ofDefault("break_statement"));
 
-            Expression expression  = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+            Expression expression = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
             if (expression instanceof FunctionCallExpression || expression instanceof ClassCallExpression ||
                     expression instanceof AssignmentExpression || expression instanceof MemberExpression) {
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of expression");
@@ -588,17 +613,15 @@ public final class ParsingFunctions {
 
 
     @SuppressWarnings("unchecked")
-    private static Set<String> getAccessModifiers(Object[] extra) {
-        if (extra.length == 0) throw new IllegalArgumentException("Expected Set of access modifiers as extra argument");
-        if (!(extra[0] instanceof Set<?> set)) throw new IllegalArgumentException("Expected Set of access modifiers as extra argument");
-        Set<String> accessModifiers;
+    private static Set<Modifier> getModifiers(Object[] extra) {
+        if (extra.length == 0) throw new IllegalArgumentException("Expected Set of Modifiers as extra argument");
+        if (!(extra[0] instanceof Set<?> set)) throw new IllegalArgumentException("Expected Set of Modifiers as extra argument");
         try {
-            accessModifiers = (Set<String>) set;
+            return (Set<Modifier>) set;
         }
-        catch (ClassCastException e) {
-            throw new IllegalArgumentException("Expected Set of access modifiers as extra argument");
+        catch (ClassCastException ignore) {
+            throw new IllegalArgumentException("Expected Set of Modifiers as extra argument");
         }
-        return accessModifiers;
     }
 
     private static List<CallArgExpression> parseArgs() {

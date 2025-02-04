@@ -22,8 +22,8 @@ public final class TokenTypeSets {
         return Registries.TOKEN_TYPE_SETS.getEntry(RegistryIdentifier.ofDefault("operator_postfix")).getValue();
     }
 
-    public static TokenTypeSet ACCESS_MODIFIERS() {
-        return Registries.TOKEN_TYPE_SETS.getEntry(RegistryIdentifier.ofDefault("access_modifiers")).getValue();
+    public static TokenTypeSet MODIFIERS() {
+        return Registries.TOKEN_TYPE_SETS.getEntry(RegistryIdentifier.ofDefault("modifiers")).getValue();
     }
 
     public static TokenTypeSet MEMBER_ACCESS() {
@@ -80,7 +80,7 @@ public final class TokenTypeSets {
                 TokenTypes.DOUBLE_PLUS(),
                 TokenTypes.DOUBLE_MINUS()));
 
-        register("access_modifiers", new TokenTypeSet(
+        register("modifiers", new TokenTypeSet(
                 TokenTypes.PRIVATE(),
                 TokenTypes.SHARED()));
 

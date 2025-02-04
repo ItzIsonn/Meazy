@@ -8,7 +8,8 @@ import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
 import me.itzisonn_.meazy.parser.ParsingFunctions;
-import me.itzisonn_.meazy.parser.ast.AccessModifiers;
+import me.itzisonn_.meazy.parser.ast.Modifier;
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
@@ -71,9 +72,9 @@ public final class Registries {
 
 
     /**
-     * Registry for all access modifiers
+     * Registry for all Modifiers
      */
-    public static final SetRegistry<String> ACCESS_MODIFIERS = new SetRegistry<>();
+    public static final SetRegistry<Modifier> MODIFIERS = new SetRegistry<>();
 
     /**
      * Registry for all ParsingFunctions
@@ -162,7 +163,7 @@ public final class Registries {
         Commands.INIT();
         TokenTypes.INIT();
         TokenTypeSets.INIT();
-        AccessModifiers.INIT();
+        Modifiers.INIT();
         ParsingFunctions.INIT();
         EvaluationFunctions.INIT();
         Converters.INIT();

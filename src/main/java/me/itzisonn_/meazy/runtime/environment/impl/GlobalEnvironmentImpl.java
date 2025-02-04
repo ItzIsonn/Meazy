@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
+import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
@@ -106,7 +107,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
 
         declareFunction(new DefaultFunctionValue("print", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
-                null, this, Set.of("shared")) {
+                null, this, Set.of(Modifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
                 Interpreter.OUTPUT.append(value);
@@ -117,7 +118,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
 
         declareFunction(new DefaultFunctionValue("println", List.of(
                 new CallArgExpression("value", new DataType("Any", true), true)),
-                null, this, Set.of("shared")) {
+                null, this, Set.of(Modifiers.SHARED())) {
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionArgs.getFirst().getFinalRuntimeValue();
                 Interpreter.OUTPUT.append(value).append("\n");

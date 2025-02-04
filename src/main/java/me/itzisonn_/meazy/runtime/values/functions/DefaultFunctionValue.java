@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.values.functions;
 
 import lombok.EqualsAndHashCode;
+import me.itzisonn_.meazy.parser.ast.Modifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -22,10 +23,10 @@ public abstract class DefaultFunctionValue extends FunctionValue {
      * @param args Args of this DefaultFunctionValue
      * @param returnDataType Which DataType should this DefaultFunctionValue return
      * @param parentEnvironment Parent of this DefaultFunctionValue
-     * @param accessModifiers Access modifiers of this DefaultFunctionValue
+     * @param modifiers AccessModifiers of this DefaultFunctionValue
      */
-    public DefaultFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<String> accessModifiers) {
-        super(id, args, returnDataType, parentEnvironment, accessModifiers);
+    public DefaultFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
+        super(id, args, returnDataType, parentEnvironment, modifiers);
     }
 
     /**
@@ -45,7 +46,7 @@ public abstract class DefaultFunctionValue extends FunctionValue {
     public final DefaultFunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
         RunFunction runFunction = this::run;
 
-        return new DefaultFunctionValue(id, args, returnDataType, parentEnvironment, accessModifiers) {
+        return new DefaultFunctionValue(id, args, returnDataType, parentEnvironment, modifiers) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return runFunction.run(functionArgs, functionEnvironment);

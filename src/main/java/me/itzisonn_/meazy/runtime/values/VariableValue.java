@@ -2,8 +2,8 @@ package me.itzisonn_.meazy.runtime.values;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.Modifier;
 import me.itzisonn_.meazy.parser.ast.DataType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 
 import java.util.Set;
@@ -15,19 +15,17 @@ public class VariableValue extends RuntimeValue<RuntimeValue<?>> {
     private final DataType dataType;
     private RuntimeValue<?> value;
     private final boolean isConstant;
-    private final Set<String> accessModifiers;
+    private final Set<Modifier> modifiers;
     private final boolean isArgument;
-    private final Environment parentEnvironment;
 
-    public VariableValue(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<String> accessModifiers, boolean isArgument, Environment parentEnvironment) {
+    public VariableValue(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<Modifier> modifiers, boolean isArgument) {
         super(null);
         this.id = id;
         this.dataType = dataType;
         setValue(value);
         this.isConstant = isConstant;
-        this.accessModifiers = accessModifiers;
+        this.modifiers = modifiers;
         this.isArgument = isArgument;
-        this.parentEnvironment = parentEnvironment;
     }
 
     public void setValue(RuntimeValue<?> value) {

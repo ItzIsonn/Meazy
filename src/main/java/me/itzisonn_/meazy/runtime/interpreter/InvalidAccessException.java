@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
 /**
- * InvalidAccessException is thrown when {@link EvaluationFunction} can't access class member because of it's access modifiers
+ * InvalidAccessException is thrown when {@link EvaluationFunction} can't access member
  */
 public class InvalidAccessException extends RuntimeException {
     /**

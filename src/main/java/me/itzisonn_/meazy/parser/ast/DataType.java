@@ -16,7 +16,7 @@ public class DataType {
      */
     private final String id;
     /**
-     * Whether this DataType accepts null value
+     * Whether does this DataType accept null value
      */
     private final boolean isNullable;
 
