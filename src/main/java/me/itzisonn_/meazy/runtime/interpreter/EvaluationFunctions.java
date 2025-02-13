@@ -95,26 +95,6 @@ public final class EvaluationFunctions {
             return null;
         });
 
-        register("constructor_declaration_statement", ConstructorDeclarationStatement.class, (constructorDeclarationStatement, environment, extra) -> {
-            if (!(environment instanceof ConstructorDeclarationEnvironment constructorDeclarationEnvironment)) {
-                throw new InvalidSyntaxException("Can't declare constructor in this environment!");
-            }
-
-            for (Modifier modifier : constructorDeclarationStatement.getModifiers()) {
-                if (!modifier.canUse(constructorDeclarationStatement, environment))
-                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' AccessModifier");
-            }
-
-            RuntimeConstructorValue runtimeConstructorValue = new RuntimeConstructorValue(
-                    constructorDeclarationStatement.getArgs(),
-                    constructorDeclarationStatement.getBody(),
-                    constructorDeclarationEnvironment,
-                    constructorDeclarationStatement.getModifiers());
-
-            constructorDeclarationEnvironment.declareConstructor(runtimeConstructorValue);
-            return null;
-        });
-
         register("function_declaration_statement", FunctionDeclarationStatement.class, (functionDeclarationStatement, environment, extra) -> {
             if (!(environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
                 throw new InvalidSyntaxException("Can't declare function in this environment!");
@@ -155,7 +135,27 @@ public final class EvaluationFunctions {
                             variableDeclarationStatement.isConstant(),
                             modifiers,
                             false)
-            ));
+                    ));
+            return null;
+        });
+
+        register("constructor_declaration_statement", ConstructorDeclarationStatement.class, (constructorDeclarationStatement, environment, extra) -> {
+            if (!(environment instanceof ConstructorDeclarationEnvironment constructorDeclarationEnvironment)) {
+                throw new InvalidSyntaxException("Can't declare constructor in this environment!");
+            }
+
+            for (Modifier modifier : constructorDeclarationStatement.getModifiers()) {
+                if (!modifier.canUse(constructorDeclarationStatement, environment))
+                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' AccessModifier");
+            }
+
+            RuntimeConstructorValue runtimeConstructorValue = new RuntimeConstructorValue(
+                    constructorDeclarationStatement.getArgs(),
+                    constructorDeclarationStatement.getBody(),
+                    constructorDeclarationEnvironment,
+                    constructorDeclarationStatement.getModifiers());
+
+            constructorDeclarationEnvironment.declareConstructor(runtimeConstructorValue);
             return null;
         });
 
@@ -206,68 +206,6 @@ public final class EvaluationFunctions {
                 }
                 break;
             }
-            return null;
-        });
-
-        register("foreach_statement", ForeachStatement.class, (foreachStatement, environment, extra) -> {
-            LoopEnvironment foreachEnvironment;
-            try {
-                foreachEnvironment = Registries.LOOP_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-
-            RuntimeValue<?> rawCollectionValue = Interpreter.evaluate(foreachStatement.getCollection(), foreachEnvironment);
-            if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getId().equals("List")))
-                throw new InvalidSyntaxException("Can't get members of non-list value");
-
-            VariableValue variable = classValue.getEnvironment().getVariable("value");
-            if (variable == null) throw new InvalidSyntaxException("Can't get members of non-list value");
-            if (!(variable.getValue() instanceof ListClassEnvironment.InnerListValue listValue)) throw new InvalidSyntaxException("Can't get members of non-list value");
-
-            main:
-            for (RuntimeValue<?> runtimeValue : listValue.getValue()) {
-                foreachEnvironment.clearVariables();
-
-                foreachEnvironment.declareVariable(new VariableValue(
-                        foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getId(),
-                        foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getDataType(),
-                        runtimeValue,
-                        foreachStatement.getVariableDeclarationStatement().isConstant(),
-                        new HashSet<>(),
-                        false));
-
-                for (int i = 0; i < foreachStatement.getBody().size(); i++) {
-                    Statement statement = foreachStatement.getBody().get(i);
-                    RuntimeValue<?> result = Interpreter.evaluate(statement, foreachEnvironment);
-
-                    if (statement instanceof ReturnStatement) {
-                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
-                        return new ReturnInfoValue(result);
-                    }
-                    if (result instanceof ReturnInfoValue returnInfoValue) {
-                        return returnInfoValue;
-                    }
-
-                    if (statement instanceof ContinueStatement) {
-                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Continue statement must be last in body");
-                        break;
-                    }
-                    if (result instanceof ContinueInfoValue) {
-                        break;
-                    }
-
-                    if (statement instanceof BreakStatement) {
-                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Break statement must be last in body");
-                        break main;
-                    }
-                    if (result instanceof BreakInfoValue) {
-                        break main;
-                    }
-                }
-            }
-
             return null;
         });
 
@@ -338,6 +276,68 @@ public final class EvaluationFunctions {
                             false));
                 }
                 evaluateAssignmentExpression(forStatement.getAssignmentExpression(), forEnvironment);
+            }
+
+            return null;
+        });
+
+        register("foreach_statement", ForeachStatement.class, (foreachStatement, environment, extra) -> {
+            LoopEnvironment foreachEnvironment;
+            try {
+                foreachEnvironment = Registries.LOOP_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(environment);
+            }
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            RuntimeValue<?> rawCollectionValue = Interpreter.evaluate(foreachStatement.getCollection(), foreachEnvironment);
+            if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getId().equals("List")))
+                throw new InvalidSyntaxException("Can't get members of non-list value");
+
+            VariableValue variable = classValue.getEnvironment().getVariable("value");
+            if (variable == null) throw new InvalidSyntaxException("Can't get members of non-list value");
+            if (!(variable.getValue() instanceof ListClassEnvironment.InnerListValue listValue)) throw new InvalidSyntaxException("Can't get members of non-list value");
+
+            main:
+            for (RuntimeValue<?> runtimeValue : listValue.getValue()) {
+                foreachEnvironment.clearVariables();
+
+                foreachEnvironment.declareVariable(new VariableValue(
+                        foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getId(),
+                        foreachStatement.getVariableDeclarationStatement().getDeclarationInfos().getFirst().getDataType(),
+                        runtimeValue,
+                        foreachStatement.getVariableDeclarationStatement().isConstant(),
+                        new HashSet<>(),
+                        false));
+
+                for (int i = 0; i < foreachStatement.getBody().size(); i++) {
+                    Statement statement = foreachStatement.getBody().get(i);
+                    RuntimeValue<?> result = Interpreter.evaluate(statement, foreachEnvironment);
+
+                    if (statement instanceof ReturnStatement) {
+                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
+                        return new ReturnInfoValue(result);
+                    }
+                    if (result instanceof ReturnInfoValue returnInfoValue) {
+                        return returnInfoValue;
+                    }
+
+                    if (statement instanceof ContinueStatement) {
+                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Continue statement must be last in body");
+                        break;
+                    }
+                    if (result instanceof ContinueInfoValue) {
+                        break;
+                    }
+
+                    if (statement instanceof BreakStatement) {
+                        if (i + 1 < foreachStatement.getBody().size()) throw new InvalidSyntaxException("Break statement must be last in body");
+                        break main;
+                    }
+                    if (result instanceof BreakInfoValue) {
+                        break main;
+                    }
+                }
             }
 
             return null;
@@ -420,6 +420,15 @@ public final class EvaluationFunctions {
 
         register("assignment_expression", AssignmentExpression.class, (assignmentExpression, environment, extra) -> evaluateAssignmentExpression(assignmentExpression, environment));
 
+        register("null_check_expression", NullCheckExpression.class, (nullCheckExpression, environment, extra) -> {
+            RuntimeValue<?> checkValue = Interpreter.evaluate(nullCheckExpression.getCheckExpression(), environment).getFinalRuntimeValue();
+
+            if (checkValue instanceof NullValue) {
+                return Interpreter.evaluate(nullCheckExpression.getNullExpression(), environment).getFinalRuntimeValue();
+            }
+            return checkValue;
+        });
+
         register("logical_expression", LogicalExpression.class, (logicalExpression, environment, extra) -> {
             RuntimeValue<?> left = Interpreter.evaluate(logicalExpression.getLeft(), environment).getFinalRuntimeValue();
             RuntimeValue<?> right = Interpreter.evaluate(logicalExpression.getRight(), environment).getFinalRuntimeValue();
@@ -436,15 +445,6 @@ public final class EvaluationFunctions {
             }
 
             throw new InvalidSyntaxException("Logical expression can't contain non-boolean values");
-        });
-
-        register("null_check_expression", NullCheckExpression.class, (nullCheckExpression, environment, extra) -> {
-            RuntimeValue<?> checkValue = Interpreter.evaluate(nullCheckExpression.getCheckExpression(), environment).getFinalRuntimeValue();
-
-            if (checkValue instanceof NullValue) {
-                return Interpreter.evaluate(nullCheckExpression.getNullExpression(), environment).getFinalRuntimeValue();
-            }
-            return checkValue;
         });
 
         register("comparison_expression", ComparisonExpression.class, (comparisonExpression, environment, extra) -> {
@@ -588,102 +588,11 @@ public final class EvaluationFunctions {
             return new BooleanValue(!booleanValue.getValue());
         });
 
-        register("function_call_expression", FunctionCallExpression.class, (functionCallExpression, environment, extra) -> {
-            Environment extraEnvironment;
-            if (extra.length == 0) extraEnvironment = environment;
-            else if (extra[0] instanceof Environment extraEnv) extraEnvironment = extraEnv;
-            else extraEnvironment = environment;
-
-            List<RuntimeValue<?>> args = functionCallExpression.getArgs().stream().map(expression -> Interpreter.evaluate(expression, extraEnvironment)).collect(Collectors.toList());
-            RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, args);
-
-            if (function instanceof DefaultFunctionValue defaultFunctionValue) {
-                if (defaultFunctionValue.getArgs().size() != args.size()) {
-                    throw new InvalidCallException("Expected " + defaultFunctionValue.getArgs().size() + " args but found " + args.size());
-                }
-
-                FunctionEnvironment functionEnvironment;
-                try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, boolean.class)
-                            .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(Modifiers.SHARED()));
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-
-                RuntimeValue<?> returnValue = defaultFunctionValue.run(args, functionEnvironment);
-                if (returnValue != null) returnValue = returnValue.getFinalRuntimeValue();
-                return checkReturnValue(
-                        returnValue,
-                        defaultFunctionValue.getReturnDataType(),
-                        defaultFunctionValue.getId(),
-                        true);
-            }
-            if (function instanceof RuntimeFunctionValue runtimeFunctionValue) {
-                if (runtimeFunctionValue.getArgs().size() != args.size()) {
-                    throw new InvalidCallException("Expected " + runtimeFunctionValue.getArgs().size() + " args but found " + args.size());
-                }
-
-                FunctionEnvironment functionEnvironment;
-                try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, boolean.class)
-                            .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(Modifiers.SHARED()));
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-
-                for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
-                    CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
-
-                    functionEnvironment.declareVariable(new VariableValue(
-                            callArgExpression.getId(),
-                            callArgExpression.getDataType(),
-                            args.get(i),
-                            callArgExpression.isConstant(),
-                            new HashSet<>(),
-                            true));
-                }
-
-                RuntimeValue<?> result = null;
-                boolean hasReturnStatement = false;
-                for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
-                    Statement statement = runtimeFunctionValue.getBody().get(i);
-                    if (statement instanceof ReturnStatement) {
-                        hasReturnStatement = true;
-                        result = Interpreter.evaluate(statement, functionEnvironment);
-                        if (result != null) {
-                            checkReturnValue(
-                                    result.getFinalRuntimeValue(),
-                                    runtimeFunctionValue.getReturnDataType(),
-                                    runtimeFunctionValue.getId(),
-                                    false);
-                        }
-                        if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
-                        break;
-                    }
-                    RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
-                    if (value instanceof ReturnInfoValue returnInfoValue) {
-                        hasReturnStatement = true;
-                        result = returnInfoValue.getFinalRuntimeValue();
-                        if (result.getFinalValue() != null) {
-                            checkReturnValue(
-                                    result.getFinalRuntimeValue(),
-                                    runtimeFunctionValue.getReturnDataType(),
-                                    runtimeFunctionValue.getId(),
-                                    false);
-                        }
-                        break;
-                    }
-                }
-                if ((result == null || result instanceof NullValue) && runtimeFunctionValue.getReturnDataType() != null) {
-                    throw new InvalidSyntaxException(hasReturnStatement ?
-                            "Function specified return value's data type but return statement is empty" : "Missing return statement");
-                }
-                return result;
-            }
-
-            throw new InvalidCallException("Can't call " + function.getValue() + " because it's not a function");
+        register("negation_expression", NegationExpression.class, (negationExpression, environment, extra) -> {
+            RuntimeValue<?> value = Interpreter.evaluate(negationExpression.getExpression(), environment).getFinalRuntimeValue();
+            if (!(value instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't negate non-number value " + value);
+            if (numberValue instanceof IntValue intValue) return new IntValue(-intValue.getValue());
+            return new DoubleValue(-numberValue.getValue().doubleValue());
         });
 
         register("class_call_expression", ClassCallExpression.class, (classCallExpression, environment, extra) -> {
@@ -837,6 +746,104 @@ public final class EvaluationFunctions {
             throw new InvalidSyntaxException("Can't get member of " + value + " because it's not a class");
         });
 
+        register("function_call_expression", FunctionCallExpression.class, (functionCallExpression, environment, extra) -> {
+            Environment extraEnvironment;
+            if (extra.length == 0) extraEnvironment = environment;
+            else if (extra[0] instanceof Environment extraEnv) extraEnvironment = extraEnv;
+            else extraEnvironment = environment;
+
+            List<RuntimeValue<?>> args = functionCallExpression.getArgs().stream().map(expression -> Interpreter.evaluate(expression, extraEnvironment)).collect(Collectors.toList());
+            RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, args);
+
+            if (function instanceof DefaultFunctionValue defaultFunctionValue) {
+                if (defaultFunctionValue.getArgs().size() != args.size()) {
+                    throw new InvalidCallException("Expected " + defaultFunctionValue.getArgs().size() + " args but found " + args.size());
+                }
+
+                FunctionEnvironment functionEnvironment;
+                try {
+                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, boolean.class)
+                            .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(Modifiers.SHARED()));
+                }
+                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+
+                RuntimeValue<?> returnValue = defaultFunctionValue.run(args, functionEnvironment);
+                if (returnValue != null) returnValue = returnValue.getFinalRuntimeValue();
+                return checkReturnValue(
+                        returnValue,
+                        defaultFunctionValue.getReturnDataType(),
+                        defaultFunctionValue.getId(),
+                        true);
+            }
+            if (function instanceof RuntimeFunctionValue runtimeFunctionValue) {
+                if (runtimeFunctionValue.getArgs().size() != args.size()) {
+                    throw new InvalidCallException("Expected " + runtimeFunctionValue.getArgs().size() + " args but found " + args.size());
+                }
+
+                FunctionEnvironment functionEnvironment;
+                try {
+                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, boolean.class)
+                            .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(Modifiers.SHARED()));
+                }
+                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+
+                for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
+                    CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
+
+                    functionEnvironment.declareVariable(new VariableValue(
+                            callArgExpression.getId(),
+                            callArgExpression.getDataType(),
+                            args.get(i),
+                            callArgExpression.isConstant(),
+                            new HashSet<>(),
+                            true));
+                }
+
+                RuntimeValue<?> result = null;
+                boolean hasReturnStatement = false;
+                for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
+                    Statement statement = runtimeFunctionValue.getBody().get(i);
+                    if (statement instanceof ReturnStatement) {
+                        hasReturnStatement = true;
+                        result = Interpreter.evaluate(statement, functionEnvironment);
+                        if (result != null) {
+                            checkReturnValue(
+                                    result.getFinalRuntimeValue(),
+                                    runtimeFunctionValue.getReturnDataType(),
+                                    runtimeFunctionValue.getId(),
+                                    false);
+                        }
+                        if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
+                        break;
+                    }
+                    RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
+                    if (value instanceof ReturnInfoValue returnInfoValue) {
+                        hasReturnStatement = true;
+                        result = returnInfoValue.getFinalRuntimeValue();
+                        if (result.getFinalValue() != null) {
+                            checkReturnValue(
+                                    result.getFinalRuntimeValue(),
+                                    runtimeFunctionValue.getReturnDataType(),
+                                    runtimeFunctionValue.getId(),
+                                    false);
+                        }
+                        break;
+                    }
+                }
+                if ((result == null || result instanceof NullValue) && runtimeFunctionValue.getReturnDataType() != null) {
+                    throw new InvalidSyntaxException(hasReturnStatement ?
+                            "Function specified return value's data type but return statement is empty" : "Missing return statement");
+                }
+                return result;
+            }
+
+            throw new InvalidCallException("Can't call " + function.getValue() + " because it's not a function");
+        });
+
         register("identifier", Identifier.class, new EvaluationFunction<>() {
             @Override
             public RuntimeValue<?> evaluate(Identifier identifier, Environment environment, Object... extra) {
@@ -895,14 +902,9 @@ public final class EvaluationFunctions {
         });
 
         register("null_literal", NullLiteral.class, (nullLiteral, environment, extra) -> new NullValue());
-
-        register("number_literal", NumberLiteral.class, (numberLiteral, environment, extra) -> {
-            if (numberLiteral.isInt()) return new IntValue((int) numberLiteral.getValue());
-            else return new DoubleValue(numberLiteral.getValue());
-        });
-
+        register("int_literal", IntLiteral.class, (intLiteral, environment, extra) -> new IntValue(intLiteral.getValue()));
+        register("number_literal", DoubleLiteral.class, (doubleLiteral, environment, extra) -> new DoubleValue(doubleLiteral.getValue()));
         register("string_literal", StringLiteral.class, (stringLiteral, environment, extra) -> new StringValue(stringLiteral.getValue()));
-
         register("boolean_literal", BooleanLiteral.class, (booleanLiteral, environment, extra) -> new BooleanValue(booleanLiteral.isValue()));
 
         register("this_literal", ThisLiteral.class, (thisLiteral, environment, extra) -> {

@@ -6,8 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +19,6 @@ public final class Utils {
      * Regex used by all identifiers
      */
     public static final String IDENTIFIER_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*";
-
-    /**
-     * NumberFormat
-     */
-    public static final NumberFormat NUMBER_FORMAT = new DecimalFormat();
-
-    static {
-        NUMBER_FORMAT.setGroupingUsed(false);
-    }
 
     /**
      * Counts number of target's matches in given string

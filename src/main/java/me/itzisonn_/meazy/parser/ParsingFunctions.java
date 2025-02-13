@@ -61,22 +61,22 @@ public final class ParsingFunctions {
             }
 
             if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-                return parse(RegistryIdentifier.ofDefault("function_declaration"), FunctionDeclarationStatement.class, modifiers);
+                return parse(RegistryIdentifier.ofDefault("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
             }
             if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, modifiers, false);
+                        parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 return variableDeclarationStatement;
             }
             if (getCurrent().getType().equals(TokenTypes.CLASS())) {
-                return parse(RegistryIdentifier.ofDefault("class_declaration"), ClassDeclarationStatement.class, modifiers);
+                return parse(RegistryIdentifier.ofDefault("class_declaration_statement"), ClassDeclarationStatement.class, modifiers);
             }
 
             throw new InvalidStatementException("At global environment you only can declare variable, function or class", getCurrent().getLine());
         });
 
-        register("class_declaration", extra -> {
+        register("class_declaration_statement", extra -> {
             Set<Modifier> modifiers = getModifiers(extra);
 
             getCurrentAndNext();
@@ -108,21 +108,21 @@ public final class ParsingFunctions {
             }
 
             if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-                return parse(RegistryIdentifier.ofDefault("function_declaration"), FunctionDeclarationStatement.class, modifiers);
+                return parse(RegistryIdentifier.ofDefault("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
             }
             if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, modifiers, true);
+                        parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 return variableDeclarationStatement;
             }
             if (getCurrent().getType().equals(TokenTypes.CONSTRUCTOR())) {
-                return parse(RegistryIdentifier.ofDefault("constructor_declaration"), ConstructorDeclarationStatement.class, modifiers);
+                return parse(RegistryIdentifier.ofDefault("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
             }
             throw new InvalidStatementException("Invalid statement found", getCurrent().getLine());
         });
 
-        register("function_declaration", extra -> {
+        register("function_declaration_statement", extra -> {
             Set<Modifier> modifiers = getModifiers(extra);
 
             getCurrentAndNext();
@@ -161,7 +161,7 @@ public final class ParsingFunctions {
             return new CallArgExpression(id, dataType == null ? new DataType("Any", false) : dataType, isConstant);
         });
 
-        register("variable_declaration", extra -> {
+        register("variable_declaration_statement", extra -> {
             Set<Modifier> modifiers = getModifiers(extra);
 
             if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
@@ -180,7 +180,7 @@ public final class ParsingFunctions {
             return new VariableDeclarationStatement(modifiers, isConstant, declarations);
         });
 
-        register("constructor_declaration", extra -> {
+        register("constructor_declaration_statement", extra -> {
             Set<Modifier> modifiers = getModifiers(extra);
             getCurrentAndNext();
 
@@ -209,7 +209,7 @@ public final class ParsingFunctions {
 
             if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
-                        parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, modifiers, false);
+                        parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
                 return variableDeclarationStatement;
             }
@@ -282,7 +282,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open for condition");
 
             if (currentLineHasToken(TokenTypes.IN())) {
-                VariableDeclarationStatement variableDeclarationStatement = parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, new HashSet<>(), true);
+                VariableDeclarationStatement variableDeclarationStatement = parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, new HashSet<>(), true);
                 if (variableDeclarationStatement.getDeclarationInfos().size() > 1) {
                     throw new InvalidSyntaxException("Foreach statement can declare only one variable");
                 }
@@ -303,7 +303,7 @@ public final class ParsingFunctions {
 
             VariableDeclarationStatement variableDeclarationStatement = null;
             if (!getCurrent().getType().equals(TokenTypes.SEMICOLON())) {
-                variableDeclarationStatement = parse(RegistryIdentifier.ofDefault("variable_declaration"), VariableDeclarationStatement.class, new HashSet<>(), false);
+                variableDeclarationStatement = parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, new HashSet<>(), false);
             }
             getCurrentAndNext(TokenTypes.SEMICOLON(), "Expected semicolon as separator between for statement's args");
 
@@ -488,7 +488,16 @@ public final class ParsingFunctions {
         register("inversion_expression", extra -> {
             if (getCurrent().getType().equals(TokenTypes.INVERSION())) {
                 getCurrentAndNext();
-                return new InversionExpression(parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class));
+                return new InversionExpression(parse(RegistryIdentifier.ofDefault("negation_expression"), Expression.class));
+            }
+
+            return parse(RegistryIdentifier.ofDefault("negation_expression"), Expression.class);
+        });
+
+        register("negation_expression", extra -> {
+            if (getCurrent().getType().equals(TokenTypes.MINUS())) {
+                getCurrentAndNext();
+                return new NegationExpression(parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class));
             }
 
             return parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class);
@@ -499,7 +508,7 @@ public final class ParsingFunctions {
 
             if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
-                Expression value = new BinaryExpression(id, new NumberLiteral(1, true), token.getValue().substring(1));
+                Expression value = new BinaryExpression(id, new IntLiteral(1), token.getValue().substring(1));
                 return new AssignmentExpression(id, value);
             }
 
@@ -583,8 +592,8 @@ public final class ParsingFunctions {
             }
             if (tokenType.equals(TokenTypes.NUMBER())) {
                 String value = getCurrentAndNext().getValue();
-                if (value.contains(".")) return new NumberLiteral(Double.parseDouble(value), false);
-                else return new NumberLiteral(Double.parseDouble(value), true);
+                if (value.contains(".")) return new DoubleLiteral(Double.parseDouble(value));
+                else return new IntLiteral(Integer.parseInt(value));
             }
             if (tokenType.equals(TokenTypes.STRING())) {
                 String value = getCurrentAndNext().getValue();

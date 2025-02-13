@@ -173,12 +173,6 @@ public final class Registries {
             int lineNumber = 1;
 
             for (int i = 0; i < lines.length(); i++) {
-                if (i == lines.length() - 1) {
-                    TokenType tokenType = TokenTypes.parse(String.valueOf(lines.charAt(i)));
-                    if (tokenType != null && !tokenType.isShouldSkip()) tokens.add(new Token(lineNumber, tokenType, String.valueOf(lines.charAt(i))));
-                    break;
-                }
-
                 String string = lines.substring(i);
                 Token token = null;
                 for (RegistryEntry<TokenType> entry : Registries.TOKEN_TYPES.getEntries()) {
@@ -189,7 +183,7 @@ public final class Registries {
                     if (matcher.find()) {
                         int end = matcher.end();
                         String matched = string.substring(0, end);
-                        if (!tokenType.getCanMatch().test(matched)) continue;
+                        if (!tokenType.canMatch(matched)) continue;
 
                         if (token == null || token.getValue().length() < matched.length()) {
                             token = new Token(lineNumber, tokenType, matched);

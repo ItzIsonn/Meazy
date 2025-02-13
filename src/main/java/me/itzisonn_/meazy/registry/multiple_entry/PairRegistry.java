@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Implementation of {@link MultipleEntryRegistry} with entries stored in {@link Set} of {@link Pair}. Key must be unique value
+ * Implementation of {@link MultipleEntryRegistry} with entries stored in {@link Set} of {@link Pair}. Key and value must be unique
  *
  * @param <K> Keys' type
  * @param <V> Values' type
@@ -19,23 +19,28 @@ public class PairRegistry<K, V> implements MultipleEntryRegistry<Pair<K, V>> {
      * Registers new entry
      *
      * @param identifier Identifier to register
-     * @param value Value to register
+     * @param pair Pair to register
      * @param overridable Is this entry overridable
      *
-     * @throws NullPointerException If given identifier or value is null
-     * @throws IllegalArgumentException When not overridable entry with given identifier or key of pair is already registered
+     * @throws NullPointerException If given identifier, pair, key or value is null
+     * @throws IllegalArgumentException When not overridable entry with given identifier, key or value is already registered
      */
     @Override
-    public void register(RegistryIdentifier identifier, Pair<K, V> value, boolean overridable) throws NullPointerException, IllegalArgumentException {
+    public void register(RegistryIdentifier identifier, Pair<K, V> pair, boolean overridable) throws NullPointerException, IllegalArgumentException {
         if (identifier == null) throw new NullPointerException("Identifier can't be null");
-        if (value == null) throw new NullPointerException("Value can't be null");
+        if (pair == null) throw new NullPointerException("Value can't be null");
+
+        if (pair.getKey() == null) throw new NullPointerException("Pair's key can't be null");
+        if (pair.getValue() == null) throw new NullPointerException("Pair's value can't be null");
 
         RegistryEntry<Pair<K, V>> entry = getEntry(identifier);
         if (entry != null && !entry.isOverrideable()) throw new IllegalArgumentException("Entry with identifier " + identifier + " already exists!");
-        entry = getEntryByKey(value.getKey());
-        if (entry != null && !entry.isOverrideable()) throw new IllegalArgumentException("Entry with key " + value.getKey() + " already exists!");
+        entry = getEntryByKey(pair.getKey());
+        if (entry != null && !entry.isOverrideable()) throw new IllegalArgumentException("Entry with key " + pair.getKey() + " already exists!");
+        entry = getEntryByValue(pair.getValue());
+        if (entry != null && !entry.isOverrideable()) throw new IllegalArgumentException("Entry with value " + pair.getValue() + " already exists!");
 
-        entries.add(new RegistryEntry<>(identifier, value, overridable));
+        entries.add(new RegistryEntry<>(identifier, pair, overridable));
     }
 
     /**
@@ -45,8 +50,8 @@ public class PairRegistry<K, V> implements MultipleEntryRegistry<Pair<K, V>> {
      * @param key Pair's key to register
      * @param value Pair's value to register
      *
-     * @throws NullPointerException If given identifier or key is null
-     * @throws IllegalArgumentException When not overridable entry with given identifier or key is already registered
+     * @throws NullPointerException If given identifier, key or value is null
+     * @throws IllegalArgumentException When not overridable entry with given identifier, key or value is already registered
      */
     public void register(RegistryIdentifier identifier, K key, V value) throws NullPointerException, IllegalArgumentException {
         register(identifier, key, value, true);
@@ -60,8 +65,8 @@ public class PairRegistry<K, V> implements MultipleEntryRegistry<Pair<K, V>> {
      * @param value Pair's value to register
      * @param overridable Is this entry overridable
      *
-     * @throws NullPointerException If given identifier or key is null
-     * @throws IllegalArgumentException When not overridable entry with given identifier or key is already registered
+     * @throws NullPointerException If given identifier, key or value is null
+     * @throws IllegalArgumentException When not overridable entry with given identifier, key or value is already registered
      */
     public void register(RegistryIdentifier identifier, K key, V value, boolean overridable) throws NullPointerException, IllegalArgumentException {
         register(identifier, new Pair<>(key, value), overridable);
@@ -107,6 +112,24 @@ public class PairRegistry<K, V> implements MultipleEntryRegistry<Pair<K, V>> {
 
         for (RegistryEntry<Pair<K, V>> entry : entries) {
             if (entry.getValue().getKey().equals(key)) return entry;
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds entry by given value
+     *
+     * @param value Entry's pair's value
+     * @return Entry with pair containing given value
+     *
+     * @throws NullPointerException If given value is null
+     */
+    public RegistryEntry<Pair<K, V>> getEntryByValue(V value) throws NullPointerException {
+        if (value == null) throw new NullPointerException("Value can't be null");
+
+        for (RegistryEntry<Pair<K, V>> entry : entries) {
+            if (entry.getValue().getValue().equals(value)) return entry;
         }
 
         return null;

@@ -69,39 +69,41 @@ public final class Converters {
         if (isInit) throw new IllegalStateException("Converters have already been initialized!");
         isInit = true;
 
-        register(new BreakStatementConverter());
-        register(new ClassDeclarationStatementConverter());
-        register(new ConstructorDeclarationStatementConverter());
-        register(new ContinueStatementConverter());
-        register(new ForeachStatementConverter());
-        register(new ForStatementConverter());
-        register(new FunctionDeclarationStatementConverter());
-        register(new IfStatementConverter());
         register(new ProgramConverter());
-        register(new ReturnStatementConverter());
+        register(new ClassDeclarationStatementConverter());
+        register(new FunctionDeclarationStatementConverter());
         register(new VariableDeclarationConverter());
+        register(new ConstructorDeclarationStatementConverter());
+        register(new IfStatementConverter());
+        register(new ForStatementConverter());
+        register(new ForeachStatementConverter());
         register(new WhileStatementConverter());
-
-        register(new NullLiteralConverter());
-        register(new NumberLiteralConverter());
-        register(new StringLiteralConverter());
-        register(new BooleanLiteralConverter());
-        register(new ThisLiteralConverter());
+        register(new ReturnStatementConverter());
+        register(new ContinueStatementConverter());
+        register(new BreakStatementConverter());
 
         register(new AssignmentExpressionConverter());
-        register(new BinaryExpressionConverter());
-        register(new CallArgExpressionConverter());
-        register(new ComparisonExpressionConverter());
-        register(new InversionExpressionConverter());
-        register(new LogicalExpressionConverter());
-        register(new IsExpressionConverter());
-        register(new MemberExpressionConverter());
         register(new NullCheckExpressionConverter());
+        register(new LogicalExpressionConverter());
+        register(new ComparisonExpressionConverter());
+        register(new IsExpressionConverter());
+        register(new BinaryExpressionConverter());
+        register(new InversionExpressionConverter());
+        register(new NegationExpressionConverter());
         register(new ClassCallExpressionConverter());
+        register(new MemberExpressionConverter());
         register(new FunctionCallExpressionConverter());
+        register(new CallArgExpressionConverter());
         register(new ClassIdentifierConverter());
         register(new FunctionIdentifierConverter());
         register(new VariableIdentifierConverter());
+
+        register(new NullLiteralConverter());
+        register(new IntLiteralConverter());
+        register(new DoubleLiteralConverter());
+        register(new StringLiteralConverter());
+        register(new BooleanLiteralConverter());
+        register(new ThisLiteralConverter());
 
         register(new StatementConverter());
         register(new ExpressionConverter());
