@@ -4,7 +4,6 @@ import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.registry.Registries;
 
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
@@ -26,10 +25,6 @@ public class TokenType {
      * Should {@link Token}s with this type be skipped (not added in list)
      */
     private final boolean shouldSkip;
-    /**
-     * Predicate that checks can string match this TokenType
-     */
-    private final Predicate<String> canMatch;
 
     /**
      * TokenType constructor
@@ -42,22 +37,7 @@ public class TokenType {
      * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
      */
     public TokenType(String id, String regex, boolean shouldSkip) throws NullPointerException, IllegalArgumentException {
-        this(id, regex, shouldSkip, s -> true);
-    }
-
-    /**
-     * TokenType constructor
-     *
-     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
-     * @param regex Regex that is converted into {@link Pattern}
-     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
-     * @param canMatch Predicate that checks can string match this TokenType
-     *
-     * @throws NullPointerException If given id is null
-     * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
-     */
-    public TokenType(String id, String regex, boolean shouldSkip, Predicate<String> canMatch) throws NullPointerException, IllegalArgumentException {
-        this(id, regex == null ? null : Pattern.compile(regex, Pattern.DOTALL), shouldSkip, canMatch);
+        this(id, regex == null ? null : Pattern.compile(regex, Pattern.DOTALL), shouldSkip);
     }
 
     /**
@@ -66,12 +46,11 @@ public class TokenType {
      * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
      * @param pattern Pattern that is used to match tokens
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
-     * @param canMatch Predicate that checks can string match this TokenType
      *
      * @throws NullPointerException If given id is null
      * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
      */
-    public TokenType(String id, Pattern pattern, boolean shouldSkip, Predicate<String> canMatch) throws NullPointerException, IllegalArgumentException {
+    public TokenType(String id, Pattern pattern, boolean shouldSkip) throws NullPointerException, IllegalArgumentException {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (!id.matches(Utils.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid id");
         if (pattern != null && !pattern.pattern().startsWith("^")) {
@@ -81,8 +60,16 @@ public class TokenType {
         this.id = id;
         this.pattern = pattern;
         this.shouldSkip = shouldSkip;
-        this.canMatch = canMatch == null ? s -> true : canMatch;
     }
+
+    /**
+     * @param string String to check
+     * @return Can given string match this TokenType
+     */
+    public boolean canMatch(String string) {
+        return true;
+    }
+
 
     @Override
     public String toString() {

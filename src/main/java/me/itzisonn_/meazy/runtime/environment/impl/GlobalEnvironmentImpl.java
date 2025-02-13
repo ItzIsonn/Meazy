@@ -4,7 +4,8 @@ import me.itzisonn_.meazy.parser.ast.Modifiers;
 import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.DoubleLiteral;
+import me.itzisonn_.meazy.parser.ast.expression.literal.IntLiteral;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.*;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.BooleanClassEnvironment;
@@ -67,10 +68,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
-                if (value instanceof Integer || value instanceof IntValue) return true;
-                if (value instanceof NumberLiteral numberLiteral) {
-                    return numberLiteral.isInt();
-                }
+                if (value instanceof Integer || value instanceof IntValue || value instanceof IntLiteral) return true;
                 try {
                     Integer.parseInt(value.toString());
                     return true;
@@ -85,10 +83,10 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
-                if (value instanceof Float || value instanceof NumberLiteral || value instanceof NumberValue)
+                if (value instanceof Number || value instanceof NumberValue || value instanceof DoubleLiteral)
                     return true;
                 try {
-                    Float.parseFloat(value.toString());
+                    Double.parseDouble(value.toString());
                     return true;
                 }
                 catch (NumberFormatException ignore) {

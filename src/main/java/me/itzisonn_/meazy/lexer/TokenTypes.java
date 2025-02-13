@@ -2,10 +2,7 @@ package me.itzisonn_.meazy.lexer;
 
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
-
-import java.util.regex.Pattern;
 
 /**
  * All basic TokenTypes
@@ -283,30 +280,6 @@ public final class TokenTypes {
 
 
 
-    /**
-     * Returns TokenType whose pattern matches given string
-     *
-     * @param string String to match
-     * @return Matched TokenType or null if none matched
-     *
-     * @throws NullPointerException When given string is null
-     *
-     * @see Registries#TOKEN_TYPES
-     */
-    public static TokenType parse(String string) throws NullPointerException {
-        if (string == null) throw new NullPointerException("String can't be null");
-
-        for (RegistryEntry<TokenType> entry : Registries.TOKEN_TYPES.getEntries()) {
-            TokenType tokenType = entry.getValue();
-            Pattern pattern = tokenType.getPattern();
-            if (pattern != null && pattern.matcher(string).matches() && tokenType.getCanMatch().test(string)) return tokenType;
-        }
-
-        return null;
-    }
-
-
-
     private static void register(TokenType tokenType) {
         Registries.TOKEN_TYPES.register(RegistryIdentifier.ofDefault(tokenType.getId()), tokenType);
     }
@@ -343,7 +316,7 @@ public final class TokenTypes {
         register(new TokenType("comment", "\\/\\/[^\n]*", true));
         register(new TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", true));
         register(new TokenType("white_space", "(?!\n)\\s", true));
-        register(new TokenType("end_of_file", null, false));
+        register(new TokenType("end_of_file", (String) null, false));
 
         register(new TokenType("left_paren", "\\(", false));
         register(new TokenType("right_paren", "\\)", false));
@@ -385,15 +358,18 @@ public final class TokenTypes {
         register(new TokenType("less_or_equals", "<=", false));
 
         register(new TokenType("null", "null", false));
-        register(new TokenType("number", "(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?", false));
+        register(new TokenType("number", "(0|([1-9][0-9]*))(\\.[0-9]+)?", false));
         register(new TokenType("string", "\"[^\"]*\"", false));
         register(new TokenType("boolean", "true|false", false));
         register(new TokenType("this", "this", false));
-        register(new TokenType("id", Utils.IDENTIFIER_REGEX, false, s -> {
-            for (TokenType tokenType : TokenTypeSets.KEYWORDS().getTokenTypes()) {
-                if (tokenType.getPattern().matcher(s).matches()) return false;
+        register(new TokenType("id", Utils.IDENTIFIER_REGEX, false) {
+            @Override
+            public boolean canMatch(String string) {
+                for (TokenType tokenType : TokenTypeSets.KEYWORDS().getTokenTypes()) {
+                    if (tokenType.getPattern().matcher(string).matches()) return false;
+                }
+                return true;
             }
-            return true;
-        }));
+        });
     }
 }
