@@ -25,7 +25,9 @@ import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.number.IntValue;
 import me.itzisonn_.meazy.runtime.values.number.NumberValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements GlobalEnvironment {
     private final List<ClassValue> classes;
@@ -127,27 +129,48 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
 
         declareFunction(new DefaultFunctionValue("range",
                 List.of(new CallArgExpression("begin", new DataType("Int", false), true), new CallArgExpression("end", new DataType("Int", false), true)),
-                new DataType("List", false), this, new HashSet<>()) {
+                new DataType("List", false), this, Set.of()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                int begin;
-                if (functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue beginValue) {
-                    begin = beginValue.getValue();
-                }
-                else throw new InvalidArgumentException("Begin must be int");
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue beginValue)) throw new InvalidArgumentException("Begin must be int");
+                if (!(functionArgs.get(1).getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("End must be int");
 
-                int end;
-                if (functionArgs.get(1).getFinalRuntimeValue() instanceof IntValue endValue) {
-                    end = endValue.getValue();
-                }
-                else throw new InvalidArgumentException("End must be int");
-
-                List<RuntimeValue<?>> list = new ArrayList<>();
-                for (int i = begin; i < end; i++) {
-                    list.add(new IntValue(i));
-                }
+                List<RuntimeValue<?>> list = range(beginValue.getValue(), endValue.getValue(), 1);
                 return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
             }
         });
+
+        declareFunction(new DefaultFunctionValue("range",
+                List.of(new CallArgExpression("begin", new DataType("Int", false), true), new CallArgExpression("end", new DataType("Int", false), true), new CallArgExpression("step", new DataType("Int", false), true)),
+                new DataType("List", false), this, Set.of()) {
+            @Override
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                if (!(functionArgs.getFirst().getFinalRuntimeValue() instanceof IntValue beginValue)) throw new InvalidArgumentException("Begin must be int");
+                if (!(functionArgs.get(1).getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("End must be int");
+                if (!(functionArgs.get(2).getFinalRuntimeValue() instanceof IntValue stepValue)) throw new InvalidArgumentException("Step must be int");
+
+                if (stepValue.getValue() <= 0) throw new InvalidArgumentException("Step must be positive int");
+
+                List<RuntimeValue<?>> list = range(beginValue.getValue(),  endValue.getValue(), stepValue.getValue());
+                return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
+            }
+        });
+    }
+
+    private static List<RuntimeValue<?>> range(int begin, int end, int step) {
+        List<RuntimeValue<?>> list = new ArrayList<>();
+
+        if (begin < end) {
+            for (int i = begin; i < end; i += step) {
+                list.add(new IntValue(i));
+            }
+        }
+        else {
+            for (int i = begin; i > end; i -= step) {
+                list.add(new IntValue(i));
+            }
+        }
+
+        return list;
     }
 }

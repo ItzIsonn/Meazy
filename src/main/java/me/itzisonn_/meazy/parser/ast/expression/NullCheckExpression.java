@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.ast.expression;
 import lombok.Getter;
 
 @Getter
-public class NullCheckExpression implements Expression {
+public class NullCheckExpression implements Expression, ParenthesisExpression {
     private final Expression checkExpression;
     private final Expression nullExpression;
 

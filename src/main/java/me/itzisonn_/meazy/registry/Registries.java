@@ -15,6 +15,7 @@ import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
 import me.itzisonn_.meazy.parser.json_converters.Converters;
+import me.itzisonn_.meazy.registry.multiple_entry.OrderedRegistry;
 import me.itzisonn_.meazy.registry.multiple_entry.PairRegistry;
 import me.itzisonn_.meazy.registry.multiple_entry.SetRegistry;
 import me.itzisonn_.meazy.registry.single_entry.SingleEntryRegistry;
@@ -82,7 +83,7 @@ public final class Registries {
      * @see ParsingFunction
      * @see Parser
      */
-    public static final SetRegistry<ParsingFunction<? extends Statement>> PARSING_FUNCTIONS = new SetRegistry<>();
+    public static final OrderedRegistry<ParsingFunction<? extends Statement>> PARSING_FUNCTIONS = new OrderedRegistry<>();
 
     /**
      * Registry for function that uses {@link Registries#PARSING_FUNCTIONS} to parse tokens into {@link Program}

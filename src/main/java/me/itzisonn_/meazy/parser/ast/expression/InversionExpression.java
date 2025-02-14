@@ -12,8 +12,7 @@ public class InversionExpression implements Expression {
 
     @Override
     public String toCodeString() {
-        String expressionString = expression.toCodeString();
-        if (expressionString.contains(" ")) {
+        if (expression instanceof ParenthesisExpression) {
             return "!(" + expression.toCodeString() + ")";
         }
         return "!" + expression.toCodeString();

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class IsExpression implements Expression {
+public class IsExpression implements Expression, ParenthesisExpression {
     private final Expression value;
     private final String dataType;
 

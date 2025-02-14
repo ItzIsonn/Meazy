@@ -32,10 +32,10 @@ public final class Modifiers {
 
 
     /**
-     * Finds registered AccessModifier with given id
+     * Finds registered Modifier with given id
      *
-     * @param id Id of AccessModifier
-     * @return AccessModifier with given id or null
+     * @param id Id of Modifier
+     * @return Modifier with given id or null
      */
     public static Modifier parse(String id) {
         for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
@@ -59,7 +59,7 @@ public final class Modifiers {
      * @throws IllegalStateException If {@link Registries#MODIFIERS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("AccessModifiers have already been initialized!");
+        if (isInit) throw new IllegalStateException("Modifiers have already been initialized!");
         isInit = true;
 
         register(new Modifier("private") {

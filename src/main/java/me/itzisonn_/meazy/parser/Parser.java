@@ -132,18 +132,60 @@ public final class Parser {
      * @param identifier Identifier of ParsingFunction
      * @param cls Required returned statement's class
      * @param extra Extra info
-     * @return Parsed statement
      * @param <T> Returned statement's type
+     * @return Parsed statement
      *
      * @throws NullPointerException If identifier or cls is null
      * @throws IllegalArgumentException If can't find ParsingFunction with given identifier
-     *         or return type of ParsingFunction doesn't match requested
+     *                                  or return type of ParsingFunction doesn't match requested
      */
     @SuppressWarnings("unchecked")
     public static <T extends Statement> T parse(RegistryIdentifier identifier, Class<T> cls, Object... extra) throws NullPointerException, IllegalArgumentException {
         if (cls == null) throw new NullPointerException("Class can't be null!");
 
         Statement statement = parse(identifier, extra);
+        if (!cls.isInstance(statement)) throw new IllegalArgumentException("Return type of ParsingFunction with identifier " + identifier + " doesn't match requested (" + cls.getName() + ")");
+
+        return (T) statement;
+    }
+
+    /**
+     * Executes ParsingFunction after ParsingFunction with given identifier
+     *
+     * @param identifier Identifier of ParsingFunction
+     * @param extra Extra info
+     * @return Parsed statement
+     *
+     * @throws NullPointerException If identifier is null
+     * @throws IllegalArgumentException If can't find ParsingFunction with given identifier
+     */
+    public static Statement parseAfter(RegistryIdentifier identifier, Object... extra) throws NullPointerException, IllegalArgumentException {
+        if (identifier == null) throw new NullPointerException("Identifier can't be null!");
+
+        ParsingFunction<? extends Statement> parsingFunction = getParsingFunctionAfterOrNull(identifier);
+        if (parsingFunction == null) throw new IllegalArgumentException("Can't find ParsingFunction with identifier " + identifier);
+
+        return parsingFunction.parse(extra);
+    }
+
+    /**
+     * Executes ParsingFunction after ParsingFunction with given identifier
+     *
+     * @param identifier Identifier of ParsingFunction
+     * @param cls Required returned statement's class
+     * @param extra Extra info
+     * @param <T> Returned statement's type
+     * @return Parsed statement
+     *
+     * @throws NullPointerException If identifier or cls is null
+     * @throws IllegalArgumentException If can't find ParsingFunction with given identifier
+     *                                  or return type of ParsingFunction doesn't match requested
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Statement> T parseAfter(RegistryIdentifier identifier, Class<T> cls, Object... extra) throws NullPointerException, IllegalArgumentException {
+        if (cls == null) throw new NullPointerException("Class can't be null!");
+
+        Statement statement = parseAfter(identifier, extra);
         if (!cls.isInstance(statement)) throw new IllegalArgumentException("Return type of ParsingFunction with identifier " + identifier + " doesn't match requested (" + cls.getName() + ")");
 
         return (T) statement;
@@ -157,6 +199,18 @@ public final class Parser {
      */
     private static ParsingFunction<? extends Statement> getParsingFunctionOrNull(RegistryIdentifier identifier) {
         RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTIONS.getEntry(identifier);
+        if (entry == null) return null;
+        return entry.getValue();
+    }
+
+    /**
+     * Finds ParsingFunction after ParsingFunction with given identifier
+     *
+     * @param identifier Identifier
+     * @return ParsingFunction or null
+     */
+    private static ParsingFunction<? extends Statement> getParsingFunctionAfterOrNull(RegistryIdentifier identifier) {
+        RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTIONS.getEntryAfter(identifier);
         if (entry == null) return null;
         return entry.getValue();
     }

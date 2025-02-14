@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.ast.expression;
 import lombok.Getter;
 
 @Getter
-public class AssignmentExpression implements Expression {
+public class AssignmentExpression implements Expression, ParenthesisExpression {
     private final Expression id;
     private final Expression value;
 
