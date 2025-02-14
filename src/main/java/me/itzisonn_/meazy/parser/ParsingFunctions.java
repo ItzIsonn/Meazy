@@ -52,13 +52,7 @@ public final class ParsingFunctions {
         isInit = true;
 
         register("global_statement", extra -> {
-            Set<Modifier> modifiers = new HashSet<>();
-            while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
-                String id = getCurrentAndNext().getValue();
-                Modifier modifier = Modifiers.parse(id);
-                if (modifier == null) throw new InvalidStatementException("AccessModifier with id " + id + " doesn't exist");
-                modifiers.add(modifier);
-            }
+            Set<Modifier> modifiers = parseModifiers();
 
             if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
                 return parse(RegistryIdentifier.ofDefault("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
@@ -77,7 +71,7 @@ public final class ParsingFunctions {
         });
 
         register("class_declaration_statement", extra -> {
-            Set<Modifier> modifiers = getModifiers(extra);
+            Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
             getCurrentAndNext();
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after class keyword").getValue();
@@ -99,13 +93,7 @@ public final class ParsingFunctions {
         });
 
         register("class_body_statement", extra -> {
-            Set<Modifier> modifiers = new HashSet<>();
-            while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
-                String id = getCurrentAndNext().getValue();
-                Modifier modifier = Modifiers.parse(id);
-                if (modifier == null) throw new InvalidStatementException("AccessModifier with id " + id + " doesn't exist");
-                modifiers.add(modifier);
-            }
+            Set<Modifier> modifiers = parseModifiers();
 
             if (getCurrent().getType().equals(TokenTypes.FUNCTION())) {
                 return parse(RegistryIdentifier.ofDefault("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
@@ -123,7 +111,7 @@ public final class ParsingFunctions {
         });
 
         register("function_declaration_statement", extra -> {
-            Set<Modifier> modifiers = getModifiers(extra);
+            Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
             getCurrentAndNext();
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
@@ -158,11 +146,11 @@ public final class ParsingFunctions {
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after variable keyword in function arg").getValue();
 
             DataType dataType = parseDataType();
-            return new CallArgExpression(id, dataType == null ? new DataType("Any", false) : dataType, isConstant);
+            return new CallArgExpression(id, dataType == null ? new DataType("Any", true) : dataType, isConstant);
         });
 
         register("variable_declaration_statement", extra -> {
-            Set<Modifier> modifiers = getModifiers(extra);
+            Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
             if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
             if (!(extra[1] instanceof Boolean canWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
@@ -181,7 +169,7 @@ public final class ParsingFunctions {
         });
 
         register("constructor_declaration_statement", extra -> {
-            Set<Modifier> modifiers = getModifiers(extra);
+            Set<Modifier> modifiers = getModifiersFromExtra(extra);
             getCurrentAndNext();
 
             List<CallArgExpression> args = parseArgs().stream().map(expression -> {
@@ -199,13 +187,7 @@ public final class ParsingFunctions {
         });
 
         register("statement", extra -> {
-            Set<Modifier> modifiers = new HashSet<>();
-            while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
-                String id = getCurrentAndNext().getValue();
-                Modifier modifier = Modifiers.parse(id);
-                if (modifier == null) throw new InvalidStatementException("Modifier with id " + id + " doesn't exist");
-                modifiers.add(modifier);
-            }
+            Set<Modifier> modifiers = parseModifiers();
 
             if (getCurrent().getType().equals(TokenTypes.VARIABLE())) {
                 VariableDeclarationStatement variableDeclarationStatement =
@@ -372,10 +354,10 @@ public final class ParsingFunctions {
             return new BreakStatement();
         });
 
-        register("expression", extra -> parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class));
+        register("expression", extra -> parseAfter(RegistryIdentifier.ofDefault("expression"), Expression.class));
 
         register("assignment_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("null_check_expression"), Expression.class);
+            Expression left = parseAfter(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class);
 
             if (getCurrent().getType().equals(TokenTypes.ASSIGN())) {
                 getCurrentAndNext();
@@ -395,7 +377,7 @@ public final class ParsingFunctions {
         });
 
         register("null_check_expression", extra -> {
-            Expression checkExpression = parse(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
+            Expression checkExpression = parseAfter(RegistryIdentifier.ofDefault("null_check_expression"), Expression.class);
 
             if (getCurrent().getType().equals(TokenTypes.QUESTION_COLON())) {
                 getCurrentAndNext();
@@ -407,12 +389,12 @@ public final class ParsingFunctions {
         });
 
         register("logical_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
+            Expression left = parseAfter(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
 
             TokenType current = getCurrent().getType();
             while (current.equals(TokenTypes.AND()) || current.equals(TokenTypes.OR())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
+                Expression right = parseAfter(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
                 left = new LogicalExpression(left, right, operator);
 
                 current = getCurrent().getType();
@@ -422,13 +404,13 @@ public final class ParsingFunctions {
         });
 
         register("comparison_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("is_expression"), Expression.class);
+            Expression left = parseAfter(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
 
             TokenType current = getCurrent().getType();
             while (current.equals(TokenTypes.EQUALS()) || current.equals(TokenTypes.NOT_EQUALS()) || current.equals(TokenTypes.GREATER()) ||
                     current.equals(TokenTypes.GREATER_OR_EQUALS()) || current.equals(TokenTypes.LESS()) || current.equals(TokenTypes.LESS_OR_EQUALS())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("is_expression"), Expression.class);
+                Expression right = parseAfter(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
                 left = new ComparisonExpression(left, right, operator);
 
                 current = getCurrent().getType();
@@ -438,7 +420,7 @@ public final class ParsingFunctions {
         });
 
         register("is_expression", extra -> {
-            Expression value = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
+            Expression value = parseAfter(RegistryIdentifier.ofDefault("is_expression"), Expression.class);
 
             if (getCurrent().getType().equals(TokenTypes.IS())) {
                 getCurrentAndNext();
@@ -449,11 +431,11 @@ public final class ParsingFunctions {
         });
 
         register("addition_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
+            Expression left = parseAfter(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
 
             while (getCurrent().getType().equals(TokenTypes.PLUS()) || getCurrent().getType().equals(TokenTypes.MINUS())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
+                Expression right = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
                 left = new BinaryExpression(left, right, operator);
             }
 
@@ -461,12 +443,12 @@ public final class ParsingFunctions {
         });
 
         register("multiplication_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
+            Expression left = parseAfter(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
 
             while (getCurrent().getType().equals(TokenTypes.MULTIPLY()) || getCurrent().getType().equals(TokenTypes.DIVIDE()) ||
                     getCurrent().getType().equals(TokenTypes.PERCENT())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
+                Expression right = parseAfter(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
                 left = new BinaryExpression(left, right, operator);
             }
 
@@ -474,11 +456,11 @@ public final class ParsingFunctions {
         });
 
         register("power_expression", extra -> {
-            Expression left = parse(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
+            Expression left = parseAfter(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
 
             while (getCurrent().getType().equals(TokenTypes.POWER())) {
                 String operator = getCurrentAndNext().getValue();
-                Expression right = parse(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
+                Expression right = parseAfter(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
                 left = new BinaryExpression(left, right, operator);
             }
 
@@ -488,23 +470,23 @@ public final class ParsingFunctions {
         register("inversion_expression", extra -> {
             if (getCurrent().getType().equals(TokenTypes.INVERSION())) {
                 getCurrentAndNext();
-                return new InversionExpression(parse(RegistryIdentifier.ofDefault("negation_expression"), Expression.class));
+                return new InversionExpression(parseAfter(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class));
             }
 
-            return parse(RegistryIdentifier.ofDefault("negation_expression"), Expression.class);
+            return parseAfter(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
         });
 
         register("negation_expression", extra -> {
             if (getCurrent().getType().equals(TokenTypes.MINUS())) {
                 getCurrentAndNext();
-                return new NegationExpression(parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class));
+                return new NegationExpression(parseAfter(RegistryIdentifier.ofDefault("negation_expression"), Expression.class));
             }
 
-            return parse(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class);
+            return parseAfter(RegistryIdentifier.ofDefault("negation_expression"), Expression.class);
         });
 
         register("postfix_expression", extra -> {
-            Expression id = parse(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
+            Expression id = parseAfter(RegistryIdentifier.ofDefault("postfix_expression"), Expression.class);
 
             if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
@@ -518,7 +500,7 @@ public final class ParsingFunctions {
         register("class_call_expression", extra -> {
             if (getCurrent().getType().equals(TokenTypes.NEW())) {
                 getCurrentAndNext();
-                Expression expression = parse(RegistryIdentifier.ofDefault("member_expression"), Expression.class);
+                Expression expression = parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
                 if (expression instanceof CallExpression callExpression) {
                     return new ClassCallExpression(callExpression.getCaller(), callExpression.getArgs());
                 }
@@ -535,15 +517,15 @@ public final class ParsingFunctions {
                 throw new InvalidSyntaxException("Class creation must be call expression");
             }
 
-            return parse(RegistryIdentifier.ofDefault("member_expression"), Expression.class);
+            return parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
         });
 
         register("member_expression", extra -> {
-            Expression object = parse(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
+            Expression object = parseAfter(RegistryIdentifier.ofDefault("member_expression"), Expression.class);
 
             while (TokenTypeSets.MEMBER_ACCESS().contains(getCurrent().getType())) {
                 boolean isNullSafe = getCurrentAndNext().getType().equals(TokenTypes.QUESTION_DOT());
-                Expression member = parse(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
+                Expression member = parseAfter(RegistryIdentifier.ofDefault("member_expression"), Expression.class);
                 if (!(member instanceof Identifier) && !(member instanceof CallExpression)) {
                     throw new UnexpectedTokenException("Right side must be either Identifier or Call", getCurrent().getLine());
                 }
@@ -554,7 +536,7 @@ public final class ParsingFunctions {
         });
 
         register("call_expression", extra -> {
-            Expression expression = parse(RegistryIdentifier.ofDefault("primary_expression"), Expression.class);
+            Expression expression = parseAfter(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
 
             if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) {
                 getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
@@ -621,8 +603,19 @@ public final class ParsingFunctions {
 
 
 
+    private static Set<Modifier> parseModifiers() {
+        Set<Modifier> modifiers = new HashSet<>();
+        while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
+            String id = getCurrentAndNext().getValue();
+            Modifier modifier = Modifiers.parse(id);
+            if (modifier == null) throw new InvalidStatementException("Modifier with id " + id + " doesn't exist");
+            modifiers.add(modifier);
+        }
+        return modifiers;
+    }
+
     @SuppressWarnings("unchecked")
-    private static Set<Modifier> getModifiers(Object[] extra) {
+    private static Set<Modifier> getModifiersFromExtra(Object[] extra) {
         if (extra.length == 0) throw new IllegalArgumentException("Expected Set of Modifiers as extra argument");
         if (!(extra[0] instanceof Set<?> set)) throw new IllegalArgumentException("Expected Set of Modifiers as extra argument");
         try {
@@ -679,7 +672,7 @@ public final class ParsingFunctions {
         String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier in variable declaration statement").getValue();
 
         DataType dataType = parseDataType();
-        if (dataType == null) dataType = new DataType("Any", false);
+        if (dataType == null) dataType = new DataType("Any", true);
 
         if (!getCurrent().getType().equals(TokenTypes.ASSIGN())) {
             if (canWithoutValue) {
