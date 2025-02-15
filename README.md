@@ -10,5 +10,5 @@
 
 ## Полезные ссылки
 - [Скачать](https://github.com/ItzIsonn/Meazy/wiki/Установка-и-использование)
-- [Репорт ошибок](https://github.com/ItzIsonn/Meazy/issues) ([Уже известные ошибки](https://github.com/ItzIsonn/Meazy/wiki/Известные-ошибки))
+- [Репорт ошибок](https://github.com/ItzIsonn/Meazy/issues) ([Уже известные ошибки](https://itzisonn.github.io/Meazy/docs/?page=known-issues))
 - [Документация](https://itzisonn.github.io/Meazy/docs/)
