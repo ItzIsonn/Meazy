@@ -20,8 +20,9 @@ public class IsExpressionConverter extends Converter<IsExpression> {
 
         Expression value = jsonDeserializationContext.deserialize(getElement(object, "value"), Expression.class);
         String dataType = getElement(object, "data_type").getAsString();
+        boolean isLike = getElement(object, "is_like").getAsBoolean();
 
-        return new IsExpression(value, dataType);
+        return new IsExpression(value, dataType, isLike);
     }
 
     @Override
@@ -29,7 +30,8 @@ public class IsExpressionConverter extends Converter<IsExpression> {
         JsonObject result = getJsonObject();
 
         result.add("value", jsonSerializationContext.serialize(isExpression.getValue()));
-        result.add("data_type", jsonSerializationContext.serialize(isExpression.getDataType()));
+        result.addProperty("data_type", isExpression.getDataType());
+        result.addProperty("is_like", isExpression.isLike());
 
         return result;
     }

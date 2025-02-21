@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.parser.ast;
+package me.itzisonn_.meazy.parser;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;

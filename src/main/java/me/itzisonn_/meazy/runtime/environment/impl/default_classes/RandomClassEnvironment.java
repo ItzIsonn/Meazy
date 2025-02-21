@@ -1,8 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
-import me.itzisonn_.meazy.parser.ast.Modifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -19,7 +20,7 @@ import java.util.Random;
 import java.util.Set;
 
 public class RandomClassEnvironment extends ClassEnvironmentImpl {
-    public RandomClassEnvironment(Environment parent) {
+    public RandomClassEnvironment(ClassDeclarationEnvironment parent) {
         super(parent, true, "Random");
 
 

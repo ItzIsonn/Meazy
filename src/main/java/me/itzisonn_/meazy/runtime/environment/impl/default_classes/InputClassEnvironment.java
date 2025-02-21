@@ -1,7 +1,8 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
-import me.itzisonn_.meazy.parser.ast.Modifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
@@ -16,7 +17,7 @@ import java.util.*;
 public class InputClassEnvironment extends ClassEnvironmentImpl {
     private static final Scanner SCANNER = new Scanner(System.in);
 
-    public InputClassEnvironment(Environment parent) {
+    public InputClassEnvironment(ClassDeclarationEnvironment parent) {
         super(parent, true, "Input");
 
 

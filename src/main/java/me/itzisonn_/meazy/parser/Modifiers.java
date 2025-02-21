@@ -1,9 +1,6 @@
-package me.itzisonn_.meazy.parser.ast;
+package me.itzisonn_.meazy.parser;
 
-import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;
-import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
+import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
@@ -28,6 +25,10 @@ public final class Modifiers {
 
     public static Modifier SHARED() {
         return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
+    }
+
+    public static Modifier ABSTRACT() {
+        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("abstract")).getValue();
     }
 
 
@@ -78,6 +79,17 @@ public final class Modifiers {
             public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
                 if (modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement) {
                     return environment instanceof ClassEnvironment;
+                }
+                return false;
+            }
+        });
+
+        register(new Modifier("abstract") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement instanceof ClassDeclarationStatement) return true;
+                if (modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment classEnvironment) {
+                    return classEnvironment.getModifiers().contains(Modifiers.ABSTRACT());
                 }
                 return false;
             }

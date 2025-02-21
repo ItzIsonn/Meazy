@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
-import me.itzisonn_.meazy.parser.ast.Modifier;
-import me.itzisonn_.meazy.parser.ast.Modifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
@@ -20,6 +20,7 @@ import me.itzisonn_.meazy.runtime.values.*;
 import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.RuntimeClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.values.classes.constructors.BaseClassIdValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.RuntimeConstructorValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
@@ -74,15 +75,16 @@ public final class EvaluationFunctions {
 
             for (Modifier modifier : classDeclarationStatement.getModifiers()) {
                 if (!modifier.canUse(classDeclarationStatement, environment))
-                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' AccessModifier");
+                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
             ClassEnvironment classEnvironment;
             try {
-                classEnvironment = Registries.CLASS_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, boolean.class, String.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), true, classDeclarationStatement.getId());
+                classEnvironment = Registries.CLASS_ENVIRONMENT.getEntry().getValue()
+                        .getConstructor(ClassDeclarationEnvironment.class, boolean.class, String.class, Set.class)
+                        .newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), true, classDeclarationStatement.getId(), classDeclarationStatement.getModifiers());
             }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException e) {
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
 
@@ -90,7 +92,19 @@ public final class EvaluationFunctions {
                 Interpreter.evaluate(statement, classEnvironment);
             }
 
-            RuntimeClassValue runtimeClassValue = new RuntimeClassValue(classEnvironment, classDeclarationStatement.getBody());
+            if (hasRepeatedBaseClasses(classDeclarationStatement.getBaseClasses(), new ArrayList<>())) {
+                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated base classes");
+            }
+            if (hasRepeatedVariables(
+                    classDeclarationStatement.getBaseClasses(),
+                    new ArrayList<>(classEnvironment.getVariables().stream().map(VariableValue::getId).toList()))) {
+                throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated variables");
+            }
+
+            RuntimeClassValue runtimeClassValue = new RuntimeClassValue(
+                    classDeclarationStatement.getBaseClasses(),
+                    classEnvironment,
+                    classDeclarationStatement.getBody());
             classDeclarationEnvironment.declareClass(runtimeClassValue);
             return null;
         });
@@ -102,7 +116,7 @@ public final class EvaluationFunctions {
 
             for (Modifier modifier : functionDeclarationStatement.getModifiers()) {
                 if (!modifier.canUse(functionDeclarationStatement, environment))
-                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' AccessModifier");
+                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
             RuntimeFunctionValue runtimeFunctionValue = new RuntimeFunctionValue(
@@ -119,7 +133,7 @@ public final class EvaluationFunctions {
 
         register("variable_declaration_statement", VariableDeclarationStatement.class, (variableDeclarationStatement, environment, extra) -> {
             for (Modifier modifier : variableDeclarationStatement.getModifiers()) {
-                if (!modifier.canUse(variableDeclarationStatement, environment)) throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' AccessModifier");
+                if (!modifier.canUse(variableDeclarationStatement, environment)) throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
             Set<Modifier> modifiers = new HashSet<>(variableDeclarationStatement.getModifiers());
@@ -146,7 +160,7 @@ public final class EvaluationFunctions {
 
             for (Modifier modifier : constructorDeclarationStatement.getModifiers()) {
                 if (!modifier.canUse(constructorDeclarationStatement, environment))
-                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' AccessModifier");
+                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
             RuntimeConstructorValue runtimeConstructorValue = new RuntimeConstructorValue(
@@ -158,6 +172,22 @@ public final class EvaluationFunctions {
             constructorDeclarationEnvironment.declareConstructor(runtimeConstructorValue);
             return null;
         });
+
+        register("base_call_statement", BaseCallStatement.class, (baseCallStatement, environment, extra) -> {
+            ClassEnvironment classEnvironment;
+            if (extra.length == 1 && extra[0] instanceof ClassEnvironment env) classEnvironment = env;
+            else throw new InvalidSyntaxException("Unknown error occurred");
+
+            if (!(environment instanceof ConstructorEnvironment)) {
+                throw new InvalidSyntaxException("Can't use BaseCallStatement in this environment!");
+            }
+
+            ClassValue baseClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseCallStatement.getId());
+            List<RuntimeValue<?>> args = baseCallStatement.getArgs().stream().map(expression -> Interpreter.evaluate(expression, environment)).collect(Collectors.toList());
+            classEnvironment.addBaseClass(initClassEnvironment(baseClassValue, classEnvironment, args));
+            return new BaseClassIdValue(baseCallStatement.getId());
+        });
+
 
         register("if_statement", IfStatement.class, (ifStatement, environment, extra) -> {
             while (ifStatement != null) {
@@ -521,6 +551,7 @@ public final class EvaluationFunctions {
             ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(isExpression.getDataType());
             if (classValue == null) throw new InvalidSyntaxException("Data type with id " + isExpression.getDataType() + " doesn't exist");
 
+            if (isExpression.isLike()) return new BooleanValue(classValue.isLikeMatches(value.getFinalRuntimeValue()));
             return new BooleanValue(classValue.isMatches(value.getFinalRuntimeValue()));
         });
 
@@ -604,131 +635,14 @@ public final class EvaluationFunctions {
             List<RuntimeValue<?>> args = classCallExpression.getArgs().stream().map(expression -> Interpreter.evaluate(expression, extraEnvironment)).collect(Collectors.toList());
             RuntimeValue<?> rawClass = Interpreter.evaluate(classCallExpression.getCaller(), environment);
 
-            if (rawClass instanceof RuntimeClassValue runtimeClassValue) {
-                ClassEnvironment classEnvironment;
-                try {
-                    classEnvironment = Registries.CLASS_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, String.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), runtimeClassValue.getId());
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
+            if (!(rawClass instanceof ClassValue classValue)) throw new InvalidCallException("Can't call " + rawClass.getClass().getName() + " because it's not a class");
+            if (classValue.getModifiers().contains(Modifiers.ABSTRACT())) throw new InvalidCallException("Can't call abstract class " + classValue.getId());
 
-                for (Statement statement : runtimeClassValue.getBody()) {
-                    Interpreter.evaluate(statement, classEnvironment);
-                }
+            ClassEnvironment classEnvironment = initClassEnvironment(classValue, extraEnvironment, args);
+            if (classValue instanceof RuntimeClassValue runtimeClassValue) return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());
+            if (classValue instanceof DefaultClassValue) return new DefaultClassValue(classValue.getBaseClasses(), classEnvironment);
 
-                if (classEnvironment.hasConstructor()) {
-                    RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
-                    if (rawConstructor == null) throw new InvalidCallException("Class with id " + runtimeClassValue.getId() + " doesn't have requested constructor");
-
-                    if (rawConstructor instanceof RuntimeConstructorValue runtimeConstructorValue) {
-                        if (runtimeConstructorValue.getModifiers().contains(Modifiers.PRIVATE()) && !extraEnvironment.hasParent(env -> {
-                            if (env instanceof ClassEnvironment classEnv) {
-                                return classEnv.getId().equals(runtimeClassValue.getId());
-                            }
-                            return false;
-                        })) {
-                            throw new InvalidCallException("Requested constructor has private access");
-                        }
-
-                        Environment constructorEnvironment;
-                        try {
-                            constructorEnvironment = Registries.ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(classEnvironment);
-                        }
-                        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        for (int i = 0; i < runtimeConstructorValue.getArgs().size(); i++) {
-                            CallArgExpression callArgExpression = runtimeConstructorValue.getArgs().get(i);
-
-                            constructorEnvironment.declareVariable(new VariableValue(
-                                    callArgExpression.getId(),
-                                    callArgExpression.getDataType(),
-                                    args.get(i),
-                                    callArgExpression.isConstant(),
-                                    new HashSet<>(),
-                                    true));
-                        }
-
-                        for (Statement statement : runtimeConstructorValue.getBody()) {
-                            Interpreter.evaluate(statement, constructorEnvironment);
-                        }
-                    }
-                }
-
-                for (VariableValue variableValue : classEnvironment.getVariables()) {
-                    if (variableValue.isConstant() && variableValue.getValue() == null) {
-                        throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call");
-                    }
-                }
-
-                return new RuntimeClassValue(classEnvironment, runtimeClassValue.getBody());
-            }
-            if (rawClass instanceof DefaultClassValue defaultClassValue) {
-                ClassEnvironment classEnvironment;
-                try {
-                    classEnvironment = Registries.CLASS_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, String.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), defaultClassValue.getId());
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-
-                defaultClassValue.getEnvironment().getVariables().forEach(variable -> classEnvironment.declareVariable(new VariableValue(
-                        variable.getId(),
-                        variable.getDataType(),
-                        variable.getValue(),
-                        variable.isConstant(),
-                        variable.getModifiers(),
-                        variable.isArgument())));
-                defaultClassValue.getEnvironment().getFunctions().forEach(function -> {
-                    if (function instanceof DefaultFunctionValue defaultFunctionValue) {
-                        classEnvironment.declareFunction(defaultFunctionValue.copy(classEnvironment));
-                    }
-                });
-                defaultClassValue.getEnvironment().getConstructors().forEach(constructor -> {
-                    if (constructor instanceof DefaultConstructorValue defaultConstructorValue) {
-                        classEnvironment.declareConstructor(defaultConstructorValue.copy(classEnvironment));
-                    }
-                });
-
-                if (classEnvironment.hasConstructor()) {
-                    RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
-                    if (rawConstructor == null) throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
-
-                    if (rawConstructor instanceof DefaultConstructorValue defaultConstructorValue) {
-                        if (defaultConstructorValue.getModifiers().contains(Modifiers.SHARED()) && !extraEnvironment.hasParent(env -> {
-                            if (env instanceof ClassEnvironment classEnv) {
-                                return classEnv.getId().equals(defaultClassValue.getId());
-                            }
-                            return false;
-                        })) {
-                            throw new InvalidCallException("Requested constructor has private access");
-                        }
-
-                        Environment constructorEnvironment;
-                        try {
-                            constructorEnvironment = Registries.ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(classEnvironment);
-                        }
-                        catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                               NoSuchMethodException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        defaultConstructorValue.run(args, constructorEnvironment);
-                    }
-                }
-
-                for (VariableValue variableValue : classEnvironment.getVariables()) {
-                    if (variableValue.isConstant() && variableValue.getValue() == null) {
-                        throw new InvalidSyntaxException("All empty constant variables must be initialized after constructor call. It's probably an Addon's error");
-                    }
-                }
-
-                return new DefaultClassValue(classEnvironment);
-            }
-
-            throw new InvalidCallException("Can't call " + rawClass.getValue() + " because it's not a class");
+            throw new InvalidCallException("Can't call " + classValue.getClass().getName() + " because it's unknown class");
         });
 
         register("member_expression", MemberExpression.class, (memberExpression, environment, extra) -> {
@@ -762,7 +676,7 @@ public final class EvaluationFunctions {
 
                 FunctionEnvironment functionEnvironment;
                 try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, boolean.class)
+                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
                             .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(Modifiers.SHARED()));
                 }
                 catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -784,7 +698,7 @@ public final class EvaluationFunctions {
 
                 FunctionEnvironment functionEnvironment;
                 try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class, boolean.class)
+                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
                             .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(Modifiers.SHARED()));
                 }
                 catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -911,7 +825,9 @@ public final class EvaluationFunctions {
             Environment parent = environment.getParent(env -> env instanceof ClassEnvironment);
             if (!(parent instanceof ClassEnvironment classEnvironment)) throw new RuntimeException("Can't use 'this' keyword not inside a class");
             if (environment.isShared()) throw new RuntimeException("Can't use 'this' keyword inside a shared environment");
-            return new DefaultClassValue(classEnvironment);
+            return new DefaultClassValue(
+                    classEnvironment.getBaseClasses().stream().map(ClassEnvironment::getId).collect(Collectors.toSet()),
+                    classEnvironment);
         });
     }
 
@@ -960,6 +876,236 @@ public final class EvaluationFunctions {
         }
 
         return returnValue;
+    }
+
+    private static boolean hasRepeatedBaseClasses(Set<String> baseClassesList, List<String> baseClasses) {
+        for (String baseClass : baseClassesList) {
+            if (baseClasses.contains(baseClass)) {
+                return true;
+            }
+            baseClasses.add(baseClass);
+
+            ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClass);
+            if (classValue == null) {
+                throw new InvalidIdentifierException("Class with id " + baseClass + " doesn't exist");
+            }
+
+            boolean check = hasRepeatedBaseClasses(classValue.getBaseClasses(), baseClasses);
+            if (check) return true;
+        }
+
+        return false;
+    }
+
+    private static boolean hasRepeatedVariables(Set<String> baseClassesList, List<String> variables) {
+        for (String baseClass : baseClassesList) {
+            ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClass);
+            if (classValue == null) {
+                throw new InvalidIdentifierException("Class with id " + baseClass + " doesn't exist");
+            }
+
+            for (VariableValue variableValue : classValue.getEnvironment().getVariables()) {
+                if (variableValue.getModifiers().contains(Modifiers.PRIVATE())) continue;
+                if (variables.contains(variableValue.getId())) {
+                    return true;
+                }
+                variables.add(variableValue.getId());
+            }
+
+            boolean check = hasRepeatedVariables(classValue.getBaseClasses(), variables);
+            if (check) return true;
+        }
+
+        return false;
+    }
+
+    private static boolean hasRepeatedFunctions(Set<ClassEnvironment> baseClassesList, List<FunctionValue> functions) {
+        for (ClassEnvironment classEnvironment : baseClassesList) {
+            for (FunctionValue functionValue : getFinalFunctions(classEnvironment)) {
+                if (functionValue.getModifiers().contains(Modifiers.PRIVATE())) continue;
+                if (functionValue.getModifiers().contains(Modifiers.ABSTRACT())) {
+                    if (functions.stream().anyMatch(function -> function.isLike(functionValue) && !function.getModifiers().contains(Modifiers.ABSTRACT()))) {
+                        return true;
+                    }
+                }
+                else if (functions.stream().anyMatch(function -> function.isLike(functionValue))) {
+                    return true;
+                }
+                functions.add(functionValue);
+            }
+
+            boolean check = hasRepeatedFunctions(classEnvironment.getBaseClasses(), functions);
+            if (check) return true;
+        }
+
+        return false;
+    }
+
+    private static List<FunctionValue> getFinalFunctions(ClassEnvironment classEnvironment) {
+        List<FunctionValue> functionValues = new ArrayList<>();
+        for (FunctionValue functionValue : classEnvironment.getFunctions()) {
+            if (!functionValue.isOverridden()) functionValues.add(functionValue);
+        }
+
+        return functionValues;
+    }
+
+    private static ClassEnvironment initClassEnvironment(ClassValue classValue, Environment callEnvironment, List<RuntimeValue<?>> args) {
+        ClassEnvironment classEnvironment;
+        try {
+            classEnvironment = Registries.CLASS_ENVIRONMENT.getEntry().getValue()
+                    .getConstructor(ClassDeclarationEnvironment.class, String.class, Set.class)
+                    .newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), classValue.getId(), classValue.getModifiers());
+        }
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        Set<String> calledBaseClasses = new HashSet<>();
+        if (classValue instanceof RuntimeClassValue runtimeClassValue) {
+            for (Statement statement : runtimeClassValue.getBody()) {
+                Interpreter.evaluate(statement, classEnvironment);
+            }
+
+            if (classEnvironment.hasConstructor()) {
+                RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
+                if (rawConstructor == null) throw new InvalidCallException("Class with id " + runtimeClassValue.getId() + " doesn't have requested constructor");
+
+                if (rawConstructor instanceof RuntimeConstructorValue runtimeConstructorValue) {
+                    if (runtimeConstructorValue.getModifiers().contains(Modifiers.PRIVATE()) && !callEnvironment.hasParent(env -> {
+                        if (env instanceof ClassEnvironment classEnv) {
+                            return classEnv.getId().equals(runtimeClassValue.getId());
+                        }
+                        return false;
+                    })) {
+                        throw new InvalidCallException("Requested constructor has private access");
+                    }
+
+                    Environment constructorEnvironment;
+                    try {
+                        constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT.getEntry().getValue().getConstructor(ConstructorDeclarationEnvironment.class).newInstance(classEnvironment);
+                    }
+                    catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    for (int i = 0; i < runtimeConstructorValue.getArgs().size(); i++) {
+                        CallArgExpression callArgExpression = runtimeConstructorValue.getArgs().get(i);
+
+                        constructorEnvironment.declareVariable(new VariableValue(
+                                callArgExpression.getId(),
+                                callArgExpression.getDataType(),
+                                args.get(i),
+                                callArgExpression.isConstant(),
+                                new HashSet<>(),
+                                true));
+                    }
+
+                    for (Statement statement : runtimeConstructorValue.getBody()) {
+                        RuntimeValue<?> value = Interpreter.evaluate(statement, constructorEnvironment, classEnvironment);
+                        if (statement instanceof BaseCallStatement) {
+                            if (!(value instanceof BaseClassIdValue baseClassIdValue)) throw new RuntimeException("Unknown error occurred");
+                            if (!classValue.getBaseClasses().contains(baseClassIdValue.getValue()))
+                                throw new InvalidSyntaxException("Can't call base class " + baseClassIdValue.getValue() + " because it's not base class of class " + classValue.getId());
+                            calledBaseClasses.add(baseClassIdValue.getValue());
+                        }
+                    }
+                }
+            }
+            else if (!args.isEmpty()) {
+                throw new InvalidCallException("Class with id " + runtimeClassValue.getId() + " doesn't have requested constructor");
+            }
+        }
+        else if (classValue instanceof DefaultClassValue defaultClassValue) {
+            defaultClassValue.getEnvironment().getVariables().forEach(variable -> classEnvironment.declareVariable(new VariableValue(
+                    variable.getId(),
+                    variable.getDataType(),
+                    variable.getValue(),
+                    variable.isConstant(),
+                    variable.getModifiers(),
+                    variable.isArgument())));
+            defaultClassValue.getEnvironment().getFunctions().forEach(function -> {
+                if (function instanceof DefaultFunctionValue defaultFunctionValue) {
+                    classEnvironment.declareFunction(defaultFunctionValue.copy(classEnvironment));
+                }
+            });
+            defaultClassValue.getEnvironment().getConstructors().forEach(constructor -> {
+                if (constructor instanceof DefaultConstructorValue defaultConstructorValue) {
+                    classEnvironment.declareConstructor(defaultConstructorValue.copy(classEnvironment));
+                }
+            });
+
+            if (classEnvironment.hasConstructor()) {
+                RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
+                if (rawConstructor == null) throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
+
+                if (rawConstructor instanceof DefaultConstructorValue defaultConstructorValue) {
+                    if (defaultConstructorValue.getModifiers().contains(Modifiers.SHARED()) && !callEnvironment.hasParent(env -> {
+                        if (env instanceof ClassEnvironment classEnv) {
+                            return classEnv.getId().equals(defaultClassValue.getId());
+                        }
+                        return false;
+                    })) {
+                        throw new InvalidCallException("Requested constructor has private access");
+                    }
+
+                    Environment constructorEnvironment;
+                    try {
+                        constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT.getEntry().getValue().getConstructor(ConstructorDeclarationEnvironment.class).newInstance(classEnvironment);
+                    }
+                    catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                           NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    defaultConstructorValue.run(args, constructorEnvironment);
+                }
+            }
+            else if (!args.isEmpty()) {
+                throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
+            }
+        }
+        else {
+            throw new RuntimeException("Can't init ClassEnvironment of class value " + classValue.getClass().getName());
+        }
+
+        for (VariableValue variableValue : classEnvironment.getVariables()) {
+            if (variableValue.isConstant() && variableValue.getValue() == null) {
+                throw new InvalidSyntaxException("Empty constant variable with id " + variableValue.getId() + " hasn't been initialized");
+            }
+        }
+
+        for (String baseClass : classValue.getBaseClasses()) {
+            if (calledBaseClasses.contains(baseClass)) continue;
+            ClassValue baseClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClass);
+            classEnvironment.addBaseClass(initClassEnvironment(baseClassValue, classEnvironment, new ArrayList<>()));
+        }
+
+        for (FunctionValue value : classEnvironment.getFunctions()) {
+            for (ClassEnvironment baseClass : classEnvironment.getDeepBaseClasses()) {
+                for (FunctionValue baseClassFunction : baseClass.getFunctions()) {
+                    if (baseClassFunction.isLike(value) && !baseClassFunction.getModifiers().contains(Modifiers.PRIVATE())) {
+                        baseClassFunction.setOverridden();
+                    }
+                }
+            }
+        }
+
+        if (hasRepeatedFunctions(classEnvironment.getBaseClasses(), new ArrayList<>(classEnvironment.getFunctions()))) {
+            throw new InvalidIdentifierException("Class with id " + classEnvironment.getId() + " has repeated functions");
+        }
+
+        if (!classEnvironment.getModifiers().contains(Modifiers.ABSTRACT())) {
+            for (ClassEnvironment baseClass : classEnvironment.getBaseClasses()) {
+                for (FunctionValue functionValue : getFinalFunctions(baseClass)) {
+                    if (functionValue.getModifiers().contains(Modifiers.ABSTRACT())) {
+                        throw new InvalidSyntaxException("Abstract function with id " + functionValue.getId() + " hasn't been initialized");
+                    }
+                }
+            }
+        }
+
+        return classEnvironment;
     }
 
 

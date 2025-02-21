@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.values.classes.constructors;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.Modifier;
+import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -25,7 +25,7 @@ public abstract class ConstructorValue extends RuntimeValue<Object> {
      *
      * @param args Args of this ConstructorValue
      * @param parentEnvironment Parent of this ConstructorValue
-     * @param modifiers AccessModifiers of this ConstructorValue
+     * @param modifiers Modifiers of this ConstructorValue
      */
     public ConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(null);

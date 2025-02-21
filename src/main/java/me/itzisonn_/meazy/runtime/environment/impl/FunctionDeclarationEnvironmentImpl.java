@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl implements FunctionDeclarationEnvironment {
-    private final List<FunctionValue> functions;
+    protected final List<FunctionValue> functions;
 
     public FunctionDeclarationEnvironmentImpl(Environment parent, boolean isShared) {
         super(parent, isShared);

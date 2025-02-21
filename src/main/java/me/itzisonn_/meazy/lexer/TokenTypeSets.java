@@ -52,9 +52,11 @@ public final class TokenTypeSets {
                 TokenTypes.FUNCTION(),
                 TokenTypes.CLASS(),
                 TokenTypes.CONSTRUCTOR(),
+                TokenTypes.BASE(),
                 TokenTypes.NEW(),
                 TokenTypes.PRIVATE(),
                 TokenTypes.SHARED(),
+                TokenTypes.ABSTRACT(),
                 TokenTypes.IF(),
                 TokenTypes.ELSE(),
                 TokenTypes.FOR(),
@@ -64,9 +66,11 @@ public final class TokenTypeSets {
                 TokenTypes.CONTINUE(),
                 TokenTypes.BREAK(),
                 TokenTypes.IS(),
+                TokenTypes.IS_LIKE(),
                 TokenTypes.NULL(),
                 TokenTypes.BOOLEAN(),
-                TokenTypes.THIS()));
+                TokenTypes.THIS()
+        ));
 
         register("operator_assign", new TokenTypeSet(
                 TokenTypes.PLUS_ASSIGN(),
@@ -74,15 +78,19 @@ public final class TokenTypeSets {
                 TokenTypes.MULTIPLY_ASSIGN(),
                 TokenTypes.DIVIDE_ASSIGN(),
                 TokenTypes.PERCENT_ASSIGN(),
-                TokenTypes.POWER_ASSIGN()));
+                TokenTypes.POWER_ASSIGN()
+        ));
 
         register("operator_postfix", new TokenTypeSet(
                 TokenTypes.DOUBLE_PLUS(),
-                TokenTypes.DOUBLE_MINUS()));
+                TokenTypes.DOUBLE_MINUS()
+        ));
 
         register("modifiers", new TokenTypeSet(
                 TokenTypes.PRIVATE(),
-                TokenTypes.SHARED()));
+                TokenTypes.SHARED(),
+                TokenTypes.ABSTRACT()
+        ));
 
         register("member_access", new TokenTypeSet(
                 TokenTypes.DOT(),

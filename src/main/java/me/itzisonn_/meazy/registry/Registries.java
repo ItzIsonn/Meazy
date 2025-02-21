@@ -8,8 +8,8 @@ import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
 import me.itzisonn_.meazy.parser.ParsingFunctions;
-import me.itzisonn_.meazy.parser.ast.Modifier;
-import me.itzisonn_.meazy.parser.ast.Modifiers;
+import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.Modifiers;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
@@ -139,6 +139,11 @@ public final class Registries {
     public static final SingleEntryRegistry<Class<? extends FunctionEnvironment>> FUNCTION_ENVIRONMENT = new SingleEntryRegistryImpl<>();
 
     /**
+     * Registry for {@link ConstructorEnvironment} class
+     */
+    public static final SingleEntryRegistry<Class<? extends ConstructorEnvironment>> CONSTRUCTOR_ENVIRONMENT = new SingleEntryRegistryImpl<>();
+
+    /**
      * Registry for {@link LoopEnvironment} class
      */
     public static final SingleEntryRegistry<Class<? extends LoopEnvironment>> LOOP_ENVIRONMENT = new SingleEntryRegistryImpl<>();
@@ -233,7 +238,7 @@ public final class Registries {
             if (runtimeValue instanceof RuntimeFunctionValue runtimeFunctionValue) {
                 FunctionEnvironment functionEnvironment;
                 try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(Environment.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
+                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
                 }
                 catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e);
@@ -267,6 +272,7 @@ public final class Registries {
         globalEnvironment.init();
         CLASS_ENVIRONMENT.register(RegistryIdentifier.ofDefault("class_environment"), ClassEnvironmentImpl.class);
         FUNCTION_ENVIRONMENT.register(RegistryIdentifier.ofDefault("function_environment"), FunctionEnvironmentImpl.class);
+        CONSTRUCTOR_ENVIRONMENT.register(RegistryIdentifier.ofDefault("constructor_environment"), ConstructorEnvironmentImpl.class);
         LOOP_ENVIRONMENT.register(RegistryIdentifier.ofDefault("loop_environment"), LoopEnvironmentImpl.class);
         ENVIRONMENT.register(RegistryIdentifier.ofDefault("environment"), EnvironmentImpl.class);
     }

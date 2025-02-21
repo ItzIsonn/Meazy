@@ -2,6 +2,8 @@ package me.itzisonn_.meazy.command;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.addons.Addon;
+import me.itzisonn_.meazy.addons.AddonInfo;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
 import me.itzisonn_.meazy.parser.json_converters.Converters;
@@ -63,6 +65,27 @@ public final class Commands {
             @Override
             public String execute(String[] args) {
                 MeazyMain.LOGGER.log(Level.INFO, "Meazy version {}", MeazyMain.VERSION);
+                return null;
+            }
+        });
+
+        register("addons", new Command(List.of()) {
+            @Override
+            public String execute(String... args) {
+                if (MeazyMain.ADDON_MANAGER.getAddons().length == 0) {
+                    MeazyMain.LOGGER.log(Level.INFO, "No addons present");
+                    return null;
+                }
+
+                MeazyMain.LOGGER.log(Level.INFO, "Loaded addons:");
+                for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
+                    AddonInfo addonInfo = addon.getAddonInfo();
+
+                    MeazyMain.LOGGER.log(Level.INFO, "    {} by {} - {}",
+                            addonInfo.getFullName(),
+                            String.join(", ", addonInfo.getAuthors()),
+                            addonInfo.getDescription());
+                }
                 return null;
             }
         });

@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.Modifier;
+import me.itzisonn_.meazy.parser.Modifier;
 
 import java.util.Set;
 

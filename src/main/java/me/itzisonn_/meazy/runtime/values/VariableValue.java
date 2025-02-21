@@ -2,8 +2,8 @@ package me.itzisonn_.meazy.runtime.values;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.Modifier;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 
 import java.util.Set;

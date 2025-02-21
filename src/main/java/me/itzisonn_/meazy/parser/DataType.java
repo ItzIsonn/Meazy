@@ -1,5 +1,6 @@
-package me.itzisonn_.meazy.parser.ast;
+package me.itzisonn_.meazy.parser;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.values.NullValue;
@@ -10,6 +11,7 @@ import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
  * DataType
  */
 @Getter
+@EqualsAndHashCode
 public class DataType {
     /**
      * DataType's id
@@ -42,7 +44,7 @@ public class DataType {
         if (value instanceof NullValue) return isNullable;
 
         ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(id);
-        return classValue != null && classValue.isMatches(value);
+        return classValue != null && classValue.isLikeMatches(value);
     }
 
     @Override
