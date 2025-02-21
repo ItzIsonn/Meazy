@@ -1,14 +1,14 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
-import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 
 public class FunctionEnvironmentImpl extends EnvironmentImpl implements FunctionEnvironment {
-    public FunctionEnvironmentImpl(Environment parent, boolean isShared) {
+    public FunctionEnvironmentImpl(FunctionDeclarationEnvironment parent, boolean isShared) {
         super(parent, isShared);
     }
 
-    public FunctionEnvironmentImpl(Environment parent) {
+    public FunctionEnvironmentImpl(FunctionDeclarationEnvironment parent) {
         super(parent, false);
     }
 }

@@ -2,8 +2,8 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.parser.ast.Modifier;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.List;

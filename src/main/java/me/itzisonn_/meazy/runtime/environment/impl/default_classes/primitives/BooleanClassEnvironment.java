@@ -1,8 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives;
 
-import me.itzisonn_.meazy.parser.ast.Modifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 public class BooleanClassEnvironment extends ClassEnvironmentImpl {
-    public BooleanClassEnvironment(Environment parent) {
+    public BooleanClassEnvironment(ClassDeclarationEnvironment parent) {
         super(parent, true, "Boolean");
 
 

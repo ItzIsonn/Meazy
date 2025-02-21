@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
 import lombok.NonNull;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.DataType;
 
 @Getter
 public class CallArgExpression implements Expression {

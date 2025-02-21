@@ -74,6 +74,7 @@ public final class Converters {
         register(new FunctionDeclarationStatementConverter());
         register(new VariableDeclarationConverter());
         register(new ConstructorDeclarationStatementConverter());
+        register(new BaseCallStatementConverter());
         register(new IfStatementConverter());
         register(new ForStatementConverter());
         register(new ForeachStatementConverter());

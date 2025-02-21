@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.parser.ast.Modifier;
-import me.itzisonn_.meazy.parser.ast.Modifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;

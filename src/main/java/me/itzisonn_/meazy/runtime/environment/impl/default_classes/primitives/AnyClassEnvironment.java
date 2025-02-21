@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives;
 
-import me.itzisonn_.meazy.parser.ast.Modifiers;
+import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AnyClassEnvironment extends ClassEnvironmentImpl {
-    public AnyClassEnvironment(Environment parent) {
+    public AnyClassEnvironment(ClassDeclarationEnvironment parent) {
         super(parent, true, "Any");
 
 

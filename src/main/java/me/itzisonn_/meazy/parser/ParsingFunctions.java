@@ -4,9 +4,6 @@ import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ast.Modifier;
-import me.itzisonn_.meazy.parser.ast.Modifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.CallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
@@ -61,6 +58,7 @@ public final class ParsingFunctions {
                 VariableDeclarationStatement variableDeclarationStatement =
                         parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
+                moveOverOptionalNewLines();
                 return variableDeclarationStatement;
             }
             if (getCurrent().getType().equals(TokenTypes.CLASS())) {
@@ -76,6 +74,17 @@ public final class ParsingFunctions {
             getCurrentAndNext();
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after class keyword").getValue();
 
+            Set<String> baseClasses = new HashSet<>();
+            if (getCurrent().getType().equals(TokenTypes.COLON())) {
+                getCurrentAndNext();
+                baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected identifier as base class").getValue());
+
+                while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                    getCurrentAndNext();
+                    baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected identifier as base class after comma").getValue());
+                }
+            }
+
             moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
             moveOverOptionalNewLines();
@@ -89,7 +98,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
 
-            return new ClassDeclarationStatement(modifiers, id, body);
+            return new ClassDeclarationStatement(modifiers, id, baseClasses, body);
         });
 
         register("class_body_statement", extra -> {
@@ -102,11 +111,13 @@ public final class ParsingFunctions {
                 VariableDeclarationStatement variableDeclarationStatement =
                         parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
+                moveOverOptionalNewLines();
                 return variableDeclarationStatement;
             }
             if (getCurrent().getType().equals(TokenTypes.CONSTRUCTOR())) {
                 return parse(RegistryIdentifier.ofDefault("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
             }
+
             throw new InvalidStatementException("Invalid statement found", getCurrent().getLine());
         });
 
@@ -122,6 +133,11 @@ public final class ParsingFunctions {
             }).toList();
 
             DataType dataType = parseDataType();
+
+            if (modifiers.contains(Modifiers.ABSTRACT())) {
+                getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
+                return new FunctionDeclarationStatement(modifiers, id, args, new ArrayList<>(), dataType);
+            }
 
             List<Statement> body;
             if (getCurrent().getType().equals(TokenTypes.ARROW())) {
@@ -179,11 +195,39 @@ public final class ParsingFunctions {
 
             moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
-            List<Statement> body = parseBody();
+            List<Statement> body = new ArrayList<>();
+            moveOverOptionalNewLines();
+
+            while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
+                if (getCurrent().getType().equals(TokenTypes.BASE())) body.add(parse(RegistryIdentifier.ofDefault("base_call_statement")));
+                else body.add(parse(RegistryIdentifier.ofDefault("statement")));
+                moveOverOptionalNewLines();
+            }
+
+            moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close constructor body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the constructor declaration");
 
             return new ConstructorDeclarationStatement(modifiers, args, body);
+        });
+
+        register("base_call_statement", extra -> {
+            getCurrentAndNext(TokenTypes.BASE(), "Expected BASE to start base call statement");
+
+            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after base keyword").getValue();
+
+            getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
+            List<Expression> args = new ArrayList<>();
+            if (getCurrent().getType() != TokenTypes.RIGHT_PAREN()) {
+                args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+
+                while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                    getCurrentAndNext();
+                    args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+                }
+            }
+            getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
+            return new BaseCallStatement(id, args);
         });
 
         register("statement", extra -> {
@@ -193,6 +237,7 @@ public final class ParsingFunctions {
                 VariableDeclarationStatement variableDeclarationStatement =
                         parse(RegistryIdentifier.ofDefault("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the variable declaration");
+                moveOverOptionalNewLines();
                 return variableDeclarationStatement;
             }
             if (!modifiers.isEmpty()) throw new InvalidStatementException("Unexpected Modifier found", getCurrent().getLine());
@@ -422,9 +467,9 @@ public final class ParsingFunctions {
         register("is_expression", extra -> {
             Expression value = parseAfter(RegistryIdentifier.ofDefault("is_expression"), Expression.class);
 
-            if (getCurrent().getType().equals(TokenTypes.IS())) {
-                getCurrentAndNext();
-                return new IsExpression(value, getCurrentAndNext(TokenTypes.ID(), "Must specify data type after is keyword").getValue());
+            if (getCurrent().getType().equals(TokenTypes.IS()) || getCurrent().getType().equals(TokenTypes.IS_LIKE())) {
+                boolean isLike = getCurrentAndNext().getType().equals(TokenTypes.IS_LIKE());
+                return new IsExpression(value, getCurrentAndNext(TokenTypes.ID(), "Must specify data type after is keyword").getValue(), isLike);
             }
 
             return value;

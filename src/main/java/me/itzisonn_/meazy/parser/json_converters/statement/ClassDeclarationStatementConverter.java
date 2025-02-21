@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.parser.json_converters.statement;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.parser.ast.Modifier;
-import me.itzisonn_.meazy.parser.ast.Modifiers;
+import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.Modifiers;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.statement.ClassDeclarationStatement;
 import me.itzisonn_.meazy.parser.json_converters.Converter;
@@ -10,6 +10,7 @@ import me.itzisonn_.meazy.parser.json_converters.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,10 +35,17 @@ public class ClassDeclarationStatementConverter extends Converter<ClassDeclarati
 
         String id = getElement(object, "id").getAsString();
 
+        Set<String> baseClasses;
+        if (object.get("base_classes") != null) {
+            baseClasses = getElement(object, "base_classes").getAsJsonArray().asList().stream()
+                    .map(JsonElement::getAsString).collect(Collectors.toSet());
+        }
+        else baseClasses = new HashSet<>();
+
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        return new ClassDeclarationStatement(modifiers, id, body);
+        return new ClassDeclarationStatement(modifiers, id, baseClasses, body);
     }
 
     @Override
@@ -51,6 +59,14 @@ public class ClassDeclarationStatementConverter extends Converter<ClassDeclarati
         result.add("modifiers", modifiers);
 
         result.addProperty("id", classDeclarationStatement.getId());
+
+        if (classDeclarationStatement.getBaseClasses() != null) {
+            JsonArray baseClasses = new JsonArray();
+            for (String baseClass : classDeclarationStatement.getBaseClasses()) {
+                baseClasses.add(baseClass);
+            }
+            result.add("base_classes", baseClasses);
+        }
 
         JsonArray body = new JsonArray();
         for (Statement statement : classDeclarationStatement.getBody()) {

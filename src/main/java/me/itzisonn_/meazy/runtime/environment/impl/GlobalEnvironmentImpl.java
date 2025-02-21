@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
-import me.itzisonn_.meazy.parser.ast.Modifiers;
-import me.itzisonn_.meazy.parser.ast.DataType;
+import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy.parser.ast.expression.literal.DoubleLiteral;

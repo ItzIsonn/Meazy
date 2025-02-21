@@ -4,6 +4,8 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
+import java.util.regex.Pattern;
+
 /**
  * All basic TokenTypes
  *
@@ -32,6 +34,10 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("constructor")).getValue();
     }
 
+    public static TokenType BASE() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("base")).getValue();
+    }
+
     public static TokenType NEW() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("new")).getValue();
     }
@@ -42,6 +48,10 @@ public final class TokenTypes {
 
     public static TokenType SHARED() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
+    }
+
+    public static TokenType ABSTRACT() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("abstract")).getValue();
     }
 
     public static TokenType IF() {
@@ -78,6 +88,10 @@ public final class TokenTypes {
 
     public static TokenType IS() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("is")).getValue();
+    }
+
+    public static TokenType IS_LIKE() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("is_like")).getValue();
     }
 
 
@@ -299,9 +313,11 @@ public final class TokenTypes {
         register(new TokenType("function", "function|fun", false));
         register(new TokenType("class", "class", false));
         register(new TokenType("constructor", "constructor", false));
+        register(new TokenType("base", "base", false));
         register(new TokenType("new", "new", false));
         register(new TokenType("private", "private", false));
         register(new TokenType("shared", "shared", false));
+        register(new TokenType("abstract", "abstract", false));
         register(new TokenType("if", "if", false));
         register(new TokenType("else", "else", false));
         register(new TokenType("for", "for", false));
@@ -311,12 +327,13 @@ public final class TokenTypes {
         register(new TokenType("continue", "continue", false));
         register(new TokenType("break", "break", false));
         register(new TokenType("is", "is", false));
+        register(new TokenType("is_like", "isLike", false));
 
         register(new TokenType("new_line", "\n+", false));
         register(new TokenType("comment", "\\/\\/[^\n]*", true));
         register(new TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", true));
         register(new TokenType("white_space", "(?!\n)\\s", true));
-        register(new TokenType("end_of_file", (String) null, false));
+        register(new TokenType("end_of_file", (Pattern) null, false));
 
         register(new TokenType("left_paren", "\\(", false));
         register(new TokenType("right_paren", "\\)", false));
