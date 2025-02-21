@@ -42,18 +42,6 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("new")).getValue();
     }
 
-    public static TokenType PRIVATE() {
-        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("private")).getValue();
-    }
-
-    public static TokenType SHARED() {
-        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
-    }
-
-    public static TokenType ABSTRACT() {
-        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("abstract")).getValue();
-    }
-
     public static TokenType IF() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("if")).getValue();
     }
@@ -315,9 +303,6 @@ public final class TokenTypes {
         register(new TokenType("constructor", "constructor", false));
         register(new TokenType("base", "base", false));
         register(new TokenType("new", "new", false));
-        register(new TokenType("private", "private", false));
-        register(new TokenType("shared", "shared", false));
-        register(new TokenType("abstract", "abstract", false));
         register(new TokenType("if", "if", false));
         register(new TokenType("else", "else", false));
         register(new TokenType("for", "for", false));

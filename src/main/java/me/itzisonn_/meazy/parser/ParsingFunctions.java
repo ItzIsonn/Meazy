@@ -650,10 +650,14 @@ public final class ParsingFunctions {
 
     private static Set<Modifier> parseModifiers() {
         Set<Modifier> modifiers = new HashSet<>();
-        while (TokenTypeSets.MODIFIERS().contains(getCurrent().getType())) {
-            String id = getCurrentAndNext().getValue();
+        while (getCurrent().getType().equals(TokenTypes.ID())) {
+            String id = getCurrent().getValue();
             Modifier modifier = Modifiers.parse(id);
-            if (modifier == null) throw new InvalidStatementException("Modifier with id " + id + " doesn't exist");
+            if (modifier == null) {
+                if (modifiers.isEmpty()) return modifiers;
+                throw new InvalidStatementException("Modifier with id " + id + " doesn't exist");
+            }
+            getCurrentAndNext();
             modifiers.add(modifier);
         }
         return modifiers;
