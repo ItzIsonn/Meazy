@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -8,6 +9,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
  * Modifier defines behaviour of statements
  */
 @Getter
+@EqualsAndHashCode
 public abstract class Modifier {
     /**
      * Modifier's id

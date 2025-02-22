@@ -23,6 +23,10 @@ public final class Modifiers {
         return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("private")).getValue();
     }
 
+    public static Modifier PROTECTED() {
+        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("protected")).getValue();
+    }
+
     public static Modifier SHARED() {
         return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("shared")).getValue();
     }
@@ -66,8 +70,23 @@ public final class Modifiers {
         register(new Modifier("private") {
             @Override
             public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement.getModifiers().contains(ABSTRACT()) || modifierStatement.getModifiers().contains(PROTECTED())) return false;
+
                 if (modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
                     modifierStatement instanceof ConstructorDeclarationStatement) {
+                    return environment instanceof ClassEnvironment;
+                }
+                return false;
+            }
+        });
+
+        register(new Modifier("protected") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement.getModifiers().contains(PRIVATE())) return false;
+
+                if (modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
+                        modifierStatement instanceof ConstructorDeclarationStatement) {
                     return environment instanceof ClassEnvironment;
                 }
                 return false;
@@ -77,6 +96,8 @@ public final class Modifiers {
         register(new Modifier("shared") {
             @Override
             public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement.getModifiers().contains(ABSTRACT())) return false;
+
                 if (modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement) {
                     return environment instanceof ClassEnvironment;
                 }
@@ -87,6 +108,8 @@ public final class Modifiers {
         register(new Modifier("abstract") {
             @Override
             public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement.getModifiers().contains(PRIVATE()) || modifierStatement.getModifiers().contains(SHARED())) return false;
+
                 if (modifierStatement instanceof ClassDeclarationStatement) return true;
                 if (modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment classEnvironment) {
                     return classEnvironment.getModifiers().contains(Modifiers.ABSTRACT());
