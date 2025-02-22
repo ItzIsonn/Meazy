@@ -4,14 +4,9 @@ import me.itzisonn_.meazy.parser.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.DoubleLiteral;
-import me.itzisonn_.meazy.parser.ast.expression.literal.IntLiteral;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.*;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.BooleanClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.AnyClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.FloatClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.IntClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.*;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
@@ -22,8 +17,7 @@ import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.number.IntValue;
-import me.itzisonn_.meazy.runtime.values.number.NumberValue;
+import me.itzisonn_.meazy.runtime.values.number.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,9 +64,24 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
-                if (value instanceof Integer || value instanceof IntValue || value instanceof IntLiteral) return true;
+                if (value instanceof Integer || value instanceof IntValue) return true;
                 try {
                     Integer.parseInt(value.toString());
+                    return true;
+                }
+                catch (NumberFormatException ignore) {
+                    return false;
+                }
+            }
+        });
+
+        declareClass(new DefaultClassValue(new LongClassEnvironment(this)) {
+            @Override
+            public boolean isMatches(Object value) {
+                if (value == null) return true;
+                if (value instanceof Integer || value instanceof IntValue || value instanceof Long || value instanceof LongValue) return true;
+                try {
+                    Long.parseLong(value.toString());
                     return true;
                 }
                 catch (NumberFormatException ignore) {
@@ -85,8 +94,22 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
             @Override
             public boolean isMatches(Object value) {
                 if (value == null) return true;
-                if (value instanceof Number || value instanceof NumberValue || value instanceof DoubleLiteral)
+                if (value instanceof Integer || value instanceof IntValue || value instanceof Float || value instanceof FloatValue) return true;
+                try {
+                    Float.parseFloat(value.toString());
                     return true;
+                }
+                catch (NumberFormatException ignore) {
+                    return false;
+                }
+            }
+        });
+
+        declareClass(new DefaultClassValue(new DoubleClassEnvironment(this)) {
+            @Override
+            public boolean isMatches(Object value) {
+                if (value == null) return true;
+                if (value instanceof Number || value instanceof NumberValue<?>) return true;
                 try {
                     Double.parseDouble(value.toString());
                     return true;
@@ -94,6 +117,15 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
                 catch (NumberFormatException ignore) {
                     return false;
                 }
+            }
+        });
+
+        declareClass(new DefaultClassValue(new CharClassEnvironment(this)) {
+            @Override
+            public boolean isMatches(Object value) {
+                if (value == null) return true;
+                if (value instanceof Character) return true;
+                return value.toString().length() == 1;
             }
         });
 

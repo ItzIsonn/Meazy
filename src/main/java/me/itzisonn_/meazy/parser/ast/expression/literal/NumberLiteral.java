@@ -4,15 +4,15 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 
 @Getter
-public class IntLiteral implements Expression {
-    private final int value;
+public class NumberLiteral implements Expression {
+    private final String value;
 
-    public IntLiteral(int value) {
+    public NumberLiteral(String value) {
         this.value = value;
     }
 
     @Override
     public String toCodeString() {
-        return String.valueOf(value);
+        return value;
     }
 }

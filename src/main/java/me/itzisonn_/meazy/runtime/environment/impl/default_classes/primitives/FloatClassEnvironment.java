@@ -6,11 +6,11 @@ import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
+import me.itzisonn_.meazy.runtime.values.NullValue;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
+import me.itzisonn_.meazy.runtime.values.number.FloatValue;
 
 import java.util.List;
 import java.util.Set;
@@ -28,15 +28,15 @@ public class FloatClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("valueOf", List.of(
                 new CallArgExpression("object", new DataType("Any", false), true)),
-                new DataType("Float", false), this, Set.of(Modifiers.SHARED())) {
+                new DataType("Float", true), this, Set.of(Modifiers.SHARED())) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                Object value = functionArgs.getFirst().getFinalValue();
+                String value = functionArgs.getFirst().getFinalValue().toString();
                 try {
-                    return new DoubleValue(Float.parseFloat(value.toString()));
+                    return new FloatValue(Float.parseFloat(value));
                 }
                 catch (NumberFormatException ignore) {
-                    throw new InvalidSyntaxException("Can't convert " + value + " to Float");
+                    return new NullValue();
                 }
             }
         });

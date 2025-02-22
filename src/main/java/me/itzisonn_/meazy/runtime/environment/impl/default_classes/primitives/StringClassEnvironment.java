@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
+package me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives;
 
 import me.itzisonn_.meazy.parser.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.ListClassEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidCallException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -152,7 +153,7 @@ public class StringClassEnvironment extends ClassEnvironmentImpl {
 
         declareFunction(new DefaultFunctionValue("getCharAt", List.of(
                 new CallArgExpression("pos", new DataType("Int", false), true)),
-                new DataType("String", false), this, new HashSet<>()) {
+                new DataType("Char", false), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 Object value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue().getValue();
@@ -163,7 +164,7 @@ public class StringClassEnvironment extends ClassEnvironmentImpl {
                             return new StringValue(String.valueOf(string.charAt(intValue.getValue())));
                         }
                         catch (IndexOutOfBoundsException ignore) {
-                            throw new InvalidArgumentException("Index " + intValue.getValue() + "out of bounds " + (string.length() - 1));
+                            throw new InvalidArgumentException("Index " + intValue.getValue() + " is out of bounds " + (string.length() - 1));
                         }
                     }
                 }
@@ -172,7 +173,7 @@ public class StringClassEnvironment extends ClassEnvironmentImpl {
         });
 
         declareFunction(new DefaultFunctionValue("setCharAt",
-                List.of(new CallArgExpression("pos", new DataType("Int", false), true), new CallArgExpression("char", new DataType("String", false), true)),
+                List.of(new CallArgExpression("pos", new DataType("Int", false), true), new CallArgExpression("char", new DataType("Char", false), true)),
                 new DataType("String", false), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
@@ -186,11 +187,7 @@ public class StringClassEnvironment extends ClassEnvironmentImpl {
                     throw new InvalidArgumentException("Position must be int");
                 }
 
-                String stringChar = functionArgs.get(1).getFinalValue().toString();
-                if (stringChar.length() != 1) {
-                    throw new InvalidArgumentException("Char must be one character long");
-                }
-                char ch = stringChar.charAt(0);
+                char ch = functionArgs.get(1).getFinalValue().toString().charAt(0);
 
                 if (value instanceof String string) {
                     if (!(getParentEnvironment() instanceof StringClassEnvironment classEnvironment)) {

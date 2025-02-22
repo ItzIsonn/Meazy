@@ -26,9 +26,7 @@ import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructor
 import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
 import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
 import me.itzisonn_.meazy.runtime.values.functions.RuntimeFunctionValue;
-import me.itzisonn_.meazy.runtime.values.number.DoubleValue;
-import me.itzisonn_.meazy.runtime.values.number.IntValue;
-import me.itzisonn_.meazy.runtime.values.number.NumberValue;
+import me.itzisonn_.meazy.runtime.values.number.*;
 import me.itzisonn_.meazy.runtime.values.statement_info.BreakInfoValue;
 import me.itzisonn_.meazy.runtime.values.statement_info.ContinueInfoValue;
 import me.itzisonn_.meazy.runtime.values.statement_info.ReturnInfoValue;
@@ -564,26 +562,11 @@ public final class EvaluationFunctions {
             RuntimeValue<?> left = Interpreter.evaluate(binaryExpression.getLeft(), environment).getFinalRuntimeValue();
             RuntimeValue<?> right = Interpreter.evaluate(binaryExpression.getRight(), environment).getFinalRuntimeValue();
 
-            if (left instanceof IntValue leftValue && right instanceof IntValue rightValue) {
-                int leftNumber = leftValue.getValue();
-                int rightNumber = rightValue.getValue();
-
-                return new IntValue(switch (binaryExpression.getOperator()) {
-                    case "+" -> leftNumber + rightNumber;
-                    case "-" -> leftNumber - rightNumber;
-                    case "*" -> leftNumber * rightNumber;
-                    case "/" -> leftNumber / rightNumber;
-                    case "%" -> leftNumber % rightNumber;
-                    case "^" -> (int) Math.pow(leftNumber, rightNumber);
-                    default -> throw new UnsupportedOperatorException(binaryExpression.getOperator());
-                });
-            }
-
             if (left instanceof NumberValue<?> leftValue && right instanceof NumberValue<?> rightValue) {
                 double leftNumber = leftValue.getValue().doubleValue();
                 double rightNumber = rightValue.getValue().doubleValue();
 
-                return new DoubleValue(switch (binaryExpression.getOperator()) {
+                double value = switch (binaryExpression.getOperator()) {
                     case "+" -> leftNumber + rightNumber;
                     case "-" -> leftNumber - rightNumber;
                     case "*" -> leftNumber * rightNumber;
@@ -591,7 +574,17 @@ public final class EvaluationFunctions {
                     case "%" -> leftNumber % rightNumber;
                     case "^" -> Math.pow(leftNumber, rightNumber);
                     default -> throw new UnsupportedOperatorException(binaryExpression.getOperator());
-                });
+                };
+
+                if (value % 1 == 0) {
+                    if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) return new IntValue((int) value);
+                    if (value >= Long.MIN_VALUE && value <= Long.MAX_VALUE) return new LongValue((long) value);
+                }
+                else {
+                    if (value >= Float.MIN_VALUE && value <= Float.MAX_VALUE) return new FloatValue((float) value);
+                    if (value >= Double.MIN_VALUE && value <= Double.MAX_VALUE) return new DoubleValue(value);
+                }
+                throw new InvalidValueException("Resulted value is out of bounds");
             }
 
             return new StringValue(switch (binaryExpression.getOperator()) {
@@ -627,8 +620,12 @@ public final class EvaluationFunctions {
         register("negation_expression", NegationExpression.class, (negationExpression, environment, extra) -> {
             RuntimeValue<?> value = Interpreter.evaluate(negationExpression.getExpression(), environment).getFinalRuntimeValue();
             if (!(value instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't negate non-number value " + value);
-            if (numberValue instanceof IntValue intValue) return new IntValue(-intValue.getValue());
-            return new DoubleValue(-numberValue.getValue().doubleValue());
+            return switch (numberValue) {
+                case IntValue intValue -> new IntValue(-intValue.getValue());
+                case LongValue longValue -> new LongValue(-longValue.getValue());
+                case FloatValue floatValue -> new FloatValue(-floatValue.getValue());
+                default -> new DoubleValue(-numberValue.getValue().doubleValue());
+            };
         });
 
         register("class_call_expression", ClassCallExpression.class, (classCallExpression, environment, extra) -> {
@@ -863,8 +860,34 @@ public final class EvaluationFunctions {
         });
 
         register("null_literal", NullLiteral.class, (nullLiteral, environment, extra) -> new NullValue());
-        register("int_literal", IntLiteral.class, (intLiteral, environment, extra) -> new IntValue(intLiteral.getValue()));
-        register("number_literal", DoubleLiteral.class, (doubleLiteral, environment, extra) -> new DoubleValue(doubleLiteral.getValue()));
+        register("number_literal", NumberLiteral.class, (numberLiteral, environment, extra) -> {
+            String value = numberLiteral.getValue();
+            if (!value.contains(".")) {
+                try {
+                    return new IntValue(Integer.parseInt(value));
+                }
+                catch (NumberFormatException ignore) {
+                    try {
+                        return new LongValue(Long.parseLong(value));
+                    }
+                    catch (NumberFormatException ignore2) {
+                        throw new InvalidSyntaxException("Number " + value + " is too big");
+                    }
+                }
+            }
+
+            try {
+                return new FloatValue(Float.parseFloat(value));
+            }
+            catch (NumberFormatException ignore) {
+                try {
+                    return new DoubleValue(Double.parseDouble(value));
+                }
+                catch (NumberFormatException ignore2) {
+                    throw new InvalidSyntaxException("Number " + value + " is too big");
+                }
+            }
+        });
         register("string_literal", StringLiteral.class, (stringLiteral, environment, extra) -> new StringValue(stringLiteral.getValue()));
         register("boolean_literal", BooleanLiteral.class, (booleanLiteral, environment, extra) -> new BooleanValue(booleanLiteral.isValue()));
 
