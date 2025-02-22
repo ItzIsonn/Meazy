@@ -5,6 +5,8 @@ import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.values.RuntimeValue;
 import me.itzisonn_.meazy.runtime.values.VariableValue;
@@ -63,16 +65,40 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     }
 
     @Override
+    public Environment getVariableDeclarationEnvironment(String id) {
+        if (super.getVariable(id) != null) return this;
+
+        for (ClassEnvironment baseClass : baseClasses) {
+            VariableValue variable = baseClass.getVariable(id);
+            if (variable != null) return baseClass;
+        }
+
+        return super.getVariableDeclarationEnvironment(id);
+    }
+
+    @Override
     public FunctionValue getFunction(String id, List<RuntimeValue<?>> args) {
         FunctionValue functionValue = super.getFunction(id, args);
         if (functionValue != null) return functionValue;
 
         for (ClassEnvironment baseClass : baseClasses) {
-            FunctionValue variable = baseClass.getFunction(id, args);
-            if (variable != null) return variable;
+            FunctionValue function = baseClass.getFunction(id, args);
+            if (function != null) return function;
         }
 
         return null;
+    }
+
+    @Override
+    public FunctionDeclarationEnvironment getFunctionDeclarationEnvironment(String id, List<RuntimeValue<?>> args) {
+        if (super.getFunction(id, args) != null) return this;
+
+        for (ClassEnvironment baseClass : baseClasses) {
+            FunctionValue function = baseClass.getFunction(id, args);
+            if (function != null) return baseClass;
+        }
+
+        return super.getFunctionDeclarationEnvironment(id, args);
     }
 
     @Override
