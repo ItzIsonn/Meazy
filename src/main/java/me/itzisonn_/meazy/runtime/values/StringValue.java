@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.values;
 
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.StringClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.StringClassEnvironment;
 import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
 
 public class StringValue extends DefaultClassValue {

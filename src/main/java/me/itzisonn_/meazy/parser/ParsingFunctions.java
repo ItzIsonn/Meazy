@@ -85,8 +85,22 @@ public final class ParsingFunctions {
                 }
             }
 
+            boolean hasNewLine = getCurrent().getType().equals(TokenTypes.NEW_LINE());
             moveOverOptionalNewLines();
+
+            if (!getCurrent().getType().equals(TokenTypes.LEFT_BRACE()) && hasNewLine) {
+                return new ClassDeclarationStatement(modifiers, id, baseClasses, new ArrayList<>());
+            }
+
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
+
+            if (getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
+                getCurrentAndNext();
+                getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
+                moveOverOptionalNewLines();
+                return new ClassDeclarationStatement(modifiers, id, baseClasses, new ArrayList<>());
+            }
+
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
             moveOverOptionalNewLines();
 
@@ -536,7 +550,7 @@ public final class ParsingFunctions {
 
             if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
-                Expression value = new BinaryExpression(id, new IntLiteral(1), token.getValue().substring(1));
+                Expression value = new BinaryExpression(id, new NumberLiteral("1"), token.getValue().substring(1));
                 return new AssignmentExpression(id, value);
             }
 
@@ -618,11 +632,7 @@ public final class ParsingFunctions {
                 getCurrentAndNext();
                 return new NullLiteral();
             }
-            if (tokenType.equals(TokenTypes.NUMBER())) {
-                String value = getCurrentAndNext().getValue();
-                if (value.contains(".")) return new DoubleLiteral(Double.parseDouble(value));
-                else return new IntLiteral(Integer.parseInt(value));
-            }
+            if (tokenType.equals(TokenTypes.NUMBER())) return new NumberLiteral(getCurrentAndNext().getValue());
             if (tokenType.equals(TokenTypes.STRING())) {
                 String value = getCurrentAndNext().getValue();
                 return new StringLiteral(value.substring(1, value.length() - 1));
@@ -635,7 +645,7 @@ public final class ParsingFunctions {
             if (tokenType.equals(TokenTypes.LEFT_PAREN())) {
                 getCurrentAndNext();
                 Expression value = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
-                getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis inside expression");
+                getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
                 return value;
             }
             if (tokenType.equals(TokenTypes.NEW_LINE())) {

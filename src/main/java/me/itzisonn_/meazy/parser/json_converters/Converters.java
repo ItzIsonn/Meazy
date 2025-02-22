@@ -100,8 +100,7 @@ public final class Converters {
         register(new VariableIdentifierConverter());
 
         register(new NullLiteralConverter());
-        register(new IntLiteralConverter());
-        register(new DoubleLiteralConverter());
+        register(new NumberLiteralConverter());
         register(new StringLiteralConverter());
         register(new BooleanLiteralConverter());
         register(new ThisLiteralConverter());
