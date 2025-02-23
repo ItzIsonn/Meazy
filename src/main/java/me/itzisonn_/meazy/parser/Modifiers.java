@@ -35,6 +35,14 @@ public final class Modifiers {
         return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("abstract")).getValue();
     }
 
+    public static Modifier GET() {
+        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("get")).getValue();
+    }
+
+    public static Modifier SET() {
+        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("set")).getValue();
+    }
+
 
     /**
      * Finds registered Modifier with given id
@@ -115,6 +123,21 @@ public final class Modifiers {
                     return classEnvironment.getModifiers().contains(Modifiers.ABSTRACT());
                 }
                 return false;
+            }
+        });
+
+        register(new Modifier("get") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                return modifierStatement instanceof VariableDeclarationStatement && environment instanceof ClassEnvironment;
+            }
+        });
+
+        register(new Modifier("set") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                return modifierStatement instanceof VariableDeclarationStatement variableDeclarationStatement && !variableDeclarationStatement.isConstant()
+                        && environment instanceof ClassEnvironment;
             }
         });
     }
