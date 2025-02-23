@@ -150,9 +150,48 @@ public final class EvaluationFunctions {
                         value,
                         variableDeclarationStatement.isConstant(),
                         modifiers,
-                        false)
-                );
+                        false
+                ));
+
+                if (environment instanceof ClassEnvironment classEnvironment && (modifiers.contains(Modifiers.GET()) || modifiers.contains(Modifiers.SET()))) {
+                    boolean isUpperCase;
+                    String functionId;
+                    if (variableDeclarationInfo.getId().equals(variableDeclarationInfo.getId().toUpperCase())) {
+                        functionId = variableDeclarationInfo.getId();
+                        isUpperCase = true;
+                    }
+                    else {
+                        functionId = variableDeclarationInfo.getId().substring(0, 1).toUpperCase() + variableDeclarationInfo.getId().substring(1);
+                        isUpperCase = false;
+                    }
+
+                    Set<Modifier> functionModifiers = new HashSet<>();
+                    if (variableDeclarationStatement.getModifiers().contains(Modifiers.SHARED())) functionModifiers.add(Modifiers.SHARED());
+
+                    if (modifiers.contains(Modifiers.GET())) {
+                        classEnvironment.declareFunction(new DefaultFunctionValue(isUpperCase ? "GET_" : "get" + functionId, List.of(),
+                                variableDeclarationInfo.getDataType(), classEnvironment, functionModifiers) {
+                            @Override
+                            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                                return environment.getVariable(variableDeclarationInfo.getId());
+                            }
+                        });
+                    }
+
+                    if (modifiers.contains(Modifiers.SET())) {
+                        classEnvironment.declareFunction(new DefaultFunctionValue(isUpperCase ? "SET_" : "set" + functionId,
+                                List.of(new CallArgExpression("value", variableDeclarationInfo.getDataType(), true)),
+                                null, classEnvironment, functionModifiers) {
+                            @Override
+                            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                                environment.assignVariable(variableDeclarationInfo.getId(),functionArgs.getFirst().getFinalRuntimeValue());
+                                return null;
+                            }
+                        });
+                    }
+                }
             });
+
             return null;
         });
 
@@ -601,7 +640,7 @@ public final class EvaluationFunctions {
                         string = stringValue.getValue();
                         amount = numberValue.getValue();
                     }
-                    else throw new InvalidSyntaxException("Can't multiply non-number values");
+                    else throw new InvalidSyntaxException("Can't values " + left + " and " + right);
 
                     if (amount < 0) throw new InvalidSyntaxException("Can't multiply string by a negative int");
 
