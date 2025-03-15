@@ -1,17 +1,17 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.*;
-import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
-import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.number.IntValue;
+import me.itzisonn_.meazy.runtime.value.*;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.DefaultConstructorValue;
+import me.itzisonn_.meazy.runtime.value.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.value.number.IntValue;
 
 import java.util.ArrayList;
 import java.util.HashSet;

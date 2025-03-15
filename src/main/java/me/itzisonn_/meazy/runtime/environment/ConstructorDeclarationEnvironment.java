@@ -1,10 +1,11 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.classes.constructors.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.ConstructorValue;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * ConstructorDeclarationEnvironment adds the ability to declare and get constructors
@@ -41,7 +42,7 @@ public interface ConstructorDeclarationEnvironment extends Environment {
     /**
      * @return All declared constructors
      */
-    List<ConstructorValue> getConstructors();
+    Set<ConstructorValue> getConstructors();
 
     /**
      * @return Whether has this environment at least one declared constructor

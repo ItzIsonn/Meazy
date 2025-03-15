@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser;
 
+import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
@@ -14,6 +15,8 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -72,16 +75,22 @@ public final class ParsingFunctions {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
             getCurrentAndNext(TokenTypes.CLASS(), "Expected class keyword");
-            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after class keyword").getValue();
+            String id = getCurrentAndNext(TokenTypes.ID(), "Expected id after class keyword").getValue();
+
+            List<Statement> generatedBody = new ArrayList<>();
+            if (modifiers.contains(Modifiers.DATA())) {
+                generatedBody.addAll(generateDataBody(id, parseArgs()));
+                modifiers.remove(Modifiers.DATA());
+            }
 
             Set<String> baseClasses = new HashSet<>();
             if (getCurrent().getType().equals(TokenTypes.COLON())) {
                 getCurrentAndNext();
-                baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected identifier as base class").getValue());
+                baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected id as base class").getValue());
 
                 while (getCurrent().getType().equals(TokenTypes.COMMA())) {
                     getCurrentAndNext();
-                    baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected identifier as base class after comma").getValue());
+                    baseClasses.add(getCurrentAndNext(TokenTypes.ID(), "Expected id as base class after comma").getValue());
                 }
             }
 
@@ -89,7 +98,7 @@ public final class ParsingFunctions {
             moveOverOptionalNewLines();
 
             if (!getCurrent().getType().equals(TokenTypes.LEFT_BRACE()) && hasNewLine) {
-                return new ClassDeclarationStatement(modifiers, id, baseClasses, new ArrayList<>());
+                return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
             }
 
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open class body");
@@ -98,7 +107,7 @@ public final class ParsingFunctions {
                 getCurrentAndNext();
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
                 moveOverOptionalNewLines();
-                return new ClassDeclarationStatement(modifiers, id, baseClasses, new ArrayList<>());
+                return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
             }
 
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
@@ -142,11 +151,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.FUNCTION(), "Expected function keyword");
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
 
-            List<CallArgExpression> args = parseArgs().stream().map(expression -> {
-                if (!(expression instanceof CallArgExpression callArgExpression)) throw new UnexpectedTokenException("Expected function args", getCurrent().getLine());
-                return callArgExpression;
-            }).toList();
-
+            List<CallArgExpression> args = parseArgs();
             DataType dataType = parseDataType();
 
             if (modifiers.contains(Modifiers.ABSTRACT())) {
@@ -203,10 +208,7 @@ public final class ParsingFunctions {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
             getCurrentAndNext(TokenTypes.CONSTRUCTOR(), "Expected constructor keyword");
 
-            List<CallArgExpression> args = parseArgs().stream().map(expression -> {
-                if (!(expression instanceof CallArgExpression callArgExpression)) throw new UnexpectedTokenException("Expected constructor args", getCurrent().getLine());
-                return callArgExpression;
-            }).toList();
+            List<CallArgExpression> args = parseArgs();
 
             moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
@@ -746,6 +748,82 @@ public final class ParsingFunctions {
         getCurrentAndNext(TokenTypes.ASSIGN(), "Expected ASSIGN token after the id in variable declaration");
 
         return new VariableDeclarationStatement.VariableDeclarationInfo(id, dataType, parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+    }
+
+    private static List<Statement> generateDataBody(String id, List<CallArgExpression> dataVariables) {
+        List<Statement> body = new ArrayList<>();
+
+        for (CallArgExpression dataVariable : dataVariables) {
+            body.add(new VariableDeclarationStatement(
+                    Set.of(Modifiers.PRIVATE()),
+                    dataVariable.isConstant(),
+                    List.of(new VariableDeclarationStatement.VariableDeclarationInfo(dataVariable.getId(), dataVariable.getDataType(), null))));
+        }
+
+        List<Statement> constructorBody = new ArrayList<>();
+        for (CallArgExpression callArgExpression : dataVariables) {
+            constructorBody.add(new AssignmentExpression(new MemberExpression(new ThisLiteral(), new VariableIdentifier(callArgExpression.getId()), false), new VariableIdentifier(callArgExpression.getId())));
+        }
+        body.add(new ConstructorDeclarationStatement(Set.of(), dataVariables, constructorBody));
+
+        for (CallArgExpression dataVariable : dataVariables) {
+            body.add(new FunctionDeclarationStatement(
+                    Set.of(),
+                    Utils.generatePrefixedName("get", dataVariable.getId()),
+                    List.of(),
+                    List.of(new ReturnStatement(new VariableIdentifier(dataVariable.getId()))),
+                    dataVariable.getDataType()));
+        }
+
+        for (CallArgExpression dataVariable : dataVariables) {
+            if (dataVariable.isConstant()) continue;
+            body.add(new FunctionDeclarationStatement(
+                    Set.of(),
+                    Utils.generatePrefixedName("set", dataVariable.getId()),
+                    List.of(new CallArgExpression(dataVariable.getId(), dataVariable.getDataType(), true)),
+                    List.of(new AssignmentExpression(new MemberExpression(new ThisLiteral(), new VariableIdentifier(dataVariable.getId()), false), new VariableIdentifier(dataVariable.getId()))),
+                    null));
+        }
+
+        Expression toStringExpression = new StringLiteral(id + "(");
+        for (int i = 0; i < dataVariables.size(); i++) {
+            CallArgExpression dataVariable = dataVariables.get(i);
+
+            Expression endingExpression;
+            if (i == dataVariables.size() - 1) endingExpression = new BinaryExpression(
+                    new VariableIdentifier(dataVariable.getId()),
+                    new StringLiteral(")"),
+                    "+"
+            );
+            else endingExpression = new VariableIdentifier(dataVariable.getId());
+
+            toStringExpression = new BinaryExpression(
+                    toStringExpression,
+                    new BinaryExpression(
+                            new StringLiteral((i == 0 ? "" : ",") + dataVariable.getId() + "="),
+                            endingExpression,
+                            "+"),
+                    "+");
+        }
+        body.add(new FunctionDeclarationStatement(
+                Set.of(),
+                "toString",
+                List.of(),
+                List.of(new ReturnStatement(toStringExpression)),
+                new DataType("String", false)));
+
+        List<Expression> copyArgs = new ArrayList<>();
+        for (CallArgExpression dataVariable : dataVariables) {
+            copyArgs.add(new VariableIdentifier(dataVariable.getId()));
+        }
+        body.add(new FunctionDeclarationStatement(
+                Set.of(),
+                "copy",
+                List.of(),
+                List.of(new ReturnStatement(new ClassCallExpression(new ClassIdentifier(id), copyArgs))),
+                new DataType(id, false)));
+
+        return body;
     }
 
 

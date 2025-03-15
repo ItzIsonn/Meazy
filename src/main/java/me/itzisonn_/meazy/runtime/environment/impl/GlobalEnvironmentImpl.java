@@ -1,34 +1,35 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
-import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.*;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitives.*;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitive.*;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidArgumentException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.BooleanValue;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.number.*;
+import me.itzisonn_.meazy.runtime.value.BooleanValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.value.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.value.number.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements GlobalEnvironment {
-    private final List<ClassValue> classes;
+    private final Set<ClassValue> classes;
 
     public GlobalEnvironmentImpl() {
         super(null, false);
-        classes = new ArrayList<>();
+        classes = new HashSet<>();
     }
 
     @Override
@@ -39,8 +40,8 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
     }
 
     @Override
-    public List<ClassValue> getClasses() {
-        return new ArrayList<>(classes);
+    public Set<ClassValue> getClasses() {
+        return new HashSet<>(classes);
     }
 
     public void init() {

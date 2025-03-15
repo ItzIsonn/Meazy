@@ -4,17 +4,18 @@ import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl implements FunctionDeclarationEnvironment {
-    protected final List<FunctionValue> functions;
+    protected final Set<FunctionValue> functions;
 
     public FunctionDeclarationEnvironmentImpl(Environment parent, boolean isShared) {
         super(parent, isShared);
-        functions = new ArrayList<>();
+        functions = new HashSet<>();
     }
 
     @Override
@@ -41,7 +42,7 @@ public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl
     }
 
     @Override
-    public List<FunctionValue> getFunctions() {
-        return new ArrayList<>(functions);
+    public Set<FunctionValue> getFunctions() {
+        return new HashSet<>(functions);
     }
 }

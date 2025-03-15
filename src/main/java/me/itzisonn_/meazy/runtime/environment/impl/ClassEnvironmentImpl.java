@@ -1,19 +1,18 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.VariableValue;
-import me.itzisonn_.meazy.runtime.values.classes.constructors.ConstructorValue;
-import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,14 +20,14 @@ import java.util.Set;
 public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl implements ClassEnvironment {
     @Getter
     protected final String id;
-    protected final List<ConstructorValue> constructors;
+    protected final Set<ConstructorValue> constructors;
     protected final Set<ClassEnvironment> baseClasses;
     protected final Set<Modifier> modifiers;
 
     public ClassEnvironmentImpl(ClassDeclarationEnvironment parent, boolean isShared, String id, Set<Modifier> modifiers) {
         super(parent, isShared);
         this.id = id;
-        this.constructors = new ArrayList<>();
+        this.constructors = new HashSet<>();
         this.baseClasses = new HashSet<>();
         this.modifiers = modifiers;
     }
@@ -123,8 +122,8 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     }
 
     @Override
-    public List<ConstructorValue> getConstructors() {
-        return new ArrayList<>(constructors);
+    public Set<ConstructorValue> getConstructors() {
+        return new HashSet<>(constructors);
     }
 
     @Override
@@ -137,7 +136,6 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         return new HashSet<>(baseClasses);
     }
 
-    @Override
     public Set<Modifier> getModifiers() {
         return new HashSet<>(modifiers);
     }

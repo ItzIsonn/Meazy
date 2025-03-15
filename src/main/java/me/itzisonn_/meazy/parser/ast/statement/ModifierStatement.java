@@ -1,13 +1,13 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 
 import java.util.Set;
 
 @Getter
 public abstract class ModifierStatement implements Statement {
-    private final Set<Modifier> modifiers;
+    protected final Set<Modifier> modifiers;
 
     public ModifierStatement(Set<Modifier> modifiers) {
         this.modifiers = modifiers;

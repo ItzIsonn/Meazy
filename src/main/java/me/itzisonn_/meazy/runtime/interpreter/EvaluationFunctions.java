@@ -1,7 +1,8 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
-import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
@@ -16,20 +17,20 @@ import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.ListClassEnvironment;
-import me.itzisonn_.meazy.runtime.values.*;
-import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.values.classes.RuntimeClassValue;
-import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.values.classes.constructors.BaseClassIdValue;
-import me.itzisonn_.meazy.runtime.values.classes.constructors.RuntimeConstructorValue;
-import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
-import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
-import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
-import me.itzisonn_.meazy.runtime.values.functions.RuntimeFunctionValue;
-import me.itzisonn_.meazy.runtime.values.number.*;
-import me.itzisonn_.meazy.runtime.values.statement_info.BreakInfoValue;
-import me.itzisonn_.meazy.runtime.values.statement_info.ContinueInfoValue;
-import me.itzisonn_.meazy.runtime.values.statement_info.ReturnInfoValue;
+import me.itzisonn_.meazy.runtime.value.*;
+import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.RuntimeClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.BaseClassIdValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.RuntimeConstructorValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.DefaultConstructorValue;
+import me.itzisonn_.meazy.runtime.value.function.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
+import me.itzisonn_.meazy.runtime.value.number.*;
+import me.itzisonn_.meazy.runtime.value.statement_info.BreakInfoValue;
+import me.itzisonn_.meazy.runtime.value.statement_info.ContinueInfoValue;
+import me.itzisonn_.meazy.runtime.value.statement_info.ReturnInfoValue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -154,22 +155,11 @@ public final class EvaluationFunctions {
                 ));
 
                 if (environment instanceof ClassEnvironment classEnvironment && (modifiers.contains(Modifiers.GET()) || modifiers.contains(Modifiers.SET()))) {
-                    boolean isUpperCase;
-                    String functionId;
-                    if (variableDeclarationInfo.getId().equals(variableDeclarationInfo.getId().toUpperCase())) {
-                        functionId = variableDeclarationInfo.getId();
-                        isUpperCase = true;
-                    }
-                    else {
-                        functionId = variableDeclarationInfo.getId().substring(0, 1).toUpperCase() + variableDeclarationInfo.getId().substring(1);
-                        isUpperCase = false;
-                    }
-
                     Set<Modifier> functionModifiers = new HashSet<>();
                     if (variableDeclarationStatement.getModifiers().contains(Modifiers.SHARED())) functionModifiers.add(Modifiers.SHARED());
 
                     if (modifiers.contains(Modifiers.GET())) {
-                        classEnvironment.declareFunction(new DefaultFunctionValue(isUpperCase ? "GET_" : "get" + functionId, List.of(),
+                        classEnvironment.declareFunction(new DefaultFunctionValue(Utils.generatePrefixedName("get", variableDeclarationInfo.getId()), List.of(),
                                 variableDeclarationInfo.getDataType(), classEnvironment, functionModifiers) {
                             @Override
                             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
@@ -179,7 +169,7 @@ public final class EvaluationFunctions {
                     }
 
                     if (modifiers.contains(Modifiers.SET())) {
-                        classEnvironment.declareFunction(new DefaultFunctionValue(isUpperCase ? "SET_" : "set" + functionId,
+                        classEnvironment.declareFunction(new DefaultFunctionValue(Utils.generatePrefixedName("set", variableDeclarationInfo.getId()),
                                 List.of(new CallArgExpression("value", variableDeclarationInfo.getDataType(), true)),
                                 null, classEnvironment, functionModifiers) {
                             @Override
@@ -944,14 +934,14 @@ public final class EvaluationFunctions {
 
     private static RuntimeValue<?> evaluateAssignmentExpression(AssignmentExpression assignmentExpression, Environment environment) {
         if (assignmentExpression.getId() instanceof VariableIdentifier variableIdentifier) {
-            RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
+            RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment).getFinalRuntimeValue();
             environment.getVariableDeclarationEnvironment(variableIdentifier.getId()).assignVariable(variableIdentifier.getId(), value);
             return value;
         }
         if (assignmentExpression.getId() instanceof MemberExpression memberExpression) {
             RuntimeValue<?> memberExpressionValue = Interpreter.evaluate(memberExpression, environment);
             if (memberExpressionValue instanceof VariableValue variableValue) {
-                RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment);
+                RuntimeValue<?> value = Interpreter.evaluate(assignmentExpression.getValue(), environment).getFinalRuntimeValue();
                 variableValue.setValue(value);
                 return value;
             }

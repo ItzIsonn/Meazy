@@ -1,10 +1,11 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.VariableValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.VariableValue;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -96,7 +97,7 @@ public interface Environment {
     /**
      * @return All declared variables
      */
-    List<VariableValue> getVariables();
+    Set<VariableValue> getVariables();
 
 
 

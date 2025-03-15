@@ -3,21 +3,21 @@ package me.itzisonn_.meazy.runtime.environment.impl;
 import lombok.Getter;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
-import me.itzisonn_.meazy.runtime.values.VariableValue;
+import me.itzisonn_.meazy.runtime.value.VariableValue;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EnvironmentImpl implements Environment {
     @Getter
     protected final Environment parent;
     protected boolean isShared;
-    protected final List<VariableValue> variables;
+    protected final Set<VariableValue> variables;
 
     public EnvironmentImpl(Environment parent, boolean isShared) {
         this.parent = parent;
         this.isShared = isShared;
-        variables = new ArrayList<>();
+        variables = new HashSet<>();
     }
 
     public EnvironmentImpl(Environment parent) {
@@ -44,7 +44,7 @@ public class EnvironmentImpl implements Environment {
     }
 
     @Override
-    public List<VariableValue> getVariables() {
-        return new ArrayList<>(variables);
+    public Set<VariableValue> getVariables() {
+        return new HashSet<>(variables);
     }
 }
