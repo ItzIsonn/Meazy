@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 
 import java.util.List;
@@ -21,7 +21,6 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
 
     @Override
     public String toCodeString(int offset) throws IllegalArgumentException {
-
         StringBuilder argsBuilder = new StringBuilder();
         for (int i = 0; i < args.size(); i++) {
             argsBuilder.append(args.get(i).toCodeString());

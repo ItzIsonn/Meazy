@@ -2,10 +2,11 @@ package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.functions.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * FunctionDeclarationEnvironment adds the ability to declare and get functions
@@ -45,7 +46,7 @@ public interface FunctionDeclarationEnvironment extends Environment {
     /**
      * @return All declared functions
      */
-    List<FunctionValue> getFunctions();
+    Set<FunctionValue> getFunctions();
 
 
 

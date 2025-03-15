@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 
 import java.util.List;
 import java.util.Set;
@@ -28,11 +28,16 @@ public class ClassDeclarationStatement extends ModifierStatement implements Stat
         }
         else baseClassesString = "";
 
-        StringBuilder bodyBuilder = new StringBuilder();
-        for (Statement statement : body) {
-            bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+        String bodyString;
+        if (!body.isEmpty()) {
+            StringBuilder bodyBuilder = new StringBuilder();
+            for (Statement statement : body) {
+                bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+            }
+            bodyString = " {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
         }
+        else bodyString = "";
 
-        return super.toCodeString(0) + "class " + id + baseClassesString + " {\n" + bodyBuilder + Utils.getOffset(offset -1) + "}";
+        return super.toCodeString(0) + "class " + id + baseClassesString + bodyString;
     }
 }

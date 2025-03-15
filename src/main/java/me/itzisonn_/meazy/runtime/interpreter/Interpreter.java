@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.registry.multiple_entry.Pair;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.values.*;
+import me.itzisonn_.meazy.runtime.value.*;
 
 /**
  * Interpreter used to evaluate statements

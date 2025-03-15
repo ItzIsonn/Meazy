@@ -2,9 +2,10 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 
 import java.util.List;
 import java.util.Set;
@@ -34,11 +35,16 @@ public class FunctionDeclarationStatement extends ModifierStatement implements S
 
         String returnDataTypeString = returnDataType == null ? "" : ":" + returnDataType;
 
-        StringBuilder bodyBuilder = new StringBuilder();
-        for (Statement statement : body) {
-            bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+        String bodyString;
+        if (!modifiers.contains(Modifiers.ABSTRACT())) {
+            StringBuilder bodyBuilder = new StringBuilder();
+            for (Statement statement : body) {
+                bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
+            }
+            bodyString = " {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
         }
+        else bodyString = "";
 
-        return super.toCodeString(0) + "function " + id + "(" + argsBuilder + ")" + returnDataTypeString + " {\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}";
+        return super.toCodeString(0) + "function " + id + "(" + argsBuilder + ")" + returnDataTypeString + bodyString;
     }
 }

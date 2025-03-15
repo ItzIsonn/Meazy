@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime.interpreter;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 /**
  * EvaluationFunction

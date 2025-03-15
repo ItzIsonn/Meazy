@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy;
 
-import me.itzisonn_.meazy.addons.AddonManager;
-import me.itzisonn_.meazy.addons.Addon;
+import me.itzisonn_.meazy.addon.AddonManager;
+import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryEntry;

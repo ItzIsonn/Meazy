@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.values.classes.ClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * ClassDeclarationEnvironment adds the ability to declare and get classes
@@ -30,5 +30,5 @@ public interface ClassDeclarationEnvironment extends Environment {
     /**
      * @return All declared classes
      */
-    List<ClassValue> getClasses();
+    Set<ClassValue> getClasses();
 }

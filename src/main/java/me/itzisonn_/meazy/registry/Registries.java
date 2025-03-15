@@ -8,13 +8,13 @@ import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
 import me.itzisonn_.meazy.parser.ParsingFunctions;
-import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.parser.json_converters.Converter;
-import me.itzisonn_.meazy.parser.json_converters.Converters;
+import me.itzisonn_.meazy.parser.json_converter.Converter;
+import me.itzisonn_.meazy.parser.json_converter.Converters;
 import me.itzisonn_.meazy.registry.multiple_entry.OrderedRegistry;
 import me.itzisonn_.meazy.registry.multiple_entry.PairRegistry;
 import me.itzisonn_.meazy.registry.multiple_entry.SetRegistry;
@@ -23,9 +23,9 @@ import me.itzisonn_.meazy.registry.single_entry.SingleEntryRegistryImpl;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.environment.impl.*;
 import me.itzisonn_.meazy.runtime.interpreter.*;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.functions.RuntimeFunctionValue;
-import me.itzisonn_.meazy.runtime.values.statement_info.ReturnInfoValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.function.RuntimeFunctionValue;
+import me.itzisonn_.meazy.runtime.value.statement_info.ReturnInfoValue;
 import org.apache.logging.log4j.Level;
 
 import java.lang.reflect.InvocationTargetException;
@@ -197,13 +197,13 @@ public final class Registries {
                     }
                 }
 
-                if (token != null) {
-                    if (!token.getType().isShouldSkip()) tokens.add(token);
-                    if (token.getType() == TokenTypes.NEW_LINE()) lineNumber += token.getValue().length();
-                    else if (token.getType() == TokenTypes.MULTI_LINE_COMMENT()) lineNumber += Utils.countMatches(token.getValue(), "\n");
-                    i += token.getValue().length() - 1;
-                }
-                else throw new UnknownTokenException("At line " + lineNumber + ": " + string.replaceAll("\n", "\\\\n"));
+                if (token == null) throw new UnknownTokenException("At line " + lineNumber + ": " + string.replaceAll("\n", "\\\\n"));
+
+                i += token.getValue().length() - 1;
+                if (!token.getType().isShouldSkip()) tokens.add(token);
+
+                if (token.getType() == TokenTypes.NEW_LINE()) lineNumber += token.getValue().length();
+                else if (token.getType() == TokenTypes.MULTI_LINE_COMMENT()) lineNumber += Utils.countMatches(token.getValue(), "\n");
 
             }
 
@@ -219,8 +219,8 @@ public final class Registries {
 
             List<Statement> body = new ArrayList<>();
             while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                Statement statement = Parser.parse(RegistryIdentifier.ofDefault("global_statement"), Statement.class);
-                body.add(statement);
+                body.add(Parser.parse(RegistryIdentifier.ofDefault("global_statement"), Statement.class));
+                Parser.moveOverOptionalNewLines();
             }
 
             return new Program(MeazyMain.VERSION, body);
@@ -235,36 +235,39 @@ public final class Registries {
                 return;
             }
 
-            if (runtimeValue instanceof RuntimeFunctionValue runtimeFunctionValue) {
-                FunctionEnvironment functionEnvironment;
-                try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+            if (!(runtimeValue instanceof RuntimeFunctionValue runtimeFunctionValue)) {
+                MeazyMain.LOGGER.log(Level.WARN, "File contains invalid main function");
+                return;
+            }
+
+            FunctionEnvironment functionEnvironment;
+            try {
+                functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class).newInstance(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
+            }
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (!runtimeFunctionValue.getArgs().isEmpty()) throw new InvalidArgumentException("Main function must have no args");
+
+            for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
+                Statement statement = runtimeFunctionValue.getBody().get(i);
+                if (statement instanceof ReturnStatement returnStatement) {
+                    if (returnStatement.getValue() != null) {
+                        throw new InvalidSyntaxException("Found return statement but function must return nothing");
+                    }
+                    if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
+                    break;
                 }
 
-                if (!runtimeFunctionValue.getArgs().isEmpty()) throw new InvalidArgumentException("Main function must have no args");
-
-                for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
-                    Statement statement = runtimeFunctionValue.getBody().get(i);
-                    if (statement instanceof ReturnStatement returnStatement) {
-                        if (returnStatement.getValue() != null) {
-                            throw new InvalidSyntaxException("Found return statement but function must return nothing");
-                        }
-                        if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
-                        break;
+                RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
+                if (value instanceof ReturnInfoValue returnInfoValue) {
+                    if (returnInfoValue.getFinalValue() != null) {
+                        throw new InvalidSyntaxException("Found return statement but function must return nothing");
                     }
-                    RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
-                    if (value instanceof ReturnInfoValue returnInfoValue) {
-                        if (returnInfoValue.getFinalValue() != null) {
-                            throw new InvalidSyntaxException("Found return statement but function must return nothing");
-                        }
-                        break;
-                    }
+                    break;
                 }
             }
-            else MeazyMain.LOGGER.log(Level.WARN, "File contains invalid main function");
         });
 
         GlobalEnvironmentImpl globalEnvironment = new GlobalEnvironmentImpl();

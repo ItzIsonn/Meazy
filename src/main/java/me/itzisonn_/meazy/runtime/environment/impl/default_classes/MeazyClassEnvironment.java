@@ -1,19 +1,19 @@
 package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.addons.Addon;
-import me.itzisonn_.meazy.parser.Modifiers;
+import me.itzisonn_.meazy.addon.Addon;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
-import me.itzisonn_.meazy.runtime.values.StringValue;
-import me.itzisonn_.meazy.runtime.values.VariableValue;
-import me.itzisonn_.meazy.runtime.values.classes.DefaultClassValue;
-import me.itzisonn_.meazy.runtime.values.classes.constructors.DefaultConstructorValue;
-import me.itzisonn_.meazy.runtime.values.functions.DefaultFunctionValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.StringValue;
+import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.value.classes.DefaultClassValue;
+import me.itzisonn_.meazy.runtime.value.classes.constructors.DefaultConstructorValue;
+import me.itzisonn_.meazy.runtime.value.function.DefaultFunctionValue;
 
 import java.util.ArrayList;
 import java.util.List;

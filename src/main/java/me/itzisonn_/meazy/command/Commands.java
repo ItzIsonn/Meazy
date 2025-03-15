@@ -2,11 +2,11 @@ package me.itzisonn_.meazy.command;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.addons.Addon;
-import me.itzisonn_.meazy.addons.AddonInfo;
+import me.itzisonn_.meazy.addon.Addon;
+import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.ast.statement.Program;
-import me.itzisonn_.meazy.parser.json_converters.Converters;
+import me.itzisonn_.meazy.parser.json_converter.Converters;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;

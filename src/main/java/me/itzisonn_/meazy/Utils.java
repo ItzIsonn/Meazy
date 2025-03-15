@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy;
 
-import me.itzisonn_.meazy.runtime.values.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -136,5 +136,19 @@ public final class Utils {
             unpackedList.add(runtimeValue.getFinalValue());
         }
         return unpackedList;
+    }
+
+    /**
+     * Generates name with prefix:<br>
+     * - If given name is uppercase, returns value in format PREFIX_NAME<br>
+     * - Else returns value in format prefixName
+     *
+     * @param prefix Prefix
+     * @param name Name
+     * @return Generated name
+     */
+    public static String generatePrefixedName(String prefix, String name) {
+        if (name.equals(name.toUpperCase())) return prefix.toUpperCase() + "_" + name;
+        return prefix + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }
