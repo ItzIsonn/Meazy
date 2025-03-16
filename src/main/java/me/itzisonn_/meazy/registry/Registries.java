@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.*;
+import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
 import me.itzisonn_.meazy.parser.ParsingFunctions;
@@ -15,6 +16,7 @@ import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.Converters;
+import me.itzisonn_.meazy.parser.operator.Operators;
 import me.itzisonn_.meazy.registry.multiple_entry.OrderedRegistry;
 import me.itzisonn_.meazy.registry.multiple_entry.PairRegistry;
 import me.itzisonn_.meazy.registry.multiple_entry.SetRegistry;
@@ -76,6 +78,11 @@ public final class Registries {
      * Registry for all Modifiers
      */
     public static final SetRegistry<Modifier> MODIFIERS = new SetRegistry<>();
+
+    /**
+     * Registry for all Operators
+     */
+    public static final SetRegistry<Operator> OPERATORS = new SetRegistry<>();
 
     /**
      * Registry for all ParsingFunctions
@@ -170,6 +177,7 @@ public final class Registries {
         TokenTypes.INIT();
         TokenTypeSets.INIT();
         Modifiers.INIT();
+        Operators.INIT();
         ParsingFunctions.INIT();
         EvaluationFunctions.INIT();
         Converters.INIT();

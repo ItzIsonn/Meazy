@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
-import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
@@ -13,6 +12,8 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
+import me.itzisonn_.meazy.parser.operator.Operator;
+import me.itzisonn_.meazy.parser.operator.Operators;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.*;
@@ -126,7 +127,28 @@ public final class EvaluationFunctions {
                     functionDeclarationEnvironment,
                     functionDeclarationStatement.getModifiers());
 
-            functionDeclarationEnvironment.declareFunction(runtimeFunctionValue);
+            if (functionDeclarationStatement.getModifiers().contains(Modifiers.OPERATOR())) {
+                if (!(environment instanceof ClassEnvironment classEnvironment)) {
+                    throw new InvalidSyntaxException("Can't declare operator function not inside a class");
+                }
+
+                Operator operator = Operators.parse(runtimeFunctionValue.getId());
+                if (operator == null) {
+                    throw new InvalidSyntaxException("Can't declare operator function because operator " + runtimeFunctionValue.getId() + " doesn't exist");
+                }
+
+                int args = operator.isInfix() ? 1 : 0;
+                if (runtimeFunctionValue.getArgs().size() != args) {
+                    throw new InvalidSyntaxException("Function for operator " + operator.getOperator() + " must have " + args + " args");
+                }
+
+                if (runtimeFunctionValue.getReturnDataType() == null) {
+                    throw new InvalidSyntaxException("Operator function must return value");
+                }
+
+                classEnvironment.declareOperatorFunction(runtimeFunctionValue);
+            }
+            else functionDeclarationEnvironment.declareFunction(runtimeFunctionValue);
             return null;
         });
 
@@ -153,33 +175,6 @@ public final class EvaluationFunctions {
                         modifiers,
                         false
                 ));
-
-                if (environment instanceof ClassEnvironment classEnvironment && (modifiers.contains(Modifiers.GET()) || modifiers.contains(Modifiers.SET()))) {
-                    Set<Modifier> functionModifiers = new HashSet<>();
-                    if (variableDeclarationStatement.getModifiers().contains(Modifiers.SHARED())) functionModifiers.add(Modifiers.SHARED());
-
-                    if (modifiers.contains(Modifiers.GET())) {
-                        classEnvironment.declareFunction(new DefaultFunctionValue(Utils.generatePrefixedName("get", variableDeclarationInfo.getId()), List.of(),
-                                variableDeclarationInfo.getDataType(), classEnvironment, functionModifiers) {
-                            @Override
-                            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                                return environment.getVariable(variableDeclarationInfo.getId());
-                            }
-                        });
-                    }
-
-                    if (modifiers.contains(Modifiers.SET())) {
-                        classEnvironment.declareFunction(new DefaultFunctionValue(Utils.generatePrefixedName("set", variableDeclarationInfo.getId()),
-                                List.of(new CallArgExpression("value", variableDeclarationInfo.getDataType(), true)),
-                                null, classEnvironment, functionModifiers) {
-                            @Override
-                            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                                environment.assignVariable(variableDeclarationInfo.getId(),functionArgs.getFirst().getFinalRuntimeValue());
-                                return null;
-                            }
-                        });
-                    }
-                }
             });
 
             return null;
@@ -506,6 +501,17 @@ public final class EvaluationFunctions {
                 });
             }
 
+            if (left instanceof ClassValue classValue) {
+                List<RuntimeValue<?>> args = List.of(right);
+                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(logicalExpression.getOperator(), args);
+                if (operatorFunction != null) return callFunction(operatorFunction, args);
+            }
+            else if (right instanceof ClassValue classValue) {
+                List<RuntimeValue<?>> args = List.of(left);
+                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(logicalExpression.getOperator(), args);
+                if (operatorFunction != null) return callFunction(operatorFunction, args);
+            }
+
             throw new InvalidSyntaxException("Logical expression can't contain non-boolean values");
         });
 
@@ -552,6 +558,17 @@ public final class EvaluationFunctions {
                     case "!=" -> leftBoolean != rightBoolean;
                     default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
                 });
+            }
+
+            if (left instanceof ClassValue classValue) {
+                List<RuntimeValue<?>> args = List.of(right);
+                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(comparisonExpression.getOperator(), args);
+                if (operatorFunction != null) return callFunction(operatorFunction, args);
+            }
+            else if (right instanceof ClassValue classValue) {
+                List<RuntimeValue<?>> args = List.of(left);
+                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(comparisonExpression.getOperator(), args);
+                if (operatorFunction != null) return callFunction(operatorFunction, args);
             }
 
             if (left instanceof NullValue) {
@@ -616,6 +633,17 @@ public final class EvaluationFunctions {
                 throw new InvalidValueException("Resulted value is out of bounds");
             }
 
+            if (left instanceof ClassValue classValue) {
+                List<RuntimeValue<?>> args = List.of(right);
+                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(binaryExpression.getOperator(), args);
+                if (operatorFunction != null) return callFunction(operatorFunction, args);
+            }
+            else if (right instanceof ClassValue classValue) {
+                List<RuntimeValue<?>> args = List.of(left);
+                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(binaryExpression.getOperator(), args);
+                if (operatorFunction != null) return callFunction(operatorFunction, args);
+            }
+
             return new StringValue(switch (binaryExpression.getOperator()) {
                 case "+" -> String.valueOf(left.getValue()) + right.getValue();
                 case "*" -> {
@@ -642,6 +670,13 @@ public final class EvaluationFunctions {
 
         register("inversion_expression", InversionExpression.class, (inversionExpression, environment, extra) -> {
             RuntimeValue<?> value = Interpreter.evaluate(inversionExpression.getExpression(), environment).getFinalRuntimeValue();
+
+            if (value instanceof ClassValue classValue) {
+                List<RuntimeValue<?>> args = List.of();
+                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction("!", args);
+                if (operatorFunction != null) return callFunction(operatorFunction, args);
+            }
+
             if (!(value instanceof BooleanValue booleanValue)) throw new InvalidSyntaxException("Can't invert non-boolean value " + value);
             return new BooleanValue(!booleanValue.getValue());
         });
@@ -699,94 +734,11 @@ public final class EvaluationFunctions {
 
             List<RuntimeValue<?>> args = functionCallExpression.getArgs().stream().map(expression -> Interpreter.evaluate(expression, extraEnvironment)).collect(Collectors.toList());
             RuntimeValue<?> function = Interpreter.evaluate(functionCallExpression.getCaller(), environment, args);
-
-            if (function instanceof DefaultFunctionValue defaultFunctionValue) {
-                if (defaultFunctionValue.getArgs().size() != args.size()) {
-                    throw new InvalidCallException("Expected " + defaultFunctionValue.getArgs().size() + " args but found " + args.size());
-                }
-
-                FunctionEnvironment functionEnvironment;
-                try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
-                            .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(Modifiers.SHARED()));
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-
-                RuntimeValue<?> returnValue = defaultFunctionValue.run(args, functionEnvironment);
-                if (returnValue != null) returnValue = returnValue.getFinalRuntimeValue();
-                return checkReturnValue(
-                        returnValue,
-                        defaultFunctionValue.getReturnDataType(),
-                        defaultFunctionValue.getId(),
-                        true);
-            }
-            if (function instanceof RuntimeFunctionValue runtimeFunctionValue) {
-                if (runtimeFunctionValue.getArgs().size() != args.size()) {
-                    throw new InvalidCallException("Expected " + runtimeFunctionValue.getArgs().size() + " args but found " + args.size());
-                }
-
-                FunctionEnvironment functionEnvironment;
-                try {
-                    functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
-                            .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(Modifiers.SHARED()));
-                }
-                catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-
-                for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
-                    CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
-
-                    functionEnvironment.declareVariable(new VariableValue(
-                            callArgExpression.getId(),
-                            callArgExpression.getDataType(),
-                            args.get(i),
-                            callArgExpression.isConstant(),
-                            new HashSet<>(),
-                            true));
-                }
-
-                RuntimeValue<?> result = null;
-                boolean hasReturnStatement = false;
-                for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
-                    Statement statement = runtimeFunctionValue.getBody().get(i);
-                    if (statement instanceof ReturnStatement) {
-                        hasReturnStatement = true;
-                        result = Interpreter.evaluate(statement, functionEnvironment);
-                        if (result != null) {
-                            checkReturnValue(
-                                    result.getFinalRuntimeValue(),
-                                    runtimeFunctionValue.getReturnDataType(),
-                                    runtimeFunctionValue.getId(),
-                                    false);
-                        }
-                        if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
-                        break;
-                    }
-                    RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
-                    if (value instanceof ReturnInfoValue returnInfoValue) {
-                        hasReturnStatement = true;
-                        result = returnInfoValue.getFinalRuntimeValue();
-                        if (result.getFinalValue() != null) {
-                            checkReturnValue(
-                                    result.getFinalRuntimeValue(),
-                                    runtimeFunctionValue.getReturnDataType(),
-                                    runtimeFunctionValue.getId(),
-                                    false);
-                        }
-                        break;
-                    }
-                }
-                if ((result == null || result instanceof NullValue) && runtimeFunctionValue.getReturnDataType() != null) {
-                    throw new InvalidSyntaxException(hasReturnStatement ?
-                            "Function specified return value's data type but return statement is empty" : "Missing return statement");
-                }
-                return result;
+            if (!(function instanceof FunctionValue functionValue)) {
+                throw new InvalidCallException("Can't call " + function.getValue() + " because it's not a function");
             }
 
-            throw new InvalidCallException("Can't call " + function.getValue() + " because it's not a function");
+            return callFunction(functionValue, args);
         });
 
         register("identifier", Identifier.class, new EvaluationFunction<>() {
@@ -1225,6 +1177,96 @@ public final class EvaluationFunctions {
         }
 
         return classEnvironment;
+    }
+
+    private static RuntimeValue<?> callFunction(FunctionValue functionValue, List<RuntimeValue<?>> args) {
+        if (functionValue instanceof DefaultFunctionValue defaultFunctionValue) {
+            if (defaultFunctionValue.getArgs().size() != args.size()) {
+                throw new InvalidCallException("Expected " + defaultFunctionValue.getArgs().size() + " args but found " + args.size());
+            }
+
+            FunctionEnvironment functionEnvironment;
+            try {
+                functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
+                        .newInstance(defaultFunctionValue.getParentEnvironment(), defaultFunctionValue.getModifiers().contains(Modifiers.SHARED()));
+            }
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            RuntimeValue<?> returnValue = defaultFunctionValue.run(args, functionEnvironment);
+            if (returnValue != null) returnValue = returnValue.getFinalRuntimeValue();
+            return checkReturnValue(
+                    returnValue,
+                    defaultFunctionValue.getReturnDataType(),
+                    defaultFunctionValue.getId(),
+                    true);
+        }
+        if (functionValue instanceof RuntimeFunctionValue runtimeFunctionValue) {
+            if (runtimeFunctionValue.getArgs().size() != args.size()) {
+                throw new InvalidCallException("Expected " + runtimeFunctionValue.getArgs().size() + " args but found " + args.size());
+            }
+
+            FunctionEnvironment functionEnvironment;
+            try {
+                functionEnvironment = Registries.FUNCTION_ENVIRONMENT.getEntry().getValue().getConstructor(FunctionDeclarationEnvironment.class, boolean.class)
+                        .newInstance(runtimeFunctionValue.getParentEnvironment(), runtimeFunctionValue.getModifiers().contains(Modifiers.SHARED()));
+            }
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            for (int i = 0; i < runtimeFunctionValue.getArgs().size(); i++) {
+                CallArgExpression callArgExpression = runtimeFunctionValue.getArgs().get(i);
+
+                functionEnvironment.declareVariable(new VariableValue(
+                        callArgExpression.getId(),
+                        callArgExpression.getDataType(),
+                        args.get(i),
+                        callArgExpression.isConstant(),
+                        new HashSet<>(),
+                        true));
+            }
+
+            RuntimeValue<?> result = null;
+            boolean hasReturnStatement = false;
+            for (int i = 0; i < runtimeFunctionValue.getBody().size(); i++) {
+                Statement statement = runtimeFunctionValue.getBody().get(i);
+                if (statement instanceof ReturnStatement) {
+                    hasReturnStatement = true;
+                    result = Interpreter.evaluate(statement, functionEnvironment);
+                    if (result != null) {
+                        checkReturnValue(
+                                result.getFinalRuntimeValue(),
+                                runtimeFunctionValue.getReturnDataType(),
+                                runtimeFunctionValue.getId(),
+                                false);
+                    }
+                    if (i + 1 < runtimeFunctionValue.getBody().size()) throw new InvalidSyntaxException("Return statement must be last in body");
+                    break;
+                }
+                RuntimeValue<?> value = Interpreter.evaluate(statement, functionEnvironment);
+                if (value instanceof ReturnInfoValue returnInfoValue) {
+                    hasReturnStatement = true;
+                    result = returnInfoValue.getFinalRuntimeValue();
+                    if (result.getFinalValue() != null) {
+                        checkReturnValue(
+                                result.getFinalRuntimeValue(),
+                                runtimeFunctionValue.getReturnDataType(),
+                                runtimeFunctionValue.getId(),
+                                false);
+                    }
+                    break;
+                }
+            }
+            if ((result == null || result instanceof NullValue) && runtimeFunctionValue.getReturnDataType() != null) {
+                throw new InvalidSyntaxException(hasReturnStatement ?
+                        "Function specified return value's data type but return statement is empty" : "Missing return statement");
+            }
+            return result;
+        }
+
+        throw new InvalidCallException("Can't call " + functionValue.getValue() + " because it's not a function");
     }
 
 

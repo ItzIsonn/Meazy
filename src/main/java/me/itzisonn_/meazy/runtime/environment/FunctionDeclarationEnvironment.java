@@ -15,7 +15,7 @@ public interface FunctionDeclarationEnvironment extends Environment {
     /**
      * Declares given function in this environment
      *
-     * @param value Function value
+     * @param value FunctionValue
      */
     void declareFunction(FunctionValue value);
 

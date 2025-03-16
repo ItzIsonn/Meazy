@@ -1,8 +1,12 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,6 +22,44 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
      * @return All modifiers
      */
     Set<Modifier> getModifiers();
+
+
+
+    /**
+     * Declares given operator function in this environment
+     *
+     * @param value FunctionValue
+     */
+    void declareOperatorFunction(FunctionValue value);
+
+    /**
+     * @param id Function's id
+     * @param args Function's args
+     * @return Declared operator function with given id and args
+     */
+    default FunctionValue getOperatorFunction(String id, List<RuntimeValue<?>> args) {
+        main:
+        for (FunctionValue functionValue : getOperatorFunctions()) {
+            if (functionValue.getId().equals(id)) {
+                List<CallArgExpression> callArgExpressions = functionValue.getArgs();
+
+                if (args.size() != callArgExpressions.size()) continue;
+
+                for (int i = 0; i < args.size(); i++) {
+                    if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i))) continue main;
+                }
+
+                return functionValue;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return All declared operator functions
+     */
+    Set<FunctionValue> getOperatorFunctions();
 
 
 
