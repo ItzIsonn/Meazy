@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser;
 import lombok.Getter;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
+import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.registry.Registries;
@@ -75,7 +76,7 @@ public final class Parser {
     }
 
     /**
-     * Returns token at current position and increments position by 1
+     * Returns token at current position increments position by 1
      *
      * @param tokenType Required TokenType
      * @param e Exception's message
@@ -85,6 +86,20 @@ public final class Parser {
      */
     public static Token getCurrentAndNext(TokenType tokenType, String e) throws UnexpectedTokenException {
         if (!getCurrent().getType().equals(tokenType)) throw new UnexpectedTokenException(e, getCurrent().getLine());
+        return getCurrentAndNext();
+    }
+
+    /**
+     * Returns token at current position and increments position by 1
+     *
+     * @param tokenTypeSet Required TokenTypeSet
+     * @param e Exception's message
+     * @return Token at {@link Parser#pos} in {@link Parser#tokens}
+     *
+     * @throws UnexpectedTokenException If token's type doesn't match required
+     */
+    public static Token getCurrentAndNext(TokenTypeSet tokenTypeSet, String e) throws UnexpectedTokenException {
+        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) throw new UnexpectedTokenException(e, getCurrent().getLine());
         return getCurrentAndNext();
     }
 

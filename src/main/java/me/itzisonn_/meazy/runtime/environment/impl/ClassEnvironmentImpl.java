@@ -23,13 +23,15 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     protected final Set<ConstructorValue> constructors;
     protected final Set<ClassEnvironment> baseClasses;
     protected final Set<Modifier> modifiers;
+    protected final Set<FunctionValue> operatorFunctions;
 
     public ClassEnvironmentImpl(ClassDeclarationEnvironment parent, boolean isShared, String id, Set<Modifier> modifiers) {
         super(parent, isShared);
         this.id = id;
-        this.constructors = new HashSet<>();
-        this.baseClasses = new HashSet<>();
+        constructors = new HashSet<>();
+        baseClasses = new HashSet<>();
         this.modifiers = modifiers;
+        operatorFunctions = new HashSet<>();
     }
 
     public ClassEnvironmentImpl(ClassDeclarationEnvironment parent, boolean isShared, String id) {
@@ -73,6 +75,34 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         }
 
         return super.getVariableDeclarationEnvironment(id);
+    }
+
+    @Override
+    public void declareOperatorFunction(FunctionValue value) {
+        List<CallArgExpression> args = value.getArgs();
+
+        main:
+        for (FunctionValue functionValue : operatorFunctions) {
+            if (functionValue.getId().equals(value.getId())) {
+                List<CallArgExpression> callArgExpressions = functionValue.getArgs();
+
+                if (args.size() != callArgExpressions.size()) continue;
+
+                for (int i = 0; i < args.size(); i++) {
+                    CallArgExpression callArgExpression = callArgExpressions.get(i);
+                    if (!callArgExpression.getDataType().equals(args.get(i).getDataType())) continue main;
+                }
+
+                throw new InvalidSyntaxException("Function for operator " + value.getId() + " already exists!");
+            }
+        }
+
+        operatorFunctions.add(value);
+    }
+
+    @Override
+    public Set<FunctionValue> getOperatorFunctions() {
+        return new HashSet<>(operatorFunctions);
     }
 
     @Override

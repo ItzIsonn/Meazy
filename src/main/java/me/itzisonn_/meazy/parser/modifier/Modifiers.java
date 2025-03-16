@@ -51,6 +51,10 @@ public final class Modifiers {
         return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("final")).getValue();
     }
 
+    public static Modifier OPERATOR() {
+        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("operator")).getValue();
+    }
+
 
     /**
      * Finds registered Modifier with given id
@@ -60,7 +64,7 @@ public final class Modifiers {
      */
     public static Modifier parse(String id) {
         for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
-            if (id.equals(entry.getValue().getId())) return entry.getValue().copy();
+            if (id.equals(entry.getValue().getId())) return entry.getValue();
         }
 
         return null;
@@ -163,6 +167,16 @@ public final class Modifiers {
                 if (modifierStatement.getModifiers().contains(ABSTRACT())) return false;
 
                 if (modifierStatement instanceof ClassDeclarationStatement) return true;
+                return modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment;
+            }
+        });
+
+        register(new Modifier("operator") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement.getModifiers().contains(ABSTRACT()) || modifierStatement.getModifiers().contains(PRIVATE()) ||
+                    modifierStatement.getModifiers().contains(PROTECTED()) || modifierStatement.getModifiers().contains(SHARED())) return false;
+
                 return modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment;
             }
         });
