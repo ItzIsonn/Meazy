@@ -988,6 +988,7 @@ public final class EvaluationFunctions {
             if (classValue == null) {
                 throw new InvalidIdentifierException("Class with id " + baseClass + " doesn't exist");
             }
+            if (classValue.getModifiers().contains(Modifiers.FINAL())) throw new InvalidAccessException("Can't inherit final class with id " + baseClass);
 
             boolean check = hasRepeatedBaseClasses(classValue.getBaseClasses(), baseClasses);
             if (check) return true;
@@ -1182,13 +1183,9 @@ public final class EvaluationFunctions {
                     defaultConstructorValue.run(args, constructorEnvironment);
                 }
             }
-            else if (!args.isEmpty()) {
-                throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
-            }
+            else if (!args.isEmpty()) throw new InvalidCallException("Class with id " + defaultClassValue.getId() + " doesn't have requested constructor");
         }
-        else {
-            throw new RuntimeException("Can't init ClassEnvironment of class value " + classValue.getClass().getName());
-        }
+        else throw new RuntimeException("Can't init ClassEnvironment of class value " + classValue.getClass().getName());
 
         for (VariableValue variableValue : classEnvironment.getVariables()) {
             if (variableValue.isConstant() && variableValue.getValue() == null) {
@@ -1206,6 +1203,7 @@ public final class EvaluationFunctions {
             for (ClassEnvironment baseClass : classEnvironment.getDeepBaseClasses()) {
                 for (FunctionValue baseClassFunction : baseClass.getFunctions()) {
                     if (baseClassFunction.isLike(value) && !baseClassFunction.getModifiers().contains(Modifiers.PRIVATE())) {
+                        if (baseClassFunction.getModifiers().contains(Modifiers.FINAL())) throw new InvalidAccessException("Can't override final function with id " + baseClassFunction.getId());
                         baseClassFunction.setOverridden();
                     }
                 }
