@@ -85,12 +85,8 @@ public final class Converters {
 
         register(new AssignmentExpressionConverter());
         register(new NullCheckExpressionConverter());
-        register(new LogicalExpressionConverter());
-        register(new ComparisonExpressionConverter());
         register(new IsExpressionConverter());
-        register(new BinaryExpressionConverter());
-        register(new InversionExpressionConverter());
-        register(new NegationExpressionConverter());
+        register(new OperatorExpressionConverter());
         register(new ClassCallExpressionConverter());
         register(new MemberExpressionConverter());
         register(new FunctionCallExpressionConverter());

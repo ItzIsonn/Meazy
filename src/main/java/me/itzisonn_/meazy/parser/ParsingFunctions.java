@@ -17,6 +17,7 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
+import me.itzisonn_.meazy.parser.operator.Operators;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
@@ -163,10 +164,7 @@ public final class ParsingFunctions {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
             getCurrentAndNext(TokenTypes.FUNCTION(), "Expected function keyword");
-
-            String id;
-            if (modifiers.contains(Modifiers.OPERATOR())) id = getCurrentAndNext(TokenTypeSets.OPERATORS(), "Expected operator after function keyword").getValue();
-            else id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
+            String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
 
             List<CallArgExpression> args = parseArgs();
             DataType dataType = parseDataType();
@@ -445,7 +443,7 @@ public final class ParsingFunctions {
             }
             else if (TokenTypeSets.OPERATOR_ASSIGN().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
-                Expression value = new BinaryExpression(
+                Expression value = new OperatorExpression(
                         left,
                         parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class),
                         token.getValue().replaceAll("=$", ""));
@@ -474,7 +472,7 @@ public final class ParsingFunctions {
             while (current.equals(TokenTypes.AND()) || current.equals(TokenTypes.OR())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
-                left = new LogicalExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator);
 
                 current = getCurrent().getType();
             }
@@ -490,7 +488,7 @@ public final class ParsingFunctions {
                     current.equals(TokenTypes.GREATER_OR_EQUALS()) || current.equals(TokenTypes.LESS()) || current.equals(TokenTypes.LESS_OR_EQUALS())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
-                left = new ComparisonExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator);
 
                 current = getCurrent().getType();
             }
@@ -515,7 +513,7 @@ public final class ParsingFunctions {
             while (getCurrent().getType().equals(TokenTypes.PLUS()) || getCurrent().getType().equals(TokenTypes.MINUS())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
-                left = new BinaryExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator);
             }
 
             return left;
@@ -528,7 +526,7 @@ public final class ParsingFunctions {
                     getCurrent().getType().equals(TokenTypes.PERCENT())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
-                left = new BinaryExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator);
             }
 
             return left;
@@ -540,7 +538,7 @@ public final class ParsingFunctions {
             while (getCurrent().getType().equals(TokenTypes.POWER())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
-                left = new BinaryExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator);
             }
 
             return left;
@@ -549,7 +547,8 @@ public final class ParsingFunctions {
         register("inversion_expression", extra -> {
             if (getCurrent().getType().equals(TokenTypes.INVERSION())) {
                 getCurrentAndNext();
-                return new InversionExpression(parseAfter(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class));
+                Expression expression = parseAfter(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
+                return new OperatorExpression(expression, null, Operators.INVERSION());
             }
 
             return parseAfter(RegistryIdentifier.ofDefault("inversion_expression"), Expression.class);
@@ -558,7 +557,7 @@ public final class ParsingFunctions {
         register("negation_expression", extra -> {
             if (getCurrent().getType().equals(TokenTypes.MINUS())) {
                 getCurrentAndNext();
-                return new NegationExpression(parseAfter(RegistryIdentifier.ofDefault("negation_expression"), Expression.class));
+                return new OperatorExpression(parseAfter(RegistryIdentifier.ofDefault("negation_expression"), Expression.class), null, Operators.NEGATION());
             }
 
             return parseAfter(RegistryIdentifier.ofDefault("negation_expression"), Expression.class);
@@ -569,7 +568,7 @@ public final class ParsingFunctions {
 
             if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
-                Expression value = new BinaryExpression(id, new NumberLiteral("1"), token.getValue().substring(1));
+                Expression value = new OperatorExpression(id, new NumberLiteral("1"), token.getValue().substring(1));
                 return new AssignmentExpression(id, value);
             }
 
@@ -797,16 +796,16 @@ public final class ParsingFunctions {
             CallArgExpression dataVariable = dataVariables.get(i);
 
             Expression endingExpression;
-            if (i == dataVariables.size() - 1) endingExpression = new BinaryExpression(
+            if (i == dataVariables.size() - 1) endingExpression = new OperatorExpression(
                     new VariableIdentifier(dataVariable.getId()),
                     new StringLiteral(")"),
                     "+"
             );
             else endingExpression = new VariableIdentifier(dataVariable.getId());
 
-            toStringExpression = new BinaryExpression(
+            toStringExpression = new OperatorExpression(
                     toStringExpression,
-                    new BinaryExpression(
+                    new OperatorExpression(
                             new StringLiteral((i == 0 ? "" : ",") + dataVariable.getId() + "="),
                             endingExpression,
                             "+"),
@@ -832,7 +831,7 @@ public final class ParsingFunctions {
 
         Expression equalsExpression;
         if (!dataVariables.isEmpty()) {
-            equalsExpression = new ComparisonExpression(
+            equalsExpression = new OperatorExpression(
                     new VariableIdentifier(dataVariables.getFirst().getId()),
                     new MemberExpression(
                             new VariableIdentifier("value"),
@@ -843,9 +842,9 @@ public final class ParsingFunctions {
                     "==");
             for (int i = 1; i < dataVariables.size(); i++) {
                 CallArgExpression dataVariable = dataVariables.get(i);
-                equalsExpression = new LogicalExpression(
+                equalsExpression = new OperatorExpression(
                         equalsExpression,
-                        new ComparisonExpression(
+                        new OperatorExpression(
                                 new VariableIdentifier(dataVariable.getId()),
                                 new MemberExpression(
                                         new VariableIdentifier("value"),
@@ -861,15 +860,15 @@ public final class ParsingFunctions {
         else equalsExpression = new BooleanLiteral(true);
         body.add(new FunctionDeclarationStatement(
                 Set.of(Modifiers.OPERATOR()),
-                "==",
+                "equals",
                 List.of(new CallArgExpression("value", new DataType("Any", true), true)),
                 List.of(
                         new IfStatement(
-                                new ComparisonExpression(new VariableIdentifier("value"), new NullLiteral(), "=="),
+                                new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "=="),
                                 List.of(new ReturnStatement(new BooleanLiteral(false))),
                                 null),
                         new IfStatement(
-                                new InversionExpression(new IsExpression(new VariableIdentifier("value"), id, true)),
+                                new OperatorExpression(new IsExpression(new VariableIdentifier("value"), id, true), null, "!"),
                                 List.of(new ReturnStatement(new BooleanLiteral(false))),
                                 null),
                         new ReturnStatement(equalsExpression)),
