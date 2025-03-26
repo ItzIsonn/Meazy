@@ -13,8 +13,10 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.parser.operator.Operator;
+import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.parser.operator.Operators;
 import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.ListClassEnvironment;
@@ -132,14 +134,14 @@ public final class EvaluationFunctions {
                     throw new InvalidSyntaxException("Can't declare operator function not inside a class");
                 }
 
-                Operator operator = Operators.parse(runtimeFunctionValue.getId());
+                Operator operator = Operators.parseById(runtimeFunctionValue.getId());
                 if (operator == null) {
                     throw new InvalidSyntaxException("Can't declare operator function because operator " + runtimeFunctionValue.getId() + " doesn't exist");
                 }
 
-                int args = operator.isInfix() ? 1 : 0;
+                int args = operator.getOperatorType() == OperatorType.INFIX ? 1 : 0;
                 if (runtimeFunctionValue.getArgs().size() != args) {
-                    throw new InvalidSyntaxException("Function for operator " + operator.getOperator() + " must have " + args + " args");
+                    throw new InvalidSyntaxException("Function for operator " + runtimeFunctionValue.getId() + " must have " + args + " args");
                 }
 
                 if (runtimeFunctionValue.getReturnDataType() == null) {
@@ -486,114 +488,6 @@ public final class EvaluationFunctions {
             return checkValue;
         });
 
-        register("logical_expression", LogicalExpression.class, (logicalExpression, environment, extra) -> {
-            RuntimeValue<?> left = Interpreter.evaluate(logicalExpression.getLeft(), environment).getFinalRuntimeValue();
-            RuntimeValue<?> right = Interpreter.evaluate(logicalExpression.getRight(), environment).getFinalRuntimeValue();
-
-            if (left instanceof BooleanValue leftValue && right instanceof BooleanValue rightValue) {
-                boolean leftBoolean = leftValue.getValue();
-                boolean rightBoolean = rightValue.getValue();
-
-                return new BooleanValue(switch (logicalExpression.getOperator()) {
-                    case "&&" -> leftBoolean && rightBoolean;
-                    case "||" -> leftBoolean || rightBoolean;
-                    default -> throw new UnsupportedOperatorException(logicalExpression.getOperator());
-                });
-            }
-
-            if (left instanceof ClassValue classValue) {
-                List<RuntimeValue<?>> args = List.of(right);
-                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(logicalExpression.getOperator(), args);
-                if (operatorFunction != null) return callFunction(operatorFunction, args);
-            }
-            else if (right instanceof ClassValue classValue) {
-                List<RuntimeValue<?>> args = List.of(left);
-                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(logicalExpression.getOperator(), args);
-                if (operatorFunction != null) return callFunction(operatorFunction, args);
-            }
-
-            throw new InvalidSyntaxException("Logical expression can't contain non-boolean values");
-        });
-
-        register("comparison_expression", ComparisonExpression.class, (comparisonExpression, environment, extra) -> {
-            RuntimeValue<?> left = Interpreter.evaluate(comparisonExpression.getLeft(), environment).getFinalRuntimeValue();
-            RuntimeValue<?> right = Interpreter.evaluate(comparisonExpression.getRight(), environment).getFinalRuntimeValue();
-
-            if (left instanceof NumberValue<?> leftValue && right instanceof NumberValue<?> rightValue) {
-                double leftNumber = leftValue.getValue().doubleValue();
-                double rightNumber = rightValue.getValue().doubleValue();
-
-                return new BooleanValue(switch (comparisonExpression.getOperator()) {
-                    case "==" -> leftNumber == rightNumber;
-                    case "!=" -> leftNumber != rightNumber;
-                    case ">" -> leftNumber > rightNumber;
-                    case ">=" -> leftNumber >= rightNumber;
-                    case "<" -> leftNumber < rightNumber;
-                    case "<=" -> leftNumber <= rightNumber;
-                    default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                });
-            }
-
-            if (left instanceof StringValue leftValue && right instanceof StringValue rightValue) {
-                String leftString = leftValue.getValue();
-                String rightString = rightValue.getValue();
-
-                return new BooleanValue(switch (comparisonExpression.getOperator()) {
-                    case "==" -> leftString.equals(rightString);
-                    case "!=" -> !leftString.equals(rightString);
-                    case ">" -> leftString.length() > rightString.length();
-                    case ">=" -> leftString.length() >= rightString.length();
-                    case "<" -> leftString.length() < rightString.length();
-                    case "<=" -> leftString.length() <= rightString.length();
-                    default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                });
-            }
-
-            if (left instanceof BooleanValue leftValue && right instanceof BooleanValue rightValue) {
-                boolean leftBoolean = leftValue.getValue();
-                boolean rightBoolean = rightValue.getValue();
-
-                return new BooleanValue(switch (comparisonExpression.getOperator()) {
-                    case "==" -> leftBoolean == rightBoolean;
-                    case "!=" -> leftBoolean != rightBoolean;
-                    default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                });
-            }
-
-            if (left instanceof ClassValue classValue) {
-                List<RuntimeValue<?>> args = List.of(right);
-                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(comparisonExpression.getOperator(), args);
-                if (operatorFunction != null) return callFunction(operatorFunction, args);
-            }
-            else if (right instanceof ClassValue classValue) {
-                List<RuntimeValue<?>> args = List.of(left);
-                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(comparisonExpression.getOperator(), args);
-                if (operatorFunction != null) return callFunction(operatorFunction, args);
-            }
-
-            if (left instanceof NullValue) {
-                Object rightObject = right.getValue();
-
-                return new BooleanValue(switch (comparisonExpression.getOperator()) {
-                    case "==" -> rightObject == null;
-                    case "!=" -> rightObject != null;
-                    default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                });
-            }
-
-            if (right instanceof NullValue) {
-                Object leftObject = left.getValue();
-
-                return new BooleanValue(switch (comparisonExpression.getOperator()) {
-                    case "==" -> leftObject == null;
-                    case "!=" -> leftObject != null;
-                    default -> throw new UnsupportedOperatorException(comparisonExpression.getOperator());
-                });
-            }
-
-            throw new InvalidSyntaxException("Can't compare different values (" + left + " " + right + ")");
-        });
-
         register("is_expression", IsExpression.class, (isExpression, environment, extra) -> {
             RuntimeValue<?> value = Interpreter.evaluate(isExpression.getValue(), environment).getFinalRuntimeValue();
 
@@ -604,92 +498,39 @@ public final class EvaluationFunctions {
             return new BooleanValue(classValue.isMatches(value.getFinalRuntimeValue()));
         });
 
-        register("binary_expression", BinaryExpression.class, (binaryExpression, environment, extra) -> {
-            RuntimeValue<?> left = Interpreter.evaluate(binaryExpression.getLeft(), environment).getFinalRuntimeValue();
-            RuntimeValue<?> right = Interpreter.evaluate(binaryExpression.getRight(), environment).getFinalRuntimeValue();
+        register("operator_expression", OperatorExpression.class, (operatorExpression, environment, extra) -> {
+            RuntimeValue<?> left = Interpreter.evaluate(operatorExpression.getLeft(), environment).getFinalRuntimeValue();
+            RuntimeValue<?> right = operatorExpression.getRight() != null ? Interpreter.evaluate(operatorExpression.getRight(), environment).getFinalRuntimeValue() : null;
 
-            if (left instanceof NumberValue<?> leftValue && right instanceof NumberValue<?> rightValue) {
-                double leftNumber = leftValue.getValue().doubleValue();
-                double rightNumber = rightValue.getValue().doubleValue();
+            if (operatorExpression.getType() == OperatorType.INFIX && right == null) throw new RuntimeException("Infix expression must contain both parts");
+            if (operatorExpression.getType() != OperatorType.INFIX && right != null) throw new RuntimeException("Prefix and suffix expression must contain only one part");
 
-                double value = switch (binaryExpression.getOperator()) {
-                    case "+" -> leftNumber + rightNumber;
-                    case "-" -> leftNumber - rightNumber;
-                    case "*" -> leftNumber * rightNumber;
-                    case "/" -> leftNumber / rightNumber;
-                    case "%" -> leftNumber % rightNumber;
-                    case "^" -> Math.pow(leftNumber, rightNumber);
-                    default -> throw new UnsupportedOperatorException(binaryExpression.getOperator());
-                };
-
-                if (value % 1 == 0) {
-                    if (value >= Integer.MIN_VALUE && value <= Integer.MAX_VALUE) return new IntValue((int) value);
-                    if (value >= Long.MIN_VALUE && value <= Long.MAX_VALUE) return new LongValue((long) value);
+            ClassValue classValue;
+            List<RuntimeValue<?>> args;
+            if (left instanceof ClassValue leftClassValue) {
+                classValue = leftClassValue;
+                args = right == null ? List.of() : List.of(right);
+            }
+            else if (right instanceof ClassValue rightClassValue) {
+                classValue = rightClassValue;
+                args = List.of(left);
+            }
+            else {
+                classValue = null;
+                args = null;
+            }
+            if (classValue != null) {
+                RegistryEntry<Operator> entry = Registries.OPERATORS.getEntry(operatorExpression.getOperator());
+                if (entry != null) {
+                    FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(entry.getIdentifier().getId(), args);
+                    if (operatorFunction != null) return callFunction(operatorFunction, args);
                 }
-                else {
-                    if (value >= Float.MIN_VALUE && value <= Float.MAX_VALUE) return new FloatValue((float) value);
-                    if (value >= Double.MIN_VALUE && value <= Double.MAX_VALUE) return new DoubleValue(value);
-                }
-                throw new InvalidValueException("Resulted value is out of bounds");
             }
 
-            if (left instanceof ClassValue classValue) {
-                List<RuntimeValue<?>> args = List.of(right);
-                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(binaryExpression.getOperator(), args);
-                if (operatorFunction != null) return callFunction(operatorFunction, args);
-            }
-            else if (right instanceof ClassValue classValue) {
-                List<RuntimeValue<?>> args = List.of(left);
-                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction(binaryExpression.getOperator(), args);
-                if (operatorFunction != null) return callFunction(operatorFunction, args);
-            }
+            RuntimeValue<?> result = operatorExpression.getOperator().calculate(left, right);
+            if (result == null) throw new UnsupportedOperatorException(operatorExpression.getOperator().getSymbol());
 
-            return new StringValue(switch (binaryExpression.getOperator()) {
-                case "+" -> String.valueOf(left.getValue()) + right.getValue();
-                case "*" -> {
-                    String string;
-                    int amount;
-
-                    if (left instanceof StringValue stringValue && right instanceof IntValue numberValue) {
-                        string = stringValue.getValue();
-                        amount = numberValue.getValue();
-                    }
-                    else if (right instanceof StringValue stringValue && left instanceof IntValue numberValue) {
-                        string = stringValue.getValue();
-                        amount = numberValue.getValue();
-                    }
-                    else throw new InvalidSyntaxException("Can't values " + left + " and " + right);
-
-                    if (amount < 0) throw new InvalidSyntaxException("Can't multiply string by a negative int");
-
-                    yield new StringBuilder().repeat(string, amount).toString();
-                }
-                default -> throw new UnsupportedOperatorException(binaryExpression.getOperator());
-            });
-        });
-
-        register("inversion_expression", InversionExpression.class, (inversionExpression, environment, extra) -> {
-            RuntimeValue<?> value = Interpreter.evaluate(inversionExpression.getExpression(), environment).getFinalRuntimeValue();
-
-            if (value instanceof ClassValue classValue) {
-                List<RuntimeValue<?>> args = List.of();
-                FunctionValue operatorFunction = classValue.getEnvironment().getOperatorFunction("!", args);
-                if (operatorFunction != null) return callFunction(operatorFunction, args);
-            }
-
-            if (!(value instanceof BooleanValue booleanValue)) throw new InvalidSyntaxException("Can't invert non-boolean value " + value);
-            return new BooleanValue(!booleanValue.getValue());
-        });
-
-        register("negation_expression", NegationExpression.class, (negationExpression, environment, extra) -> {
-            RuntimeValue<?> value = Interpreter.evaluate(negationExpression.getExpression(), environment).getFinalRuntimeValue();
-            if (!(value instanceof NumberValue<?> numberValue)) throw new InvalidSyntaxException("Can't negate non-number value " + value);
-            return switch (numberValue) {
-                case IntValue intValue -> new IntValue(-intValue.getValue());
-                case LongValue longValue -> new LongValue(-longValue.getValue());
-                case FloatValue floatValue -> new FloatValue(-floatValue.getValue());
-                default -> new DoubleValue(-numberValue.getValue().doubleValue());
-            };
+            return result;
         });
 
         register("class_call_expression", ClassCallExpression.class, (classCallExpression, environment, extra) -> {
