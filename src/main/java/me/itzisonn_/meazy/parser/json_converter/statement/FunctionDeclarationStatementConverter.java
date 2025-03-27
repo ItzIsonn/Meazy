@@ -36,6 +36,12 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
 
         String id = getElement(object, "id").getAsString();
 
+        String classId;
+        if (object.get("class_id") != null) {
+            classId = getElement(object, "class_id").getAsString();
+        }
+        else classId = null;
+
         List<CallArgExpression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
                 (CallArgExpression) jsonDeserializationContext.deserialize(arg, CallArgExpression.class)).collect(Collectors.toList());
 
@@ -51,7 +57,7 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         }
         else dataType = null;
 
-        return new FunctionDeclarationStatement(modifiers, id, args, body, dataType);
+        return new FunctionDeclarationStatement(modifiers, id, classId, args, body, dataType);
     }
 
     @Override
@@ -65,6 +71,8 @@ public class FunctionDeclarationStatementConverter extends Converter<FunctionDec
         result.add("modifiers", modifiers);
 
         result.addProperty("id", functionDeclarationStatement.getId());
+
+        if (functionDeclarationStatement.getClassId() != null) result.addProperty("class_id", functionDeclarationStatement.getClassId());
 
         JsonArray args = new JsonArray();
         for (CallArgExpression arg : functionDeclarationStatement.getArgs()) {

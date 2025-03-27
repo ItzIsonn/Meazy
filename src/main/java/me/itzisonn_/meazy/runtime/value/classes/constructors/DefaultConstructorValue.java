@@ -32,13 +32,8 @@ public abstract class DefaultConstructorValue extends ConstructorValue {
      */
     public abstract void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment);
 
-    /**
-     * Copies this DefaultConstructorValue with given parent environment
-     *
-     * @param parentEnvironment New parent of this DefaultConstructorValue
-     * @return Copy of this DefaultConstructorValue
-     */
-    public final DefaultConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment) {
+    @Override
+    public final ConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment) {
         RunFunction runFunction = this::run;
 
         return new DefaultConstructorValue(args, parentEnvironment, modifiers) {

@@ -33,4 +33,12 @@ public abstract class ConstructorValue extends RuntimeValue<Object> {
         this.parentEnvironment = parentEnvironment;
         this.modifiers = modifiers;
     }
+
+    /**
+     * Copies this ConstructorValue with given parent environment
+     *
+     * @param parentEnvironment New parent of this ConstructorValue
+     * @return Copy of this ConstructorValue
+     */
+    public abstract ConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment);
 }

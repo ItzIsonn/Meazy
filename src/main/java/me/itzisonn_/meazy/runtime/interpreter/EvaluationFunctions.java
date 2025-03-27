@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
  */
 public final class EvaluationFunctions {
     private static boolean isInit = false;
+    private static final List<FunctionDeclarationStatement> extensionFunctions = new ArrayList<>();
 
     private EvaluationFunctions() {}
 
@@ -112,13 +113,21 @@ public final class EvaluationFunctions {
         });
 
         register("function_declaration_statement", FunctionDeclarationStatement.class, (functionDeclarationStatement, environment, extra) -> {
-            if (!(environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
+            FunctionDeclarationEnvironment functionDeclarationEnvironment;
+
+            if (functionDeclarationStatement.getClassId() != null) {
+                ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(functionDeclarationStatement.getClassId());
+                if (classValue == null) throw new InvalidIdentifierException("Can't find class with id " + functionDeclarationStatement.getClassId());
+                if (!extensionFunctions.contains(functionDeclarationStatement)) extensionFunctions.add(functionDeclarationStatement);
+                return null;
+            }
+            if (!(environment instanceof FunctionDeclarationEnvironment declarationEnvironment)) {
                 throw new InvalidSyntaxException("Can't declare function in this environment!");
             }
+            else functionDeclarationEnvironment = declarationEnvironment;
 
             for (Modifier modifier : functionDeclarationStatement.getModifiers()) {
-                if (!modifier.canUse(functionDeclarationStatement, environment))
-                    throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
+                if (!modifier.canUse(functionDeclarationStatement, environment)) throw new InvalidSyntaxException("Can't use '" + modifier.getId() + "' Modifier");
             }
 
             RuntimeFunctionValue runtimeFunctionValue = new RuntimeFunctionValue(
@@ -867,6 +876,18 @@ public final class EvaluationFunctions {
             for (Statement statement : runtimeClassValue.getBody()) {
                 Interpreter.evaluate(statement, classEnvironment);
             }
+            for (FunctionDeclarationStatement functionDeclarationStatement : extensionFunctions) {
+                if (functionDeclarationStatement.getClassId().equals(runtimeClassValue.getId())) {
+                    Interpreter.evaluate(new FunctionDeclarationStatement(
+                            functionDeclarationStatement.getModifiers(),
+                            functionDeclarationStatement.getId(),
+                            null,
+                            functionDeclarationStatement.getArgs(),
+                            functionDeclarationStatement.getBody(),
+                            functionDeclarationStatement.getReturnDataType()
+                    ), classEnvironment);
+                }
+            }
 
             if (classEnvironment.hasConstructor()) {
                 RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
@@ -933,16 +954,8 @@ public final class EvaluationFunctions {
                     variable.isConstant(),
                     variable.getModifiers(),
                     variable.isArgument())));
-            defaultClassValue.getEnvironment().getFunctions().forEach(function -> {
-                if (function instanceof DefaultFunctionValue defaultFunctionValue) {
-                    classEnvironment.declareFunction(defaultFunctionValue.copy(classEnvironment));
-                }
-            });
-            defaultClassValue.getEnvironment().getConstructors().forEach(constructor -> {
-                if (constructor instanceof DefaultConstructorValue defaultConstructorValue) {
-                    classEnvironment.declareConstructor(defaultConstructorValue.copy(classEnvironment));
-                }
-            });
+            defaultClassValue.getEnvironment().getFunctions().forEach(function -> classEnvironment.declareFunction(function.copy(classEnvironment)));
+            defaultClassValue.getEnvironment().getConstructors().forEach(constructor -> classEnvironment.declareConstructor(constructor.copy(classEnvironment)));
 
             if (classEnvironment.hasConstructor()) {
                 RuntimeValue<?> rawConstructor = classEnvironment.getConstructor(args);
