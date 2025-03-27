@@ -210,9 +210,7 @@ public final class Registries {
                 i += token.getValue().length() - 1;
                 if (!token.getType().isShouldSkip()) tokens.add(token);
 
-                if (token.getType() == TokenTypes.NEW_LINE()) lineNumber += token.getValue().length();
-                else if (token.getType() == TokenTypes.MULTI_LINE_COMMENT()) lineNumber += Utils.countMatches(token.getValue(), "\n");
-
+                lineNumber += Utils.countMatches(token.getValue(), "\n");
             }
 
             tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE(), ""));

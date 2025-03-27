@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -29,5 +30,10 @@ public class RuntimeConstructorValue extends ConstructorValue {
     public RuntimeConstructorValue(List<CallArgExpression> args, List<Statement> body, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(args, parentEnvironment, modifiers);
         this.body = body;
+    }
+
+    @Override
+    public final ConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment) {
+        return new RuntimeConstructorValue(args, new ArrayList<>(body), parentEnvironment, modifiers);
     }
 }

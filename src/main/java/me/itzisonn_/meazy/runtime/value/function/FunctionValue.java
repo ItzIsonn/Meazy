@@ -48,6 +48,14 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
         isOverridden = true;
     }
 
+    /**
+     * Copies this FunctionValue with given parent environment
+     *
+     * @param parentEnvironment New parent of this FunctionValue
+     * @return Copy of this FunctionValue
+     */
+    public abstract FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment);
+
     public boolean isLike(Object o) {
         if (o == this) return true;
         else if (!(o instanceof FunctionValue other)) return false;

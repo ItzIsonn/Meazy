@@ -17,6 +17,7 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.*;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
+import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.parser.operator.Operators;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
@@ -164,7 +165,14 @@ public final class ParsingFunctions {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
 
             getCurrentAndNext(TokenTypes.FUNCTION(), "Expected function keyword");
+
+            String classId = null;
             String id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
+            if (getCurrent().getType().equals(TokenTypes.DOT())) {
+                getCurrentAndNext();
+                classId = id;
+                id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
+            }
 
             List<CallArgExpression> args = parseArgs();
             DataType dataType = parseDataType();
@@ -187,7 +195,7 @@ public final class ParsingFunctions {
                 getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the function declaration");
             }
 
-            return new FunctionDeclarationStatement(modifiers, id, args, body, dataType);
+            return new FunctionDeclarationStatement(modifiers, id, classId, args, body, dataType);
         });
 
         register("function_arg", extra -> {
@@ -446,7 +454,7 @@ public final class ParsingFunctions {
                 Expression value = new OperatorExpression(
                         left,
                         parse(RegistryIdentifier.ofDefault("assignment_expression"), Expression.class),
-                        token.getValue().replaceAll("=$", ""));
+                        token.getValue().replaceAll("=$", ""), OperatorType.INFIX);
                 return new AssignmentExpression(left, value);
             }
 
@@ -472,7 +480,7 @@ public final class ParsingFunctions {
             while (current.equals(TokenTypes.AND()) || current.equals(TokenTypes.OR())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("logical_expression"), Expression.class);
-                left = new OperatorExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
 
                 current = getCurrent().getType();
             }
@@ -488,7 +496,7 @@ public final class ParsingFunctions {
                     current.equals(TokenTypes.GREATER_OR_EQUALS()) || current.equals(TokenTypes.LESS()) || current.equals(TokenTypes.LESS_OR_EQUALS())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("comparison_expression"), Expression.class);
-                left = new OperatorExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
 
                 current = getCurrent().getType();
             }
@@ -513,7 +521,7 @@ public final class ParsingFunctions {
             while (getCurrent().getType().equals(TokenTypes.PLUS()) || getCurrent().getType().equals(TokenTypes.MINUS())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parse(RegistryIdentifier.ofDefault("addition_expression"), Expression.class);
-                left = new OperatorExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
             }
 
             return left;
@@ -526,7 +534,7 @@ public final class ParsingFunctions {
                     getCurrent().getType().equals(TokenTypes.PERCENT())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("multiplication_expression"), Expression.class);
-                left = new OperatorExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
             }
 
             return left;
@@ -538,7 +546,7 @@ public final class ParsingFunctions {
             while (getCurrent().getType().equals(TokenTypes.POWER())) {
                 String operator = getCurrentAndNext().getValue();
                 Expression right = parseAfter(RegistryIdentifier.ofDefault("power_expression"), Expression.class);
-                left = new OperatorExpression(left, right, operator);
+                left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
             }
 
             return left;
@@ -568,34 +576,11 @@ public final class ParsingFunctions {
 
             if (TokenTypeSets.OPERATOR_POSTFIX().contains(getCurrent().getType())) {
                 Token token = getCurrentAndNext();
-                Expression value = new OperatorExpression(id, new NumberLiteral("1"), token.getValue().substring(1));
+                Expression value = new OperatorExpression(id, new NumberLiteral("1"), token.getValue().substring(1), OperatorType.INFIX);
                 return new AssignmentExpression(id, value);
             }
 
             return id;
-        });
-
-        register("class_call_expression", extra -> {
-            if (getCurrent().getType().equals(TokenTypes.NEW())) {
-                getCurrentAndNext();
-                Expression expression = parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
-                if (expression instanceof CallExpression callExpression) {
-                    return new ClassCallExpression(callExpression.getCaller(), callExpression.getArgs());
-                }
-                if (expression instanceof MemberExpression memberExpression) {
-                    Expression member = memberExpression;
-                    while (member instanceof MemberExpression memberExpression1) {
-                        if (!(memberExpression1.getObject() instanceof CallExpression callExpression)) member = memberExpression1.getObject();
-                        else {
-                            memberExpression1.setObject(new ClassCallExpression(callExpression.getCaller(), callExpression.getArgs()));
-                            return memberExpression;
-                        }
-                    }
-                }
-                throw new InvalidSyntaxException("Class creation must be call expression");
-            }
-
-            return parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
         });
 
         register("member_expression", extra -> {
@@ -613,8 +598,21 @@ public final class ParsingFunctions {
             return object;
         });
 
-        register("call_expression", extra -> {
-            Expression expression = parseAfter(RegistryIdentifier.ofDefault("call_expression"), Expression.class);
+        register("class_call_expression", extra -> {
+            if (getCurrent().getType().equals(TokenTypes.NEW())) {
+                getCurrentAndNext();
+                Expression expression = parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
+                if (expression instanceof CallExpression callExpression) {
+                    return new ClassCallExpression(callExpression.getCaller(), callExpression.getArgs());
+                }
+                throw new InvalidSyntaxException("Class creation must be call expression");
+            }
+
+            return parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
+        });
+
+        register("function_call_expression", extra -> {
+            Expression expression = parseAfter(RegistryIdentifier.ofDefault("function_call_expression"), Expression.class);
 
             if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) {
                 getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
@@ -665,10 +663,6 @@ public final class ParsingFunctions {
                 Expression value = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
                 getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
                 return value;
-            }
-            if (tokenType.equals(TokenTypes.NEW_LINE())) {
-                getCurrentAndNext();
-                return null;
             }
 
             throw new InvalidStatementException("Can't parse token with type " + tokenType.getId());
@@ -799,7 +793,7 @@ public final class ParsingFunctions {
             if (i == dataVariables.size() - 1) endingExpression = new OperatorExpression(
                     new VariableIdentifier(dataVariable.getId()),
                     new StringLiteral(")"),
-                    "+"
+                    "+", OperatorType.INFIX
             );
             else endingExpression = new VariableIdentifier(dataVariable.getId());
 
@@ -808,8 +802,8 @@ public final class ParsingFunctions {
                     new OperatorExpression(
                             new StringLiteral((i == 0 ? "" : ",") + dataVariable.getId() + "="),
                             endingExpression,
-                            "+"),
-                    "+");
+                            "+", OperatorType.INFIX),
+                    "+", OperatorType.INFIX);
         }
         body.add(new FunctionDeclarationStatement(
                 Set.of(),
@@ -839,7 +833,7 @@ public final class ParsingFunctions {
                                     new FunctionIdentifier(Utils.generatePrefixedName("get", dataVariables.getFirst().getId())),
                                     List.of()),
                             false),
-                    "==");
+                    "==", OperatorType.INFIX);
             for (int i = 1; i < dataVariables.size(); i++) {
                 CallArgExpression dataVariable = dataVariables.get(i);
                 equalsExpression = new OperatorExpression(
@@ -852,8 +846,8 @@ public final class ParsingFunctions {
                                                 new FunctionIdentifier(Utils.generatePrefixedName("get", dataVariable.getId())),
                                                 List.of()),
                                         false),
-                                "=="),
-                        "&&"
+                                "==", OperatorType.INFIX),
+                        "&&", OperatorType.INFIX
                 );
             }
         }
@@ -864,11 +858,11 @@ public final class ParsingFunctions {
                 List.of(new CallArgExpression("value", new DataType("Any", true), true)),
                 List.of(
                         new IfStatement(
-                                new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "=="),
+                                new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "==", OperatorType.INFIX),
                                 List.of(new ReturnStatement(new BooleanLiteral(false))),
                                 null),
                         new IfStatement(
-                                new OperatorExpression(new IsExpression(new VariableIdentifier("value"), id, true), null, "!"),
+                                new OperatorExpression(new IsExpression(new VariableIdentifier("value"), id, true), null, "!", OperatorType.PREFIX),
                                 List.of(new ReturnStatement(new BooleanLiteral(false))),
                                 null),
                         new ReturnStatement(equalsExpression)),

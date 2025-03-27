@@ -13,20 +13,28 @@ import java.util.Set;
 @Getter
 public class FunctionDeclarationStatement extends ModifierStatement implements Statement {
     private final String id;
+    private final String classId;
     private final List<CallArgExpression> args;
     private final List<Statement> body;
     private final DataType returnDataType;
 
-    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType) {
+    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, String classId, List<CallArgExpression> args, List<Statement> body, DataType returnDataType) {
         super(modifiers);
         this.id = id;
+        this.classId = classId;
         this.args = args;
         this.body = body;
         this.returnDataType = returnDataType;
     }
 
+    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType) {
+        this(modifiers, id, null, args, body, returnDataType);
+    }
+
     @Override
     public String toCodeString(int offset) throws IllegalArgumentException {
+        String classString = classId == null ? "" :  classId + ".";
+
         StringBuilder argsBuilder = new StringBuilder();
         for (int i = 0; i < args.size(); i++) {
             argsBuilder.append(args.get(i).toCodeString(0));
@@ -45,6 +53,6 @@ public class FunctionDeclarationStatement extends ModifierStatement implements S
         }
         else bodyString = "";
 
-        return super.toCodeString(0) + "function " + id + "(" + argsBuilder + ")" + returnDataTypeString + bodyString;
+        return super.toCodeString(0) + "function " + classString + id + "(" + argsBuilder + ")" + returnDataTypeString + bodyString;
     }
 }

@@ -19,8 +19,8 @@ public class OperatorExpression implements Expression, ParenthesisExpression {
         this.operator = operator;
     }
 
-    public OperatorExpression(Expression left, Expression right, String operator) {
-        this(left, right, Operators.parse(operator));
+    public OperatorExpression(Expression left, Expression right, String operator, OperatorType operatorType) {
+        this(left, right, Operators.parse(operator, operatorType));
     }
 
     public OperatorType getType() {

@@ -4,6 +4,10 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
+import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
+import me.itzisonn_.meazy.parser.operator.Operator;
+import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
@@ -19,10 +23,16 @@ public class OperatorExpressionConverter extends Converter<OperatorExpression> {
         checkType(object);
 
         Expression left = jsonDeserializationContext.deserialize(getElement(object, "left"), Expression.class);
-        Expression right = jsonDeserializationContext.deserialize(getElement(object, "right"), Expression.class);
-        String operator = getElement(object, "operator").getAsString();
 
-        return new OperatorExpression(left, right, operator);
+        Expression right;
+        if (object.get("right") != null) right = jsonDeserializationContext.deserialize(getElement(object, "right"), Expression.class);
+        else right = null;
+
+        String operatorId = getElement(object, "operator").getAsString();
+        RegistryEntry<Operator> operatorEntry = Registries.OPERATORS.getEntry(RegistryIdentifier.of(operatorId));
+        if (operatorEntry == null) throw new InvalidCompiledFileException("Can't find operator " + operatorId);
+
+        return new OperatorExpression(left, right, operatorEntry.getValue());
     }
 
     @Override
@@ -30,8 +40,11 @@ public class OperatorExpressionConverter extends Converter<OperatorExpression> {
         JsonObject result = getJsonObject();
 
         result.add("left", jsonSerializationContext.serialize(operatorExpression.getLeft()));
-        result.add("right", jsonSerializationContext.serialize(operatorExpression.getRight()));
-        result.addProperty("operator", operatorExpression.getOperator().getSymbol());
+        if (operatorExpression.getRight() != null) result.add("right", jsonSerializationContext.serialize(operatorExpression.getRight()));
+
+        RegistryEntry<Operator> operatorEntry = Registries.OPERATORS.getEntry(operatorExpression.getOperator());
+        if (operatorEntry == null) throw new InvalidCompiledFileException("Can't find operator " + operatorExpression.getOperator().getSymbol());
+        result.addProperty("operator", operatorEntry.getIdentifier().toString());
 
         return result;
     }

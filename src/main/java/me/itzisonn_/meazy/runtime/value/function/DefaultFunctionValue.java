@@ -43,7 +43,8 @@ public abstract class DefaultFunctionValue extends FunctionValue {
      * @param parentEnvironment New parent of this DefaultFunctionValue
      * @return Copy of this DefaultFunctionValue
      */
-    public final DefaultFunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
+    @Override
+    public final FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
         RunFunction runFunction = this::run;
 
         return new DefaultFunctionValue(id, args, returnDataType, parentEnvironment, modifiers) {
