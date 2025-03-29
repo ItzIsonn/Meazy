@@ -78,7 +78,7 @@ public final class ParsingFunctions {
 
             List<Statement> generatedBody = new ArrayList<>();
             if (modifiers.contains(Modifiers.DATA())) {
-                generatedBody.addAll(generateDataBody(id, parseArgs()));
+                generatedBody.addAll(generateDataBody(id, parseCallArgs()));
                 modifiers.remove(Modifiers.DATA());
             }
 
@@ -112,6 +112,30 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected new line");
             moveOverOptionalNewLines();
 
+            LinkedHashMap<String, List<Expression>> enumIds = new LinkedHashMap<>();
+            if (modifiers.contains(Modifiers.ENUM())) {
+                if (!baseClasses.isEmpty()) throw new InvalidSyntaxException("Enum class can't have base classes");
+
+                String enumId = getCurrentAndNext(TokenTypes.ID(), "Expected enum member id").getValue();
+                List<Expression> args;
+                if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) args = parseArgs();
+                else args = new ArrayList<>();
+                enumIds.put(enumId, args);
+
+                while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                    getCurrentAndNext();
+                    moveOverOptionalNewLines();
+
+                    enumId = getCurrentAndNext(TokenTypes.ID(), "Expected enum member id").getValue();
+                    if (enumIds.containsKey(enumId)) throw new InvalidSyntaxException("Enum class can't have duplicated entries");
+                    if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) args = parseArgs();
+                    else args = new ArrayList<>();
+                    enumIds.put(enumId, args);
+                }
+
+                moveOverOptionalNewLines();
+            }
+
             List<Statement> body = new ArrayList<>(generatedBody);
             while (!getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
                 Statement statement = parse(RegistryIdentifier.ofDefault("class_body_statement"));
@@ -138,7 +162,7 @@ public final class ParsingFunctions {
             getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close class body");
             getCurrentAndNext(TokenTypes.NEW_LINE(), "Expected NEW_LINE token in the end of the class declaration");
 
-            return new ClassDeclarationStatement(modifiers, id, baseClasses, body);
+            return new ClassDeclarationStatement(modifiers, id, baseClasses, body, enumIds);
         });
 
         register("class_body_statement", extra -> {
@@ -174,7 +198,7 @@ public final class ParsingFunctions {
                 id = getCurrentAndNext(TokenTypes.ID(), "Expected identifier after function keyword").getValue();
             }
 
-            List<CallArgExpression> args = parseArgs();
+            List<CallArgExpression> args = parseCallArgs();
             DataType dataType = parseDataType();
 
             if (modifiers.contains(Modifiers.ABSTRACT())) {
@@ -231,7 +255,7 @@ public final class ParsingFunctions {
             Set<Modifier> modifiers = getModifiersFromExtra(extra);
             getCurrentAndNext(TokenTypes.CONSTRUCTOR(), "Expected constructor keyword");
 
-            List<CallArgExpression> args = parseArgs();
+            List<CallArgExpression> args = parseCallArgs();
 
             moveOverOptionalNewLines();
             getCurrentAndNext(TokenTypes.LEFT_BRACE(), "Expected left brace to open constructor body");
@@ -603,7 +627,7 @@ public final class ParsingFunctions {
                 getCurrentAndNext();
                 Expression expression = parseAfter(RegistryIdentifier.ofDefault("class_call_expression"), Expression.class);
                 if (expression instanceof CallExpression callExpression) {
-                    return new ClassCallExpression(callExpression.getCaller(), callExpression.getArgs());
+                    return new ClassCallExpression(new ClassIdentifier(callExpression.getCaller().getId()), callExpression.getArgs());
                 }
                 throw new InvalidSyntaxException("Class creation must be call expression");
             }
@@ -615,18 +639,8 @@ public final class ParsingFunctions {
             Expression expression = parseAfter(RegistryIdentifier.ofDefault("function_call_expression"), Expression.class);
 
             if (getCurrent().getType().equals(TokenTypes.LEFT_PAREN())) {
-                getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
-                List<Expression> args = new ArrayList<>();
-                if (getCurrent().getType() != TokenTypes.RIGHT_PAREN()) {
-                    args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
-
-                    while (getCurrent().getType().equals(TokenTypes.COMMA())) {
-                        getCurrentAndNext();
-                        args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
-                    }
-                }
-                getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
-                return new FunctionCallExpression(expression, args);
+                if (!(expression instanceof Identifier identifier)) throw new InvalidSyntaxException("Can't call non-identifier");
+                return new FunctionCallExpression(new FunctionIdentifier(identifier.getId()), parseArgs());
             }
 
             return expression;
@@ -698,8 +712,8 @@ public final class ParsingFunctions {
         }
     }
 
-    private static List<CallArgExpression> parseArgs() {
-        getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis");
+    private static List<CallArgExpression> parseCallArgs() {
+        getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
         List<CallArgExpression> args = new ArrayList<>();
         if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN())) {
             args.add(parse(RegistryIdentifier.ofDefault("function_arg"), CallArgExpression.class));
@@ -709,7 +723,22 @@ public final class ParsingFunctions {
                 args.add(parse(RegistryIdentifier.ofDefault("function_arg"), CallArgExpression.class));
             }
         }
-        getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis");
+        getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
+        return args;
+    }
+
+    private static List<Expression> parseArgs() {
+        getCurrentAndNext(TokenTypes.LEFT_PAREN(), "Expected left parenthesis to open call args");
+        List<Expression> args = new ArrayList<>();
+        if (!getCurrent().getType().equals(TokenTypes.RIGHT_PAREN())) {
+            args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+
+            while (getCurrent().getType().equals(TokenTypes.COMMA())) {
+                getCurrentAndNext();
+                args.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+            }
+        }
+        getCurrentAndNext(TokenTypes.RIGHT_PAREN(), "Expected right parenthesis to close call args");
         return args;
     }
 

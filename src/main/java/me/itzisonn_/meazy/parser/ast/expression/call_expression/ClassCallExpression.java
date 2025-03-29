@@ -1,11 +1,12 @@
 package me.itzisonn_.meazy.parser.ast.expression.call_expression;
 
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 
 import java.util.List;
 
 public class ClassCallExpression extends CallExpression {
-    public ClassCallExpression(Expression caller, List<Expression> args) {
+    public ClassCallExpression(ClassIdentifier caller, List<Expression> args) {
         super(caller, args);
     }
 

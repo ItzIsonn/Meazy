@@ -21,7 +21,11 @@ public class IfStatementConverter extends Converter<IfStatement> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        Expression condition = jsonDeserializationContext.deserialize(getElement(object, "condition"), Expression.class);
+        Expression condition;
+        if (object.get("condition") != null) {
+            condition = jsonDeserializationContext.deserialize(getElement(object, "condition"), Expression.class);
+        }
+        else condition = null;
 
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
@@ -38,7 +42,7 @@ public class IfStatementConverter extends Converter<IfStatement> {
     public JsonElement serialize(IfStatement ifStatement, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject result = getJsonObject();
 
-        result.add("condition", jsonSerializationContext.serialize(ifStatement.getCondition()));
+        if (ifStatement.getCondition() != null) result.add("condition", jsonSerializationContext.serialize(ifStatement.getCondition()));
 
         JsonArray body = new JsonArray();
         for (Statement statement : ifStatement.getBody()) {
