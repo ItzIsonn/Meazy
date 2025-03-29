@@ -146,7 +146,7 @@ public final class EvaluationFunctions {
                 classEnvironment.declareFunction(new DefaultFunctionValue("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(Modifiers.SHARED())) {
                     @Override
                     public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                        return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), new ArrayList<>(enumValues)));
+                        return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), new ArrayList<>(enumValues)));
                     }
                 });
             }
