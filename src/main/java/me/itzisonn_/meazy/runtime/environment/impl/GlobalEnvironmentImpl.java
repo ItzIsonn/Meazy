@@ -178,7 +178,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
                 if (!(functionArgs.get(1).getFinalRuntimeValue() instanceof IntValue endValue)) throw new InvalidArgumentException("End must be int");
 
                 List<RuntimeValue<?>> list = range(beginValue.getValue(), endValue.getValue(), 1);
-                return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
+                return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
             }
         });
 
@@ -194,7 +194,7 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
                 if (stepValue.getValue() <= 0) throw new InvalidArgumentException("Step must be positive int");
 
                 List<RuntimeValue<?>> list = range(beginValue.getValue(),  endValue.getValue(), stepValue.getValue());
-                return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
+                return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
             }
         });
     }
