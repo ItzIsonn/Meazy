@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy.addon;
 
+import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;

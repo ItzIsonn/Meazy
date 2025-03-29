@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.addon;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

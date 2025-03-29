@@ -1,11 +1,13 @@
-package me.itzisonn_.meazy.addon;
+package me.itzisonn_.meazy.addon.addon_info;
 
 import com.google.gson.*;
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.addon.Addon;
+import me.itzisonn_.meazy.addon.AddonManager;
+import me.itzisonn_.meazy.addon.InvalidAddonInfoException;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -81,7 +83,7 @@ import java.util.*;
  *</pre></blockquote>
  */
 @Getter
-public final class AddonInfo implements JsonDeserializer<AddonInfo> {
+public final class AddonInfo {
     /**
      *  Id of the addon. This id is a unique identifier for addons.
      *  <ul>
@@ -98,7 +100,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  Example: <blockquote><pre>"id": "example_addon"</pre></blockquote>
      */
-    private String id = null;
+    private final String id;
 
     /**
      *  Version of the addon.
@@ -107,7 +109,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  Example: <blockquote><pre>"version": "1.52.0"</pre></blockquote>
      */
-    private String version = null;
+    private final String version;
 
     /**
      *  Fully qualified name of the main class for a addon. The
@@ -126,7 +128,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  Example: <blockquote><pre>"main": "org.example.addon.MyAddon"</pre></blockquote>
      */
-    private String main = null;
+    private final String main;
 
     /**
      *  A human-friendly description of the functionality the addon provides.
@@ -135,7 +137,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  Example: <blockquote><pre>"description": "Example addon for Meazy programming language"</pre></blockquote>
      */
-    private String description = "";
+    private final String description;
 
     /**
      *  List of authors for the addon. Gives credit to the developer.
@@ -149,7 +151,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  When both are specified, only <code>author</code> will be in the list
      */
-    private List<String> authors = List.of();
+    private final List<String> authors;
 
     /**
      *  Gives a list of other addons that the addon requires.
@@ -163,7 +165,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  Example: <blockquote><pre>"depend": ["OneAddon", "AnotherAddon"]</pre></blockquote>
      */
-    private List<String> depend = List.of();
+    private final List<String> depend;
 
     /**
      *  List of other addons that the addon requires for full functionality.
@@ -181,7 +183,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  Example: <blockquote><pre>"softdepend": ["OneAddon", "AnotherAddon"]</pre></blockquote>
      */
-    private List<String> softDepend = List.of();
+    private final List<String> softDepend;
 
     /**
      *  List of addons that should consider this addon a soft-dependency.
@@ -196,7 +198,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <p>
      *  Example: <blockquote><pre>"loadbefore": ["OneAddon", "AnotherAddon"]</pre></blockquote>
      */
-    private List<String> loadBefore = List.of();
+    private final List<String> loadBefore;
 
     /**
      * Returns the name of a addon, including the version.
@@ -208,20 +210,12 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
         return id + " v" + version;
     }
 
-    public AddonInfo(final InputStream stream) throws InvalidAddonInfoException {
-        StringBuilder json = new StringBuilder();
-        for (String line : new BufferedReader(new InputStreamReader(stream)).lines().toList()) {
-            json.append(line);
-        }
-        loadAddonInfo(json.toString());
-    }
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(AddonInfo.class, new AddonInfoDeserializer())
+            .create();
 
-    private void loadAddonInfo(String json) throws InvalidAddonInfoException {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(AddonInfo.class, this)
-                .create();
-        gson.fromJson(json, AddonInfo.class);
-
+    public AddonInfo(String id, String version, String main, String description, List<String> authors,
+                     List<String> depend, List<String> softDepend, List<String> loadBefore) throws InvalidAddonInfoException {
         if (!id.matches(Utils.IDENTIFIER_REGEX)) throw new InvalidAddonInfoException("Id doesn't match Identifier Regex");
         for (String string : depend) {
             if (!string.matches(Utils.IDENTIFIER_REGEX))
@@ -235,26 +229,22 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
             if (!string.matches(Utils.IDENTIFIER_REGEX))
                 throw new InvalidAddonInfoException(string + " in loadbefore list doesn't match Identifier Regex");
         }
+
+        this.id = id;
+        this.version = version;
+        this.main = main;
+        this.description = description;
+        this.authors = authors;
+        this.depend = depend;
+        this.softDepend = softDepend;
+        this.loadBefore = loadBefore;
     }
 
-
-
-    @Override
-    public AddonInfo deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        JsonObject jsonObject = jsonElement.getAsJsonObject();
-
-        id = jsonObject.get("id").getAsString();
-        version = jsonObject.get("version").getAsString();
-        main = jsonObject.get("main").getAsString();
-
-        if (jsonObject.get("description") != null) description = jsonObject.get("description").getAsString();
-        if (jsonObject.get("author") != null) authors = List.of(jsonObject.get("author").getAsString());
-        else if (jsonObject.get("authors") != null) authors = jsonObject.get("authors").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList();
-
-        if (jsonObject.get("depend") != null) depend = jsonObject.get("depend").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList();
-        if (jsonObject.get("softDepend") != null) softDepend = jsonObject.get("softDepend").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList();
-        if (jsonObject.get("loadBefore") != null) loadBefore = jsonObject.get("loadBefore").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList();
-
-        return this;
+    public static AddonInfo loadAddonInfo(InputStream stream) {
+        StringBuilder json = new StringBuilder();
+        for (String line : new BufferedReader(new InputStreamReader(stream)).lines().toList()) {
+            json.append(line);
+        }
+        return gson.fromJson(json.toString(), AddonInfo.class);
     }
 }
