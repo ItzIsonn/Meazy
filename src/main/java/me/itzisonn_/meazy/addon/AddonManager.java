@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.addon;
 
 import me.itzisonn_.meazy.MeazyMain;
+import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;

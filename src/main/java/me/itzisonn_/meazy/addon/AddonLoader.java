@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.addon;
 
 import me.itzisonn_.meazy.MeazyMain;
+import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -86,7 +87,7 @@ public class AddonLoader {
 
             stream = jar.getInputStream(entry);
 
-            return new AddonInfo(stream);
+            return AddonInfo.loadAddonInfo(stream);
 
         }
         catch (IOException e) {
