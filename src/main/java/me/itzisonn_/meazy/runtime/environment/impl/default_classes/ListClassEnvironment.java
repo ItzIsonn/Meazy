@@ -30,7 +30,7 @@ public class ListClassEnvironment extends ClassEnvironmentImpl {
         declareVariable(new VariableValue(
                 "value",
                 new DataType("Any", false),
-                new InnerListValue(list),
+                new InnerListValue(new ArrayList<>(list)),
                 false,
                 Set.of(Modifiers.PRIVATE()),
                 false));

@@ -55,6 +55,10 @@ public final class Modifiers {
         return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("operator")).getValue();
     }
 
+    public static Modifier ENUM() {
+        return Registries.MODIFIERS.getEntry(RegistryIdentifier.ofDefault("enum")).getValue();
+    }
+
 
     /**
      * Finds registered Modifier with given id
@@ -129,7 +133,7 @@ public final class Modifiers {
             @Override
             public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
                 if (modifierStatement.getModifiers().contains(PRIVATE()) || modifierStatement.getModifiers().contains(SHARED()) ||
-                        modifierStatement.getModifiers().contains(FINAL())) return false;
+                        modifierStatement.getModifiers().contains(FINAL()) || modifierStatement.getModifiers().contains(ENUM())) return false;
 
                 if (modifierStatement instanceof ClassDeclarationStatement) return true;
                 if (modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment classEnvironment) {
@@ -178,6 +182,15 @@ public final class Modifiers {
                     modifierStatement.getModifiers().contains(PROTECTED()) || modifierStatement.getModifiers().contains(SHARED())) return false;
 
                 return modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment;
+            }
+        });
+
+        register(new Modifier("enum") {
+            @Override
+            public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
+                if (modifierStatement.getModifiers().contains(ABSTRACT())) return false;
+
+                return modifierStatement instanceof ClassDeclarationStatement;
             }
         });
     }

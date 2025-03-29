@@ -95,6 +95,17 @@ public final class EvaluationFunctions {
                 Interpreter.evaluate(statement, classEnvironment);
             }
 
+            for (String enumId : classDeclarationStatement.getEnumIds().keySet()) {
+                classEnvironment.declareVariable(new VariableValue(
+                        enumId,
+                        new DataType(classDeclarationStatement.getId(), false),
+                        null,
+                        true,
+                        Set.of(Modifiers.SHARED()),
+                        false
+                ));
+            }
+
             if (hasRepeatedBaseClasses(classDeclarationStatement.getBaseClasses(), new ArrayList<>())) {
                 throw new InvalidIdentifierException("Class with id " + classDeclarationStatement.getId() + " has repeated base classes");
             }
@@ -109,6 +120,36 @@ public final class EvaluationFunctions {
                     classEnvironment,
                     classDeclarationStatement.getBody());
             classDeclarationEnvironment.declareClass(runtimeClassValue);
+
+            int enumOrdinal = 1;
+            List<ClassValue> enumValues = new ArrayList<>();
+            for (String enumId : classDeclarationStatement.getEnumIds().keySet()) {
+                List<RuntimeValue<?>> args = classDeclarationStatement.getEnumIds().get(enumId).stream().map(expression -> Interpreter.evaluate(expression, classEnvironment)).collect(Collectors.toList());
+                ClassEnvironment enumEnvironment = initClassEnvironment(runtimeClassValue, classEnvironment, args);
+
+                int finalEnumOrdinal = enumOrdinal;
+                enumEnvironment.declareFunction(new DefaultFunctionValue("getOrdinal", List.of(), new DataType("Int", false), enumEnvironment, Set.of()) {
+                    @Override
+                    public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                        return new IntValue(finalEnumOrdinal);
+                    }
+                });
+                enumOrdinal++;
+
+                ClassValue enumValue = new DefaultClassValue(enumEnvironment);
+                classEnvironment.assignVariable(enumId, enumValue);
+                enumValues.add(enumValue);
+            }
+
+            if (classDeclarationStatement.getModifiers().contains(Modifiers.ENUM())) {
+                classEnvironment.declareFunction(new DefaultFunctionValue("getValues", List.of(), new DataType("List", false), classEnvironment, Set.of(Modifiers.SHARED())) {
+                    @Override
+                    public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                        return new DefaultClassValue(new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), new ArrayList<>(enumValues)));
+                    }
+                });
+            }
+
             return null;
         });
 
@@ -118,6 +159,7 @@ public final class EvaluationFunctions {
             if (functionDeclarationStatement.getClassId() != null) {
                 ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(functionDeclarationStatement.getClassId());
                 if (classValue == null) throw new InvalidIdentifierException("Can't find class with id " + functionDeclarationStatement.getClassId());
+                if (classValue.getModifiers().contains(Modifiers.FINAL())) throw new InvalidIdentifierException("Can't extend final class with id " + functionDeclarationStatement.getClassId());
                 if (!extensionFunctions.contains(functionDeclarationStatement)) extensionFunctions.add(functionDeclarationStatement);
                 return null;
             }
@@ -552,7 +594,8 @@ public final class EvaluationFunctions {
             RuntimeValue<?> rawClass = Interpreter.evaluate(classCallExpression.getCaller(), environment);
 
             if (!(rawClass instanceof ClassValue classValue)) throw new InvalidCallException("Can't call " + rawClass.getClass().getName() + " because it's not a class");
-            if (classValue.getModifiers().contains(Modifiers.ABSTRACT())) throw new InvalidCallException("Can't call abstract class " + classValue.getId());
+            if (classValue.getModifiers().contains(Modifiers.ABSTRACT())) throw new InvalidCallException("Can't create instance of an abstract class " + classValue.getId());
+            if (classValue.getModifiers().contains(Modifiers.ENUM())) throw new InvalidCallException("Can't create instance of an enum class " + classValue.getId());
 
             ClassEnvironment classEnvironment = initClassEnvironment(classValue, extraEnvironment, args);
             if (classValue instanceof RuntimeClassValue runtimeClassValue) return new RuntimeClassValue(classValue.getBaseClasses(), classEnvironment, runtimeClassValue.getBody());

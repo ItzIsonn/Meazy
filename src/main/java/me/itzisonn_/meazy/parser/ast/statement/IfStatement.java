@@ -27,7 +27,7 @@ public class IfStatement implements Statement {
             bodyBuilder.append(Utils.getOffset(offset)).append(statement.toCodeString(offset + 1)).append("\n");
         }
 
-        String elseString = elseStatement == null ? "" : "\n" + Utils.getOffset(offset - 1) + "else " + elseStatement.toCodeString(0);
+        String elseString = elseStatement == null ? "" : "\n" + Utils.getOffset(offset - 1) + "else " + elseStatement.toCodeString(offset);
 
         return conditionString + "{\n" + bodyBuilder + Utils.getOffset(offset - 1) + "}" + elseString;
     }

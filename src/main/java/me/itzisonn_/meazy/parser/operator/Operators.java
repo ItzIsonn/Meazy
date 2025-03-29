@@ -259,6 +259,7 @@ public final class Operators {
             @Override
             public RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2) {
                 if (value1 instanceof NullValue) return new BooleanValue(value2 instanceof NullValue);
+                if (value1.getValue() == null) return new BooleanValue(value1.equals(value2));
                 return new BooleanValue(value1.getValue().equals(value2.getValue()));
             }
         });

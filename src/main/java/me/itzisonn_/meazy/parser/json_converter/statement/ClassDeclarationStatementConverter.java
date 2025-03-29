@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.json_converter.statement;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
@@ -10,9 +11,7 @@ import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ClassDeclarationStatementConverter extends Converter<ClassDeclarationStatement> {
@@ -45,7 +44,16 @@ public class ClassDeclarationStatementConverter extends Converter<ClassDeclarati
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        return new ClassDeclarationStatement(modifiers, id, baseClasses, body);
+        LinkedHashMap<String, List<Expression>> enumIds = new LinkedHashMap<>();
+        if (object.get("enum_ids") != null) {
+            Map<String, JsonElement> map = getElement(object, "enum_ids").getAsJsonObject().asMap();
+            for (String enumId : new LinkedHashMap<>(map).sequencedKeySet()) {
+                enumIds.put(enumId, map.get(enumId).getAsJsonArray().asList().stream().map(expression ->
+                        (Expression) jsonDeserializationContext.deserialize(expression, Expression.class)).toList());
+            }
+        }
+
+        return new ClassDeclarationStatement(modifiers, id, baseClasses, body, enumIds);
     }
 
     @Override
@@ -73,6 +81,16 @@ public class ClassDeclarationStatementConverter extends Converter<ClassDeclarati
             body.add(jsonSerializationContext.serialize(statement));
         }
         result.add("body", body);
+
+        JsonObject enumIds = new JsonObject();
+        for (String enumId : classDeclarationStatement.getEnumIds().sequencedKeySet()) {
+            JsonArray args = new JsonArray();
+            for (Expression arg : classDeclarationStatement.getEnumIds().get(enumId)) {
+                args.add(jsonSerializationContext.serialize(arg));
+            }
+            enumIds.add(enumId, args);
+        }
+        result.add("enum_ids", enumIds);
 
         return result;
     }

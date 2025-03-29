@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.json_converter.expression.call_expression;
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
@@ -20,7 +21,7 @@ public class FunctionCallExpressionConverter extends Converter<FunctionCallExpre
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        Expression caller = jsonDeserializationContext.deserialize(getElement(object, "caller"), Expression.class);
+        FunctionIdentifier caller = jsonDeserializationContext.deserialize(getElement(object, "caller"), FunctionIdentifier.class);
 
         List<Expression> args = getElement(object, "args").getAsJsonArray().asList().stream().map(arg ->
                 (Expression) jsonDeserializationContext.deserialize(arg, Expression.class)).collect(Collectors.toList());
