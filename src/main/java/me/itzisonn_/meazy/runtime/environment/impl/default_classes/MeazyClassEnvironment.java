@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.ListClassEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.StringValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;

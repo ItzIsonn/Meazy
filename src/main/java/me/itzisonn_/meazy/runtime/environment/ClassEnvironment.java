@@ -100,7 +100,7 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
     Set<ClassEnvironment> getBaseClasses();
 
     /**
-     * @return All base classes of this ClassEnvironment and it's base classes
+     * @return All base classes of this ClassEnvironment and their base classes
      */
     default Set<ClassEnvironment> getDeepBaseClasses() {
         Set<ClassEnvironment> baseClasses = new HashSet<>();
