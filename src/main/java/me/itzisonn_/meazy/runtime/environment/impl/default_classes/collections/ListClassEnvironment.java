@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime.environment.impl.default_classes;
+package me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections;
 
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
@@ -25,7 +25,6 @@ public class ListClassEnvironment extends ClassEnvironmentImpl {
 
     public ListClassEnvironment(ClassDeclarationEnvironment parent, List<RuntimeValue<?>> list) {
         super(parent, false, "List");
-
 
         declareVariable(new VariableValue(
                 "value",
@@ -132,18 +131,40 @@ public class ListClassEnvironment extends ClassEnvironmentImpl {
             }
         });
 
+        declareFunction(new DefaultFunctionValue("isEmpty", List.of(), new DataType("Boolean", false), this, new HashSet<>()) {
+            @Override
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
+                if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't use non-list value");
+
+                return new BooleanValue(listValue.getValue().isEmpty());
+            }
+        });
+
+        declareFunction(new DefaultFunctionValue("contains", List.of(
+                new CallArgExpression("element", new DataType("Any", true), true)),
+                new DataType("Boolean", false), this, new HashSet<>()) {
+            @Override
+            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
+                RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
+                if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't use non-list value");
+
+                return new BooleanValue(listValue.getValue().contains(functionArgs.getFirst().getFinalRuntimeValue()));
+            }
+        });
+
         declareFunction(new DefaultFunctionValue("toString", List.of(), new DataType("String", false), this, new HashSet<>()) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 RuntimeValue<?> value = functionEnvironment.getVariableDeclarationEnvironment("value").getVariable("value").getValue();
                 if (!(value instanceof InnerListValue listValue)) throw new InvalidSyntaxException("Can't convert non-list value to string");
 
-                return new StringValue(Utils.unpackRuntimeValuesList(listValue.getValue()).toString());
+                return new StringValue(Utils.unpackRuntimeValuesCollection(listValue.getValue()).toString());
             }
         });
     }
 
-    public static class InnerListValue extends RuntimeValue<List<RuntimeValue<?>>> {
+    public static class InnerListValue extends CollectionClassEnvironment.InnerCollectionValue<List<RuntimeValue<?>>> {
         private InnerListValue(List<RuntimeValue<?>> value) {
             super(value);
         }

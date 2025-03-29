@@ -6,6 +6,10 @@ import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.*;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.CollectionClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.ListClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.MapClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.SetClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.primitive.*;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
@@ -132,7 +136,12 @@ public class GlobalEnvironmentImpl extends FunctionDeclarationEnvironmentImpl im
 
         declareClass(new DefaultClassValue(new StringClassEnvironment(this, null)));
         declareClass(new DefaultClassValue(new InputClassEnvironment(this)));
-        declareClass(new DefaultClassValue(new ListClassEnvironment(this)));
+
+        declareClass(new DefaultClassValue(new CollectionClassEnvironment(this)));
+        declareClass(new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(this)));
+        declareClass(new DefaultClassValue(Set.of("Collection"), new SetClassEnvironment(this)));
+        declareClass(new DefaultClassValue(new MapClassEnvironment(this)));
+
         declareClass(new DefaultClassValue(new MathClassEnvironment(this)));
         declareClass(new DefaultClassValue(new RandomClassEnvironment(this)));
         declareClass(new DefaultClassValue(new MeazyClassEnvironment(this)));

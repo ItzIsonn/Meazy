@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -125,14 +126,14 @@ public final class Utils {
     }
 
     /**
-     * Iterates over given list and uses {@link RuntimeValue#getFinalValue()} function on all elements.
+     * Iterates over given collection and uses {@link RuntimeValue#getFinalValue()} function on all elements.
      *
-     * @param list List of RuntimeValues
+     * @param collection Collection of RuntimeValues
      * @return Unpacked list
      */
-    public static List<Object> unpackRuntimeValuesList(List<RuntimeValue<?>> list) {
+    public static List<Object> unpackRuntimeValuesCollection(Collection<RuntimeValue<?>> collection) {
         List<Object> unpackedList = new ArrayList<>();
-        for (RuntimeValue<?> runtimeValue : list) {
+        for (RuntimeValue<?> runtimeValue : collection) {
             unpackedList.add(runtimeValue.getFinalValue());
         }
         return unpackedList;

@@ -1,10 +1,12 @@
 package me.itzisonn_.meazy.parser.ast.expression;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import me.itzisonn_.meazy.parser.DataType;
 
 @Getter
+@EqualsAndHashCode
 public class CallArgExpression implements Expression {
     private final String id;
     private final DataType dataType;

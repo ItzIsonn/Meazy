@@ -19,7 +19,8 @@ import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.environment.impl.default_classes.ListClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.CollectionClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.ListClassEnvironment;
 import me.itzisonn_.meazy.runtime.value.*;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.RuntimeClassValue;
@@ -400,16 +401,16 @@ public final class EvaluationFunctions {
                 throw new RuntimeException(e);
             }
 
-            RuntimeValue<?> rawCollectionValue = Interpreter.evaluate(foreachStatement.getCollection(), foreachEnvironment);
-            if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getId().equals("List")))
-                throw new InvalidSyntaxException("Can't get members of non-list value");
+            RuntimeValue<?> rawCollectionValue = Interpreter.evaluate(foreachStatement.getCollection(), foreachEnvironment).getFinalRuntimeValue();
+            if (!(rawCollectionValue instanceof ClassValue classValue && classValue.getBaseClasses().contains("Collection")))
+                throw new InvalidSyntaxException("Can't get members of non-collection value");
 
             VariableValue variable = classValue.getEnvironment().getVariable("value");
-            if (variable == null) throw new InvalidSyntaxException("Can't get members of non-list value");
-            if (!(variable.getValue() instanceof ListClassEnvironment.InnerListValue listValue)) throw new InvalidSyntaxException("Can't get members of non-list value");
+            if (variable == null) throw new InvalidSyntaxException("Can't get members of non-collection value");
+            if (!(variable.getValue() instanceof CollectionClassEnvironment.InnerCollectionValue<?> collectionValue)) throw new InvalidSyntaxException("Can't get members of non-collection value");
 
             main:
-            for (RuntimeValue<?> runtimeValue : listValue.getValue()) {
+            for (RuntimeValue<?> runtimeValue : collectionValue.getValue()) {
                 foreachEnvironment.clearVariables();
 
                 foreachEnvironment.declareVariable(new VariableValue(
@@ -1067,7 +1068,7 @@ public final class EvaluationFunctions {
             for (ClassEnvironment baseClass : classEnvironment.getBaseClasses()) {
                 for (FunctionValue functionValue : getFinalFunctions(baseClass)) {
                     if (functionValue.getModifiers().contains(Modifiers.ABSTRACT())) {
-                        throw new InvalidSyntaxException("Abstract function with id " + functionValue.getId() + " hasn't been initialized");
+                        throw new InvalidSyntaxException("Abstract function with id " + functionValue.getId() + " in class with id " + classEnvironment.getId() + " hasn't been initialized");
                     }
                 }
             }

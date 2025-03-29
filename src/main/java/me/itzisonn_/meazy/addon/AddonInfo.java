@@ -173,7 +173,7 @@ public final class AddonInfo implements JsonDeserializer<AddonInfo> {
      *  <ul>
      *  <li>Use the value in the {@link #getId()} of the target addon to specify the dependency.
      *  <li>When an unresolvable addon is listed, it will be ignored and doesn't affect load order.
-     *  <li>When a circular dependency occurs (a network of addons depending or soft-dependending each other),
+     *  <li>When a circular dependency occurs (a network of addons depending or soft-depending each other),
      *      it will randomly choose an addon that can be resolved when ignoring soft-dependencies.
      *  </ul>
      *  <p>

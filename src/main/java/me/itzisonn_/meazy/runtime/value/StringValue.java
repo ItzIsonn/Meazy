@@ -22,4 +22,12 @@ public class StringValue extends DefaultClassValue {
     public String toString() {
         return getValue();
     }
+
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        else if (!(o instanceof StringValue other)) return false;
+        else {
+            return other.getValue().equals(this.getValue());
+        }
+    }
 }
