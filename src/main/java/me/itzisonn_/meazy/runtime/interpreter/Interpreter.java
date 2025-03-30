@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
-import me.itzisonn_.meazy.parser.ast.statement.*;
+import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.registry.multiple_entry.Pair;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.registry.RegistryEntry;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.value.*;

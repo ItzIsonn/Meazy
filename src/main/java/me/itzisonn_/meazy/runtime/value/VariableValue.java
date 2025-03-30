@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.value;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 

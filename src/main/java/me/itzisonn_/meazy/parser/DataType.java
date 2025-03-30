@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;

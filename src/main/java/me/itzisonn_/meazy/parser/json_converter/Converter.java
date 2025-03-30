@@ -2,8 +2,8 @@ package me.itzisonn_.meazy.parser.json_converter;
 
 import com.google.gson.*;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.lang.reflect.ParameterizedType;

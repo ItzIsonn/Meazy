@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.lexer;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.Registries;
 
 import java.util.regex.Pattern;
 

@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy.registry;
 
+import me.itzisonn_.meazy.Registries;
+
 /**
  * Registry
  *

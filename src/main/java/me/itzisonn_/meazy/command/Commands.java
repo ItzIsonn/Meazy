@@ -5,9 +5,8 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.parser.ast.statement.Program;
-import me.itzisonn_.meazy.parser.json_converter.Converters;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.parser.ast.Program;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
@@ -109,7 +108,7 @@ public final class Commands {
                     Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
                 }
                 else if (extension.equals("meac")) {
-                    Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
+                    Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
                     if (program == null) {
                         MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}, try to run it in the same version of Meazy ({})", file.getAbsolutePath(), MeazyMain.VERSION);
                         return null;
@@ -178,7 +177,7 @@ public final class Commands {
                     }
                 }
 
-                String json = Converters.getGson().toJson(program, Program.class);
+                String json = Registries.getGson().toJson(program, Program.class);
 
                 try (FileWriter fileWriter = new FileWriter(outputFile)) {
                     fileWriter.write(json);
@@ -207,7 +206,7 @@ public final class Commands {
                 MeazyMain.LOGGER.log(Level.INFO, "Decompiling file '{}'", file.getAbsoluteFile());
 
                 long startMillis = System.currentTimeMillis();
-                Program program = Converters.getGson().fromJson(Utils.getLines(file), Program.class);
+                Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
                 if (program == null) {
                     MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}, try to decompile it in the same version of Meazy ({})", file.getAbsolutePath(), MeazyMain.VERSION);
                     return null;

@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.command;
 
 import me.itzisonn_.meazy.Utils;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.Registries;
 
 import java.util.List;
 
