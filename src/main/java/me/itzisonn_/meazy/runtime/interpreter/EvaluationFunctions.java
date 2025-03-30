@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
+import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreationExpression;
+import me.itzisonn_.meazy.parser.ast.expression.collection_creation.MapCreationExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.DataType;
@@ -21,6 +23,7 @@ import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.CollectionClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.ListClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.impl.default_classes.collections.MapClassEnvironment;
 import me.itzisonn_.meazy.runtime.value.*;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 import me.itzisonn_.meazy.runtime.value.classes.RuntimeClassValue;
@@ -530,6 +533,22 @@ public final class EvaluationFunctions {
         });
 
         register("assignment_expression", AssignmentExpression.class, (assignmentExpression, environment, extra) -> evaluateAssignmentExpression(assignmentExpression, environment));
+
+        register("list_creation_expression", ListCreationExpression.class, (listCreationExpression, environment, extra) -> {
+            List<RuntimeValue<?>> list = listCreationExpression.getList().stream().map(expression -> Interpreter.evaluate(expression, environment)).collect(Collectors.toList());
+            return new DefaultClassValue(Set.of("Collection"), new ListClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), list));
+        });
+
+        register("map_creation_expression", MapCreationExpression.class, (mapCreationExpression, environment, extra) -> {
+            Map<RuntimeValue<?>, RuntimeValue<?>> map = new HashMap<>();
+
+            for (Expression key : mapCreationExpression.getMap().keySet()) {
+                Expression value = mapCreationExpression.getMap().get(key);
+                map.put(Interpreter.evaluate(key, environment), Interpreter.evaluate(value, environment));
+            }
+
+            return new DefaultClassValue(new MapClassEnvironment(Registries.GLOBAL_ENVIRONMENT.getEntry().getValue(), map));
+        });
 
         register("null_check_expression", NullCheckExpression.class, (nullCheckExpression, environment, extra) -> {
             RuntimeValue<?> checkValue = Interpreter.evaluate(nullCheckExpression.getCheckExpression(), environment).getFinalRuntimeValue();
