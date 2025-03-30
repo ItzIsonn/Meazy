@@ -2,8 +2,8 @@ package me.itzisonn_.meazy.runtime.value.classes;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 

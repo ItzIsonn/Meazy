@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.value.classes;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
+import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 
 import java.util.HashSet;
