@@ -9,6 +9,8 @@ import me.itzisonn_.meazy.parser.ast.expression.*;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.CallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.ClassCallExpression;
 import me.itzisonn_.meazy.parser.ast.expression.call_expression.FunctionCallExpression;
+import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreationExpression;
+import me.itzisonn_.meazy.parser.ast.expression.collection_creation.MapCreationExpression;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
@@ -483,6 +485,48 @@ public final class ParsingFunctions {
             }
 
             return left;
+        });
+
+        register("list_creation_expression", extra -> {
+            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
+                getCurrentAndNext();
+
+                List<Expression> list = new ArrayList<>();
+                while (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) {
+                    list.add(parse(RegistryIdentifier.ofDefault("expression"), Expression.class));
+                    if (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) getCurrentAndNext(TokenTypes.COMMA(), "Expected comma as a separator between list elements");
+                }
+                getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), "Expected right bracket to close list creation");
+
+                return new ListCreationExpression(list);
+            }
+
+            return parseAfter(RegistryIdentifier.ofDefault("list_creation_expression"), Expression.class);
+        });
+
+        register("map_creation_expression", extra -> {
+            if (getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
+                getCurrentAndNext();
+
+                Map<Expression, Expression> map = new HashMap<>();
+                while (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
+                    Expression key = parse(RegistryIdentifier.ofDefault("list_creation_expression"), Expression.class);
+                    Expression value;
+                    if (getCurrent().getType().equals(TokenTypes.ASSIGN())) {
+                        getCurrentAndNext();
+                        value = parse(RegistryIdentifier.ofDefault("expression"), Expression.class);
+                    }
+                    else value = new NullLiteral();
+                    map.put(key, value);
+
+                    if (!getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) getCurrentAndNext(TokenTypes.COMMA(), "Expected comma as a separator between map pairs");
+                }
+                getCurrentAndNext(TokenTypes.RIGHT_BRACE(), "Expected right brace to close map creation");
+
+                return new MapCreationExpression(map);
+            }
+
+            return parseAfter(RegistryIdentifier.ofDefault("map_creation_expression"), Expression.class);
         });
 
         register("null_check_expression", extra -> {

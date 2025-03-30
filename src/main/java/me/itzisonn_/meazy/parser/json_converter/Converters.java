@@ -6,6 +6,8 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.parser.json_converter.expression.*;
 import me.itzisonn_.meazy.parser.json_converter.expression.call_expression.*;
+import me.itzisonn_.meazy.parser.json_converter.expression.collection_creation.ListCreationExpressionConverter;
+import me.itzisonn_.meazy.parser.json_converter.expression.collection_creation.MapCreationExpressionConverter;
 import me.itzisonn_.meazy.parser.json_converter.expression.identifier.*;
 import me.itzisonn_.meazy.parser.json_converter.expression.literal.*;
 import me.itzisonn_.meazy.parser.json_converter.statement.*;
@@ -84,6 +86,8 @@ public final class Converters {
         register(new BreakStatementConverter());
 
         register(new AssignmentExpressionConverter());
+        register(new ListCreationExpressionConverter());
+        register(new MapCreationExpressionConverter());
         register(new NullCheckExpressionConverter());
         register(new IsExpressionConverter());
         register(new OperatorExpressionConverter());

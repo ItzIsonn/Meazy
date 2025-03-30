@@ -122,6 +122,14 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("right_brace")).getValue();
     }
 
+    public static TokenType LEFT_BRACKET() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("left_bracket")).getValue();
+    }
+
+    public static TokenType RIGHT_BRACKET() {
+        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("right_bracket")).getValue();
+    }
+
     public static TokenType COLON() {
         return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("colon")).getValue();
     }
@@ -324,6 +332,8 @@ public final class TokenTypes {
         register(new TokenType("right_paren", "\\)", false));
         register(new TokenType("left_brace", "\\{", false));
         register(new TokenType("right_brace", "\\}", false));
+        register(new TokenType("left_bracket", "\\[", false));
+        register(new TokenType("right_bracket", "\\]", false));
         register(new TokenType("colon", ":", false));
         register(new TokenType("semicolon", ";", false));
         register(new TokenType("comma", ",", false));
