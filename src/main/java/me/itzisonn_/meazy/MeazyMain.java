@@ -3,7 +3,7 @@ package me.itzisonn_.meazy;
 import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.command.Command;
-import me.itzisonn_.meazy.registry.RegistryEntry;
+import me.itzisonn_.registry.RegistryEntry;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

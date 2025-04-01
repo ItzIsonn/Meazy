@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.lexer;
 
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 
 import java.util.regex.Pattern;
 
@@ -18,21 +17,21 @@ public final class TokenTypes {
 
 
     public static TokenType NEW_LINE() {
-        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("new_line")).getValue();
+        return Registries.TOKEN_TYPES.getEntry(Registries.getDefaultIdentifier("new_line")).getValue();
     }
 
     public static TokenType WHITE_SPACE() {
-        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("white_space")).getValue();
+        return Registries.TOKEN_TYPES.getEntry(Registries.getDefaultIdentifier("white_space")).getValue();
     }
 
     public static TokenType END_OF_FILE() {
-        return Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.ofDefault("end_of_file")).getValue();
+        return Registries.TOKEN_TYPES.getEntry(Registries.getDefaultIdentifier("end_of_file")).getValue();
     }
 
 
 
     private static void register(TokenType tokenType) {
-        Registries.TOKEN_TYPES.register(RegistryIdentifier.ofDefault(tokenType.getId()), tokenType);
+        Registries.TOKEN_TYPES.register(Registries.getDefaultIdentifier(tokenType.getId()), tokenType);
     }
 
     /**

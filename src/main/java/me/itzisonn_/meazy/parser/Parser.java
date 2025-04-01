@@ -7,8 +7,8 @@ import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
+import me.itzisonn_.registry.RegistryEntry;
+import me.itzisonn_.registry.RegistryIdentifier;
 
 import java.util.ArrayList;
 import java.util.List;

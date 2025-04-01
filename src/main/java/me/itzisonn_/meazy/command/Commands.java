@@ -7,7 +7,6 @@ import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -28,25 +27,25 @@ public final class Commands {
 
 
     public static Command VERSION() {
-        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("version")).getValue();
+        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("version")).getValue();
     }
 
     public static Command RUN() {
-        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("run")).getValue();
+        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("run")).getValue();
     }
 
     public static Command COMPILE() {
-        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("compile")).getValue();
+        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("compile")).getValue();
     }
 
     public static Command DECOMPILE() {
-        return Registries.COMMANDS.getEntry(RegistryIdentifier.ofDefault("decompile")).getValue();
+        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("decompile")).getValue();
     }
 
 
 
     private static void register(String id, Command command) {
-        Registries.COMMANDS.register(RegistryIdentifier.ofDefault(id), command);
+        Registries.COMMANDS.register(Registries.getDefaultIdentifier(id), command);
     }
 
     /**

@@ -13,4 +13,20 @@ public interface Statement {
      * @throws IllegalArgumentException If given offset is negative
      */
     String toCodeString(int offset) throws IllegalArgumentException;
+
+
+
+    /**
+     * Returns offset represented by a string
+     *
+     * @param offset Number of offsets
+     * @return String offset
+     *
+     * @throws IllegalArgumentException When given offset is negative
+     */
+    static String getOffset(int offset) throws IllegalArgumentException {
+        if (offset < 0) throw new IllegalArgumentException("Offset can't be negative");
+
+        return "\t".repeat(offset);
+    }
 }
