@@ -6,24 +6,27 @@ import lombok.Getter;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.*;
+import me.itzisonn_.meazy.parser.json_converter.ExpressionConverter;
+import me.itzisonn_.meazy.parser.json_converter.StatementConverter;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
-import me.itzisonn_.meazy.registry.RegistryEntry;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
+import me.itzisonn_.registry.RegistryEntry;
+import me.itzisonn_.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.Program;
-import me.itzisonn_.meazy.registry.multiple_entry.Pair;
+import me.itzisonn_.registry.multiple_entry.Pair;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
-import me.itzisonn_.meazy.registry.multiple_entry.OrderedRegistry;
-import me.itzisonn_.meazy.registry.multiple_entry.PairRegistry;
-import me.itzisonn_.meazy.registry.multiple_entry.SetRegistry;
-import me.itzisonn_.meazy.registry.single_entry.SingleEntryRegistry;
-import me.itzisonn_.meazy.registry.single_entry.SingleEntryRegistryImpl;
+import me.itzisonn_.registry.multiple_entry.OrderedRegistry;
+import me.itzisonn_.registry.multiple_entry.PairRegistry;
+import me.itzisonn_.registry.multiple_entry.SetRegistry;
+import me.itzisonn_.registry.single_entry.SingleEntryRegistry;
+import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -190,7 +193,10 @@ public final class Registries {
         Commands.INIT();
         TokenTypes.INIT();
 
-        TOKENIZATION_FUNCTION.register(RegistryIdentifier.ofDefault("tokens_function"), lines -> {
+        registerConverter(new StatementConverter());
+        registerConverter(new ExpressionConverter());
+
+        TOKENIZATION_FUNCTION.register(getDefaultIdentifier("tokens_function"), lines -> {
             List<Token> tokens = new ArrayList<>();
             int lineNumber = 1;
 
@@ -223,14 +229,14 @@ public final class Registries {
                 i += token.getValue().length() - 1;
                 if (!token.getType().isShouldSkip()) tokens.add(token);
 
-                lineNumber += Utils.countMatches(token.getValue(), "\n");
+                lineNumber += (token.getValue().length() - token.getValue().replace("\n", "").length());
             }
 
             tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE(), ""));
             return tokens;
         });
 
-        PARSE_TOKENS_FUNCTION.register(RegistryIdentifier.ofDefault("parse_tokens"), tokens -> {
+        PARSE_TOKENS_FUNCTION.register(getDefaultIdentifier("parse_tokens"), tokens -> {
             if (tokens == null) throw new NullPointerException("Tokens can't be null!");
             Parser.setTokens(tokens);
 
@@ -238,15 +244,38 @@ public final class Registries {
 
             List<Statement> body = new ArrayList<>();
             while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                body.add(Parser.parse(RegistryIdentifier.ofDefault("global_statement"), Statement.class));
+                body.add(Parser.parse(getDefaultIdentifier("global_statement"), Statement.class));
                 Parser.moveOverOptionalNewLines();
             }
 
             return new Program(MeazyMain.VERSION, body);
         });
 
-        EVALUATE_PROGRAM_FUNCTION.register(RegistryIdentifier.ofDefault("evaluate_program"), program -> {
-            Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
-        });
+        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), program ->
+                Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static  <T extends Statement> void registerConverter(Converter<T> converter) {
+        CONVERTERS.register(
+                converter.getIdentifier(),
+                (Class<T>) ((ParameterizedType) converter.getClass().getGenericSuperclass()).getActualTypeArguments()[0],
+                converter);
+    }
+
+    /**
+     * Creates new RegistryIdentifier with 'meazy' namespace
+     * <p>
+     * <i>Recommended to use {@link RegistryIdentifier#of(String, String)} or {@link RegistryIdentifier#of(String)}
+     * because 'meazy' namespace belongs to core identifiers</i>
+     *
+     * @param id Identifier's id that matches {@link RegistryIdentifier#IDENTIFIER_REGEX}
+     * @return New RegistryIdentifier
+     *
+     * @throws NullPointerException If id is null
+     * @throws IllegalArgumentException If id doesn't match {@link RegistryIdentifier#IDENTIFIER_REGEX}
+     */
+    public static RegistryIdentifier getDefaultIdentifier(String id) throws NullPointerException, IllegalArgumentException {
+        return RegistryIdentifier.of("meazy", id);
     }
 }

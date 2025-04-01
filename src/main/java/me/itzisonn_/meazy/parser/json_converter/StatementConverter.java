@@ -2,16 +2,15 @@ package me.itzisonn_.meazy.parser.json_converter;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
-import me.itzisonn_.meazy.registry.multiple_entry.Pair;
+import me.itzisonn_.registry.multiple_entry.Pair;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.registry.RegistryEntry;
+import me.itzisonn_.registry.RegistryEntry;
 
 import java.lang.reflect.Type;
 
 public class StatementConverter extends Converter<Statement> {
     public StatementConverter() {
-        super(RegistryIdentifier.ofDefault("statement"));
+        super(Registries.getDefaultIdentifier("statement"));
     }
 
     @Override

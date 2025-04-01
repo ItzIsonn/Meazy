@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.json_converter;
 
-import me.itzisonn_.meazy.registry.RegistryIdentifier;
+import me.itzisonn_.registry.RegistryIdentifier;
 
 /**
  * InvalidCompiledFileException is thrown when {@link Converter} meets invalid json object
