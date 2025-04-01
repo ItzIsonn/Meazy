@@ -6,8 +6,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.*;
-import me.itzisonn_.meazy.parser.json_converter.ExpressionConverter;
-import me.itzisonn_.meazy.parser.json_converter.StatementConverter;
+import me.itzisonn_.meazy.parser.json_converter.*;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
@@ -17,7 +16,6 @@ import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.registry.multiple_entry.Pair;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.registry.multiple_entry.OrderedRegistry;
 import me.itzisonn_.registry.multiple_entry.PairRegistry;
 import me.itzisonn_.registry.multiple_entry.SetRegistry;
@@ -195,6 +193,8 @@ public final class Registries {
 
         registerConverter(new StatementConverter());
         registerConverter(new ExpressionConverter());
+        registerConverter(new ProgramConverter());
+        registerConverter(new CallArgExpressionConverter());
 
         TOKENIZATION_FUNCTION.register(getDefaultIdentifier("tokens_function"), lines -> {
             List<Token> tokens = new ArrayList<>();
