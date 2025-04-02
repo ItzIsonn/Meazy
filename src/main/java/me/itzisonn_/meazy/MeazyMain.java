@@ -38,7 +38,7 @@ public final class MeazyMain {
 
         Command command = Commands.getByName(args[0]);
         if (command == null) {
-            LOGGER.log(Level.ERROR, "Unknown command!");
+            LOGGER.log(Level.ERROR, "Unknown command with name {}", args[0]);
             showAvailableCommandsList();
             return;
         }
@@ -59,14 +59,7 @@ public final class MeazyMain {
         LOGGER.log(Level.INFO, "Available commands:");
         for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
             Command command = entry.getValue();
-
-            StringBuilder argsBuilder = new StringBuilder();
-            for (int i = 0; i < command.getArgs().size(); i++) {
-                argsBuilder.append(command.getArgs().get(i));
-                if (i < command.getArgs().size() - 1) argsBuilder.append(" ");
-            }
-
-            LOGGER.log(Level.INFO, "    {}", command.getName() + " " + argsBuilder);
+            LOGGER.log(Level.INFO, "    {}", command.getName() + " " + String.join(" ", command.getArgs()));
         }
     }
 
