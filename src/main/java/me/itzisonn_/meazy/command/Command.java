@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.command;
 
+import lombok.Getter;
 import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.Registries;
 
@@ -12,6 +13,11 @@ import java.util.List;
  */
 public abstract class Command {
     /**
+     * Command's name
+     */
+    @Getter
+    private final String name;
+    /**
      * List of args' names
      */
     private final List<String> args;
@@ -19,14 +25,20 @@ public abstract class Command {
     /**
      * Command constructor
      *
+     * @param name Command's name
      * @param args Args' names
      *
-     * @throws NullPointerException If given args is null
-     * @throws IllegalArgumentException If any of given args doesn't match {@link Utils#IDENTIFIER_REGEX}
+     * @throws NullPointerException If given name or args is null
+     * @throws IllegalArgumentException If name or any of given args doesn't match {@link Utils#IDENTIFIER_REGEX}
      */
-    public Command(List<String> args) throws NullPointerException, IllegalArgumentException {
-        if (args == null) throw new NullPointerException("Arg's can't be null");
+    public Command(String name, List<String> args) throws NullPointerException, IllegalArgumentException {
+        if (name == null) throw new NullPointerException("Name can't be null");
+        if (args == null) throw new NullPointerException("Args can't be null");
+
+        if (!name.matches(Utils.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid command's name");
         if (!args.isEmpty() && args.stream().allMatch(arg -> arg.matches(Utils.IDENTIFIER_REGEX))) throw new IllegalArgumentException("Invalid arg's name");
+
+        this.name = name;
         this.args = args;
     }
 

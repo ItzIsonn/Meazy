@@ -3,6 +3,7 @@ package me.itzisonn_.meazy;
 import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.command.Command;
+import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.registry.RegistryEntry;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +16,10 @@ import java.util.Arrays;
 public final class MeazyMain {
     public static final String VERSION = "2.6";
     public static final Logger LOGGER = LogManager.getLogger("meazy");
+
     public static final AddonManager ADDON_MANAGER = new AddonManager();
+    public static final File ADDONS_DIRECTORY = getAddonsDirectory();
+
     private static boolean isInit = false;
 
     private MeazyMain() {}
@@ -28,39 +32,30 @@ public final class MeazyMain {
         long endLoadMillis = System.currentTimeMillis();
 
         if (args.length == 0) {
-            LOGGER.log(Level.INFO, "Available commands:");
-            for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
-                Command command = entry.getValue();
-
-                StringBuilder argsBuilder = new StringBuilder();
-                for (int i = 0; i < command.getArgs().size(); i++) {
-                    argsBuilder.append(command.getArgs().get(i));
-                    if (i < command.getArgs().size() - 1) argsBuilder.append(" ");
-                }
-
-                LOGGER.log(Level.INFO, "    {}", entry.getIdentifier().getId() + " " + argsBuilder);
-            }
+            showAvailableCommandsList();
             return;
         }
 
-        for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
-            Command command = entry.getValue();
-            if (entry.getIdentifier().getId().equals(args[0])) {
-                if (args.length - 1 != command.getArgs().size()) {
-                    LOGGER.log(Level.ERROR, "Expected {} arguments but found {}", command.getArgs().size(), args.length - 1);
-                    return;
-                }
-
-                String message = command.execute(Arrays.copyOfRange(args, 1, args.length));
-                if (message != null) {
-                    LOGGER.log(Level.INFO, "Loaded in {}s. {}", ((double) endLoadMillis - (double) startLoadMillis) / 1000, message);
-                }
-                return;
-            }
+        Command command = Commands.getByName(args[0]);
+        if (command == null) {
+            LOGGER.log(Level.ERROR, "Unknown command!");
+            showAvailableCommandsList();
+            return;
         }
 
+        String[] commandArgs = Arrays.copyOfRange(args, 1, args.length);
+        if (commandArgs.length != command.getArgs().size()) {
+            LOGGER.log(Level.ERROR, "Expected {} arguments but found {}", command.getArgs().size(), commandArgs.length);
+            return;
+        }
 
-        LOGGER.log(Level.ERROR, "Unknown command!");
+        String message = command.execute(commandArgs);
+        if (message != null) {
+            LOGGER.log(Level.INFO, "Loaded in {}s. {}", ((double) endLoadMillis - (double) startLoadMillis) / 1000, message);
+        }
+    }
+
+    private static void showAvailableCommandsList() {
         LOGGER.log(Level.INFO, "Available commands:");
         for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
             Command command = entry.getValue();
@@ -71,33 +66,37 @@ public final class MeazyMain {
                 if (i < command.getArgs().size() - 1) argsBuilder.append(" ");
             }
 
-            LOGGER.log(Level.INFO, "    {}", entry.getIdentifier().getId() + " " + argsBuilder);
+            LOGGER.log(Level.INFO, "    {}", command.getName() + " " + argsBuilder);
         }
     }
 
-    private static void loadAddons() {
-        File addonsDir;
+    private static File getAddonsDirectory() {
         try {
-            addonsDir = new File(new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent() + "/addons/");
+            File addonsDir = new File(new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent() + "/addons/");
             if (!addonsDir.exists() && !addonsDir.mkdirs()) throw new RuntimeException("Can't load addons folder");
+            return addonsDir;
         }
         catch (URISyntaxException e) {
             throw new RuntimeException("Can't load addons folder", e);
         }
+    }
 
-        for (Addon addon : ADDON_MANAGER.loadAddons(addonsDir)) {
+    public static void INIT() {
+        if (isInit) throw new IllegalStateException("MeazyMain have already been initialized!");
+        isInit = true;
+
+        Registries.INIT();
+
+        loadAddons();
+    }
+
+    private static void loadAddons() {
+        for (Addon addon : ADDON_MANAGER.loadAddons(ADDONS_DIRECTORY)) {
             ADDON_MANAGER.enableAddon(addon);
         }
 
         int addons = ADDON_MANAGER.getAddons().length;
         if (addons == 1) LOGGER.log(Level.INFO, "1 addon loaded");
         else LOGGER.log(Level.INFO, "{} addons loaded", addons);
-    }
-
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("MeazyMain have already been initialized!");
-        isInit = true;
-        Registries.INIT();
-        loadAddons();
     }
 }
