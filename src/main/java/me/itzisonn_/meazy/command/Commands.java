@@ -7,11 +7,16 @@ import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.registry.RegistryEntry;
 import org.apache.logging.log4j.Level;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,6 +35,10 @@ public final class Commands {
         return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("version")).getValue();
     }
 
+    public static Command DOWNLOAD_DEFAULT_ADDON() {
+        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("download_default_addon")).getValue();
+    }
+
     public static Command RUN() {
         return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("run")).getValue();
     }
@@ -44,8 +53,28 @@ public final class Commands {
 
 
 
+    /**
+     * Finds registered Command with given name
+     *
+     * @param name Command's name
+     * @return Command with given name or null
+     */
+    public static Command getByName(String name) {
+        for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
+            if (entry.getValue().getName().equals(name)) return entry.getValue();
+        }
+
+        return null;
+    }
+
+
+
     private static void register(String id, Command command) {
         Registries.COMMANDS.register(Registries.getDefaultIdentifier(id), command);
+    }
+
+    private static void register(Command command) {
+        register(command.getName(), command);
     }
 
     /**
@@ -59,7 +88,7 @@ public final class Commands {
         if (isInit) throw new IllegalStateException("Commands have already been initialized!");
         isInit = true;
 
-        register("version", new Command(List.of()) {
+        register(new Command("version", List.of()) {
             @Override
             public String execute(String[] args) {
                 MeazyMain.LOGGER.log(Level.INFO, "Meazy version {}", MeazyMain.VERSION);
@@ -67,7 +96,38 @@ public final class Commands {
             }
         });
 
-        register("addons", new Command(List.of()) {
+        register("download_default_addon", new Command("downloadDefaultAddon", List.of()) {
+            @Override
+            public String execute(String[] args) {
+                String site = "https://github.com/ItzIsonn/MeazyAddon/releases/download/v" + MeazyMain.VERSION + "/MeazyAddon-v" + MeazyMain.VERSION + ".jar";
+                String file = MeazyMain.ADDONS_DIRECTORY.getAbsolutePath() + "\\" + Arrays.asList(site.split("/")).getLast();
+
+                ReadableByteChannel byteChannel;
+                try {
+                    URL url = new URI(site).toURL();
+                    byteChannel = Channels.newChannel(url.openStream());
+                }
+                catch (FileNotFoundException e) {
+                    MeazyMain.LOGGER.log(Level.ERROR, "Can't find MeazyAddon for {} Meazy version. It'll probably release soon", MeazyMain.VERSION);
+                    return null;
+                }
+                catch (URISyntaxException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                    fileOutputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                MeazyMain.LOGGER.log(Level.INFO, "Successfully loaded MeazyAddon v{}", MeazyMain.VERSION);
+                return null;
+            }
+        });
+
+        register(new Command("addons", List.of()) {
             @Override
             public String execute(String... args) {
                 if (MeazyMain.ADDON_MANAGER.getAddons().length == 0) {
@@ -88,7 +148,7 @@ public final class Commands {
             }
         });
 
-        register("run", new Command(List.of("<file_to_run>")) {
+        register(new Command("run", List.of("<file_to_run>")) {
             @Override
             public String execute(String[] args) {
                 File file = new File(args[0]);
@@ -131,7 +191,7 @@ public final class Commands {
             }
         });
 
-        register("compile", new Command(List.of("<file_to_compile>", "<output_file_path>")) {
+        register(new Command("compile", List.of("<file_to_compile>", "<output_file_path>")) {
             @Override
             public String execute(String[] args) {
                 File file = new File(args[0]);
@@ -188,7 +248,7 @@ public final class Commands {
             }
         });
 
-        register("decompile", new Command(List.of("<file_to_decompile>", "<output_file_path>")) {
+        register(new Command("decompile", List.of("<file_to_decompile>", "<output_file_path>")) {
             @Override
             public String execute(String[] args) {
                 File file = new File(args[0]);

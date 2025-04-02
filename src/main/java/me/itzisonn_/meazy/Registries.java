@@ -44,7 +44,13 @@ public final class Registries {
      *
      * @see Command
      */
-    public static final SetRegistry<Command> COMMANDS = new SetRegistry<>();
+    public static final SetRegistry<Command> COMMANDS = new SetRegistry<>() {
+        @Override
+        public void register(RegistryIdentifier identifier, Command value, boolean overridable) {
+            if (Commands.getByName(value.getName()) != null) throw new IllegalArgumentException("Command with name " + value.getName() + " has already been registered");
+            super.register(identifier, value, overridable);
+        }
+    };
 
 
 
