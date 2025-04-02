@@ -139,10 +139,22 @@ public final class Commands {
                 for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
                     AddonInfo addonInfo = addon.getAddonInfo();
 
-                    MeazyMain.LOGGER.log(Level.INFO, "    {} by {} - {}",
+                    String authors;
+                    if (!addonInfo.getAuthors().isEmpty()) {
+                        authors = " by " + String.join(", ", addonInfo.getAuthors());
+                    }
+                    else authors = "";
+
+                    String description;
+                    if (!addonInfo.getDescription().isBlank()) {
+                        description = " - " + addonInfo.getDescription();
+                    }
+                    else description = "";
+
+                    MeazyMain.LOGGER.log(Level.INFO, "    {}{}{}",
                             addonInfo.getFullName(),
-                            String.join(", ", addonInfo.getAuthors()),
-                            addonInfo.getDescription());
+                            authors,
+                            description);
                 }
                 return null;
             }
