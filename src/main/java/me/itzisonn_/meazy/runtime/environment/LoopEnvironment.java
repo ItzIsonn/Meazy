@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 /**
- * LoopEnvironment represents environment for loops
+ * Represents environment for loops
  */
 public interface LoopEnvironment extends Environment {
     /**

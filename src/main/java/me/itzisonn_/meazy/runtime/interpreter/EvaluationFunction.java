@@ -6,19 +6,18 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 /**
- * EvaluationFunction
- *
+ * Represents function that is used to evaluate {@link Statement}s
  * @param <T> Type of Statement to evaluate
- *
  * @see Registries#EVALUATION_FUNCTIONS
  */
 public interface EvaluationFunction<T extends Statement> {
     /**
-     * Evaluates given statement using given environment
+     * Evaluates given statement using given environment and extra info
      *
      * @param object Statement to evaluate
-     * @param environment Which Environment should the Statement be evaluated in
+     * @param environment In which Environment should the Statement be evaluated
      * @param extra Extra info
+     *
      * @return Evaluated value
      */
     RuntimeValue<?> evaluate(T object, Environment environment, Object... extra);

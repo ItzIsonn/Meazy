@@ -12,18 +12,18 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * DefaultFunctionValue represents runtime function value created directly in code
+ * Represents runtime function value created directly in code
  */
 @EqualsAndHashCode(callSuper = true)
 public abstract class DefaultFunctionValue extends FunctionValue {
     /**
      * DefaultFunctionValue constructor
      *
-     * @param id Id of this DefaultFunctionValue
-     * @param args Args of this DefaultFunctionValue
-     * @param returnDataType Which DataType should this DefaultFunctionValue return
-     * @param parentEnvironment Parent of this DefaultFunctionValue
-     * @param modifiers Modifiers of this DefaultFunctionValue
+     * @param id DefaultFunctionValue' id
+     * @param args DefaultFunctionValue's args
+     * @param returnDataType Which DataType should this DefaultFunctionValue return or null
+     * @param parentEnvironment DefaultFunctionValue's parent environment
+     * @param modifiers DefaultFunctionValue's modifiers
      */
     public DefaultFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(id, args, returnDataType, parentEnvironment, modifiers);
@@ -37,12 +37,6 @@ public abstract class DefaultFunctionValue extends FunctionValue {
      */
     public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);
 
-    /**
-     * Copies this DefaultFunctionValue with given parent environment
-     *
-     * @param parentEnvironment New parent of this DefaultFunctionValue
-     * @return Copy of this DefaultFunctionValue
-     */
     @Override
     public final FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
         RunFunction runFunction = this::run;

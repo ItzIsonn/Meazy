@@ -22,7 +22,6 @@ public final class AddonClassLoader extends URLClassLoader {
     private final File file;
     final Addon addon;
     private Addon addonInit;
-    private IllegalStateException addonState;
 
     public AddonClassLoader(final AddonLoader loader, final ClassLoader parent, final AddonInfo addonInfo, final File dataFolder, final File file) throws InvalidAddonException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, parent);
@@ -106,14 +105,13 @@ public final class AddonClassLoader extends URLClassLoader {
      * @param addon Addon to initialize
      */
     public synchronized void initialize(Addon addon) {
-        if (addon == null) throw new IllegalArgumentException("Initializing addon cannot be null");
-        if (addon.getClass().getClassLoader() != this) throw new IllegalArgumentException("Cannot initialize addon outside of this class loader");
+        if (addon == null) throw new IllegalArgumentException("Initializing addon can't be null");
+        if (addon.getClass().getClassLoader() != this) throw new IllegalArgumentException("Can't initialize addon outside of this class loader");
 
         if (this.addon != null || this.addonInit != null) {
-            throw new IllegalArgumentException("Addon already initialized!", addonState);
+            throw new IllegalArgumentException("Addon has already been initialized");
         }
 
-        addonState = new IllegalStateException("Initial initialization");
         this.addonInit = addon;
 
         addon.init(loader, addonInfo, dataFolder, file, this);

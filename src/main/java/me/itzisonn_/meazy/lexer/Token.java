@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
- * Token that is used to split string
+ * Represents code unit
  */
 @Getter
 @EqualsAndHashCode
@@ -14,7 +14,7 @@ public class Token {
      */
     private final int line;
     /**
-     * TokenType of this Token
+     * Token's TokenType
      */
     private final TokenType type;
     /**

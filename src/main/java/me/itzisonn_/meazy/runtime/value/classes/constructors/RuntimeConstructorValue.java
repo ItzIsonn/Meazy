@@ -12,23 +12,31 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * RuntimeConstructorValue represents runtime constructor value created at runtime
+ * Represents runtime constructor value created at runtime
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class RuntimeConstructorValue extends ConstructorValue {
+    /**
+     * RuntimeConstructorValue's body
+     */
     private final List<Statement> body;
 
     /**
      * RuntimeConstructorValue constructor
      *
-     * @param args Args of this RuntimeConstructorValue
-     * @param parentEnvironment Parent of this RuntimeConstructorValue
-     * @param modifiers Modifiers of this RuntimeConstructorValue
-     * @param body Body of this RuntimeConstructorValue
+     * @param args RuntimeConstructorValue's args
+     * @param body = RuntimeConstructorValue's body
+     * @param parentEnvironment RuntimeConstructorValue's parent environment
+     * @param modifiers RuntimeConstructorValue's modifiers
+     *
+     * @throws NullPointerException If either args, body, parentEnvironment or modifiers is null
      */
-    public RuntimeConstructorValue(List<CallArgExpression> args, List<Statement> body, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
+    public RuntimeConstructorValue(List<CallArgExpression> args, List<Statement> body,
+                                   ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) throws NullPointerException {
         super(args, parentEnvironment, modifiers);
+
+        if (body == null) throw new NullPointerException("Body can't be null");
         this.body = body;
     }
 

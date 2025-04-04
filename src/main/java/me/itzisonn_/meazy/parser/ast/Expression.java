@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.ast;
 
 /**
- * Expression represents the unit of the program with only one (not-full) line possible
+ * Represents unit of the program with only one (not-full) line possible
  */
 public interface Expression extends Statement {
     /**

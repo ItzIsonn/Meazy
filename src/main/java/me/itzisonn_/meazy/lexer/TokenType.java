@@ -8,13 +8,12 @@ import java.util.regex.Pattern;
 
 /**
  * TokenType
- *
  * @see Registries#TOKEN_TYPES
  */
 @Getter
 public class TokenType {
     /**
-     * Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * TokenType's id that matches {@link Utils#IDENTIFIER_REGEX}
      */
     private final String id;
     /**
@@ -29,7 +28,7 @@ public class TokenType {
     /**
      * TokenType constructor
      *
-     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * @param id TokenType's id that matches {@link Utils#IDENTIFIER_REGEX}
      * @param regex Regex that is converted into {@link Pattern}
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
      *
@@ -43,7 +42,7 @@ public class TokenType {
     /**
      * TokenType constructor
      *
-     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * @param id TokenType's id that matches {@link Utils#IDENTIFIER_REGEX}
      * @param pattern Pattern that is used to match tokens
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
      *
@@ -78,16 +77,13 @@ public class TokenType {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof TokenType other)) {
-            return false;
-        }
+        if (o == this) return true;
+        if (!(o instanceof TokenType other)) return false;
+
         String thisId = getId();
         String otherId = other.getId();
         if (thisId == null) return otherId == null;
-        else return thisId.equals(otherId);
+        return thisId.equals(otherId);
     }
 
     @Override

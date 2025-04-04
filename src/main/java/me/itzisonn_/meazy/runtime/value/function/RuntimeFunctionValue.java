@@ -13,22 +13,24 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * RuntimeFunctionValue represents runtime function value created at runtime
+ * Represents runtime function value created at runtime
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class RuntimeFunctionValue extends FunctionValue {
+    /**
+     * RuntimeFunctionValue's body
+     */
     private final List<Statement> body;
 
     /**
      * RuntimeFunctionValue constructor
      *
-     * @param id Id of this RuntimeFunctionValue
-     * @param args Args of this RuntimeFunctionValue
-     * @param returnDataType Which DataType should this RuntimeFunctionValue return
-     * @param parentEnvironment Parent of this RuntimeFunctionValue
-     * @param modifiers Modifiers of this RuntimeFunctionValue
-     * @param body Body of this RuntimeFunctionValue
+     * @param id RuntimeFunctionValue' id
+     * @param args RuntimeFunctionValue's args
+     * @param returnDataType Which DataType should this RuntimeFunctionValue return or null
+     * @param parentEnvironment RuntimeFunctionValue's parent environment
+     * @param modifiers RuntimeFunctionValue's modifiers
      */
     public RuntimeFunctionValue(String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(id, args, returnDataType, parentEnvironment, modifiers);

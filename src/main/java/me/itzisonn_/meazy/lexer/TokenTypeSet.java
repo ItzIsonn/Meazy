@@ -6,8 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TokenTypeSet represents {@link Set} of {@link TokenType}
- *
+ * Represents {@link Set} of {@link TokenType}
  * @see TokenType
  */
 @EqualsAndHashCode
@@ -16,9 +15,7 @@ public class TokenTypeSet {
 
     /**
      * TokenTypeSet constructor
-     *
      * @param tokenTypes Set of TokenTypes
-     *
      * @throws NullPointerException If given set is null
      */
     public TokenTypeSet(Set<TokenType> tokenTypes) throws NullPointerException {
@@ -28,9 +25,7 @@ public class TokenTypeSet {
 
     /**
      * TokenTypeSet constructor
-     *
      * @param tokenTypes Array of TokenTypes
-     *
      * @throws NullPointerException If given array is null
      */
     public TokenTypeSet(TokenType... tokenTypes) throws NullPointerException {

@@ -11,36 +11,50 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * ClassValue represents runtime class value
+ * Represents runtime class value
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class ClassValue extends RuntimeValue<Object> {
+    /**
+     * ClassValue's base classes
+     */
     protected final Set<String> baseClasses;
+    /**
+     * ClassValue's environment
+     */
     protected final ClassEnvironment environment;
 
     /**
      * ClassValue constructor
-     * @param baseClasses Base classes of this ClassValue
-     * @param environment ClassEnvironment of this ClassValue
+     *
+     * @param baseClasses ClassValue's base classes
+     * @param environment ClassValue's environment
+     *
+     * @throws NullPointerException If either baseClasses or environment is null
      */
-    public ClassValue(Set<String> baseClasses, ClassEnvironment environment) {
+    public ClassValue(Set<String> baseClasses, ClassEnvironment environment) throws NullPointerException {
         super(null);
+
+        if (baseClasses == null) throw new NullPointerException("BaseClasses can't be null");
+        if (environment == null) throw new NullPointerException("Environment can't be null");
+
         this.baseClasses = baseClasses;
         this.environment = environment;
     }
 
     /**
      * ClassValue constructor with empty baseClasses
-     * @param environment ClassEnvironment of this ClassValue
+     * @param environment ClassValue's environment
+     * @throws NullPointerException If given environment is null
      */
-    public ClassValue(ClassEnvironment environment) {
+    public ClassValue(ClassEnvironment environment) throws NullPointerException {
         this(new HashSet<>(), environment);
     }
 
     /**
      * @param value Value to check
-     * @return Whether given value matches this class value
+     * @return Whether given value matches this ClassValue
      */
     public boolean isMatches(Object value) {
         if (value instanceof ClassValue classValue) return classValue.getId().equals(getId());
@@ -49,7 +63,7 @@ public abstract class ClassValue extends RuntimeValue<Object> {
 
     /**
      * @param value Value to check
-     * @return Whether given value matches this class value or it's base classes
+     * @return Whether given value matches this ClassValue or it's base classes
      */
     public boolean isLikeMatches(Object value) {
         if (isMatches(value)) return true;

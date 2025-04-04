@@ -10,50 +10,46 @@ import java.lang.reflect.ParameterizedType;
 
 /**
  * Json object converter
- *
  * @param <T> Converted Statement's type
- *
  * @see Registries#CONVERTERS
  */
 @Getter
 public abstract class Converter<T extends Statement> implements JsonDeserializer<T>, JsonSerializer<T> {
     /**
-     * RegistryIdentifier of this converter
+     * Converter's RegistryIdentifier
      */
-    private final RegistryIdentifier identifier;
+    private final RegistryIdentifier id;
 
     /**
      * Converter constructor
-     *
-     * @param identifier Converter's identifier
-     *
-     * @throws NullPointerException If given identifier is null
+     * @param id Converter's id
+     * @throws NullPointerException If given id is null
      */
-    protected Converter(RegistryIdentifier identifier) {
-        if (identifier == null) throw new NullPointerException("Identifier can't be null");
-        this.identifier = identifier;
+    protected Converter(RegistryIdentifier id) {
+        if (id == null) throw new NullPointerException("Id can't be null");
+        this.id = id;
     }
 
     /**
      * Checks type of given JsonObject
-     *
      * @param object JsonObject to check
-     *
-     * @throws InvalidCompiledFileException If JsonObject doesn't contain member {@code type} or it's value doesn't match this converter's identifier
+     * @throws InvalidCompiledFileException If JsonObject doesn't contain member {@code type} or it's value doesn't match this converter's id
      */
     @SuppressWarnings("unchecked")
     protected final void checkType(JsonObject object) throws InvalidCompiledFileException {
-        if (object.get("type") == null || !object.get("type").getAsString().equals(getIdentifier().toString())) {
-            throw new InvalidCompiledFileException("Can't deserialize " + ((Class<? extends Statement>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]).getSimpleName() + " because specified type is null or doesn't match");
+        if (object.get("type") == null || !object.get("type").getAsString().equals(getId().toString())) {
+            throw new InvalidCompiledFileException("Can't deserialize " +
+                    ((Class<? extends Statement>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]).getSimpleName() +
+                    " because specified type is null or doesn't match");
         }
     }
 
     /**
-     * @return JsonObject with property {@code type} set to this converter's identifier
+     * @return JsonObject with property {@code type} set to this converter's id
      */
     protected final JsonObject getJsonObject() {
         JsonObject result = new JsonObject();
-        result.addProperty("type", getIdentifier().toString());
+        result.addProperty("type", getId().toString());
 
         return result;
     }
@@ -78,7 +74,7 @@ public abstract class Converter<T extends Statement> implements JsonDeserializer
      * @throws InvalidCompiledFileException If JsonElement with given id doesn't exist
      */
     protected JsonElement getElement(JsonObject object, String id, String exceptionId) throws InvalidCompiledFileException {
-        if (object.get(id) == null) throw new InvalidCompiledFileException(getIdentifier(), exceptionId);
+        if (object.get(id) == null) throw new InvalidCompiledFileException(getId(), exceptionId);
         return object.get(id);
     }
 }

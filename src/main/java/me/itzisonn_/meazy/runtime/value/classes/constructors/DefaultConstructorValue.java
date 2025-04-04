@@ -10,17 +10,19 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * DefaultConstructorValue represents runtime constructor value created directly in code
+ * Represents runtime constructor value created directly in code
  */
 public abstract class DefaultConstructorValue extends ConstructorValue {
     /**
      * DefaultConstructorValue constructor
      *
-     * @param args Args of this DefaultConstructorValue
-     * @param parentEnvironment Parent of this DefaultConstructorValue
-     * @param modifiers Modifiers of this DefaultConstructorValue
+     * @param args DefaultConstructorValue's args
+     * @param parentEnvironment DefaultConstructorValue's parent environment
+     * @param modifiers DefaultConstructorValue's modifiers
+     *
+     * @throws NullPointerException If either args, parentEnvironment or modifiers is null
      */
-    public DefaultConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
+    public DefaultConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) throws NullPointerException {
         super(args, parentEnvironment, modifiers);
     }
 

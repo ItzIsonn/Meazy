@@ -1,9 +1,10 @@
-package me.itzisonn_.meazy.parser.json_converter;
+package me.itzisonn_.meazy.parser.json_converter.basic;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.Program;
+import me.itzisonn_.meazy.parser.json_converter.Converter;
 
 import java.lang.reflect.Type;
 import java.util.List;
