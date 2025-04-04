@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 
 /**
- * DataType
+ * Defines which values can be stored in variables, args, etc.
  */
 @Getter
 @EqualsAndHashCode
@@ -18,7 +18,7 @@ public class DataType {
      */
     private final String id;
     /**
-     * Whether does this DataType accept null value
+     * Whether this DataType accepts {@link NullValue}
      */
     private final boolean isNullable;
 
@@ -26,14 +26,20 @@ public class DataType {
      * DataType constructor
      *
      * @param id DataType's id
-     * @param isNullable Whether this DataType accepts null value
+     * @param isNullable Whether this DataType accepts {@link NullValue}
+     *
+     * @throws NullPointerException If given id is null
      */
-    public DataType(String id, boolean isNullable) {
+    public DataType(String id, boolean isNullable) throws NullPointerException {
+        if (id == null) throw new NullPointerException("Id can't be null");
+
         this.id = id;
         this.isNullable = isNullable;
     }
 
     /**
+     * Checks whether given value matches this DataType
+     *
      * @param value Value to check
      * @return Whether given value matches this DataType
      */

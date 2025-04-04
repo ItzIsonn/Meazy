@@ -4,15 +4,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
- * RuntimeValue is used to represent values in runtime
- *
+ * Is used to represent values in runtime
  * @param <T> Type of stored value
  */
 @Getter
 @EqualsAndHashCode
 public class RuntimeValue<T> {
     /**
-     * Value
+     * RuntimeValue's value
      */
     protected final T value;
 
@@ -26,8 +25,7 @@ public class RuntimeValue<T> {
     }
 
     /**
-     * While {@link RuntimeValue#value} represents {@link RuntimeValue}, it uses {@link RuntimeValue#getValue()} on it. When then loop ends, returns resulting value
-     *
+     * Searches for not-{@link RuntimeValue} value through this {@link RuntimeValue} and it's values
      * @return Final value
      */
     public final Object getFinalValue() {
@@ -40,8 +38,7 @@ public class RuntimeValue<T> {
 
 
     /**
-     * While {@link RuntimeValue#value#getValue()} represents {@link RuntimeValue}, it uses {@link RuntimeValue#getValue()} on it. When then loop ends, returns resulting value
-     *
+     * Searches for final {@link RuntimeValue} value through this {@link RuntimeValue} and it's values
      * @return Final RuntimeValue
      */
     public final RuntimeValue<?> getFinalRuntimeValue() {

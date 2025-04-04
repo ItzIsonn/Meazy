@@ -214,7 +214,7 @@ public abstract class Addon {
             isEnabled = true;
             onInitialize();
         }
-        else throw new AddonEnableException("Addon already enabled!");
+        else throw new AddonEnableException("Addon has already been enabled");
     }
 
     public final void init(AddonLoader loader, AddonInfo addonInfo, File dataFolder, File file, ClassLoader classLoader) {

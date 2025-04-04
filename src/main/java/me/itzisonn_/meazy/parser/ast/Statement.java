@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.ast;
 
 /**
- * Statement represents the unit of the program with multiple lines possible
+ * Represents unit of the program with multiple lines possible
  *
  * @see Expression
  */

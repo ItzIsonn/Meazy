@@ -13,26 +13,44 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * FunctionValue represents runtime function value
+ * Represents runtime function value
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class FunctionValue extends RuntimeValue<Object> {
+    /**
+     * FunctionValue' id
+     */
     protected final String id;
+    /**
+     * FunctionValue's args
+     */
     protected final List<CallArgExpression> args;
+    /**
+     * Which DataType should this FunctionValue return
+     */
     protected final DataType returnDataType;
+    /**
+     * FunctionValue's parent environment
+     */
     protected final FunctionDeclarationEnvironment parentEnvironment;
+    /**
+     * FunctionValue's modifiers
+     */
     protected final Set<Modifier> modifiers;
+    /**
+     * Whether this FunctionValue is overridden
+     */
     protected boolean isOverridden = false;
 
     /**
      * FunctionValue constructor
      *
-     * @param id Id of this FunctionValue
-     * @param args Args of this FunctionValue
-     * @param returnDataType Which DataType should this FunctionValue return
-     * @param parentEnvironment Parent of this FunctionValue
-     * @param modifiers Modifiers of this FunctionValue
+     * @param id FunctionValue' id
+     * @param args FunctionValue's args
+     * @param returnDataType Which DataType should this FunctionValue return or null
+     * @param parentEnvironment FunctionValue's parent environment
+     * @param modifiers FunctionValue's modifiers
      */
     public FunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(null);
@@ -43,6 +61,9 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
         this.modifiers = modifiers;
     }
 
+    /**
+     * Sets this FunctionValue overridden
+     */
     public void setOverridden() {
         if (!(parentEnvironment instanceof ClassEnvironment)) throw new RuntimeException("Can't make function overridden because it's not inside a class");
         isOverridden = true;
@@ -56,6 +77,12 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
      */
     public abstract FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment);
 
+    /**
+     * Returns whether this Function has same id, args and returnDataType
+     *
+     * @param o Object to compare
+     * @return Whether this FunctionValue is like o
+     */
     public boolean isLike(Object o) {
         if (o == this) return true;
         else if (!(o instanceof FunctionValue other)) return false;

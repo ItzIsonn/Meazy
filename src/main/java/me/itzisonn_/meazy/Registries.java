@@ -7,6 +7,10 @@ import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.json_converter.*;
+import me.itzisonn_.meazy.parser.json_converter.basic.CallArgExpressionConverter;
+import me.itzisonn_.meazy.parser.json_converter.basic.ExpressionConverter;
+import me.itzisonn_.meazy.parser.json_converter.basic.ProgramConverter;
+import me.itzisonn_.meazy.parser.json_converter.basic.StatementConverter;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
@@ -36,6 +40,8 @@ import java.util.regex.Matcher;
  */
 public final class Registries {
     private static boolean isInit = false;
+
+    private Registries() {}
 
 
 
@@ -264,7 +270,7 @@ public final class Registries {
     @SuppressWarnings("unchecked")
     private static  <T extends Statement> void registerConverter(Converter<T> converter) {
         CONVERTERS.register(
-                converter.getIdentifier(),
+                converter.getId(),
                 (Class<T>) ((ParameterizedType) converter.getClass().getGenericSuperclass()).getActualTypeArguments()[0],
                 converter);
     }

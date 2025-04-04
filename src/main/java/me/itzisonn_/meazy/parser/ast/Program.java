@@ -4,12 +4,32 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * Represents compiled Meazy program
+ */
 @Getter
 public class Program implements Statement {
+    /**
+     * Program's version
+     */
     private final String version;
+    /**
+     * Program's body
+     */
     private final List<Statement> body;
 
-    public Program(String version, List<Statement> body) {
+    /**
+     * Program constructor
+     *
+     * @param version Program's version
+     * @param body Program's body
+     *
+     * @throws NullPointerException If either version or body is null
+     */
+    public Program(String version, List<Statement> body) throws NullPointerException {
+        if (version == null) throw new NullPointerException("Version can't be null");
+        if (body == null) throw new NullPointerException("Body can't be null");
+
         this.version = version;
         this.body = body;
     }
