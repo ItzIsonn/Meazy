@@ -3,6 +3,8 @@ package me.itzisonn_.meazy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
+import me.itzisonn_.meazy.addon.Addon;
+import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.*;
@@ -30,7 +32,9 @@ import me.itzisonn_.meazy.runtime.interpreter.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -254,17 +258,35 @@ public final class Registries {
 
             Parser.moveOverOptionalNewLines();
 
+            Map<String, String> requiredAddons = new HashMap<>();
+            for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
+                AddonInfo addonInfo = addon.getAddonInfo();
+                requiredAddons.put(addonInfo.getId(), addonInfo.getVersion());
+            }
+
             List<Statement> body = new ArrayList<>();
             while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
                 body.add(Parser.parse(getDefaultIdentifier("global_statement"), Statement.class));
                 Parser.moveOverOptionalNewLines();
             }
 
-            return new Program(MeazyMain.VERSION, body);
+            return new Program(MeazyMain.VERSION, requiredAddons, body);
         });
 
-        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), program ->
-                Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue()));
+        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), program -> {
+            for (String addonId : program.getRequiredAddons().keySet()) {
+                Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
+                if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
+
+                String addonVersion = program.getRequiredAddons().get(addonId);
+                if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonId)) {
+                    throw new RuntimeException("Can't find required addon with id " + addonId + " of version " + addonVersion +
+                            " (found version " + addon.getAddonInfo().getVersion() + ")");
+                }
+            }
+
+            Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
+        });
     }
 
     @SuppressWarnings("unchecked")
