@@ -47,6 +47,12 @@ public class Version {
         this.ordinal = ordinal;
     }
 
+    /**
+     * Checks if given version is before this Version
+     *
+     * @param version Version to check
+     * @return Whether given version is before this Version
+     */
     public boolean isBefore(Version version) {
         List<Integer> parts1 = parts;
         List<Integer> parts2 = version.getParts();
@@ -64,6 +70,12 @@ public class Version {
         return ordinal < version.ordinal;
     }
 
+    /**
+     * Checks if given version is after this Version
+     *
+     * @param version Version to check
+     * @return Whether given version is after this Version
+     */
     public boolean isAfter(Version version) {
         return !equals(version) && !isBefore(version);
     }
