@@ -67,7 +67,7 @@ public class Version {
         if (type.ordinal() < version.getType().ordinal()) return true;
         if (type.ordinal() > version.getType().ordinal()) return false;
 
-        return ordinal < version.ordinal;
+        return ordinal < version.getOrdinal();
     }
 
     /**

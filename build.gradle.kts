@@ -36,11 +36,11 @@ abstract class DownloadLibsTask : DefaultTask() {
     @TaskAction
     fun action() {
         val path = "libs/Registry.jar"
-        val sourceUrl = "https://github.com/ItzIsonn/RegistryLib/releases/download/v1.0/Registry.jar"
+        val sourceUrl = "https://github.com/ItzIsonn/RegistryLib/releases/download/v1.1/Registry-v1.1.jar"
         download(sourceUrl, path)
     }
 
-    private fun download(url : String, path : String){
+    private fun download(url: String, path: String){
         val destinationFile = File(path)
         if (!destinationFile.exists()) {
             destinationFile.parentFile.mkdirs()
