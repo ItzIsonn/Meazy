@@ -2,16 +2,38 @@ package me.itzisonn_.meazy.version;
 
 import java.util.Map;
 
+/**
+ * Represents different types of version
+ */
 public enum VersionType {
+    /**
+     * Alpha version type
+     */
     ALPHA,
+    /**
+     * Beta version type
+     */
     BETA,
+    /**
+     * Release candidate version type
+     */
     RELEASE_CANDIDATE,
+    /**
+     * Release version type
+     */
     RELEASE;
 
-    public static VersionType of(String version) {
-        return VERSION_TYPES.get(version.toUpperCase());
+    /**
+     * @param string String representation of VersionType
+     * @return VersionType that matches given string or null
+     */
+    public static VersionType of(String string) {
+        return VERSION_TYPES.get(string.toUpperCase());
     }
 
+    /**
+     * Map of different spellings of version types
+     */
     public static final Map<String, VersionType> VERSION_TYPES = Map.of(
             "ALPHA", ALPHA,
             "A", ALPHA,
