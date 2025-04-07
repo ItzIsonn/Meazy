@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
+import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +15,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 public final class MeazyMain {
-    public static final String VERSION = "2.6";
+    public static final Version VERSION = Version.of("2.6");
     public static final Logger LOGGER = LogManager.getLogger("meazy");
 
     public static final AddonManager ADDON_MANAGER = new AddonManager();

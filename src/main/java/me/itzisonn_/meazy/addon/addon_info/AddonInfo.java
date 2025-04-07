@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.Utils;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.InvalidAddonInfoException;
+import me.itzisonn_.meazy.version.Version;
 
 import java.io.*;
 import java.util.*;
@@ -109,7 +110,7 @@ public final class AddonInfo {
      *  <p>
      *  Example: <blockquote><pre>"version": "1.52.0"</pre></blockquote>
      */
-    private final String version;
+    private final Version version;
 
     /**
      *  Fully qualified name of the main class for a addon. The
@@ -214,7 +215,7 @@ public final class AddonInfo {
             .registerTypeAdapter(AddonInfo.class, new AddonInfoDeserializer())
             .create();
 
-    public AddonInfo(String id, String version, String main, String description, List<String> authors,
+    public AddonInfo(String id, Version version, String main, String description, List<String> authors,
                      List<String> depend, List<String> softDepend, List<String> loadBefore) throws InvalidAddonInfoException {
         if (!id.matches(Utils.IDENTIFIER_REGEX)) throw new InvalidAddonInfoException("Id doesn't match Identifier Regex");
         for (String string : depend) {

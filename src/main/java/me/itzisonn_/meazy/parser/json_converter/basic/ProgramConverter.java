@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
+import me.itzisonn_.meazy.version.Version;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -25,16 +26,16 @@ public class ProgramConverter extends Converter<Program> {
 
         String version = getElement(object, "version").getAsString();
 
-        Map<String, String> requiredAddons = new HashMap<>();
+        Map<String, Version> requiredAddons = new HashMap<>();
         if (object.get("required_addons") != null) {
             Map<String, JsonElement> map = getElement(object, "required_addons").getAsJsonObject().asMap();
 
             for (String addonId : map.keySet()) {
                 if (!(map.get(addonId) instanceof JsonPrimitive jsonPrimitive)) throw new InvalidCompiledFileException("Addon version must be String");
 
-                String addonVersion;
+                Version addonVersion;
                 if (jsonPrimitive.isBoolean()) addonVersion = null;
-                else addonVersion = jsonPrimitive.getAsString();
+                else addonVersion = Version.of(jsonPrimitive.getAsString());
 
                 requiredAddons.put(addonId, addonVersion);
             }
@@ -43,19 +44,19 @@ public class ProgramConverter extends Converter<Program> {
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        return new Program(version, requiredAddons, body);
+        return new Program(Version.of(version), requiredAddons, body);
     }
 
     @Override
     public JsonElement serialize(Program program, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject result = getJsonObject();
 
-        result.addProperty("version", program.getVersion());
+        result.addProperty("version", program.getVersion().toString());
 
         JsonObject requiredAddons = new JsonObject();
         for (String addonId : program.getRequiredAddons().keySet()) {
-            String version = program.getRequiredAddons().get(addonId);
-            if (version != null) requiredAddons.addProperty(addonId, version);
+            Version version = program.getRequiredAddons().get(addonId);
+            if (version != null) requiredAddons.addProperty(addonId, version.toString());
             else requiredAddons.addProperty(addonId, true);
         }
         result.add("required_addons", requiredAddons);

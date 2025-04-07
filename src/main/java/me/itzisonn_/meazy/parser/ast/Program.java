@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.version.Version;
 
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,11 @@ public class Program implements Statement {
     /**
      * Program's version
      */
-    private final String version;
+    private final Version version;
     /**
      * Program's required addons
      */
-    private final Map<String, String> requiredAddons;
+    private final Map<String, Version> requiredAddons;
     /**
      * Program's body
      */
@@ -31,7 +32,7 @@ public class Program implements Statement {
      *
      * @throws NullPointerException If either version or body is null
      */
-    public Program(String version, Map<String, String> requiredAddons, List<Statement> body) throws NullPointerException {
+    public Program(Version version, Map<String, Version> requiredAddons, List<Statement> body) throws NullPointerException {
         if (version == null) throw new NullPointerException("Version can't be null");
         if (requiredAddons == null) throw new NullPointerException("RequiredAddons can't be null");
         if (body == null) throw new NullPointerException("Body can't be null");
@@ -45,9 +46,9 @@ public class Program implements Statement {
     public String toCodeString(int offset) throws IllegalArgumentException {
         StringBuilder requiredAddonsBuilder = new StringBuilder();
         for (String addonId : requiredAddons.keySet()) {
-            String addonVersion = requiredAddons.get(addonId);
-
             requiredAddonsBuilder.append(Statement.getOffset(offset)).append("require ").append(addonId);
+
+            Version addonVersion = requiredAddons.get(addonId);
             if (addonVersion != null) requiredAddonsBuilder.append(" \"").append(addonVersion).append("\"");
             requiredAddonsBuilder.append("\n");
         }
