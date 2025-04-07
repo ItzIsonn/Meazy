@@ -96,67 +96,73 @@ public final class Commands {
             }
         });
 
-        register("download_default_addon", new Command("downloadDefaultAddon", List.of()) {
-            @Override
-            public String execute(String[] args) {
-                String site = "https://github.com/ItzIsonn/MeazyAddon/releases/download/v" + MeazyMain.VERSION + "/MeazyAddon-v" + MeazyMain.VERSION + ".jar";
-                String file = MeazyMain.ADDONS_DIRECTORY.getAbsolutePath() + "\\" + Arrays.asList(site.split("/")).getLast();
-
-                ReadableByteChannel byteChannel;
-                try {
-                    URL url = new URI(site).toURL();
-                    byteChannel = Channels.newChannel(url.openStream());
-                }
-                catch (FileNotFoundException e) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't find MeazyAddon for {} Meazy version. It'll probably release soon", MeazyMain.VERSION);
-                    return null;
-                }
-                catch (URISyntaxException | IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                    fileOutputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
-                }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                MeazyMain.LOGGER.log(Level.INFO, "Successfully loaded MeazyAddon v{}", MeazyMain.VERSION);
-                return null;
-            }
-        });
-
-        register(new Command("addons", List.of()) {
+        register(new Command("addons", List.of("[list | downloadDefault]")) {
             @Override
             public String execute(String... args) {
-                if (MeazyMain.ADDON_MANAGER.getAddons().length == 0) {
-                    MeazyMain.LOGGER.log(Level.INFO, "No addons present");
-                    return null;
-                }
+                switch (args[0]) {
+                    case "list" -> {
+                        if (MeazyMain.ADDON_MANAGER.getAddons().length == 0) {
+                            MeazyMain.LOGGER.log(Level.INFO, "No addons present");
+                            return null;
+                        }
 
-                MeazyMain.LOGGER.log(Level.INFO, "Loaded addons:");
-                for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
-                    AddonInfo addonInfo = addon.getAddonInfo();
+                        MeazyMain.LOGGER.log(Level.INFO, "Loaded addons:");
+                        for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
+                            AddonInfo addonInfo = addon.getAddonInfo();
 
-                    String authors;
-                    if (!addonInfo.getAuthors().isEmpty()) {
-                        authors = " by " + String.join(", ", addonInfo.getAuthors());
+                            String authors;
+                            if (!addonInfo.getAuthors().isEmpty()) {
+                                authors = " by " + String.join(", ", addonInfo.getAuthors());
+                            }
+                            else authors = "";
+
+                            String description;
+                            if (!addonInfo.getDescription().isBlank()) {
+                                description = " - " + addonInfo.getDescription();
+                            }
+                            else description = "";
+
+                            MeazyMain.LOGGER.log(Level.INFO, "    {}{}{}",
+                                    addonInfo.getFullName(),
+                                    authors,
+                                    description);
+                        }
+                        return null;
                     }
-                    else authors = "";
 
-                    String description;
-                    if (!addonInfo.getDescription().isBlank()) {
-                        description = " - " + addonInfo.getDescription();
+                    case "downloadDefault" -> {
+                        String site = "https://github.com/ItzIsonn/MeazyAddon/releases/download/v" + MeazyMain.VERSION + "/MeazyAddon-v" + MeazyMain.VERSION + ".jar";
+                        String file = MeazyMain.ADDONS_DIRECTORY.getAbsolutePath() + "\\" + Arrays.asList(site.split("/")).getLast();
+
+                        ReadableByteChannel byteChannel;
+                        try {
+                            URL url = new URI(site).toURL();
+                            byteChannel = Channels.newChannel(url.openStream());
+                        }
+                        catch (FileNotFoundException e) {
+                            MeazyMain.LOGGER.log(Level.ERROR, "Can't find MeazyAddon for {} Meazy version. It'll probably release soon", MeazyMain.VERSION);
+                            return null;
+                        }
+                        catch (URISyntaxException | IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                            fileOutputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
+                        }
+                        catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        MeazyMain.LOGGER.log(Level.INFO, "Successfully loaded MeazyAddon v{}", MeazyMain.VERSION);
+                        return null;
                     }
-                    else description = "";
 
-                    MeazyMain.LOGGER.log(Level.INFO, "    {}{}{}",
-                            addonInfo.getFullName(),
-                            authors,
-                            description);
+                    default -> {
+                        MeazyMain.LOGGER.log(Level.ERROR, "Unknown argument {}", args[0]);
+                        return null;
+                    }
                 }
-                return null;
             }
         });
 
@@ -181,14 +187,14 @@ public final class Commands {
                 else if (extension.equals("meac")) {
                     Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
                     if (program == null) {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}, try to run it in the same version of Meazy ({})", file.getAbsolutePath(), MeazyMain.VERSION);
+                        MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
                         return null;
                     }
-                    if (Utils.isVersionAfter(MeazyMain.VERSION, program.getVersion())) {
+                    if (MeazyMain.VERSION.isBefore(program.getVersion())) {
                         MeazyMain.LOGGER.log(Level.ERROR, "Can't run file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
                         return null;
                     }
-                    if (!MeazyMain.VERSION.equals(program.getVersion())) {
+                    if (MeazyMain.VERSION.isAfter(program.getVersion())) {
                         MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
                     }
                     Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
@@ -279,14 +285,14 @@ public final class Commands {
                 long startMillis = System.currentTimeMillis();
                 Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
                 if (program == null) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}, try to decompile it in the same version of Meazy ({})", file.getAbsolutePath(), MeazyMain.VERSION);
+                    MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
                     return null;
                 }
-                if (Utils.isVersionAfter(MeazyMain.VERSION, program.getVersion())) {
+                if (MeazyMain.VERSION.isBefore(program.getVersion())) {
                     MeazyMain.LOGGER.log(Level.ERROR, "Can't decompile file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
                     return null;
                 }
-                if (!MeazyMain.VERSION.equals(program.getVersion())) {
+                if (MeazyMain.VERSION.isAfter(program.getVersion())) {
                     MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
                 }
                 long endMillis = System.currentTimeMillis();

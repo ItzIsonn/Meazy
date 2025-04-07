@@ -61,34 +61,4 @@ public final class Utils {
 
         return stringBuilder.toString();
     }
-
-    /**
-     * Compares to versions in format 'a.b.c...'
-     *
-     * @param version1 Version to compare
-     * @param version2 Version to compare
-     * @return True if version2 was released after version1, otherwise false
-     *
-     * @throws NullPointerException When either of versions is null
-     * @throws NumberFormatException When either of version have non-integer part
-     */
-    public static boolean isVersionAfter(String version1, String version2) throws NullPointerException, NumberFormatException {
-        if (version1 == null || version2 == null) throw new NullPointerException("Neither of versions can't be null");
-
-        String[] split1 = version1.split("\\.");
-        String[] split2 = version2.split("\\.");
-        for (int i = 0; i < Math.max(split1.length, split2.length); i++) {
-            int part1, part2;
-            try {
-                part1 = i < split1.length ? Integer.parseInt(split1[i]) : 0;
-                part2 = i < split2.length ? Integer.parseInt(split2[i]) : 0;
-            }
-            catch (NumberFormatException ignore) {
-                throw new IllegalArgumentException("Version parts must be integers");
-            }
-            if (part1 < part2) return true;
-            if (part1 > part2) return false;
-        }
-        return false;
-    }
 }

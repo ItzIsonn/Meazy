@@ -16,6 +16,7 @@ import me.itzisonn_.meazy.parser.json_converter.basic.StatementConverter;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
+import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
 import me.itzisonn_.meazy.parser.Modifier;
@@ -258,7 +259,7 @@ public final class Registries {
 
             Parser.moveOverOptionalNewLines();
 
-            Map<String, String> requiredAddons = new HashMap<>();
+            Map<String, Version> requiredAddons = new HashMap<>();
             for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
                 AddonInfo addonInfo = addon.getAddonInfo();
                 requiredAddons.put(addonInfo.getId(), addonInfo.getVersion());
@@ -278,8 +279,8 @@ public final class Registries {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
 
-                String addonVersion = program.getRequiredAddons().get(addonId);
-                if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonId)) {
+                Version addonVersion = program.getRequiredAddons().get(addonId);
+                if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonVersion)) {
                     throw new RuntimeException("Can't find required addon with id " + addonId + " of version " + addonVersion +
                             " (found version " + addon.getAddonInfo().getVersion() + ")");
                 }
