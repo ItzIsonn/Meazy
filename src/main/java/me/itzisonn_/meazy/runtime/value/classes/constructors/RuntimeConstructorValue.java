@@ -12,23 +12,21 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents runtime constructor value created at runtime
+ * Represents runtime constructor value
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class RuntimeConstructorValue extends ConstructorValue {
     /**
-     * RuntimeConstructorValue's body
+     * Body
      */
     private final List<Statement> body;
 
     /**
-     * RuntimeConstructorValue constructor
-     *
-     * @param args RuntimeConstructorValue's args
-     * @param body = RuntimeConstructorValue's body
-     * @param parentEnvironment RuntimeConstructorValue's parent environment
-     * @param modifiers RuntimeConstructorValue's modifiers
+     * @param args Args
+     * @param body = Body
+     * @param parentEnvironment Parent environment
+     * @param modifiers Modifiers
      *
      * @throws NullPointerException If either args, body, parentEnvironment or modifiers is null
      */

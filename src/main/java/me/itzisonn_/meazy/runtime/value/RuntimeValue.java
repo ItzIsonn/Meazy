@@ -11,13 +11,11 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class RuntimeValue<T> {
     /**
-     * RuntimeValue's value
+     * Value
      */
-    protected final T value;
+    private final T value;
 
     /**
-     * RuntimeValue constructor
-     *
      * @param value Value to store
      */
     public RuntimeValue(T value) {
@@ -35,7 +33,6 @@ public class RuntimeValue<T> {
         }
         return value;
     }
-
 
     /**
      * Searches for final {@link RuntimeValue} value through this {@link RuntimeValue} and it's values

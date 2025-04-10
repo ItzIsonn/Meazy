@@ -14,12 +14,12 @@ import java.util.Set;
  */
 public interface ClassEnvironment extends Environment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
     /**
-     * @return This ClassEnvironment's id
+     * @return This class environment's id
      */
     String getId();
 
     /**
-     * @return This ClassEnvironment's modifiers
+     * @return This class environment's modifiers
      */
     Set<Modifier> getModifiers();
 
@@ -74,7 +74,7 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
 
     /**
      * @param id Class's id
-     * @return Base class of this ClassEnvironment with given id or null
+     * @return Base class of this class environment with given id or null
      * @throws NullPointerException If given id is null
      */
     default ClassEnvironment getBaseClass(String id) {
@@ -89,7 +89,7 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
 
     /**
      * @param id Class's id
-     * @return Base class of this ClassEnvironment and it's base classes with given id or null
+     * @return Base class of this class environment and it's base classes with given id or null
      * @throws NullPointerException If given id is null
      */
     default ClassEnvironment getDeepBaseClass(String id) throws NullPointerException {
@@ -103,12 +103,12 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
     }
 
     /**
-     * @return All base classes of this ClassEnvironment
+     * @return All base classes of this class environment
      */
     Set<ClassEnvironment> getBaseClasses();
 
     /**
-     * @return All base classes of this ClassEnvironment and their base classes
+     * @return All base classes of this class environment and their base classes
      */
     default Set<ClassEnvironment> getDeepBaseClasses() {
         Set<ClassEnvironment> baseClasses = new HashSet<>();

@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents runtime class value created directly in code
+ * Represents native class value
  */
 @EqualsAndHashCode(callSuper = true)
 public class NativeClassValue extends ClassValue {

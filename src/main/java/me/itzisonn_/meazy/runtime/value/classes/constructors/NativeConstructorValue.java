@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents runtime constructor value created directly in code
+ * Represents native constructor value
  */
 public abstract class NativeConstructorValue extends ConstructorValue {
     /**

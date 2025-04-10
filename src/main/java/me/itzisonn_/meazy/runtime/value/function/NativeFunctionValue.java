@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents runtime function value created directly in code
+ * Represents native function value
  */
 @EqualsAndHashCode(callSuper = true)
 public abstract class NativeFunctionValue extends FunctionValue {
