@@ -16,39 +16,37 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class VariableValue extends RuntimeValue<RuntimeValue<?>> {
     /**
-     * VariableValue's id
+     * Id
      */
     private final String id;
     /**
-     * VariableValue's DataType
+     * DataType
      */
     private final DataType dataType;
     /**
-     * VariableValue's value
+     * Value
      */
     private RuntimeValue<?> value;
     /**
-     * Whether this VariableValue's value is constant
+     * Whether value is constant
      */
     private final boolean isConstant;
     /**
-     * VariableValue's modifiers
+     * Modifiers
      */
     private final Set<Modifier> modifiers;
     /**
-     * Whether this VariableValue is argument
+     * Whether this variable is argument
      */
     private final boolean isArgument;
 
     /**
-     * VariableValue constructor
-     *
-     * @param id VariableValue's id
-     * @param dataType VariableValue's DataType
-     * @param value VariableValue's value
-     * @param isConstant Whether this VariableValue's value is constant
-     * @param modifiers VariableValue's modifiers
-     * @param isArgument Whether this VariableValue is argument
+     * @param id Id
+     * @param dataType DataType
+     * @param value Value
+     * @param isConstant Whether value is constant
+     * @param modifiers Modifiers
+     * @param isArgument Whether this variable is argument
      *
      * @throws NullPointerException If either id, dataType or modifiers is null
      */
@@ -68,12 +66,12 @@ public class VariableValue extends RuntimeValue<RuntimeValue<?>> {
     }
 
     /**
-     * Sets value of this VariableValue to given value
+     * Sets this variable's value to given value
      *
      * @param value New value
      *
-     * @throws InvalidSyntaxException If this VariableValue is constant and already have a value
-     * @throws InvalidValueException If given value doesn't match this VariableValue's {@link VariableValue#dataType}
+     * @throws InvalidSyntaxException If this variable is constant and already have a value
+     * @throws InvalidValueException If given value doesn't match this variable's {@link VariableValue#dataType}
      */
     public void setValue(RuntimeValue<?> value) throws InvalidSyntaxException, InvalidValueException {
         if (isConstant && this.value != null && this.value.getFinalValue() != null) {

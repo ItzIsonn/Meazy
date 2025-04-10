@@ -11,30 +11,28 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents runtime constructor value
+ * Represents constructor value
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class ConstructorValue extends RuntimeValue<Object> {
     /**
-     * ConstructorValue's args
+     * Args
      */
     protected final List<CallArgExpression> args;
     /**
-     * ConstructorValue's parent environment
+     * Parent environment
      */
     protected final ConstructorDeclarationEnvironment parentEnvironment;
     /**
-     * ConstructorValue's modifiers
+     * Modifiers
      */
     protected final Set<Modifier> modifiers;
 
     /**
-     * ConstructorValue constructor
-     *
-     * @param args ConstructorValue's args
-     * @param parentEnvironment ConstructorValue's parent environment
-     * @param modifiers ConstructorValue's modifiers
+     * @param args Args
+     * @param parentEnvironment Parent environment
+     * @param modifiers Modifiers
      *
      * @throws NullPointerException If either args, parentEnvironment or modifiers is null
      */
@@ -51,10 +49,10 @@ public abstract class ConstructorValue extends RuntimeValue<Object> {
     }
 
     /**
-     * Copies this ConstructorValue with given parent environment
+     * Copies this constructor with given parent environment
      *
-     * @param parentEnvironment New parent of this ConstructorValue
-     * @return Copy of this ConstructorValue
+     * @param parentEnvironment New parent of this constructor
+     * @return Copy of this constructor
      */
     public abstract ConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment);
 }

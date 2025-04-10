@@ -10,26 +10,26 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents runtime class value created at runtime
+ * Represents runtime class value
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class RuntimeClassValue extends ClassValue {
     /**
-     * RuntimeClassValue's body
+     * Body
      */
     private final List<Statement> body;
 
     /**
-     * RuntimeClassValue constructor
+     * Main constructor
      *
-     * @param baseClasses RuntimeClassValue's base classes
-     * @param environment RuntimeClassValue's environment
-     * @param body RuntimeClassValue's body
+     * @param baseClasses Base classes
+     * @param environment Environment
+     * @param body Body
      *
      * @throws NullPointerException If either baseClasses, environment or body is null
      */
-    public RuntimeClassValue(Set<String> baseClasses, ClassEnvironment environment, List<Statement> body) {
+    public RuntimeClassValue(Set<String> baseClasses, ClassEnvironment environment, List<Statement> body) throws NullPointerException {
         super(baseClasses, environment);
 
         if (body == null) throw new NullPointerException("Body can't be null");
@@ -37,14 +37,14 @@ public class RuntimeClassValue extends ClassValue {
     }
 
     /**
-     * RuntimeClassValue constructor with empty baseClasses
+     * Constructor with empty baseClasses
      *
-     * @param environment RuntimeClassValue's environment
-     * @param body RuntimeClassValue's body
+     * @param environment Environment
+     * @param body Body
      *
      * @throws NullPointerException If either environment or body is null
      */
-    public RuntimeClassValue(ClassEnvironment environment, List<Statement> body) {
+    public RuntimeClassValue(ClassEnvironment environment, List<Statement> body) throws NullPointerException {
         this(new HashSet<>(), environment, body);
     }
 }

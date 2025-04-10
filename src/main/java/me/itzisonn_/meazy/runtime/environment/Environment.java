@@ -9,11 +9,11 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * Represents an environment for Statements
+ * Represents an environment
  */
 public interface Environment {
     /**
-     * @return This Environment's parent
+     * @return This environment's parent
      */
     Environment getParent();
 
@@ -21,7 +21,7 @@ public interface Environment {
      * Searches for given environment as a parent in this environment and all parents
      *
      * @param environment Environment to lookup
-     * @return Whether this Environment has requested parent
+     * @return Whether this environment has requested parent
      *
      * @throws NullPointerException If given environment is null
      */
@@ -38,12 +38,12 @@ public interface Environment {
      * Searches for environment as a parent that matches given predicate in this environment and all parents
      *
      * @param predicate Predicate that matches parent environment
-     * @return Whether this Environment has requested parent
+     * @return Whether this environment has requested parent
      *
      * @throws NullPointerException If given predicate is null
      */
     default boolean hasParent(Predicate<Environment> predicate) throws NullPointerException {
-        if (predicate == null) throw new NullPointerException("Environment can't be null");
+        if (predicate == null) throw new NullPointerException("Predicate can't be null");
 
         Environment parent = getParent();
         if (predicate.test(parent)) return true;
@@ -60,7 +60,7 @@ public interface Environment {
      * @throws NullPointerException If given predicate is null
      */
     default Environment getParent(Predicate<Environment> predicate) throws NullPointerException {
-        if (predicate == null) throw new NullPointerException("Environment can't be null");
+        if (predicate == null) throw new NullPointerException("Predicate can't be null");
 
         Environment parent = getParent();
         if (predicate.test(parent)) return parent;
@@ -71,7 +71,7 @@ public interface Environment {
 
 
     /**
-     * @return Whether this Environment is shared
+     * @return Whether this environment is shared
      */
     boolean isShared();
 
@@ -110,8 +110,9 @@ public interface Environment {
      * @param value Variable's new value
      *
      * @throws NullPointerException If either id or value is null
+     * @throws InvalidIdentifierException If can't find variable with given id
      */
-    default void assignVariable(String id, RuntimeValue<?> value) throws NullPointerException {
+    default void assignVariable(String id, RuntimeValue<?> value) throws NullPointerException, InvalidIdentifierException {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (value == null) throw new NullPointerException("Value can't be null");
 
@@ -127,7 +128,7 @@ public interface Environment {
      * Searches for variable with given id in this environment and all parents
      *
      * @param id Variable's id
-     * @return VariableDeclarationEnvironment that has requested variable or null
+     * @return Environment that has requested variable or null
      *
      * @throws NullPointerException If given id is null
      */
@@ -146,7 +147,7 @@ public interface Environment {
      *
      * @param id Function's id
      * @param args Function's args
-     * @return FunctionDeclarationEnvironment that has requested function or null
+     * @return Environment that has requested function or null
      *
      * @throws NullPointerException If either id or args is null
      */

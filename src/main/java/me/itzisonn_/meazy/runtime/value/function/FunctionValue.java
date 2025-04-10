@@ -13,44 +13,42 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents runtime function value
+ * Represents function value
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public abstract class FunctionValue extends RuntimeValue<Object> {
     /**
-     * FunctionValue' id
+     * Id
      */
     protected final String id;
     /**
-     * FunctionValue's args
+     * Args
      */
     protected final List<CallArgExpression> args;
     /**
-     * Which DataType should this FunctionValue return
+     * Which DataType should this function return
      */
     protected final DataType returnDataType;
     /**
-     * FunctionValue's parent environment
+     * Parent environment
      */
     protected final FunctionDeclarationEnvironment parentEnvironment;
     /**
-     * FunctionValue's modifiers
+     * Modifiers
      */
     protected final Set<Modifier> modifiers;
     /**
-     * Whether this FunctionValue is overridden
+     * Whether this function is overridden
      */
     protected boolean isOverridden = false;
 
     /**
-     * FunctionValue constructor
-     *
-     * @param id FunctionValue' id
-     * @param args FunctionValue's args
-     * @param returnDataType Which DataType should this FunctionValue return or null
-     * @param parentEnvironment FunctionValue's parent environment
-     * @param modifiers FunctionValue's modifiers
+     * @param id Id
+     * @param args Args
+     * @param returnDataType Which DataType should this function return or null
+     * @param parentEnvironment Parent environment
+     * @param modifiers Modifiers
      */
     public FunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(null);
@@ -62,7 +60,7 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
     }
 
     /**
-     * Sets this FunctionValue overridden
+     * Makes this function overridden (can't be undone)
      */
     public void setOverridden() {
         if (!(parentEnvironment instanceof ClassEnvironment)) throw new RuntimeException("Can't make function overridden because it's not inside a class");
@@ -70,18 +68,18 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
     }
 
     /**
-     * Copies this FunctionValue with given parent environment
+     * Copies this function with given parent environment
      *
-     * @param parentEnvironment New parent of this FunctionValue
-     * @return Copy of this FunctionValue
+     * @param parentEnvironment New parent of this function
+     * @return Copy of this function
      */
     public abstract FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment);
 
     /**
-     * Returns whether this Function has same id, args and returnDataType
+     * Returns whether this function has same id, args and returnDataType
      *
      * @param o Object to compare
-     * @return Whether this FunctionValue is like o
+     * @return Whether this function is like o
      */
     public boolean isLike(Object o) {
         if (o == this) return true;
