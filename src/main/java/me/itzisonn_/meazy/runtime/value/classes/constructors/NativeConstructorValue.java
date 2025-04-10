@@ -12,25 +12,23 @@ import java.util.Set;
 /**
  * Represents runtime constructor value created directly in code
  */
-public abstract class DefaultConstructorValue extends ConstructorValue {
+public abstract class NativeConstructorValue extends ConstructorValue {
     /**
-     * DefaultConstructorValue constructor
-     *
-     * @param args DefaultConstructorValue's args
-     * @param parentEnvironment DefaultConstructorValue's parent environment
-     * @param modifiers DefaultConstructorValue's modifiers
+     * @param args Args
+     * @param parentEnvironment Parent environment
+     * @param modifiers Modifiers
      *
      * @throws NullPointerException If either args, parentEnvironment or modifiers is null
      */
-    public DefaultConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) throws NullPointerException {
+    public NativeConstructorValue(List<CallArgExpression> args, ConstructorDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) throws NullPointerException {
         super(args, parentEnvironment, modifiers);
     }
 
     /**
-     * Runs this DefaultConstructorValue with given args and environment
+     * Runs this constructor with given args and environment
      *
-     * @param constructorArgs Args given to this DefaultConstructorValue
-     * @param constructorEnvironment Unique Environment of this DefaultConstructorValue
+     * @param constructorArgs Args given to this constructor
+     * @param constructorEnvironment Unique Environment of this constructor
      */
     public abstract void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment);
 
@@ -38,7 +36,7 @@ public abstract class DefaultConstructorValue extends ConstructorValue {
     public final ConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment) {
         RunFunction runFunction = this::run;
 
-        return new DefaultConstructorValue(args, parentEnvironment, modifiers) {
+        return new NativeConstructorValue(args, parentEnvironment, modifiers) {
             @Override
             public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
                 runFunction.run(constructorArgs, constructorEnvironment);
