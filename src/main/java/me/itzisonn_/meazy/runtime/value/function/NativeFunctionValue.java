@@ -15,25 +15,23 @@ import java.util.Set;
  * Represents runtime function value created directly in code
  */
 @EqualsAndHashCode(callSuper = true)
-public abstract class DefaultFunctionValue extends FunctionValue {
+public abstract class NativeFunctionValue extends FunctionValue {
     /**
-     * DefaultFunctionValue constructor
-     *
-     * @param id DefaultFunctionValue' id
-     * @param args DefaultFunctionValue's args
-     * @param returnDataType Which DataType should this DefaultFunctionValue return or null
-     * @param parentEnvironment DefaultFunctionValue's parent environment
-     * @param modifiers DefaultFunctionValue's modifiers
+     * @param id Id
+     * @param args Args
+     * @param returnDataType Which DataType should this function return or null
+     * @param parentEnvironment Parent environment
+     * @param modifiers Modifiers
      */
-    public DefaultFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
+    public NativeFunctionValue(String id, List<CallArgExpression> args, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(id, args, returnDataType, parentEnvironment, modifiers);
     }
 
     /**
-     * Runs this DefaultFunctionValue with given args and environment
+     * Runs this function with given args and environment
      *
-     * @param functionArgs Args given to this DefaultFunctionValue
-     * @param functionEnvironment Unique Environment of this DefaultFunctionValue
+     * @param functionArgs Args given to this function
+     * @param functionEnvironment Unique Environment of this function
      */
     public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);
 
@@ -41,7 +39,7 @@ public abstract class DefaultFunctionValue extends FunctionValue {
     public final FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
         RunFunction runFunction = this::run;
 
-        return new DefaultFunctionValue(id, args, returnDataType, parentEnvironment, modifiers) {
+        return new NativeFunctionValue(id, args, returnDataType, parentEnvironment, modifiers) {
             @Override
             public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
                 return runFunction.run(functionArgs, functionEnvironment);

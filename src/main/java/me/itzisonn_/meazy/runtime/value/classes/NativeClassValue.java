@@ -10,25 +10,26 @@ import java.util.Set;
  * Represents runtime class value created directly in code
  */
 @EqualsAndHashCode(callSuper = true)
-public class DefaultClassValue extends ClassValue {
+public class NativeClassValue extends ClassValue {
     /**
-     * DefaultClassValue constructor
+     * Main constructor
      *
-     * @param baseClasses DefaultClassValue's base classes
-     * @param environment DefaultClassValue's environment
+     * @param baseClasses Base classes
+     * @param environment Environment
      *
      * @throws NullPointerException If either baseClasses or environment is null
      */
-    public DefaultClassValue(Set<String> baseClasses, ClassEnvironment environment) throws NullPointerException {
+    public NativeClassValue(Set<String> baseClasses, ClassEnvironment environment) throws NullPointerException {
         super(baseClasses, environment);
     }
 
     /**
-     * DefaultClassValue constructor with empty baseClasses
-     * @param environment DefaultClassValue's environment
+     * Constructor with empty baseClasses
+     *
+     * @param environment Environment
      * @throws NullPointerException If given environment is null
      */
-    public DefaultClassValue(ClassEnvironment environment) throws NullPointerException {
+    public NativeClassValue(ClassEnvironment environment) throws NullPointerException {
         this(new HashSet<>(), environment);
     }
 }
