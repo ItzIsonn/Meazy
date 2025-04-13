@@ -25,7 +25,7 @@ public final class Utils {
      * @throws NullPointerException When given file is null
      */
     public static String getExtension(File file) throws NullPointerException {
-        if (file == null) throw new NullPointerException("File can't be null!");
+        if (file == null) throw new NullPointerException("File can't be null");
         String name = file.getName();
 
         int i = name.lastIndexOf('.');
@@ -44,7 +44,7 @@ public final class Utils {
      * @throws NullPointerException When given file is null
      */
     public static String getLines(File file) throws NullPointerException {
-        if (file == null) throw new NullPointerException("File can't be null!");
+        if (file == null) throw new NullPointerException("File can't be null");
 
         StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

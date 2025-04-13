@@ -68,14 +68,6 @@ public abstract class FunctionValue extends RuntimeValue<Object> {
     }
 
     /**
-     * Copies this function with given parent environment
-     *
-     * @param parentEnvironment New parent of this function
-     * @return Copy of this function
-     */
-    public abstract FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment);
-
-    /**
      * Returns whether this function has same id, args and returnDataType
      *
      * @param o Object to compare

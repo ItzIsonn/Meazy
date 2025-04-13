@@ -12,10 +12,8 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class NativeClassValue extends ClassValue {
     /**
-     * Main constructor
-     *
      * @param baseClasses Base classes
-     * @param environment Environment
+     * @param environment Class environment
      *
      * @throws NullPointerException If either baseClasses or environment is null
      */
@@ -26,10 +24,27 @@ public class NativeClassValue extends ClassValue {
     /**
      * Constructor with empty baseClasses
      *
-     * @param environment Environment
+     * @param environment Class environment
      * @throws NullPointerException If given environment is null
      */
     public NativeClassValue(ClassEnvironment environment) throws NullPointerException {
         this(new HashSet<>(), environment);
     }
+
+    /**
+     * Creates new instance of this class value
+     *
+     * @param baseClasses Base classes
+     * @param classEnvironment Class environment
+     * @return New instance of this class value
+     */
+    public NativeClassValue newInstance(Set<String> baseClasses, ClassEnvironment classEnvironment) {
+        return new NativeClassValue(baseClasses, classEnvironment);
+    }
+
+    /**
+     * Setups given environment
+     * @param classEnvironment Class environment
+     */
+    public void setupEnvironment(ClassEnvironment classEnvironment) {}
 }

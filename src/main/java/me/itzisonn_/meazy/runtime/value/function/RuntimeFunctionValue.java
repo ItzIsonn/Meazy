@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,10 +32,5 @@ public class RuntimeFunctionValue extends FunctionValue {
     public RuntimeFunctionValue(String id, List<CallArgExpression> args, List<Statement> body, DataType returnDataType, FunctionDeclarationEnvironment parentEnvironment, Set<Modifier> modifiers) {
         super(id, args, returnDataType, parentEnvironment, modifiers);
         this.body = body;
-    }
-
-    @Override
-    public final FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
-        return new RuntimeFunctionValue(id, args, new ArrayList<>(body), returnDataType, parentEnvironment, modifiers);
     }
 }

@@ -85,7 +85,7 @@ public final class Commands {
      * @throws IllegalStateException If {@link Registries#COMMANDS} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("Commands have already been initialized!");
+        if (isInit) throw new IllegalStateException("Commands have already been initialized");
         isInit = true;
 
         register(new Command("version", List.of()) {
@@ -171,38 +171,42 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
+                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsolutePath());
                     return null;
                 }
 
-                MeazyMain.LOGGER.log(Level.INFO, "Running file '{}'", file.getAbsoluteFile());
+                MeazyMain.LOGGER.log(Level.INFO, "Running file '{}'", file.getAbsolutePath());
 
                 String extension = Utils.getExtension(file);
                 long startMillis = System.currentTimeMillis();
-                if (extension.equals("mea")) {
-                    List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
-                    Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
-                    Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
-                }
-                else if (extension.equals("meac")) {
-                    Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
-                    if (program == null) {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
+
+                Program program;
+                switch (extension) {
+                    case "mea" -> {
+                        List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
+                        program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
+                    }
+                    case "meac" -> {
+                        program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
+                        if (program == null) {
+                            MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
+                            return null;
+                        }
+                        if (MeazyMain.VERSION.isBefore(program.getVersion())) {
+                            MeazyMain.LOGGER.log(Level.ERROR, "Can't run file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
+                            return null;
+                        }
+                        if (MeazyMain.VERSION.isAfter(program.getVersion())) {
+                            MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
+                        }
+                    }
+                    default -> {
+                        MeazyMain.LOGGER.log(Level.ERROR, "Can't run file with extension {}", extension);
                         return null;
                     }
-                    if (MeazyMain.VERSION.isBefore(program.getVersion())) {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Can't run file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
-                        return null;
-                    }
-                    if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-                        MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
-                    }
-                    Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().accept(program);
                 }
-                else {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't run file with extension {}", extension);
-                    return null;
-                }
+
+                Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program, file);
                 long endMillis = System.currentTimeMillis();
 
                 return "Executed in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
@@ -214,7 +218,7 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
+                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsolutePath());
                     return null;
                 }
 
@@ -223,7 +227,7 @@ public final class Commands {
                     return null;
                 }
 
-                MeazyMain.LOGGER.log(Level.INFO, "Compiling file '{}'", file.getAbsoluteFile());
+                MeazyMain.LOGGER.log(Level.INFO, "Compiling file '{}'", file.getAbsolutePath());
 
                 long startMillis = System.currentTimeMillis();
                 List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
@@ -271,7 +275,7 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsoluteFile());
+                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsolutePath());
                     return null;
                 }
 
@@ -280,7 +284,7 @@ public final class Commands {
                     return null;
                 }
 
-                MeazyMain.LOGGER.log(Level.INFO, "Decompiling file '{}'", file.getAbsoluteFile());
+                MeazyMain.LOGGER.log(Level.INFO, "Decompiling file '{}'", file.getAbsolutePath());
 
                 long startMillis = System.currentTimeMillis();
                 Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);

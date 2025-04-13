@@ -76,7 +76,7 @@ public final class MeazyMain {
     }
 
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("MeazyMain have already been initialized!");
+        if (isInit) throw new IllegalStateException("MeazyMain have already been initialized");
         isInit = true;
 
         Registries.INIT();

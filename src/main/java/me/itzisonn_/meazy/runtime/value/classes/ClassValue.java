@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.runtime.value.classes;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
@@ -26,8 +25,6 @@ public abstract class ClassValue extends RuntimeValue<Object> {
     protected final ClassEnvironment environment;
 
     /**
-     * Main constructor
-     *
      * @param baseClasses Base classes
      * @param environment Environment
      *
@@ -45,6 +42,7 @@ public abstract class ClassValue extends RuntimeValue<Object> {
 
     /**
      * Constructor with empty baseClasses
+     *
      * @param environment Environment
      * @throws NullPointerException If given environment is null
      */
@@ -70,7 +68,7 @@ public abstract class ClassValue extends RuntimeValue<Object> {
 
         if (value instanceof ClassValue classValue) {
             for (String baseClassString : classValue.getBaseClasses()) {
-                ClassValue baseClassValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(baseClassString);
+                ClassValue baseClassValue = classValue.getEnvironment().getGlobalEnvironment().getClass(baseClassString);
                 if (baseClassValue == null) continue;
                 if (isLikeMatches(baseClassValue)) return true;
             }
