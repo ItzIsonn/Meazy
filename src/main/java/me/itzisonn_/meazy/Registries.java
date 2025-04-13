@@ -16,6 +16,7 @@ import me.itzisonn_.meazy.parser.json_converter.basic.StatementConverter;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
+import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
@@ -31,12 +32,13 @@ import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 
+import java.io.File;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
@@ -58,7 +60,12 @@ public final class Registries {
     public static final SetRegistry<Command> COMMANDS = new SetRegistry<>() {
         @Override
         public void register(RegistryIdentifier identifier, Command value, boolean overridable) {
-            if (Commands.getByName(value.getName()) != null) throw new IllegalArgumentException("Command with name " + value.getName() + " has already been registered");
+            for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
+                if (entry.getValue().getName().equals(value.getName()) && !entry.isOverrideable()) {
+                    throw new IllegalArgumentException("Command with name " + value.getName() + " has already been registered");
+                }
+            }
+
             super.register(identifier, value, overridable);
         }
     };
@@ -158,39 +165,39 @@ public final class Registries {
      * @see EvaluationFunction
      * @see Interpreter
      */
-    public static final SingleEntryRegistry<Consumer<Program>> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<BiFunction<Program, File, GlobalEnvironment>> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
 
 
 
     /**
-     * Registry for {@link GlobalEnvironment}
+     * Registry for {@link GlobalEnvironmentFactory}
      */
-    public static final SingleEntryRegistry<GlobalEnvironment> GLOBAL_ENVIRONMENT = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<GlobalEnvironmentFactory> GLOBAL_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
-     * Registry for {@link ClassEnvironment} class
+     * Registry for {@link ClassEnvironmentFactory}
      */
-    public static final SingleEntryRegistry<Class<? extends ClassEnvironment>> CLASS_ENVIRONMENT = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<ClassEnvironmentFactory> CLASS_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
-     * Registry for {@link FunctionEnvironment} class
+     * Registry for {@link FunctionEnvironmentFactory}
      */
-    public static final SingleEntryRegistry<Class<? extends FunctionEnvironment>> FUNCTION_ENVIRONMENT = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<FunctionEnvironmentFactory> FUNCTION_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
-     * Registry for {@link ConstructorEnvironment} class
+     * Registry for {@link ConstructorEnvironmentFactory}
      */
-    public static final SingleEntryRegistry<Class<? extends ConstructorEnvironment>> CONSTRUCTOR_ENVIRONMENT = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<ConstructorEnvironmentFactory> CONSTRUCTOR_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
-     * Registry for {@link LoopEnvironment} class
+     * Registry for {@link LoopEnvironmentFactory}
      */
-    public static final SingleEntryRegistry<Class<? extends LoopEnvironment>> LOOP_ENVIRONMENT = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<LoopEnvironmentFactory> LOOP_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
-     * Registry for {@link Environment} class
+     * Registry for {@link EnvironmentFactory}
      */
-    public static final SingleEntryRegistry<Class<? extends Environment>> ENVIRONMENT = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<EnvironmentFactory> ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
 
 
@@ -202,7 +209,7 @@ public final class Registries {
      * @throws IllegalStateException If registries have already been initialized
      */
     public static void INIT() throws IllegalStateException {
-        if (isInit) throw new IllegalStateException("Registries have already been initialized!");
+        if (isInit) throw new IllegalStateException("Registries have already been initialized");
         isInit = true;
 
         Commands.INIT();
@@ -254,7 +261,7 @@ public final class Registries {
         });
 
         PARSE_TOKENS_FUNCTION.register(getDefaultIdentifier("parse_tokens"), tokens -> {
-            if (tokens == null) throw new NullPointerException("Tokens can't be null!");
+            if (tokens == null) throw new NullPointerException("Tokens can't be null");
             Parser.setTokens(tokens);
 
             Parser.moveOverOptionalNewLines();
@@ -274,7 +281,7 @@ public final class Registries {
             return new Program(MeazyMain.VERSION, requiredAddons, body);
         });
 
-        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), program -> {
+        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), (program, parentFile) -> {
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
@@ -286,7 +293,10 @@ public final class Registries {
                 }
             }
 
-            Interpreter.evaluate(program, Registries.GLOBAL_ENVIRONMENT.getEntry().getValue());
+            GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(parentFile);
+            Interpreter.evaluate(program, globalEnvironment);
+
+            return globalEnvironment;
         });
     }
 

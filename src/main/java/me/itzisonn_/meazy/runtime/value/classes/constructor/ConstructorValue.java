@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime.value.classes.constructors;
+package me.itzisonn_.meazy.runtime.value.classes.constructor;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -47,12 +47,4 @@ public abstract class ConstructorValue extends RuntimeValue<Object> {
         this.parentEnvironment = parentEnvironment;
         this.modifiers = modifiers;
     }
-
-    /**
-     * Copies this constructor with given parent environment
-     *
-     * @param parentEnvironment New parent of this constructor
-     * @return Copy of this constructor
-     */
-    public abstract ConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment);
 }

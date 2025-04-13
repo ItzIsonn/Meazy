@@ -34,20 +34,4 @@ public abstract class NativeFunctionValue extends FunctionValue {
      * @param functionEnvironment Unique Environment of this function
      */
     public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);
-
-    @Override
-    public final FunctionValue copy(FunctionDeclarationEnvironment parentEnvironment) {
-        RunFunction runFunction = this::run;
-
-        return new NativeFunctionValue(id, args, returnDataType, parentEnvironment, modifiers) {
-            @Override
-            public RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment) {
-                return runFunction.run(functionArgs, functionEnvironment);
-            }
-        };
-    }
-
-    private interface RunFunction {
-        RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);
-    }
 }

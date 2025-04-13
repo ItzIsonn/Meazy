@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.value.NullValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
@@ -41,15 +41,19 @@ public class DataType {
      * Checks whether given value matches this DataType
      *
      * @param value Value to check
+     * @param globalEnvironment GlobalEnvironment that contains class with this DataType's name
      * @return Whether given value matches this DataType
+     *
+     * @throws NullPointerException If given globalEnvironment is null
      */
-    public boolean isMatches(RuntimeValue<?> value) {
+    public boolean isMatches(RuntimeValue<?> value, GlobalEnvironment globalEnvironment) throws NullPointerException {
+        if (globalEnvironment == null) throw new NullPointerException("GlobalEnvironment can't be null");
         if (value == null) return true;
 
         value = value.getFinalRuntimeValue();
         if (value instanceof NullValue) return isNullable;
 
-        ClassValue classValue = Registries.GLOBAL_ENVIRONMENT.getEntry().getValue().getClass(id);
+        ClassValue classValue = globalEnvironment.getClass(id);
         return classValue != null && classValue.isLikeMatches(value);
     }
 

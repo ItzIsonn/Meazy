@@ -42,7 +42,7 @@ public final class TokenTypes {
      * @throws IllegalStateException If {@link Registries#TOKEN_TYPES} registry has already been initialized
      */
     public static void INIT() {
-        if (isInit) throw new IllegalStateException("TokenTypes have already been initialized!");
+        if (isInit) throw new IllegalStateException("TokenTypes have already been initialized");
         isInit = true;
 
         register(new TokenType("new_line", "\n+", false));

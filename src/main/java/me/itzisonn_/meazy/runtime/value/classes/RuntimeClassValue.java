@@ -21,8 +21,6 @@ public class RuntimeClassValue extends ClassValue {
     private final List<Statement> body;
 
     /**
-     * Main constructor
-     *
      * @param baseClasses Base classes
      * @param environment Environment
      * @param body Body

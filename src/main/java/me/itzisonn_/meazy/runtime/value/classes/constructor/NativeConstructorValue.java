@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime.value.classes.constructors;
+package me.itzisonn_.meazy.runtime.value.classes.constructor;
 
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
@@ -31,20 +31,4 @@ public abstract class NativeConstructorValue extends ConstructorValue {
      * @param constructorEnvironment Unique Environment of this constructor
      */
     public abstract void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment);
-
-    @Override
-    public final ConstructorValue copy(ConstructorDeclarationEnvironment parentEnvironment) {
-        RunFunction runFunction = this::run;
-
-        return new NativeConstructorValue(args, parentEnvironment, modifiers) {
-            @Override
-            public void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment) {
-                runFunction.run(constructorArgs, constructorEnvironment);
-            }
-        };
-    }
-
-    private interface RunFunction {
-        void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment);
-    }
 }

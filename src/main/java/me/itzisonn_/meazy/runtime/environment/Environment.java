@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -12,6 +13,17 @@ import java.util.function.Predicate;
  * Represents an environment
  */
 public interface Environment {
+    /**
+     * @return Parent file of this environment
+     */
+    default File getParentFile() {
+        Environment parent = getParent();
+        if (parent == null) return null;
+        return parent.getParentFile();
+    }
+
+
+
     /**
      * @return This environment's parent
      */
@@ -65,6 +77,13 @@ public interface Environment {
         Environment parent = getParent();
         if (predicate.test(parent)) return parent;
         if (parent != null) return parent.getParent(predicate);
+        return null;
+    }
+
+    default GlobalEnvironment getGlobalEnvironment() {
+        Environment parent = getParent();
+        if (parent instanceof GlobalEnvironment globalEnvironment) return globalEnvironment;
+        if (parent != null) return parent.getGlobalEnvironment();
         return null;
     }
 
@@ -135,7 +154,8 @@ public interface Environment {
     default Environment getVariableDeclarationEnvironment(String id) throws NullPointerException {
         if (id == null) throw new NullPointerException("Id can't be null");
 
-        if (getVariable(id) != null) return this;
+        VariableValue variableValue = getVariable(id);
+        if (variableValue != null) return variableValue.getParentEnvironment();
 
         Environment parent = getParent();
         if (parent == null) return null;

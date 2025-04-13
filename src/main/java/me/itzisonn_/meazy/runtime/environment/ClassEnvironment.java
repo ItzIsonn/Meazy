@@ -49,7 +49,7 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
                 if (args.size() != callArgExpressions.size()) continue;
 
                 for (int i = 0; i < args.size(); i++) {
-                    if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i))) continue main;
+                    if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i), getGlobalEnvironment())) continue main;
                 }
 
                 return functionValue;
