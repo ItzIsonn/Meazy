@@ -116,7 +116,7 @@ public final class Registries {
      * @see ParsingFunction
      * @see Parser
      */
-    public static final SingleEntryRegistry<Function<List<Token>, Program>> PARSE_TOKENS_FUNCTION = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<BiFunction<File, List<Token>, Program>> PARSE_TOKENS_FUNCTION = new SingleEntryRegistryImpl<>();
 
 
 
@@ -165,7 +165,7 @@ public final class Registries {
      * @see EvaluationFunction
      * @see Interpreter
      */
-    public static final SingleEntryRegistry<BiFunction<Program, File, GlobalEnvironment>> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<Function<Program, GlobalEnvironment>> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
 
 
 
@@ -260,7 +260,7 @@ public final class Registries {
             return tokens;
         });
 
-        PARSE_TOKENS_FUNCTION.register(getDefaultIdentifier("parse_tokens"), tokens -> {
+        PARSE_TOKENS_FUNCTION.register(getDefaultIdentifier("parse_tokens"), (file, tokens) -> {
             if (tokens == null) throw new NullPointerException("Tokens can't be null");
             Parser.setTokens(tokens);
 
@@ -278,10 +278,10 @@ public final class Registries {
                 Parser.moveOverOptionalNewLines();
             }
 
-            return new Program(MeazyMain.VERSION, requiredAddons, body);
+            return new Program(file, MeazyMain.VERSION, requiredAddons, body);
         });
 
-        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), (program, parentFile) -> {
+        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), program -> {
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
@@ -293,7 +293,7 @@ public final class Registries {
                 }
             }
 
-            GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(parentFile);
+            GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(program.getFile());
             Interpreter.evaluate(program, globalEnvironment);
 
             return globalEnvironment;

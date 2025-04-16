@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast;
 import lombok.Getter;
 import me.itzisonn_.meazy.version.Version;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -12,31 +13,41 @@ import java.util.Map;
 @Getter
 public class Program implements Statement {
     /**
-     * Program's version
+     * File that contains this program
+     */
+    private final File file;
+    /**
+     * Version
      */
     private final Version version;
     /**
-     * Program's required addons
+     * Required addons
      */
     private final Map<String, Version> requiredAddons;
     /**
-     * Program's body
+     * Body
      */
     private final List<Statement> body;
 
     /**
-     * Program constructor
+     * @param file File that contains this program
+     * @param version Version
+     * @param requiredAddons Required addons
+     * @param body Body
      *
-     * @param version Program's version
-     * @param body Program's body
-     *
-     * @throws NullPointerException If either version or body is null
+     * @throws NullPointerException If either file, version, requiredAddons or body is null
+     * @throws IllegalArgumentException If file doesn't exist or is a directory
      */
-    public Program(Version version, Map<String, Version> requiredAddons, List<Statement> body) throws NullPointerException {
+    public Program(File file, Version version, Map<String, Version> requiredAddons, List<Statement> body) throws NullPointerException, IllegalArgumentException {
+        if (file == null) throw new NullPointerException("File can't be null");
+        if (!file.exists()) throw new IllegalArgumentException("File doesn't exist");
+        if (file.isDirectory()) throw new IllegalArgumentException("File can't be directory");
+
         if (version == null) throw new NullPointerException("Version can't be null");
         if (requiredAddons == null) throw new NullPointerException("RequiredAddons can't be null");
         if (body == null) throw new NullPointerException("Body can't be null");
 
+        this.file = file;
         this.version = version;
         this.requiredAddons = requiredAddons;
         this.body = body;

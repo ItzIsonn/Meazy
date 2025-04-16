@@ -7,17 +7,17 @@ import me.itzisonn_.meazy.Registries;
 import java.util.regex.Pattern;
 
 /**
- * TokenType
+ * Represents type of token
  * @see Registries#TOKEN_TYPES
  */
 @Getter
 public class TokenType {
     /**
-     * TokenType's id that matches {@link Utils#IDENTIFIER_REGEX}
+     * Id that matches {@link Utils#IDENTIFIER_REGEX}
      */
     private final String id;
     /**
-     * Pattern that is used to match tokens
+     * Pattern that is used to match this token type
      */
     private final Pattern pattern;
     /**
@@ -26,24 +26,10 @@ public class TokenType {
     private final boolean shouldSkip;
 
     /**
-     * TokenType constructor
+     * Main constructor
      *
-     * @param id TokenType's id that matches {@link Utils#IDENTIFIER_REGEX}
-     * @param regex Regex that is converted into {@link Pattern}
-     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
-     *
-     * @throws NullPointerException If given id is null
-     * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
-     */
-    public TokenType(String id, String regex, boolean shouldSkip) throws NullPointerException, IllegalArgumentException {
-        this(id, regex == null ? null : Pattern.compile(regex, Pattern.DOTALL), shouldSkip);
-    }
-
-    /**
-     * TokenType constructor
-     *
-     * @param id TokenType's id that matches {@link Utils#IDENTIFIER_REGEX}
-     * @param pattern Pattern that is used to match tokens
+     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * @param pattern Pattern that is used to match this token type
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
      *
      * @throws NullPointerException If given id is null
@@ -52,6 +38,7 @@ public class TokenType {
     public TokenType(String id, Pattern pattern, boolean shouldSkip) throws NullPointerException, IllegalArgumentException {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (!id.matches(Utils.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid id");
+
         if (pattern != null && !pattern.pattern().startsWith("^")) {
             pattern = Pattern.compile("^(" + pattern.pattern() + ")", pattern.flags());
         }
@@ -62,8 +49,22 @@ public class TokenType {
     }
 
     /**
+     * Constructor with regex that is compiled into pattern
+     *
+     * @param id Id that matches {@link Utils#IDENTIFIER_REGEX}
+     * @param regex Regex that is compiled into {@link Pattern}
+     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
+     *
+     * @throws NullPointerException If given id is null
+     * @throws IllegalArgumentException If given id doesn't match {@link Utils#IDENTIFIER_REGEX}
+     */
+    public TokenType(String id, String regex, boolean shouldSkip) throws NullPointerException, IllegalArgumentException {
+        this(id, regex == null ? null : Pattern.compile(regex, Pattern.DOTALL), shouldSkip);
+    }
+
+    /**
      * @param string String to check
-     * @return Can given string match this TokenType
+     * @return Can given string match this token type
      */
     public boolean canMatch(String string) {
         return true;
