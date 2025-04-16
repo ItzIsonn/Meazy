@@ -7,13 +7,12 @@ import me.itzisonn_.meazy.Registries;
 import java.util.List;
 
 /**
- * Command
- *
+ * Represents command
  * @see Registries#COMMANDS
  */
 public abstract class Command {
     /**
-     * Command's name
+     * Name
      */
     @Getter
     private final String name;
@@ -23,13 +22,11 @@ public abstract class Command {
     private final List<String> args;
 
     /**
-     * Command constructor
+     * @param name Name
+     * @param args List of args' names
      *
-     * @param name Command's name
-     * @param args Args' names
-     *
-     * @throws NullPointerException If given name or args is null
-     * @throws IllegalArgumentException If name or any of given args doesn't match {@link Utils#IDENTIFIER_REGEX}
+     * @throws NullPointerException If either name or args is null
+     * @throws IllegalArgumentException If either name or any of args doesn't match {@link Utils#IDENTIFIER_REGEX}
      */
     public Command(String name, List<String> args) throws NullPointerException, IllegalArgumentException {
         if (name == null) throw new NullPointerException("Name can't be null");
@@ -44,7 +41,7 @@ public abstract class Command {
 
     /**
      * Executes this command with given args.
-     * Args' amount matches {@link Command#args}'s size
+     * Args' amount matches {@link Command#args}' size
      *
      * @param args Args
      * @return Success message that will be logged or null
@@ -52,7 +49,7 @@ public abstract class Command {
     public abstract String execute(String... args);
 
     /**
-     * @return Copy of command's args' names
+     * @return Copy of args' names
      */
     public List<String> getArgs() {
         return List.copyOf(args);

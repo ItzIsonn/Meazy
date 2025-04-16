@@ -14,7 +14,7 @@ public class TokenTypeSet {
     private final Set<TokenType> tokenTypes;
 
     /**
-     * TokenTypeSet constructor
+     * Main constructor
      * @param tokenTypes Set of TokenTypes
      * @throws NullPointerException If given set is null
      */
@@ -24,16 +24,18 @@ public class TokenTypeSet {
     }
 
     /**
-     * TokenTypeSet constructor
+     * Constructor with array of tokenTypes
      * @param tokenTypes Array of TokenTypes
+     *
      * @throws NullPointerException If given array is null
+     * @throws IllegalArgumentException If given array contains duplicate elements
      */
-    public TokenTypeSet(TokenType... tokenTypes) throws NullPointerException {
+    public TokenTypeSet(TokenType... tokenTypes) throws NullPointerException, IllegalArgumentException {
         this(tokenTypes == null ? null : Set.of(tokenTypes));
     }
 
     /**
-     * @return Copy of TokenType Set
+     * @return Copy of this token type set
      */
     public Set<TokenType> getTokenTypes() {
         return Set.copyOf(tokenTypes);
@@ -41,16 +43,16 @@ public class TokenTypeSet {
 
     /**
      * @param tokenType TokenType
-     * @return This TokenTypeSet to allow chaining
+     * @return This token type set to allow chaining
      */
     public TokenTypeSet add(TokenType tokenType) throws IllegalArgumentException {
-        if (!tokenTypes.add(tokenType)) throw new IllegalArgumentException("Given TokenType has already been added to this set");
+        if (!tokenTypes.add(tokenType)) throw new IllegalArgumentException("TokenType has already been added to this set");
         return this;
     }
 
     /**
      * @param tokenType TokenType
-     * @return Whether contains given TokenType
+     * @return Whether this token type set contains given tokenType
      */
     public boolean contains(TokenType tokenType) {
         return tokenTypes.contains(tokenType);

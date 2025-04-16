@@ -10,24 +10,22 @@ import lombok.Getter;
 @EqualsAndHashCode
 public class Token {
     /**
-     * Line on which this Token is located
+     * Line on which this token is located
      */
     private final int line;
     /**
-     * Token's TokenType
+     * TokenType
      */
     private final TokenType type;
     /**
-     * String that matches this Token's type
+     * String that matches this token's type
      */
     private final String value;
 
     /**
-     * Token constructor
-     *
-     * @param line Line on which this Token is located
-     * @param type TokenType of this Token
-     * @param value String that matches this Token's type
+     * @param line Line on which this token is located
+     * @param type TokenType
+     * @param value String that matches this token's type
      *
      * @throws IllegalArgumentException If line is negative
      * @throws NullPointerException If either type or value is null

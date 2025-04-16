@@ -184,7 +184,7 @@ public final class Commands {
                 switch (extension) {
                     case "mea" -> {
                         List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
-                        program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
+                        program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(file, tokens);
                     }
                     case "meac" -> {
                         program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
@@ -206,7 +206,7 @@ public final class Commands {
                     }
                 }
 
-                Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program, file);
+                Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program);
                 long endMillis = System.currentTimeMillis();
 
                 return "Executed in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
@@ -232,7 +232,7 @@ public final class Commands {
                 long startMillis = System.currentTimeMillis();
                 List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
 
-                Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(tokens);
+                Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(file, tokens);
                 long endMillis = System.currentTimeMillis();
 
 
