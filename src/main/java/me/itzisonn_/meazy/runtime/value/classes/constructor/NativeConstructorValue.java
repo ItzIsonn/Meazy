@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.value.classes.constructor;
 
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
@@ -30,5 +30,5 @@ public abstract class NativeConstructorValue extends ConstructorValue {
      * @param constructorArgs Args given to this constructor
      * @param constructorEnvironment Unique Environment of this constructor
      */
-    public abstract void run(List<RuntimeValue<?>> constructorArgs, Environment constructorEnvironment);
+    public abstract void run(List<RuntimeValue<?>> constructorArgs, ConstructorEnvironment constructorEnvironment);
 }

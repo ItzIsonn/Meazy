@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
 import me.itzisonn_.meazy.version.Version;
 
-import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ public class ProgramConverter extends Converter<Program> {
         JsonObject object = jsonElement.getAsJsonObject();
         checkType(object);
 
-        File file = new File(getElement(object, "file").getAsString());
         String version = getElement(object, "version").getAsString();
 
         Map<String, Version> requiredAddons = new HashMap<>();
@@ -46,14 +44,13 @@ public class ProgramConverter extends Converter<Program> {
         List<Statement> body = getElement(object, "body").getAsJsonArray().asList().stream().map(statement ->
                 (Statement) jsonDeserializationContext.deserialize(statement, Statement.class)).collect(Collectors.toList());
 
-        return new Program(file, Version.of(version), requiredAddons, body);
+        return new Program(Version.of(version), requiredAddons, body);
     }
 
     @Override
     public JsonElement serialize(Program program, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject result = getJsonObject();
 
-        result.addProperty("file", program.getFile().getAbsolutePath());
         result.addProperty("version", program.getVersion().toString());
 
         JsonObject requiredAddons = new JsonObject();

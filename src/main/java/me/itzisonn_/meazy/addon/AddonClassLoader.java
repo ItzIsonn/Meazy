@@ -3,11 +3,13 @@ package me.itzisonn_.meazy.addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,17 +20,19 @@ public final class AddonClassLoader extends URLClassLoader {
     private final AddonLoader loader;
     private final Map<String, Class<?>> classes = new HashMap<>();
     private final AddonInfo addonInfo;
+    private final List<InputStream> datagenInputStreams;
     private final File dataFolder;
     private final File file;
     final Addon addon;
     private Addon addonInit;
 
-    public AddonClassLoader(final AddonLoader loader, final ClassLoader parent, final AddonInfo addonInfo, final File dataFolder, final File file) throws InvalidAddonException, MalformedURLException {
+    public AddonClassLoader(final AddonLoader loader, final ClassLoader parent, final AddonInfo addonInfo, List<InputStream> datagenInputStreams, final File dataFolder, final File file) throws InvalidAddonException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, parent);
         if (loader == null) throw new IllegalArgumentException("Loader can't be null");
 
         this.loader = loader;
         this.addonInfo = addonInfo;
+        this.datagenInputStreams = datagenInputStreams;
         this.dataFolder = dataFolder;
         this.file = file;
 
@@ -114,6 +118,6 @@ public final class AddonClassLoader extends URLClassLoader {
 
         this.addonInit = addon;
 
-        addon.init(loader, addonInfo, dataFolder, file, this);
+        addon.init(loader, addonInfo, datagenInputStreams, dataFolder, file, this);
     }
 }

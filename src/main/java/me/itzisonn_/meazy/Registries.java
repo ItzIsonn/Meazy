@@ -34,10 +34,7 @@ import me.itzisonn_.meazy.runtime.interpreter.*;
 
 import java.io.File;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -137,7 +134,7 @@ public final class Registries {
     private static Gson gson = null;
 
     /**
-     * Updates Gson
+     * Updates {@link Registries#gson}
      *
      * @see Registries#CONVERTERS
      */
@@ -198,6 +195,11 @@ public final class Registries {
      * Registry for {@link EnvironmentFactory}
      */
     public static final SingleEntryRegistry<EnvironmentFactory> ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+
+    /**
+     * Set of native related {@link GlobalEnvironment}s
+     */
+    public static final Set<GlobalEnvironment> NATIVE_RELATED_GLOBAL_ENVIRONMENTS = new HashSet<>();
 
 
 
@@ -280,8 +282,9 @@ public final class Registries {
 
             return new Program(file, MeazyMain.VERSION, requiredAddons, body);
         });
-
         EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), program -> {
+            if (program.getFile() == null) throw new NullPointerException("Program's file is null");
+
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);

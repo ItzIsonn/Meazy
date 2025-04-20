@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.addon;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import lombok.Getter;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +12,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents an Addon
@@ -19,6 +22,8 @@ public abstract class Addon {
     private boolean isEnabled = false;
     private AddonLoader loader = null;
     private File file = null;
+    @Getter
+    private List<InputStream> datagenInputStreams = new ArrayList<>();
     private AddonInfo addonInfo = null;
     private File dataFolder = null;
     private ClassLoader classLoader = null;
@@ -28,16 +33,8 @@ public abstract class Addon {
 
     public Addon() {
         final ClassLoader classLoader = this.getClass().getClassLoader();
-        if (!(classLoader instanceof AddonClassLoader))
-            throw new IllegalStateException("Addon requires " + AddonClassLoader.class.getName());
-        ((AddonClassLoader) classLoader).initialize(this);
-    }
-
-    protected Addon(final AddonLoader loader, final AddonInfo addonInfo, final File dataFolder, final File file) {
-        final ClassLoader classLoader = this.getClass().getClassLoader();
-        if (classLoader instanceof AddonClassLoader)
-            throw new IllegalStateException("Can't use initialization constructor at runtime");
-        init(loader, addonInfo, dataFolder, file, classLoader);
+        if (!(classLoader instanceof AddonClassLoader addonClassLoader)) throw new IllegalStateException("Addon requires " + AddonClassLoader.class.getName());
+        addonClassLoader.initialize(this);
     }
 
     /**
@@ -217,10 +214,11 @@ public abstract class Addon {
         else throw new AddonEnableException("Addon has already been enabled");
     }
 
-    public final void init(AddonLoader loader, AddonInfo addonInfo, File dataFolder, File file, ClassLoader classLoader) {
+    public final void init(AddonLoader loader, AddonInfo addonInfo, List<InputStream> datagenInputStreams, File dataFolder, File file, ClassLoader classLoader) {
         this.loader = loader;
         this.file = file;
         this.addonInfo = addonInfo;
+        this.datagenInputStreams = datagenInputStreams;
         this.dataFolder = dataFolder;
         this.classLoader = classLoader;
         this.configFile = new File(dataFolder, "config.json");

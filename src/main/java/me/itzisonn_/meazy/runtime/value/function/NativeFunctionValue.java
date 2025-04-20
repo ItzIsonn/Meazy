@@ -4,8 +4,8 @@ import lombok.EqualsAndHashCode;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
-import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 import java.util.List;
@@ -33,5 +33,5 @@ public abstract class NativeFunctionValue extends FunctionValue {
      * @param functionArgs Args given to this function
      * @param functionEnvironment Unique Environment of this function
      */
-    public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, Environment functionEnvironment);
+    public abstract RuntimeValue<?> run(List<RuntimeValue<?>> functionArgs, FunctionEnvironment functionEnvironment);
 }
