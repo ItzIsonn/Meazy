@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.addon.addon_info;
 
 import com.google.gson.*;
 import lombok.Getter;
-import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.InvalidAddonInfoException;
@@ -88,7 +88,7 @@ public final class AddonInfo {
     /**
      *  Id of the addon. This id is a unique identifier for addons.
      *  <ul>
-     *  <li>Must match {@link me.itzisonn_.meazy.Utils#IDENTIFIER_REGEX}
+     *  <li>Must match {@link MeazyMain#IDENTIFIER_REGEX}
      *  <li>Used to determine the name of the addon's data folder. Data
      *      folders are placed in the ./addons/ directory and
      *      should be used to reference the data folder
@@ -130,7 +130,6 @@ public final class AddonInfo {
      *  Example: <blockquote><pre>"main": "org.example.addon.MyAddon"</pre></blockquote>
      */
     private final String main;
-
     /**
      *  A human-friendly description of the functionality the addon provides.
      *  <p>
@@ -217,17 +216,17 @@ public final class AddonInfo {
 
     public AddonInfo(String id, Version version, String main, String description, List<String> authors,
                      List<String> depend, List<String> softDepend, List<String> loadBefore) throws InvalidAddonInfoException {
-        if (!id.matches(Utils.IDENTIFIER_REGEX)) throw new InvalidAddonInfoException("Id doesn't match Identifier Regex");
+        if (!id.matches(MeazyMain.IDENTIFIER_REGEX)) throw new InvalidAddonInfoException("Id doesn't match Identifier Regex");
         for (String string : depend) {
-            if (!string.matches(Utils.IDENTIFIER_REGEX))
+            if (!string.matches(MeazyMain.IDENTIFIER_REGEX))
                 throw new InvalidAddonInfoException(string + " in depend list doesn't match Identifier Regex");
         }
         for (String string : softDepend) {
-            if (!string.matches(Utils.IDENTIFIER_REGEX))
+            if (!string.matches(MeazyMain.IDENTIFIER_REGEX))
                 throw new InvalidAddonInfoException(string + " in softdepend list doesn't match Identifier Regex");
         }
         for (String string : loadBefore) {
-            if (!string.matches(Utils.IDENTIFIER_REGEX))
+            if (!string.matches(MeazyMain.IDENTIFIER_REGEX))
                 throw new InvalidAddonInfoException(string + " in loadbefore list doesn't match Identifier Regex");
         }
 

@@ -15,7 +15,7 @@ public class Program implements Statement {
     /**
      * File that contains this program
      */
-    private final File file;
+    private File file;
     /**
      * Version
      */
@@ -30,18 +30,21 @@ public class Program implements Statement {
     private final List<Statement> body;
 
     /**
-     * @param file File that contains this program
+     * Main constructor
+     *
+     * @param file File that contains this program or null
      * @param version Version
      * @param requiredAddons Required addons
      * @param body Body
      *
-     * @throws NullPointerException If either file, version, requiredAddons or body is null
+     * @throws NullPointerException If either version, requiredAddons or body is null
      * @throws IllegalArgumentException If file doesn't exist or is a directory
      */
     public Program(File file, Version version, Map<String, Version> requiredAddons, List<Statement> body) throws NullPointerException, IllegalArgumentException {
-        if (file == null) throw new NullPointerException("File can't be null");
-        if (!file.exists()) throw new IllegalArgumentException("File doesn't exist");
-        if (file.isDirectory()) throw new IllegalArgumentException("File can't be directory");
+        if (file != null) {
+            if (!file.exists()) throw new IllegalArgumentException("File doesn't exist");
+            if (file.isDirectory()) throw new IllegalArgumentException("File can't be directory");
+        }
 
         if (version == null) throw new NullPointerException("Version can't be null");
         if (requiredAddons == null) throw new NullPointerException("RequiredAddons can't be null");
@@ -51,6 +54,37 @@ public class Program implements Statement {
         this.version = version;
         this.requiredAddons = requiredAddons;
         this.body = body;
+    }
+
+    /**
+     * Constructor with file set to null
+     *
+     * @param version Version
+     * @param requiredAddons Required addons
+     * @param body Body
+     *
+     * @throws NullPointerException If either version, requiredAddons or body is null
+     */
+    public Program(Version version, Map<String, Version> requiredAddons, List<Statement> body) throws NullPointerException {
+        this(null, version, requiredAddons, body);
+    }
+
+    /**
+     * Sets file of this program to given file
+     * @param file File that contains this program
+     *
+     * @throws NullPointerException If given file is null
+     * @throws IllegalStateException If this program already have had file
+     * @throws IllegalArgumentException If file doesn't exist or is a directory
+     */
+    public void setFile(File file) throws NullPointerException, IllegalStateException {
+        if (file == null) throw new NullPointerException("File can't be null");
+        if (this.file != null) throw new IllegalStateException("Can't override existing file value");
+
+        if (!file.exists()) throw new IllegalArgumentException("File doesn't exist");
+        if (file.isDirectory()) throw new IllegalArgumentException("File can't be directory");
+
+        this.file = file;
     }
 
     @Override

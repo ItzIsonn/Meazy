@@ -4,14 +4,14 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import org.apache.logging.log4j.Level;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 /**
  * Represents an AddonLoader, allowing addons in the form of .jar
@@ -28,22 +28,24 @@ public class AddonLoader {
             throw new InvalidAddonException(new FileNotFoundException(file.getPath() + " doesn't exist"));
         }
 
-        final AddonInfo description;
+        final AddonInfo addonInfo;
         try {
-            description = getAddonInfo(file);
+            addonInfo = getAddonInfo(file);
         }
         catch (InvalidAddonInfoException e) {
             throw new InvalidAddonException(e);
         }
 
+        List<InputStream> datagenInputStream = getDatagenInputStreams(file);
+
         final File parentFile = file.getParentFile();
-        final File dataFolder = new File(parentFile, description.getId());
+        final File dataFolder = new File(parentFile, addonInfo.getId());
 
         if (dataFolder.exists() && !dataFolder.isDirectory()) {
-            throw new InvalidAddonException("Projected datafolder: '" + dataFolder + "' for " + description.getFullName() + " (" + file + ") exists and isn't a directory");
+            throw new InvalidAddonException("Projected datafolder: '" + dataFolder + "' for " + addonInfo.getFullName() + " (" + file + ") exists and isn't a directory");
         }
 
-        for (final String addonName : description.getDepend()) {
+        for (final String addonName : addonInfo.getDepend()) {
             AddonClassLoader current = loaders.get(addonName);
 
             if (current == null) {
@@ -53,7 +55,7 @@ public class AddonLoader {
 
         final AddonClassLoader loader;
         try {
-            loader = new AddonClassLoader(this, getClass().getClassLoader(), description, dataFolder, file);
+            loader = new AddonClassLoader(this, getClass().getClassLoader(), addonInfo, datagenInputStream, dataFolder, file);
         }
         catch (InvalidAddonException e) {
             throw e;
@@ -62,7 +64,7 @@ public class AddonLoader {
             throw new InvalidAddonException(e);
         }
 
-        loaders.put(description.getId(), loader);
+        loaders.put(addonInfo.getId(), loader);
 
         return loader.addon;
     }
@@ -101,6 +103,36 @@ public class AddonLoader {
                 catch (IOException ignored) {}
             }
         }
+    }
+
+    /**
+     *
+     * @param file Addon's jar file
+     * @return List of datagen input streams
+     */
+    public List<InputStream> getDatagenInputStreams(File file) {
+        if (file == null) throw new IllegalArgumentException("File can't be null");
+        List<InputStream> inputStreams = new ArrayList<>();
+
+        try {
+            ZipFile zipFile = new ZipFile(file);
+            ZipInputStream inputStream = new ZipInputStream(new FileInputStream(file));
+
+            ZipEntry zipEntry = inputStream.getNextEntry();
+            while (zipEntry != null) {
+                if (!zipEntry.getName().startsWith("datagen/") || zipEntry.isDirectory()) {
+                    zipEntry = inputStream.getNextEntry();
+                    continue;
+                }
+
+                inputStreams.add(zipFile.getInputStream(zipEntry));
+
+                zipEntry = inputStream.getNextEntry();
+            }
+        }
+        catch (IOException ignored) {}
+
+        return inputStreams;
     }
 
     public Pattern[] getAddonFileFilters() {

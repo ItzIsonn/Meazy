@@ -1,20 +1,12 @@
 package me.itzisonn_.meazy;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 /**
- * Utility class
+ * Different file utils
  */
-public final class Utils {
-    private Utils() {}
-
-    /**
-     * Regex used by all identifiers
-     */
-    public static final String IDENTIFIER_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*";
+public final class FileUtils {
+    private FileUtils() {}
 
     /**
      * Returns extension of given file
@@ -46,8 +38,27 @@ public final class Utils {
     public static String getLines(File file) throws NullPointerException {
         if (file == null) throw new NullPointerException("File can't be null");
 
+        try {
+            return getLines(new FileInputStream(file));
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException("File doesn't exist", e);
+        }
+    }
+
+    /**
+     * Returns lines of given inputStream
+     *
+     * @param inputStream Input stream
+     * @return Lines of input stream
+     *
+     * @throws NullPointerException When given inputStream is null
+     */
+    public static String getLines(InputStream inputStream) throws NullPointerException {
+        if (inputStream == null) throw new NullPointerException("InputStream can't be null");
+
         StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line = reader.readLine();
 
             while (line != null) {

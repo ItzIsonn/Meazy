@@ -1,10 +1,11 @@
 package me.itzisonn_.meazy.command;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.Utils;
+import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.lexer.Token;
+import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.registry.RegistryEntry;
@@ -177,17 +178,18 @@ public final class Commands {
 
                 MeazyMain.LOGGER.log(Level.INFO, "Running file '{}'", file.getAbsolutePath());
 
-                String extension = Utils.getExtension(file);
+                String extension = FileUtils.getExtension(file);
                 long startMillis = System.currentTimeMillis();
 
                 Program program;
                 switch (extension) {
                     case "mea" -> {
-                        List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
+                        List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(FileUtils.getLines(file));
+                        Parser.reset();
                         program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(file, tokens);
                     }
                     case "meac" -> {
-                        program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
+                        program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
                         if (program == null) {
                             MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
                             return null;
@@ -199,6 +201,7 @@ public final class Commands {
                         if (MeazyMain.VERSION.isAfter(program.getVersion())) {
                             MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
                         }
+                        program.setFile(file);
                     }
                     default -> {
                         MeazyMain.LOGGER.log(Level.ERROR, "Can't run file with extension {}", extension);
@@ -222,15 +225,15 @@ public final class Commands {
                     return null;
                 }
 
-                if (!Utils.getExtension(file).equals("mea")) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't compile file with extension {}", Utils.getExtension(file));
+                if (!FileUtils.getExtension(file).equals("mea")) {
+                    MeazyMain.LOGGER.log(Level.ERROR, "Can't compile file with extension {}", FileUtils.getExtension(file));
                     return null;
                 }
 
                 MeazyMain.LOGGER.log(Level.INFO, "Compiling file '{}'", file.getAbsolutePath());
 
                 long startMillis = System.currentTimeMillis();
-                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(Utils.getLines(file));
+                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(FileUtils.getLines(file));
 
                 Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(file, tokens);
                 long endMillis = System.currentTimeMillis();
@@ -279,15 +282,15 @@ public final class Commands {
                     return null;
                 }
 
-                if (!Utils.getExtension(file).equals("meac")) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't decompile file with extension {}", Utils.getExtension(file));
+                if (!FileUtils.getExtension(file).equals("meac")) {
+                    MeazyMain.LOGGER.log(Level.ERROR, "Can't decompile file with extension {}", FileUtils.getExtension(file));
                     return null;
                 }
 
                 MeazyMain.LOGGER.log(Level.INFO, "Decompiling file '{}'", file.getAbsolutePath());
 
                 long startMillis = System.currentTimeMillis();
-                Program program = Registries.getGson().fromJson(Utils.getLines(file), Program.class);
+                Program program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
                 if (program == null) {
                     MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
                     return null;
@@ -299,6 +302,7 @@ public final class Commands {
                 if (MeazyMain.VERSION.isAfter(program.getVersion())) {
                     MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
                 }
+                program.setFile(file);
                 long endMillis = System.currentTimeMillis();
 
 

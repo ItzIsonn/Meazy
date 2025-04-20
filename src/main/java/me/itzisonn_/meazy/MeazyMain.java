@@ -4,6 +4,11 @@ import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
+import me.itzisonn_.meazy.lexer.Token;
+import me.itzisonn_.meazy.parser.Parser;
+import me.itzisonn_.meazy.parser.ast.Program;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
 import org.apache.logging.log4j.Level;
@@ -13,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 
 public final class MeazyMain {
     public static final Version VERSION = Version.of("2.6");
@@ -20,6 +26,11 @@ public final class MeazyMain {
 
     public static final AddonManager ADDON_MANAGER = new AddonManager();
     public static final File ADDONS_DIRECTORY = getAddonsDirectory();
+
+    /**
+     * Regex used by all identifiers
+     */
+    public static final String IDENTIFIER_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*";
 
     private static boolean isInit = false;
 
@@ -87,6 +98,17 @@ public final class MeazyMain {
     private static void loadAddons() {
         for (Addon addon : ADDON_MANAGER.loadAddons(ADDONS_DIRECTORY)) {
             ADDON_MANAGER.enableAddon(addon);
+
+            for (InputStream inputStream : addon.getDatagenInputStreams()) {
+                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(FileUtils.getLines(inputStream));
+
+                Parser.reset();
+                Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(null, tokens);
+
+                GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(program.getFile());
+                Interpreter.evaluate(program, globalEnvironment);
+                Registries.NATIVE_RELATED_GLOBAL_ENVIRONMENTS.add(globalEnvironment);
+            }
         }
 
         int addons = ADDON_MANAGER.getAddons().length;
