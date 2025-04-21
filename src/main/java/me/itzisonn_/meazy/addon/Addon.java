@@ -23,7 +23,7 @@ public abstract class Addon {
     private AddonLoader loader = null;
     private File file = null;
     @Getter
-    private List<InputStream> datagenInputStreams = new ArrayList<>();
+    private List<String> datagenFilesLines = new ArrayList<>();
     private AddonInfo addonInfo = null;
     private File dataFolder = null;
     private ClassLoader classLoader = null;
@@ -214,11 +214,11 @@ public abstract class Addon {
         else throw new AddonEnableException("Addon has already been enabled");
     }
 
-    public final void init(AddonLoader loader, AddonInfo addonInfo, List<InputStream> datagenInputStreams, File dataFolder, File file, ClassLoader classLoader) {
+    public final void init(AddonLoader loader, AddonInfo addonInfo, List<String> datagenFilesLines, File dataFolder, File file, ClassLoader classLoader) {
         this.loader = loader;
         this.file = file;
         this.addonInfo = addonInfo;
-        this.datagenInputStreams = datagenInputStreams;
+        this.datagenFilesLines = datagenFilesLines;
         this.dataFolder = dataFolder;
         this.classLoader = classLoader;
         this.configFile = new File(dataFolder, "config.json");

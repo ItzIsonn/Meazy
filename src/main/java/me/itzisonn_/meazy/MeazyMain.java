@@ -99,8 +99,8 @@ public final class MeazyMain {
         for (Addon addon : ADDON_MANAGER.loadAddons(ADDONS_DIRECTORY)) {
             ADDON_MANAGER.enableAddon(addon);
 
-            for (InputStream inputStream : addon.getDatagenInputStreams()) {
-                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(FileUtils.getLines(inputStream));
+            for (String lines : addon.getDatagenFilesLines()) {
+                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(lines);
 
                 Parser.reset();
                 Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(null, tokens);
