@@ -154,6 +154,15 @@ public final class AddonInfo {
     private final List<String> authors;
 
     /**
+     *  Version of Meazy that the addon requires.
+     *  <p>
+     *  In the addon.json, this entry is named <code>core_depend</code>.
+     *  <p>
+     *  Example: <blockquote><pre>"core_depend": "2.6"</pre></blockquote>
+     */
+    private final Version coreDepend;
+
+    /**
      *  Gives a list of other addons that the addon requires.
      *  <ul>
      *  <li>Use the value in the {@link #getId()} of the target addon to specify the dependency.
@@ -214,7 +223,7 @@ public final class AddonInfo {
             .registerTypeAdapter(AddonInfo.class, new AddonInfoDeserializer())
             .create();
 
-    public AddonInfo(String id, Version version, String main, String description, List<String> authors,
+    public AddonInfo(String id, Version version, String main, String description, List<String> authors, Version coreDepend,
                      List<String> depend, List<String> softDepend, List<String> loadBefore) throws InvalidAddonInfoException {
         if (!id.matches(MeazyMain.IDENTIFIER_REGEX)) throw new InvalidAddonInfoException("Id doesn't match Identifier Regex");
         for (String string : depend) {
@@ -235,6 +244,7 @@ public final class AddonInfo {
         this.main = main;
         this.description = description;
         this.authors = authors;
+        this.coreDepend = coreDepend;
         this.depend = depend;
         this.softDepend = softDepend;
         this.loadBefore = loadBefore;

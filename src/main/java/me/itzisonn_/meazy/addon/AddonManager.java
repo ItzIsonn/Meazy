@@ -73,6 +73,12 @@ public final class AddonManager {
                     MeazyMain.LOGGER.log(Level.WARN, "Addon `{}' uses the space-character (0x20) in its name `{}' - this is discouraged",
                         addonInfo.getFullName(), addonInfo.getId());
                 }
+
+                if (addonInfo.getCoreDepend() != null && !addonInfo.getCoreDepend().equals(MeazyMain.VERSION)) {
+                    MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}': Unsupported version {}",
+                            file.getPath(), directory.getPath(), addonInfo.getCoreDepend());
+                    continue;
+                }
             }
             catch (InvalidAddonInfoException e) {
                 MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'",

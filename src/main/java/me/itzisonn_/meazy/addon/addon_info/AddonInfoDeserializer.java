@@ -26,6 +26,10 @@ public class AddonInfoDeserializer implements JsonDeserializer<AddonInfo> {
         else if (jsonObject.get("authors") != null) authors = jsonObject.get("authors").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList();
         else authors = new ArrayList<>();
 
+        Version coreDepend;
+        if (jsonObject.get("core_depend") != null) coreDepend = Version.of(jsonObject.get("core_depend").getAsString());
+        else coreDepend = null;
+
         List<String> depend;
         if (jsonObject.get("depend") != null) depend = jsonObject.get("depend").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList();
         else depend = new ArrayList<>();
@@ -39,7 +43,7 @@ public class AddonInfoDeserializer implements JsonDeserializer<AddonInfo> {
         else loadBefore = new ArrayList<>();
 
         try {
-            return new AddonInfo(id, Version.of(version), main, description, authors, depend, softDepend, loadBefore);
+            return new AddonInfo(id, Version.of(version), main, description, authors, coreDepend, depend, softDepend, loadBefore);
         }
         catch (InvalidAddonInfoException e) {
             throw new RuntimeException(e);
