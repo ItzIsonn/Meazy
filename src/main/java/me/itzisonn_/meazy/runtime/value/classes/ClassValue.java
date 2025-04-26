@@ -36,7 +36,7 @@ public abstract class ClassValue extends RuntimeValue<Object> {
         if (baseClasses == null) throw new NullPointerException("BaseClasses can't be null");
         if (environment == null) throw new NullPointerException("Environment can't be null");
 
-        this.baseClasses = baseClasses;
+        this.baseClasses = new HashSet<>(baseClasses);
         this.environment = environment;
     }
 
