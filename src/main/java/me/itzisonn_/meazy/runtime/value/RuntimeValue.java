@@ -1,32 +1,20 @@
 package me.itzisonn_.meazy.runtime.value;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
 /**
  * Is used to represent values in runtime
  * @param <T> Type of stored value
  */
-@Getter
-@EqualsAndHashCode
-public class RuntimeValue<T> {
+public interface RuntimeValue<T> {
     /**
-     * Value
+     * @return Stored value
      */
-    private final T value;
-
-    /**
-     * @param value Value to store
-     */
-    public RuntimeValue(T value) {
-        this.value = value;
-    }
+    T getValue();
 
     /**
      * Searches for not-{@link RuntimeValue} value through this {@link RuntimeValue} and it's values
      * @return Final value
      */
-    public final Object getFinalValue() {
+    default Object getFinalValue() {
         Object value = getValue();
         while (value instanceof RuntimeValue<?> runtimeValue) {
             value = runtimeValue.getValue();
@@ -38,16 +26,11 @@ public class RuntimeValue<T> {
      * Searches for final {@link RuntimeValue} value through this {@link RuntimeValue} and it's values
      * @return Final RuntimeValue
      */
-    public final RuntimeValue<?> getFinalRuntimeValue() {
+    default RuntimeValue<?> getFinalRuntimeValue() {
         RuntimeValue<?> value = this;
         while (value.getValue() instanceof RuntimeValue<?> runtimeValue) {
             value = runtimeValue;
         }
         return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(getValue());
     }
 }
