@@ -1,7 +1,5 @@
 package me.itzisonn_.meazy.runtime.value;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -13,65 +11,36 @@ import java.util.Set;
 /**
  * Represents runtime variable value
  */
-@Getter
-@EqualsAndHashCode(callSuper = true)
-public class VariableValue extends RuntimeValue<RuntimeValue<?>> {
+public interface VariableValue extends RuntimeValue<RuntimeValue<?>> {
     /**
-     * Id
+     * @return Id
      */
-    private final String id;
-    /**
-     * DataType
-     */
-    private final DataType dataType;
-    /**
-     * Value
-     */
-    private RuntimeValue<?> value;
-    /**
-     * Whether value is constant
-     */
-    private final boolean isConstant;
-    /**
-     * Modifiers
-     */
-    private final Set<Modifier> modifiers;
-    /**
-     * Whether this variable is argument
-     */
-    private final boolean isArgument;
-    /**
-     * Parent Environment
-     */
-    private final Environment parentEnvironment;
+    String getId();
 
     /**
-     * @param id Id
-     * @param dataType DataType
-     * @param value Value
-     * @param isConstant Whether value is constant
-     * @param modifiers Modifiers
-     * @param isArgument Whether this variable is argument
-     * @param parentEnvironment Parent environment
-     *
-     * @throws NullPointerException If either id, dataType or modifiers is null
+     * @return DataType
      */
-    public VariableValue(String id, DataType dataType, RuntimeValue<?> value, boolean isConstant, Set<Modifier> modifiers, boolean isArgument, Environment parentEnvironment) throws NullPointerException {
-        super(null);
+    DataType getDataType();
 
-        if (id == null) throw new NullPointerException("Id can't be null");
-        if (dataType == null) throw new NullPointerException("DataType can't be null");
-        if (modifiers == null) throw new NullPointerException("Modifiers can't be null");
-        if (parentEnvironment == null) throw new NullPointerException("ParentEnvironment can't be null");
+    /**
+     * @return Whether value is constant
+     */
+    boolean isConstant();
 
-        this.id = id;
-        this.dataType = dataType;
-        this.parentEnvironment = parentEnvironment;
-        setValue(value);
-        this.isConstant = isConstant;
-        this.modifiers = modifiers;
-        this.isArgument = isArgument;
-    }
+    /**
+     * @return Modifiers
+     */
+    Set<Modifier> getModifiers();
+
+    /**
+     * @return Whether this variable is argument
+     */
+    boolean isArgument();
+
+    /**
+     * @return Parent Environment
+     */
+    Environment getParentEnvironment();
 
     /**
      * Sets this variable's value to given value
@@ -79,14 +48,7 @@ public class VariableValue extends RuntimeValue<RuntimeValue<?>> {
      * @param value New value
      *
      * @throws InvalidSyntaxException If this variable is constant and already have a value
-     * @throws InvalidValueException If given value doesn't match this variable's {@link VariableValue#dataType}
+     * @throws InvalidValueException If given value doesn't match this variable's data type
      */
-    public void setValue(RuntimeValue<?> value) throws InvalidSyntaxException, InvalidValueException {
-        if (isConstant && this.value != null && this.value.getFinalValue() != null) {
-            throw new InvalidSyntaxException("Can't reassign value of constant variable " + id);
-        }
-
-        if (!dataType.isMatches(value, parentEnvironment.getGlobalEnvironment())) throw new InvalidValueException("Variable with id " + id + " requires data type " + dataType.getId());
-        this.value = value;
-    }
+    void setValue(RuntimeValue<?> value) throws InvalidSyntaxException, InvalidValueException;
 }
