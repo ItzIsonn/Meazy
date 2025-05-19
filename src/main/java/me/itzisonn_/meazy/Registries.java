@@ -313,12 +313,12 @@ public final class Registries {
 
     /**
      * Creates new RegistryIdentifier with 'meazy' namespace
-     * <p>
-     * <i>Recommended to use {@link RegistryIdentifier#of(String, String)} or {@link RegistryIdentifier#of(String)}
-     * because 'meazy' namespace belongs to core identifiers</i>
      *
      * @param id Identifier's id that matches {@link RegistryIdentifier#IDENTIFIER_REGEX}
      * @return New RegistryIdentifier
+     *
+     * @apiNote Recommended to use {@link RegistryIdentifier#of(String, String)} or {@link RegistryIdentifier#of(String)}
+     *          because 'meazy' namespace belongs to core identifiers
      *
      * @throws NullPointerException If id is null
      * @throws IllegalArgumentException If id doesn't match {@link RegistryIdentifier#IDENTIFIER_REGEX}

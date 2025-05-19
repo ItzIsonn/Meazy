@@ -1,22 +1,21 @@
 package me.itzisonn_.meazy.parser;
 
 /**
- * InvalidStatementException is thrown when {@link ParsingFunction} can't parse statement
+ * Is thrown when {@link ParsingFunction} can't parse statement
  */
 public class InvalidStatementException extends RuntimeException {
     /**
-     * InvalidStatementException constructor
-     *
-     * @param message Exception's message
+     * Main constructor
+     * @param message Message
      */
     public InvalidStatementException(String message) {
         super(message);
     }
 
     /**
-     * InvalidStatementException constructor. Supers message in format 'At line {@code line}: {@code message}'
+     * Constructor that supers message in format 'At line {@code line}: {@code message}'
      *
-     * @param message Exception's message
+     * @param message Message
      * @param line Line where exception occurred
      */
     public InvalidStatementException(String message, int line) {

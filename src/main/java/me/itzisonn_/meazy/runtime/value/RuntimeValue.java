@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.value;
 
 /**
- * Is used to represent values in runtime
+ * Represents value in runtime
  * @param <T> Type of stored value
  */
 public interface RuntimeValue<T> {

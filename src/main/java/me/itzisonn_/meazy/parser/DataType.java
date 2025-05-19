@@ -14,19 +14,17 @@ import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
 @EqualsAndHashCode
 public class DataType {
     /**
-     * DataType's id
+     * Id
      */
     private final String id;
     /**
-     * Whether this DataType accepts {@link NullValue}
+     * Whether this data type accepts {@link NullValue}
      */
     private final boolean isNullable;
 
     /**
-     * DataType constructor
-     *
-     * @param id DataType's id
-     * @param isNullable Whether this DataType accepts {@link NullValue}
+     * @param id Id
+     * @param isNullable Whether this data type accepts {@link NullValue}
      *
      * @throws NullPointerException If given id is null
      */
@@ -38,11 +36,11 @@ public class DataType {
     }
 
     /**
-     * Checks whether given value matches this DataType
+     * Checks whether given value matches this data type
      *
      * @param value Value to check
-     * @param globalEnvironment GlobalEnvironment that contains class with this DataType's name
-     * @return Whether given value matches this DataType
+     * @param globalEnvironment Global environment that contains class with this data type's name
+     * @return Whether given value matches this data type
      *
      * @throws NullPointerException If given globalEnvironment is null
      */

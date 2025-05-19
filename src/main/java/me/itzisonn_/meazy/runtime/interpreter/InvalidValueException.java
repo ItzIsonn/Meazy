@@ -5,7 +5,7 @@ package me.itzisonn_.meazy.runtime.interpreter;
  */
 public class InvalidValueException extends RuntimeException {
     /**
-     * @param message Exception's message
+     * @param message Message
      */
     public InvalidValueException(String message) {
         super(message);

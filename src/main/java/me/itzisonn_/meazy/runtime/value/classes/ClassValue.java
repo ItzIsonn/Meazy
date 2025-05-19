@@ -14,6 +14,7 @@ public interface ClassValue extends RuntimeValue<Object> {
      * @return Base classes
      */
     Set<String> getBaseClasses();
+
     /**
      * @return Environment
      */

@@ -3,7 +3,7 @@ package me.itzisonn_.meazy;
 import java.io.*;
 
 /**
- * Different file utils
+ * File utils
  */
 public final class FileUtils {
     private FileUtils() {}

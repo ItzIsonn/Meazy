@@ -15,27 +15,25 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode
 public class Version {
     /**
-     * Version's parts
+     * Parts
      */
     private final List<Integer> parts;
     /**
-     * Version's type
+     * Type
      */
     private final VersionType type;
     /**
-     * Version's ordinal
+     * Ordinal
      */
     private final int ordinal;
 
     /**
-     * Version constructor
-     *
-     * @param parts Version's parts
-     * @param type Version's type
-     * @param ordinal Version's ordinal
+     * @param parts Parts
+     * @param type Type
+     * @param ordinal Ordinal
      *
      * @throws NullPointerException If either parts or type is null
-     * @throws IllegalArgumentException If parts is empty
+     * @throws IllegalArgumentException If given parts is empty
      */
     public Version(List<Integer> parts, VersionType type, int ordinal) throws NullPointerException, IllegalArgumentException {
         if (parts == null) throw new NullPointerException("Parts can't be null");
@@ -48,14 +46,15 @@ public class Version {
     }
 
     /**
-     * Checks if given version is before this Version
+     * Checks if given version is before this version
      *
      * @param version Version to check
-     * @return Whether given version is before this Version
+     * @return Whether given version is before this version
      */
     public boolean isBefore(Version version) {
         List<Integer> parts1 = parts;
         List<Integer> parts2 = version.getParts();
+
         for (int i = 0; i < Math.max(parts1.size(), parts2.size()); i++) {
             int part1 = i < parts1.size() ? parts1.get(i) : 0;
             int part2 = i < parts2.size() ? parts2.get(i) : 0;
@@ -71,10 +70,10 @@ public class Version {
     }
 
     /**
-     * Checks if given version is after this Version
+     * Checks if given version is after this version
      *
      * @param version Version to check
-     * @return Whether given version is after this Version
+     * @return Whether given version is after this version
      */
     public boolean isAfter(Version version) {
         return !equals(version) && !isBefore(version);
@@ -108,7 +107,7 @@ public class Version {
     }
 
     /**
-     * Parses given string into Version
+     * Parses given string into {@link Version}
      *
      * @param version String to parse
      * @return Parsed version

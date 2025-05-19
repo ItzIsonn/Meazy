@@ -1,22 +1,21 @@
 package me.itzisonn_.meazy.parser;
 
 /**
- * UnexpectedTokenException is thrown when {@link ParsingFunction} meets unexpected token
+ * Is thrown when {@link ParsingFunction} meets unexpected token
  */
 public class UnexpectedTokenException extends RuntimeException {
     /**
-     * UnexpectedTokenException constructor
-     *
-     * @param message Exception's message
+     * Main constructor
+     * @param message Message
      */
     public UnexpectedTokenException(String message) {
         super(message);
     }
 
     /**
-     * UnexpectedTokenException constructor. Supers message in format 'At line {@code line}: {@code message}'
+     * Constructor that supers message in format 'At line {@code line}: {@code message}'
      *
-     * @param message Exception's message
+     * @param message Message
      * @param line Line where exception occurred
      */
     public UnexpectedTokenException(String message, int line) {

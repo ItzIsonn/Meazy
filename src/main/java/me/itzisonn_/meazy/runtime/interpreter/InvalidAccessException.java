@@ -5,7 +5,7 @@ package me.itzisonn_.meazy.runtime.interpreter;
  */
 public class InvalidAccessException extends RuntimeException {
     /**
-     * @param message Exception's message
+     * @param message Message
      */
     public InvalidAccessException(String message) {
         super(message);

@@ -15,6 +15,7 @@ public class TokenTypeSet {
 
     /**
      * Main constructor
+     *
      * @param tokenTypes Set of TokenTypes
      * @throws NullPointerException If given set is null
      */

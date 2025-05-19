@@ -9,20 +9,20 @@ import me.itzisonn_.registry.RegistryIdentifier;
 import java.lang.reflect.ParameterizedType;
 
 /**
- * Json object converter
- * @param <T> Converted Statement's type
+ * Represents json object converter
+ *
+ * @param <T> Converted statement's type
  * @see Registries#CONVERTERS
  */
 @Getter
 public abstract class Converter<T extends Statement> implements JsonDeserializer<T>, JsonSerializer<T> {
     /**
-     * Converter's RegistryIdentifier
+     * Registry identifier
      */
     private final RegistryIdentifier id;
 
     /**
-     * Converter constructor
-     * @param id Converter's id
+     * @param id Registry identifier
      * @throws NullPointerException If given id is null
      */
     protected Converter(RegistryIdentifier id) {
@@ -31,9 +31,10 @@ public abstract class Converter<T extends Statement> implements JsonDeserializer
     }
 
     /**
-     * Checks type of given JsonObject
+     * Checks type of given object
+     *
      * @param object JsonObject to check
-     * @throws InvalidCompiledFileException If JsonObject doesn't contain member {@code type} or it's value doesn't match this converter's id
+     * @throws InvalidCompiledFileException If given object doesn't contain member {@code type} or it's value doesn't match this converter's id
      */
     @SuppressWarnings("unchecked")
     protected final void checkType(JsonObject object) throws InvalidCompiledFileException {
@@ -45,7 +46,7 @@ public abstract class Converter<T extends Statement> implements JsonDeserializer
     }
 
     /**
-     * @return JsonObject with property {@code type} set to this converter's id
+     * @return {@link JsonObject} with property {@code type} set to this converter's id
      */
     protected final JsonObject getJsonObject() {
         JsonObject result = new JsonObject();

@@ -9,24 +9,24 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 @Getter
 public abstract class Operator {
     /**
-     * Operator's symbol
+     * Symbol
      */
     private final String symbol;
     /**
-     * Operator's type
+     * Operator type
      */
     private final OperatorType operatorType;
     /**
-     * Whether this Operator is overridable by operator functions
+     * Whether this operator is overridable by operator functions
      */
     private final boolean isOverridable;
 
     /**
-     * Operator constructor
+     * Main constructor
      *
-     * @param symbol Operator's symbol
-     * @param operatorType Operator's type
-     * @param isOverridable Whether this Operator is overridable by operator functions
+     * @param symbol Symbol
+     * @param operatorType Operator type
+     * @param isOverridable Whether this operator is overridable by operator functions
      *
      * @throws NullPointerException If either symbol or operatorType is null
      */
@@ -40,10 +40,10 @@ public abstract class Operator {
     }
 
     /**
-     * Operator constructor with isOverridable set to true
+     * Constructor with isOverridable set to true
      *
-     * @param symbol Operator's symbol
-     * @param operatorType Operator's type
+     * @param symbol Symbol
+     * @param operatorType Operator type
      *
      * @throws NullPointerException If either symbol or operatorType is null
      */
@@ -52,10 +52,10 @@ public abstract class Operator {
     }
 
     /**
-     * Calculates expression value with this Operator
+     * Calculates expression value with this operator
      *
      * @param value1 First value
-     * @param value2 Second value or null if this Operator's type isn't {@link OperatorType#INFIX}
+     * @param value2 Second value or null if this operator type isn't {@link OperatorType#INFIX}
      * @return Resulted value
      */
     public abstract RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2);

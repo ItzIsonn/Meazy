@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.Program;
  */
 public class InvalidFileException extends RuntimeException {
     /**
-     * @param message Exception's message
+     * @param message Message
      */
     public InvalidFileException(String message) {
         super(message);
