@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 /**
  * Represents function that is used to evaluate {@link Statement}s
+ *
  * @param <T> Type of Statement to evaluate
  * @see Registries#EVALUATION_FUNCTIONS
  */

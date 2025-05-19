@@ -5,7 +5,7 @@ package me.itzisonn_.meazy.runtime.interpreter;
  */
 public class InvalidSyntaxException extends RuntimeException {
     /**
-     * @param message Exception's message
+     * @param message Message
      */
     public InvalidSyntaxException(String message) {
         super(message);

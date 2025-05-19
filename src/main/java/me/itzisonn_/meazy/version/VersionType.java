@@ -24,8 +24,8 @@ public enum VersionType {
     RELEASE;
 
     /**
-     * @param string String representation of VersionType
-     * @return VersionType that matches given string or null
+     * @param string String representation of {@link VersionType}
+     * @return Version type that matches given string or null
      */
     public static VersionType of(String string) {
         return VERSION_TYPES.get(string.toUpperCase());

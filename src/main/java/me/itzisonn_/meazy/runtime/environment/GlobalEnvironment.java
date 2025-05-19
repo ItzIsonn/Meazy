@@ -25,6 +25,7 @@ public interface GlobalEnvironment extends Environment, FunctionDeclarationEnvir
     Set<GlobalEnvironment> getRelatedGlobalEnvironments();
 
 
+
     /**
      * Adds to this global environment given nativeClass that is used by native statements
      * @param nativeClass Class that is annotated with {@link MeazyNativeClass}
@@ -37,13 +38,15 @@ public interface GlobalEnvironment extends Environment, FunctionDeclarationEnvir
     Set<Class<?>> getNativeClasses();
 
 
+
     /**
      * @param id Variable's id
      * @return Declared variable with given id
      *
      * @throws NullPointerException If given id is null
      *
-     * @apiNote Difference from {@link Environment#getVariable(String)} is that this method doesn't look for variable in related global environments
+     * @apiNote Difference from {@link Environment#getVariable(String)} is that this method
+     *          doesn't look for variable in related global environments
      */
     VariableValue getLocalVariable(String id) throws NullPointerException;
 
@@ -65,7 +68,8 @@ public interface GlobalEnvironment extends Environment, FunctionDeclarationEnvir
      *
      * @throws NullPointerException If given id is null
      *
-     * @apiNote Difference from {@link ClassDeclarationEnvironment#getClass(String)} is that this method doesn't look for class in related global environments
+     * @apiNote Difference from {@link ClassDeclarationEnvironment#getClass(String)} is that this method
+     *          doesn't look for class in related global environments
      */
     ClassValue getLocalClass(String id) throws NullPointerException;
 }

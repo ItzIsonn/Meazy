@@ -12,13 +12,12 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 @EqualsAndHashCode
 public abstract class Modifier {
     /**
-     * Modifier's id
+     * Id
      */
     private final String id;
 
     /**
-     * Modifier constructor
-     * @param id Modifier's id
+     * @param id Id
      * @throws NullPointerException If given id is null
      */
     public Modifier(String id) throws NullPointerException {
@@ -27,10 +26,10 @@ public abstract class Modifier {
     }
 
     /**
-     * @param modifierStatement ModifierStatement with this Modifier
+     * @param modifierStatement Modifier statement with this modifier
      * @param environment Environment that has given modifierStatement in it
      *
-     * @return Whether this Modifier can be used on the given modifierStatement in given environment
+     * @return Whether this modifier can be used on the given modifierStatement in given environment
      */
     public abstract boolean canUse(ModifierStatement modifierStatement, Environment environment);
 

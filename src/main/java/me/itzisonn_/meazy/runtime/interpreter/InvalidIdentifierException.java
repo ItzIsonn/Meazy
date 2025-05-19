@@ -5,7 +5,7 @@ package me.itzisonn_.meazy.runtime.interpreter;
  */
 public class InvalidIdentifierException extends RuntimeException {
     /**
-     * @param message Exception's message
+     * @param message Message
      */
     public InvalidIdentifierException(String message) {
         super(message);

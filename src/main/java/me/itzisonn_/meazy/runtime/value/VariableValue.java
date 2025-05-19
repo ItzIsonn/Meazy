@@ -38,7 +38,7 @@ public interface VariableValue extends RuntimeValue<RuntimeValue<?>> {
     boolean isArgument();
 
     /**
-     * @return Parent Environment
+     * @return Parent environment
      */
     Environment getParentEnvironment();
 

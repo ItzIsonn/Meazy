@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.lexer.Token;
 
 /**
  * Represents function that is used to parse {@link Token}s into {@link Statement}
+ *
  * @param <T> Type of Statement to parse into
  * @see Registries#PARSING_FUNCTIONS
  */
