@@ -155,7 +155,7 @@ public final class Commands {
                             throw new RuntimeException(e);
                         }
 
-                        MeazyMain.LOGGER.log(Level.INFO, "Successfully loaded MeazyAddon v{}", MeazyMain.VERSION);
+                        MeazyMain.LOGGER.log(Level.INFO, "Successfully downloaded MeazyAddon v{}", MeazyMain.VERSION);
                         return null;
                     }
 
