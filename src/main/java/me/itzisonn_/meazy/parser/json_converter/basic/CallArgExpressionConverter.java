@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.json_converter.basic;
 
 import com.google.gson.*;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.CallArgExpression;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 
@@ -23,7 +23,7 @@ public class CallArgExpressionConverter extends Converter<CallArgExpression> {
         JsonObject dataTypeObject = getElement(object, "data_type").getAsJsonObject();
         String dataTypeId = getElement(dataTypeObject, "id", "data_type.id").getAsString();
         boolean dataTypeIsNullable = getElement(dataTypeObject, "is_nullable", "data_type.is_nullable").getAsBoolean();
-        DataType dataType = new DataType(dataTypeId, dataTypeIsNullable);
+        DataType dataType = Registries.DATA_TYPE_FACTORY.getEntry().getValue().create(dataTypeId, dataTypeIsNullable);
 
         boolean isConstant = getElement(object, "is_constant").getAsBoolean();
 

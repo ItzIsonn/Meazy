@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.data_type.DataType;
 
 /**
  * Represents an expression that is used as arg when defining callable statements

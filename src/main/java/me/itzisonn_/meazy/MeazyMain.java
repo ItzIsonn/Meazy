@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class MeazyMain {
-    public static final Version VERSION = Version.of("2.6");
+    public static final Version VERSION = Version.of("2.7");
     public static final Logger LOGGER = LogManager.getLogger("meazy");
 
     public static final AddonManager ADDON_MANAGER = new AddonManager();

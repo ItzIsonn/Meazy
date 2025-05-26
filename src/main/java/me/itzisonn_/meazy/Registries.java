@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.*;
+import me.itzisonn_.meazy.parser.data_type.DataTypeFactory;
 import me.itzisonn_.meazy.parser.json_converter.*;
 import me.itzisonn_.meazy.parser.json_converter.basic.CallArgExpressionConverter;
 import me.itzisonn_.meazy.parser.json_converter.basic.ExpressionConverter;
@@ -114,6 +115,11 @@ public final class Registries {
      * @see Parser
      */
     public static final SingleEntryRegistry<BiFunction<File, List<Token>, Program>> PARSE_TOKENS_FUNCTION = new SingleEntryRegistryImpl<>();
+
+    /**
+     * Registry for {@link DataTypeFactory}
+     */
+    public static final SingleEntryRegistry<DataTypeFactory> DATA_TYPE_FACTORY = new SingleEntryRegistryImpl<>();
 
 
 
