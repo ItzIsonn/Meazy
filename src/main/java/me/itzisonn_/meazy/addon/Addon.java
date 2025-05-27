@@ -3,7 +3,9 @@ package me.itzisonn_.meazy.addon;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import lombok.Getter;
+import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import me.itzisonn_.meazy.addon.datagen.DatagenManager;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,8 +14,6 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents an Addon
@@ -23,7 +23,7 @@ public abstract class Addon {
     private AddonLoader loader = null;
     private File file = null;
     @Getter
-    private List<String> datagenFilesLines = new ArrayList<>();
+    private DatagenManager datagenManager = null;
     private AddonInfo addonInfo = null;
     private File dataFolder = null;
     private ClassLoader classLoader = null;
@@ -32,8 +32,11 @@ public abstract class Addon {
     private Logger logger = null;
 
     public Addon() {
-        final ClassLoader classLoader = this.getClass().getClassLoader();
-        if (!(classLoader instanceof AddonClassLoader addonClassLoader)) throw new IllegalStateException("Addon requires " + AddonClassLoader.class.getName());
+        ClassLoader classLoader = getClass().getClassLoader();
+        if (!(classLoader instanceof AddonClassLoader addonClassLoader)) {
+            throw new IllegalStateException("Addon requires " + AddonClassLoader.class.getName());
+        }
+
         addonClassLoader.initialize(this);
     }
 
@@ -47,47 +50,38 @@ public abstract class Addon {
     }
 
     /**
-     * Returns a value indicating whether or not this addon is currently
-     * enabled
-     *
-     * @return true if this addon is enabled, otherwise false
+     * @return Whether this addon is enabled
      */
     public final boolean isEnabled() {
         return isEnabled;
     }
 
     /**
-     * Returns the file which contains this addon
-     *
-     * @return File containing this addon
+     * @return File that contains this addon
      */
     protected File getFile() {
         return file;
     }
 
     /**
-     * Returns the {@link AddonInfo} class containing the info for this addon
-     *
-     * @return Contents of the addon.json file
+     * @return AddonInfo of this addon
      */
     public final AddonInfo getAddonInfo() {
         return addonInfo;
     }
 
     /**
-     * Returns the ClassLoader which holds this addon
-     *
-     * @return ClassLoader holding this addon
+     * @return ClassLoader that holds this addon
      */
     protected final ClassLoader getClassLoader() {
         return classLoader;
     }
 
     /**
-     * Returns the folder that the addon data's files are located in. The
-     * folder may not yet exist.
+     * Returns the folder that the addon data's files are located in.
+     * The folder may not yet exist.
      *
-     * @return The folder.
+     * @return The folder
      */
     public final File getDataFolder() {
         return dataFolder;
@@ -101,20 +95,11 @@ public abstract class Addon {
     }
 
     public void reloadConfig() {
-        StringBuilder json = new StringBuilder();
-        try (FileInputStream inputStream = new FileInputStream(configFile)) {
-            for (String line : new BufferedReader(new InputStreamReader(inputStream)).lines().toList()) {
-                json.append(line);
-            }
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        config = JsonParser.parseString(json.toString());
+        config = JsonParser.parseString(FileUtils.getLines(configFile));
     }
 
     public void saveConfig() {
-        if (configFile == null) throw new IllegalArgumentException("File cannot be null");
+        if (configFile == null) throw new IllegalArgumentException("File can't be null");
 
         try {
             File parent = configFile.getCanonicalFile().getParentFile();
@@ -130,8 +115,8 @@ public abstract class Addon {
                 writer.write(data);
             }
         }
-        catch (IOException ex) {
-            logger.log(Level.ERROR, "Couldn't save config to {}", configFile, ex);
+        catch (IOException e) {
+            logger.log(Level.ERROR, "Couldn't save config to {}", configFile, e);
         }
     }
 
@@ -202,6 +187,7 @@ public abstract class Addon {
     }
 
     public abstract void onInitialize();
+    public void afterDataLoaded() {}
 
     /**
      * Enables this addon
@@ -214,11 +200,11 @@ public abstract class Addon {
         else throw new AddonEnableException("Addon has already been enabled");
     }
 
-    public final void init(AddonLoader loader, AddonInfo addonInfo, List<String> datagenFilesLines, File dataFolder, File file, ClassLoader classLoader) {
+    public final void init(AddonLoader loader, AddonInfo addonInfo, File dataFolder, File file, ClassLoader classLoader) {
         this.loader = loader;
         this.file = file;
         this.addonInfo = addonInfo;
-        this.datagenFilesLines = datagenFilesLines;
+        this.datagenManager = new DatagenManager(file);
         this.dataFolder = dataFolder;
         this.classLoader = classLoader;
         this.configFile = new File(dataFolder, "config.json");
@@ -261,11 +247,12 @@ public abstract class Addon {
         if (!Addon.class.isAssignableFrom(addonClass)) {
             throw new IllegalArgumentException(addonClass + " doesn't extend " + Addon.class);
         }
-        final ClassLoader cl = addonClass.getClassLoader();
-        if (!(cl instanceof AddonClassLoader)) {
+
+        if (!(addonClass.getClassLoader() instanceof AddonClassLoader addonClassLoader)) {
             throw new IllegalArgumentException(addonClass + " isn't initialized by " + AddonClassLoader.class);
         }
-        Addon addon = ((AddonClassLoader) cl).addon;
+
+        Addon addon = addonClassLoader.addon;
         if (addon == null) {
             throw new IllegalStateException("Can't get addon for " + addonClass + " from a static initializer");
         }
@@ -281,11 +268,11 @@ public abstract class Addon {
     public static Addon getProvidingAddon(Class<?> addonClass) {
         if (addonClass == null) throw new IllegalArgumentException("Null class can't have a addon");
 
-        ClassLoader cl = addonClass.getClassLoader();
-        if (!(cl instanceof AddonClassLoader)) {
+        if (!(addonClass.getClassLoader() instanceof AddonClassLoader addonClassLoader)) {
             throw new IllegalArgumentException(addonClass + " isn't provided by " + AddonClassLoader.class);
         }
-        Addon addon = ((AddonClassLoader) cl).addon;
+
+        Addon addon = addonClassLoader.addon;
         if (addon == null) {
             throw new IllegalStateException("Can't get addon for " + addonClass + " from a static initializer");
         }

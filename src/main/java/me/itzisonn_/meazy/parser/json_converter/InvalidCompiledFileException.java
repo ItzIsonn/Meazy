@@ -15,7 +15,7 @@ public class InvalidCompiledFileException extends RuntimeException {
     }
 
     /**
-     * IConstructor that supers message in format '{@code identifier} doesn't have field {@code field}'
+     * Constructor that supers message in format '{@code identifier} doesn't have field {@code field}'
      *
      * @param identifier Identifier
      * @param field Field

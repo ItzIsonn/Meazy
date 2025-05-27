@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.addon.addon_info;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.addon.InvalidAddonInfoException;
 import me.itzisonn_.meazy.version.Version;
 
 import java.lang.reflect.Type;
@@ -42,11 +41,6 @@ public class AddonInfoDeserializer implements JsonDeserializer<AddonInfo> {
         if (jsonObject.get("loadBefore") != null) loadBefore = jsonObject.get("loadBefore").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList();
         else loadBefore = new ArrayList<>();
 
-        try {
-            return new AddonInfo(id, Version.of(version), main, description, authors, coreDepend, depend, softDepend, loadBefore);
-        }
-        catch (InvalidAddonInfoException e) {
-            throw new RuntimeException(e);
-        }
+        return new AddonInfo(id, Version.of(version), main, description, authors, coreDepend, depend, softDepend, loadBefore);
     }
 }
