@@ -2,15 +2,19 @@ package me.itzisonn_.meazy;
 
 import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.Addon;
+import me.itzisonn_.meazy.addon.datagen.DatagenDeserializers;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lexer.Token;
+import me.itzisonn_.meazy.lexer.TokenType;
+import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.Interpreter;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
+import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -99,7 +103,17 @@ public final class MeazyMain {
         for (Addon addon : ADDON_MANAGER.loadAddons(ADDONS_DIRECTORY)) {
             ADDON_MANAGER.enableAddon(addon);
 
-            for (String lines : addon.getDatagenFilesLines()) {
+            for (TokenType tokenType : addon.getDatagenManager().getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.getTokenTypeDeserializer())) {
+                Registries.TOKEN_TYPES.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenType.getId()), tokenType);
+            }
+
+            for (TokenTypeSet tokenTypeSet : addon.getDatagenManager().getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer(addon))) {
+                Registries.TOKEN_TYPE_SETS.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenTypeSet.getId()), tokenTypeSet);
+            }
+
+            addon.afterDataLoaded();
+
+            for (String lines : addon.getDatagenManager().getDatagenFilesLines("program")) {
                 List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(lines);
 
                 Parser.reset();

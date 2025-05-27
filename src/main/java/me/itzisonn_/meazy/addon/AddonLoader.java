@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.addon;
 
-import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import org.apache.logging.log4j.Level;
@@ -10,9 +9,6 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 /**
  * Represents an AddonLoader, allowing addons in the form of .jar
@@ -37,8 +33,6 @@ public class AddonLoader {
             throw new InvalidAddonException(e);
         }
 
-        List<String> datagenFilesLines = getDatagenFilesLines(file);
-
         final File parentFile = file.getParentFile();
         final File dataFolder = new File(parentFile, addonInfo.getId());
 
@@ -56,7 +50,7 @@ public class AddonLoader {
 
         final AddonClassLoader loader;
         try {
-            loader = new AddonClassLoader(this, getClass().getClassLoader(), addonInfo, datagenFilesLines, dataFolder, file);
+            loader = new AddonClassLoader(this, getClass().getClassLoader(), addonInfo, dataFolder, file);
         }
         catch (InvalidAddonException e) {
             throw e;
@@ -104,34 +98,6 @@ public class AddonLoader {
                 catch (IOException ignored) {}
             }
         }
-    }
-
-    /**
-     *
-     * @param file Addon's jar file
-     * @return List of datagen input streams
-     */
-    public List<String> getDatagenFilesLines(File file) {
-        if (file == null) throw new IllegalArgumentException("File can't be null");
-        List<String> files = new ArrayList<>();
-
-        try (ZipFile zipFile = new ZipFile(file)) {
-            ZipInputStream inputStream = new ZipInputStream(new FileInputStream(file));
-
-            ZipEntry zipEntry = inputStream.getNextEntry();
-            while (zipEntry != null) {
-                if (!zipEntry.getName().startsWith("datagen/") || zipEntry.isDirectory()) {
-                    zipEntry = inputStream.getNextEntry();
-                    continue;
-                }
-
-                files.add(FileUtils.getLines(zipFile.getInputStream(zipEntry)));
-                zipEntry = inputStream.getNextEntry();
-            }
-        }
-        catch (IOException ignored) {}
-
-        return files;
     }
 
     public Pattern[] getAddonFileFilters() {

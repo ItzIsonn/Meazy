@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,19 +18,17 @@ public final class AddonClassLoader extends URLClassLoader {
     private final AddonLoader loader;
     private final Map<String, Class<?>> classes = new HashMap<>();
     private final AddonInfo addonInfo;
-    private final List<String> datagenFilesLines;
     private final File dataFolder;
     private final File file;
     final Addon addon;
     private Addon addonInit;
 
-    public AddonClassLoader(final AddonLoader loader, final ClassLoader parent, final AddonInfo addonInfo, List<String> datagenFilesLines, final File dataFolder, final File file) throws InvalidAddonException, MalformedURLException {
+    public AddonClassLoader(final AddonLoader loader, final ClassLoader parent, final AddonInfo addonInfo, final File dataFolder, final File file) throws InvalidAddonException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, parent);
         if (loader == null) throw new IllegalArgumentException("Loader can't be null");
 
         this.loader = loader;
         this.addonInfo = addonInfo;
-        this.datagenFilesLines = datagenFilesLines;
         this.dataFolder = dataFolder;
         this.file = file;
 
@@ -117,6 +114,6 @@ public final class AddonClassLoader extends URLClassLoader {
 
         this.addonInit = addon;
 
-        addon.init(loader, addonInfo, datagenFilesLines, dataFolder, file, this);
+        addon.init(loader, addonInfo, dataFolder, file, this);
     }
 }

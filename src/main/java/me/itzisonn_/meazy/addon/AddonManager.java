@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.addon;
 
+import lombok.Getter;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import org.apache.logging.log4j.Level;
@@ -13,18 +14,20 @@ import java.util.regex.Pattern;
  * Represents an AddonManager
  */
 public final class AddonManager {
+    @Getter
+    private final AddonLoader addonLoader;
     private final Map<Pattern, AddonLoader> fileAssociations = new HashMap<>();
     private final List<Addon> addons = new ArrayList<>();
     private final Map<String, Addon> lookupIds = new HashMap<>();
 
     public AddonManager() {
-        AddonLoader instance = new AddonLoader();
+        addonLoader = new AddonLoader();
 
-        Pattern[] patterns = instance.getAddonFileFilters();
+        Pattern[] patterns = addonLoader.getAddonFileFilters();
 
         synchronized (this) {
             for (Pattern pattern : patterns) {
-                fileAssociations.put(pattern, instance);
+                fileAssociations.put(pattern, addonLoader);
             }
         }
     }
