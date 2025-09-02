@@ -153,7 +153,7 @@ public class AddonLoader {
                 addon.enable();
             }
             catch (Throwable e) {
-                MeazyMain.LOGGER.log(Level.ERROR, "Error occurred while enabling {}", addon.getAddonInfo().getFullName(), e);
+                MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.failed_enable", addon.getAddonInfo().getFullName(), e.getMessage());
             }
         }
     }

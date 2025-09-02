@@ -14,28 +14,18 @@ import java.util.regex.Pattern;
 @Getter
 @EqualsAndHashCode
 public class Version {
-    /**
-     * Parts
-     */
     private final List<Integer> parts;
-    /**
-     * Type
-     */
     private final VersionType type;
-    /**
-     * Ordinal
-     */
     private final int ordinal;
 
     /**
      * @param parts Parts
      * @param type Type
      * @param ordinal Ordinal
-     *
      * @throws NullPointerException If either parts or type is null
      * @throws IllegalArgumentException If given parts is empty
      */
-    public Version(List<Integer> parts, VersionType type, int ordinal) throws NullPointerException, IllegalArgumentException {
+    public Version(List<Integer> parts, VersionType type, int ordinal) {
         if (parts == null) throw new NullPointerException("Parts can't be null");
         if (parts.isEmpty()) throw new IllegalArgumentException("Parts can't be empty");
         if (type == null) throw new NullPointerException("Type can't be null");
@@ -98,12 +88,11 @@ public class Version {
     }
 
 
-
     private static final Pattern versionPattern;
 
     static {
         String possibleTypes = String.join("|", VersionType.VERSION_TYPES.keySet().stream().sorted().toList().reversed());
-        versionPattern =  Pattern.compile("(\\d+(\\.\\d+)*)(-(" + possibleTypes +")(\\d*))?", Pattern.CASE_INSENSITIVE);
+        versionPattern = Pattern.compile("(\\d+(\\.\\d+)*)(-(" + possibleTypes + ")(\\d*))?", Pattern.CASE_INSENSITIVE);
     }
 
     /**
@@ -111,8 +100,7 @@ public class Version {
      *
      * @param version String to parse
      * @return Parsed version
-     *
-     * @throws NullPointerException If given version is null
+     * @throws NullPointerException     If given version is null
      * @throws IllegalArgumentException If given version is in invalid format
      */
     public static Version of(String version) throws NullPointerException, IllegalArgumentException {

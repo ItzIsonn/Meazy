@@ -1,0 +1,16 @@
+{
+  "settings.cant_load_file": "Не удалось загрузить файл настроек",
+  "settings.cant_find_default": "Не удалось найти файл настроек по умолчанию",
+  "settings.cant_create_default": "Не удалось создать файл настроек по умолчанию",
+  "settings.invalid_file": "Неверный файл настроек. Создание нового",
+  "settings.unknown_language": "Неизвестный язык {0}. Будет использоваться язык по умолчанию",
+
+  "addons.single_loaded": "Загружен 1 аддон",
+  "addons.multiple_loaded": "Загружено аддонов: {0}",
+  "addons.cant_load_folder": "Не удалось загрузить папку с аддонами",
+
+  "commands.unknown": "Неизвестная команда с именем {0}",
+  "commands.invalid_args": "Ожидалось аргументов: {0}, но получено: {1}",
+  "commands.available": "Доступные команды:",
+  "commands.loaded_info": "Загружено за {0}с. {1}"
+}

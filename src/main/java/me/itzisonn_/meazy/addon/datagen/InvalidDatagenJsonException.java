@@ -5,7 +5,6 @@ package me.itzisonn_.meazy.addon.datagen;
  */
 public class InvalidDatagenJsonException extends RuntimeException {
     /**
-     * Main constructor
      * @param message Message
      */
     public InvalidDatagenJsonException(String message) {

@@ -15,12 +15,25 @@ import java.util.regex.Pattern;
  */
 public final class AddonManager {
     @Getter
+    private final File addonsFolder;
+    @Getter
     private final AddonLoader addonLoader;
     private final Map<Pattern, AddonLoader> fileAssociations = new HashMap<>();
     private final List<Addon> addons = new ArrayList<>();
     private final Map<String, Addon> lookupIds = new HashMap<>();
 
-    public AddonManager() {
+    /**
+     * @param addonsFolder Addons folder
+     *
+     * @throws NullPointerException If given addonsFolder is null
+     * @throws IllegalArgumentException If given addonsFolder doesn't exist or isn't a directory
+     */
+    public AddonManager(File addonsFolder) {
+        if (addonsFolder == null) throw new NullPointerException("AddonsFolder can't be null");
+        if (!addonsFolder.exists()) throw new IllegalArgumentException("AddonsFolder doesn't exist");
+        if (!addonsFolder.isDirectory()) throw new IllegalArgumentException("AddonsFolder must be directory");
+        this.addonsFolder = addonsFolder;
+
         addonLoader = new AddonLoader();
 
         Pattern[] patterns = addonLoader.getAddonFileFilters();
@@ -35,13 +48,9 @@ public final class AddonManager {
     /**
      * Loads addons in given directory
      *
-     * @param directory Directory with addons
      * @return Array of loaded addons
      */
-    public Addon[] loadAddons(File directory) {
-        if (directory == null) throw new IllegalArgumentException("Directory can't be null");
-        if (!directory.isDirectory()) throw new IllegalArgumentException("Directory must be a directory");
-
+    public Addon[] loadAddons() {
         List<Addon> result = new ArrayList<>();
         Set<Pattern> filters = fileAssociations.keySet();
 
@@ -50,8 +59,9 @@ public final class AddonManager {
         Map<String, Collection<String>> dependencies = new HashMap<>();
         Map<String, Collection<String>> softDependencies = new HashMap<>();
 
-        File[] listFiles = directory.listFiles();
-        if (listFiles == null) throw new NullPointerException("Directory's list of files is null");
+        File[] listFiles = addonsFolder.listFiles();
+        if (listFiles == null) throw new NullPointerException("AddonsFolder's list of files is null");
+
         for (File file : listFiles) {
             AddonLoader loader = null;
             for (Pattern filter : filters) {
@@ -66,33 +76,20 @@ public final class AddonManager {
             AddonInfo addonInfo;
             try {
                 addonInfo = loader.getAddonInfo(file);
-                String name = addonInfo.getId();
-                if (name.equalsIgnoreCase("meazy")) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}': Restricted Name",
-                            file.getPath(), directory.getPath());
-                    continue;
-                }
-                else if (addonInfo.getId().indexOf(' ') != -1) {
-                    MeazyMain.LOGGER.log(Level.WARN, "Addon `{}' uses the space-character (0x20) in its name `{}' - this is discouraged",
-                        addonInfo.getFullName(), addonInfo.getId());
-                }
 
                 if (addonInfo.getCoreDepend() != null && !addonInfo.getCoreDepend().equals(MeazyMain.VERSION)) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}': Unsupported version {}",
-                            file.getPath(), directory.getPath(), addonInfo.getCoreDepend());
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.unsupported_version", file.getPath(), addonInfo.getCoreDepend());
                     continue;
                 }
             }
             catch (InvalidAddonInfoException e) {
-                MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'",
-                        file.getPath(), directory.getPath(), e);
+                MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), e);
                 continue;
             }
 
             File replacedFile = addons.put(addonInfo.getId(), file);
             if (replacedFile != null) {
-                MeazyMain.LOGGER.log(Level.ERROR, "Ambiguous addon name `{}' for files `{}' and `{}' in `{}'",
-                    addonInfo.getId(), file.getPath(), replacedFile.getPath(), directory.getPath());
+                MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.duplicate_name", addonInfo.getId(), file.getPath(), replacedFile.getPath());
             }
 
             Collection<String> softDependencySet = addonInfo.getSoftDepend();
@@ -148,8 +145,7 @@ public final class AddonManager {
                             softDependencies.remove(addon);
                             dependencies.remove(addon);
 
-                            MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'",
-                                    file.getPath(), directory.getPath(), new UnknownDependencyException(dependency));
+                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), new UnknownDependencyException(dependency));
                             break;
                         }
                     }
@@ -176,7 +172,7 @@ public final class AddonManager {
                         loadedAddons.add(addon);
                     }
                     catch (InvalidAddonException e) {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'", file.getPath(), directory.getPath(), e);
+                        MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), e);
                     }
                 }
             }
@@ -199,7 +195,7 @@ public final class AddonManager {
                             break;
                         }
                         catch (InvalidAddonException e) {
-                            MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}'", file.getPath(), directory.getPath(), e);
+                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), e);
                         }
                     }
                 }
@@ -212,8 +208,7 @@ public final class AddonManager {
                     while (failedAddonIterator.hasNext()) {
                         File file = failedAddonIterator.next();
                         failedAddonIterator.remove();
-                        MeazyMain.LOGGER.log(Level.ERROR, "Couldn't load '{}' in folder '{}': circular dependency detected",
-                                file.getPath(), directory.getPath());
+                        MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.circular_dependency", file.getPath());
                     }
                 }
             }
@@ -299,13 +294,13 @@ public final class AddonManager {
      * @param addon Addon to enable
      */
     public void enableAddon(Addon addon) {
-        if (!addon.isEnabled()) {
-            try {
-                addon.getAddonLoader().enableAddon(addon);
-            }
-            catch (Throwable e) {
-                MeazyMain.LOGGER.log(Level.ERROR, "Error occurred (in the addon loader) while enabling {}", addon.getAddonInfo().getFullName(), e);
-            }
+        if (addon.isEnabled()) return;
+
+        try {
+            addon.getAddonLoader().enableAddon(addon);
+        }
+        catch (Throwable e) {
+            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.failed_enable", addon.getAddonInfo().getFullName(), e);
         }
     }
 }
