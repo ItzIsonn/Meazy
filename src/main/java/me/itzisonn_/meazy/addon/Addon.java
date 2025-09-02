@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.addon.datagen.DatagenManager;
+import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -277,5 +278,12 @@ public abstract class Addon {
             throw new IllegalStateException("Can't get addon for " + addonClass + " from a static initializer");
         }
         return addon;
+    }
+
+    /**
+     * @return LanguageFileProvider for this addon
+     */
+    public LanguageFileProvider getLanguageFileProvider() {
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
@@ -29,28 +30,6 @@ public final class Commands {
     private static boolean isInit = false;
 
     private Commands() {}
-
-
-
-    public static Command VERSION() {
-        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("version")).getValue();
-    }
-
-    public static Command DOWNLOAD_DEFAULT_ADDON() {
-        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("download_default_addon")).getValue();
-    }
-
-    public static Command RUN() {
-        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("run")).getValue();
-    }
-
-    public static Command COMPILE() {
-        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("compile")).getValue();
-    }
-
-    public static Command DECOMPILE() {
-        return Registries.COMMANDS.getEntry(Registries.getDefaultIdentifier("decompile")).getValue();
-    }
 
 
 
@@ -92,7 +71,7 @@ public final class Commands {
         register(new Command("version", List.of()) {
             @Override
             public String execute(String[] args) {
-                MeazyMain.LOGGER.log(Level.INFO, "Meazy version {}", MeazyMain.VERSION);
+                MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:commands.version", MeazyMain.VERSION);
                 return null;
             }
         });
@@ -103,17 +82,17 @@ public final class Commands {
                 switch (args[0]) {
                     case "list" -> {
                         if (MeazyMain.ADDON_MANAGER.getAddons().length == 0) {
-                            MeazyMain.LOGGER.log(Level.INFO, "No addons present");
+                            MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.empty"));
                             return null;
                         }
 
-                        MeazyMain.LOGGER.log(Level.INFO, "Loaded addons:");
+                        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.loaded"));
                         for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
                             AddonInfo addonInfo = addon.getAddonInfo();
 
                             String authors;
                             if (!addonInfo.getAuthors().isEmpty()) {
-                                authors = " by " + String.join(", ", addonInfo.getAuthors());
+                                authors = " " + Text.translatable("meazy:commands.addons.by") + " " + String.join(", ", addonInfo.getAuthors());
                             }
                             else authors = "";
 
@@ -123,7 +102,7 @@ public final class Commands {
                             }
                             else description = "";
 
-                            MeazyMain.LOGGER.log(Level.INFO, "    {}{}{}",
+                            MeazyMain.LOGGER.log(Level.INFO, Text.literal("    {}{}{}"),
                                     addonInfo.getFullName(),
                                     authors,
                                     description);
@@ -133,7 +112,7 @@ public final class Commands {
 
                     case "downloadDefault" -> {
                         String site = "https://github.com/ItzIsonn/MeazyAddon/releases/download/v" + MeazyMain.VERSION + "/MeazyAddon-v" + MeazyMain.VERSION + ".jar";
-                        String file = MeazyMain.ADDONS_DIRECTORY.getAbsolutePath() + "\\" + Arrays.asList(site.split("/")).getLast();
+                        String file = MeazyMain.ADDON_MANAGER.getAddonsFolder().getAbsolutePath() + "\\" + Arrays.asList(site.split("/")).getLast();
 
                         ReadableByteChannel byteChannel;
                         try {
@@ -141,7 +120,7 @@ public final class Commands {
                             byteChannel = Channels.newChannel(url.openStream());
                         }
                         catch (FileNotFoundException e) {
-                            MeazyMain.LOGGER.log(Level.ERROR, "Can't find MeazyAddon for {} Meazy version. It'll probably release soon", MeazyMain.VERSION);
+                            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.addons.cant_find_default"), MeazyMain.VERSION);
                             return null;
                         }
                         catch (URISyntaxException | IOException e) {
@@ -155,12 +134,12 @@ public final class Commands {
                             throw new RuntimeException(e);
                         }
 
-                        MeazyMain.LOGGER.log(Level.INFO, "Successfully downloaded MeazyAddon v{}", MeazyMain.VERSION);
+                        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.loaded_default"), MeazyMain.VERSION);
                         return null;
                     }
 
                     default -> {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Unknown argument {}", args[0]);
+                        MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.invalid_argument"), args[0]);
                         return null;
                     }
                 }
@@ -172,11 +151,11 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsolutePath());
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.doesnt_exist", file.getAbsolutePath());
                     return null;
                 }
 
-                MeazyMain.LOGGER.log(Level.INFO, "Running file '{}'", file.getAbsolutePath());
+                MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:commands.run.running", file.getAbsolutePath());
 
                 String extension = FileUtils.getExtension(file);
                 long startMillis = System.currentTimeMillis();
@@ -191,20 +170,20 @@ public final class Commands {
                     case "meac" -> {
                         program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
                         if (program == null) {
-                            MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
+                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.failed_read", file.getAbsolutePath());
                             return null;
                         }
                         if (MeazyMain.VERSION.isBefore(program.getVersion())) {
-                            MeazyMain.LOGGER.log(Level.ERROR, "Can't run file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
+                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:commands.run.incompatible_version", program.getVersion(), MeazyMain.VERSION);
                             return null;
                         }
                         if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-                            MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to run file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
+                            MeazyMain.LOGGER.logTranslatable(Level.WARN, "meazy:commands.run.unsafe", program.getVersion(), MeazyMain.VERSION);
                         }
                         program.setFile(file);
                     }
                     default -> {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Can't run file with extension {}", extension);
+                        MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.unsupported_extension", extension);
                         return null;
                     }
                 }
@@ -221,16 +200,16 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsolutePath());
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.doesnt_exist", file.getAbsolutePath());
                     return null;
                 }
 
                 if (!FileUtils.getExtension(file).equals("mea")) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't compile file with extension {}", FileUtils.getExtension(file));
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.unsupported_extension", FileUtils.getExtension(file));
                     return null;
                 }
 
-                MeazyMain.LOGGER.log(Level.INFO, "Compiling file '{}'", file.getAbsolutePath());
+                MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:commands.compile.compiling'", file.getAbsolutePath());
 
                 long startMillis = System.currentTimeMillis();
                 List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(FileUtils.getLines(file));
@@ -241,22 +220,22 @@ public final class Commands {
 
                 File outputFile = new File(args[1]);
                 if (file.isDirectory()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Output file can't be directory");
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.output_cant_be_directory");
                     return null;
                 }
                 if (!outputFile.getParentFile().exists()) {
                     if (outputFile.getParentFile().mkdirs()) {
                         try {
-                            if (outputFile.createNewFile()) MeazyMain.LOGGER.log(Level.INFO, "Created file '{}'", args[1]);
-                            else MeazyMain.LOGGER.log(Level.INFO, "File '{}' already exists", args[1]);
+                            if (outputFile.createNewFile()) MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:file.created", args[1]);
+                            else MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:file.already_exists", args[1]);
                         }
                         catch (Exception e) {
-                            MeazyMain.LOGGER.log(Level.ERROR, "Can't create file '{}'", args[1]);
+                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.cant_create", args[1]);
                             return null;
                         }
                     }
                     else {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Can't create parent file");
+                        MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.cant_create_parent", args[1]);
                         return null;
                     }
                 }
@@ -278,29 +257,29 @@ public final class Commands {
             public String execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "File '{}' doesn't exist", file.getAbsolutePath());
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.doesnt_exist", file.getAbsolutePath());
                     return null;
                 }
 
                 if (!FileUtils.getExtension(file).equals("meac")) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't decompile file with extension {}", FileUtils.getExtension(file));
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.unsupported_extension", FileUtils.getExtension(file));
                     return null;
                 }
 
-                MeazyMain.LOGGER.log(Level.INFO, "Decompiling file '{}'", file.getAbsolutePath());
+                MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:commands.decompile.decompiling", file.getAbsolutePath());
 
                 long startMillis = System.currentTimeMillis();
                 Program program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
                 if (program == null) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Failed to read file {}", file.getAbsolutePath());
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.failed_read", file.getAbsolutePath());
                     return null;
                 }
                 if (MeazyMain.VERSION.isBefore(program.getVersion())) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Can't decompile file that has been compiled by a more recent version of the Meazy ({}), in a more older version ({})", program.getVersion(), MeazyMain.VERSION);
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:commands.decompile.incompatible_version", program.getVersion(), MeazyMain.VERSION);
                     return null;
                 }
                 if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-                    MeazyMain.LOGGER.log(Level.WARN, "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})", program.getVersion(), MeazyMain.VERSION);
+                    MeazyMain.LOGGER.logTranslatable(Level.WARN, "meazy:commands.decompile.unsafe", program.getVersion(), MeazyMain.VERSION);
                 }
                 program.setFile(file);
                 long endMillis = System.currentTimeMillis();
@@ -308,22 +287,22 @@ public final class Commands {
 
                 File outputFile = new File(args[1]);
                 if (file.isDirectory()) {
-                    MeazyMain.LOGGER.log(Level.ERROR, "Output file can't be directory");
+                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.output_cant_be_directory");
                     return null;
                 }
                 if (!outputFile.getParentFile().exists()) {
                     if (outputFile.getParentFile().mkdirs()) {
                         try {
-                            if (outputFile.createNewFile()) MeazyMain.LOGGER.log(Level.INFO, "Created file '{}'", args[1]);
-                            else MeazyMain.LOGGER.log(Level.INFO, "File '{}' already exists", args[1]);
+                            if (outputFile.createNewFile()) MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:file.created", args[1]);
+                            else MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:file.already_exists", args[1]);
                         }
                         catch (Exception e) {
-                            MeazyMain.LOGGER.log(Level.ERROR, "Can't create file '{}'", args[1]);
+                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.cant_create", args[1]);
                             return null;
                         }
                     }
                     else {
-                        MeazyMain.LOGGER.log(Level.ERROR, "Can't create parent file");
+                        MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.cant_create_parent");
                         return null;
                     }
                 }

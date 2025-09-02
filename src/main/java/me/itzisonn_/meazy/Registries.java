@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
+import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.data_type.DataTypeFactory;
 import me.itzisonn_.meazy.parser.json_converter.*;
@@ -17,6 +18,8 @@ import me.itzisonn_.meazy.parser.json_converter.basic.StatementConverter;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingFunction;
+import me.itzisonn_.meazy.registry.CommandRegistry;
+import me.itzisonn_.meazy.registry.LanguageRegistry;
 import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
@@ -49,24 +52,21 @@ public final class Registries {
     private Registries() {}
 
 
+    /**
+     * Registry for all Languages
+     *
+     * @see Language
+     */
+    public static final LanguageRegistry LANGUAGES = new LanguageRegistry();
+
+
 
     /**
      * Registry for all Commands
      *
      * @see Command
      */
-    public static final SetRegistry<Command> COMMANDS = new SetRegistry<>() {
-        @Override
-        public void register(RegistryIdentifier identifier, Command value, boolean overridable) {
-            for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
-                if (entry.getValue().getName().equals(value.getName()) && !entry.isOverrideable()) {
-                    throw new IllegalArgumentException("Command with name " + value.getName() + " has already been registered");
-                }
-            }
-
-            super.register(identifier, value, overridable);
-        }
-    };
+    public static final CommandRegistry COMMANDS = new CommandRegistry();
 
 
 
@@ -219,6 +219,9 @@ public final class Registries {
     public static void INIT() throws IllegalStateException {
         if (isInit) throw new IllegalStateException("Registries have already been initialized");
         isInit = true;
+
+        LANGUAGES.register(getDefaultIdentifier("english"), new Language("en", "English"));
+        LANGUAGES.register(getDefaultIdentifier("russian"), new Language("ru", "Русский"));
 
         Commands.INIT();
         TokenTypes.INIT();

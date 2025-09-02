@@ -10,28 +10,17 @@ import me.itzisonn_.meazy.parser.data_type.DataType;
 @Getter
 @EqualsAndHashCode
 public class CallArgExpression implements Expression {
-    /**
-     * CallArgExpression's id
-     */
     private final String id;
-    /**
-     * CallArgExpression's DataType
-     */
     private final DataType dataType;
-    /**
-     * Whether this CallArgExpression is constant
-     */
     private final boolean isConstant;
 
     /**
-     * CallArgExpression constructor
-     *
-     * @param id CallArgExpression's id
-     * @param dataType CallArgExpression's DataType
+     * @param id         CallArgExpression's id
+     * @param dataType   CallArgExpression's DataType
      * @param isConstant Whether this CallArgExpression is constant
      * @throws NullPointerException If either id or dataType is null
      */
-    public CallArgExpression(String id, DataType dataType, boolean isConstant) throws NullPointerException {
+    public CallArgExpression(String id, DataType dataType, boolean isConstant) {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (dataType == null) throw new NullPointerException("DataType can't be null");
 

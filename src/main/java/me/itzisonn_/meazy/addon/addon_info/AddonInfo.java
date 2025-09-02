@@ -14,80 +14,48 @@ import java.util.*;
  * Stores information about {@link Addon}
  */
 @Getter
-public final class AddonInfo {
-    /**
-     * Unique id
-     */
+public class AddonInfo {
     private final String id;
-
-    /**
-     * Version
-     */
     private final Version version;
-
-    /**
-     * Full name of the main class that extends {@link Addon}
-     */
     private final String main;
-
-    /**
-     *  Description of the addon's functionality
-     */
     private final String description;
-
-    /**
-     *  List of authors
-     */
     private final List<String> authors;
-
-    /**
-     * Required version of Meazy to run this addon
-     */
     private final Version coreDepend;
-
-    /**
-     * List of other addons that the addon requires
-     */
     private final List<String> depend;
-
-    /**
-     * List of other addons that the addon requires for full functionality
-     */
     private final List<String> softDepend;
-
-    /**
-     * List of addons that should consider this addon a soft-dependency
-     */
     private final List<String> loadBefore;
 
-    public AddonInfo(String id, Version version, String main, String description, List<String> authors, Version coreDepend,
-                     List<String> depend, List<String> softDepend, List<String> loadBefore) throws NullPointerException, IllegalArgumentException {
+    /**
+     * @param id          Unique id
+     * @param version     Version
+     * @param main        Full name of the main class that extends {@link Addon}
+     * @param description Description of the addon's functionality
+     * @param authors     List of authors
+     * @param coreDepend  Required version of Meazy to run this addon
+     * @param depend      List of other addons that the addon requires
+     * @param softDepend  List of other addons that the addon requires for full functionality
+     * @param loadBefore  List of addons that should consider this addon a soft-dependency
+     *
+     * @throws NullPointerException If either id, version or main is null
+     * @throws IllegalArgumentException If either id, depend, softDepend or loadBefore doesn't match Identifier Regex
+     */
+    public AddonInfo(String id, Version version, String main, String description, List<String> authors,
+                     Version coreDepend, List<String> depend, List<String> softDepend, List<String> loadBefore) {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (version == null) throw new NullPointerException("Version can't be null");
         if (main == null) throw new NullPointerException("Main can't be null");
 
-        if (!id.matches(MeazyMain.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Id doesn't match Identifier Regex");
+        if (!id.matches(MeazyMain.IDENTIFIER_REGEX))
+            throw new IllegalArgumentException("Id doesn't match Identifier Regex");
 
-        if (depend != null) {
-            for (String string : depend) {
-                if (!string.matches(MeazyMain.IDENTIFIER_REGEX))
-                    throw new IllegalArgumentException(string + " in depend list doesn't match Identifier Regex");
-            }
-        }
+        String dependMismatch = matchesIdentifierRegex(depend);
+        if (dependMismatch != null) throw new IllegalArgumentException(dependMismatch + " in depend list doesn't match Identifier Regex");
 
-        if (softDepend != null) {
-            for (String string : softDepend) {
-                if (!string.matches(MeazyMain.IDENTIFIER_REGEX))
-                    throw new IllegalArgumentException(string + " in softdepend list doesn't match Identifier Regex");
-            }
-        }
+        String softDependMismatch = matchesIdentifierRegex(softDepend);
+        if (softDependMismatch != null) throw new IllegalArgumentException(softDependMismatch + " in softdepend list doesn't match Identifier Regex");
 
-        if (loadBefore != null) {
-            for (String string : loadBefore) {
-                if (!string.matches(MeazyMain.IDENTIFIER_REGEX))
-                    throw new IllegalArgumentException(string + " in loadbefore list doesn't match Identifier Regex");
-            }
-        }
+        String loadBeforeMismatch = matchesIdentifierRegex(loadBefore);
+        if (loadBeforeMismatch != null) throw new IllegalArgumentException(loadBeforeMismatch + " in softdepend list doesn't match Identifier Regex");
 
         this.id = id;
         this.version = version;
@@ -108,7 +76,6 @@ public final class AddonInfo {
     }
 
 
-
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(AddonInfo.class, new AddonInfoDeserializer())
             .create();
@@ -121,5 +88,15 @@ public final class AddonInfo {
      */
     public static AddonInfo loadAddonInfo(InputStream stream) {
         return gson.fromJson(FileUtils.getLines(stream), AddonInfo.class);
+    }
+
+    private static String matchesIdentifierRegex(List<String> list) {
+        if (list == null) return null;
+
+        for (String string : list) {
+            if (!string.matches(MeazyMain.IDENTIFIER_REGEX)) return string;
+        }
+
+        return null;
     }
 }
