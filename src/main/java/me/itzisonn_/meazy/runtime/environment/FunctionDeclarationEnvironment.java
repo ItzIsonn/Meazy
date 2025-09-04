@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.parser.ast.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
 

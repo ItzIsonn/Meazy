@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ModifierStatement;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 
 /**
@@ -32,6 +33,16 @@ public abstract class Modifier {
      * @return Whether this modifier can be used on the given modifierStatement in given environment
      */
     public abstract boolean canUse(ModifierStatement modifierStatement, Environment environment);
+
+    /**
+     * @param requestEnvironment Environment from which asked an access
+     * @param environment Environment that has ModifierStatement in it
+     * @param identifier Identifier
+     * @param hasModifier Whether object with given identifier has this modifier
+     *
+     * @return Whether can access object (variable, function, class, etc) with given identifier in given environment from requestEnvironment
+     */
+    public abstract boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier);
 
     @Override
     public String toString() {

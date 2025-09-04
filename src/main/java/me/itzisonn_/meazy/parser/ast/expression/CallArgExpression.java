@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.parser.ast;
+package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

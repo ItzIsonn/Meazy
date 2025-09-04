@@ -1,4 +1,6 @@
-package me.itzisonn_.meazy.parser.ast;
+package me.itzisonn_.meazy.parser.ast.expression;
+
+import me.itzisonn_.meazy.parser.ast.Statement;
 
 /**
  * Represents unit of the program with only one (not-full) line possible
