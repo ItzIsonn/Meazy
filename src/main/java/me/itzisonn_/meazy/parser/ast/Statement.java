@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy.parser.ast;
 
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
+
 /**
  * Represents unit of the program with multiple lines possible
  *
