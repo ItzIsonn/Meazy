@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.json_converter.basic;
 
 import com.google.gson.*;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ProgramConverter extends Converter<Program> {
     public ProgramConverter() {
-        super(Registries.getDefaultIdentifier("program"));
+        super(MeazyMain.getDefaultIdentifier("program"));
     }
 
     @Override

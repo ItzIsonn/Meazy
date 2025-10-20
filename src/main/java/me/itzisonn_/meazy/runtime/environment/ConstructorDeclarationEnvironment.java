@@ -32,7 +32,7 @@ public interface ConstructorDeclarationEnvironment extends Environment {
             if (args.size() != callArgExpressions.size()) continue;
 
             for (int i = 0; i < args.size(); i++) {
-                if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i), getGlobalEnvironment())) continue main;
+                if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
             }
 
             return constructorValue;

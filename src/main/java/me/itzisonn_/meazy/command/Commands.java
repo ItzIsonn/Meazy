@@ -4,11 +4,12 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.registry.RegistryEntry;
 import org.apache.logging.log4j.Level;
 
@@ -22,12 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * All basic Commands
+ * Commands registrar
  *
  * @see Registries#COMMANDS
  */
 public final class Commands {
-    private static boolean isInit = false;
+    private static boolean hasRegistered = false;
 
     private Commands() {}
 
@@ -49,14 +50,6 @@ public final class Commands {
 
 
 
-    private static void register(String id, Command command) {
-        Registries.COMMANDS.register(Registries.getDefaultIdentifier(id), command);
-    }
-
-    private static void register(Command command) {
-        register(command.getName(), command);
-    }
-
     /**
      * Initializes {@link Registries#COMMANDS} registry
      * <p>
@@ -64,9 +57,9 @@ public final class Commands {
      *
      * @throws IllegalStateException If {@link Registries#COMMANDS} registry has already been initialized
      */
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("Commands have already been initialized");
-        isInit = true;
+    public static void REGISTER() {
+        if (hasRegistered) throw new IllegalStateException("Commands have already been initialized");
+        hasRegistered = true;
 
         register(new Command("version", List.of()) {
             @Override
@@ -163,9 +156,8 @@ public final class Commands {
                 Program program;
                 switch (extension) {
                     case "mea" -> {
-                        List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(FileUtils.getLines(file));
-                        Parser.reset();
-                        program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(file, tokens);
+                        List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(FileUtils.getLines(file));
+                        program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(file, tokens);
                     }
                     case "meac" -> {
                         program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
@@ -188,9 +180,12 @@ public final class Commands {
                     }
                 }
 
-                Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().apply(program);
-                long endMillis = System.currentTimeMillis();
 
+                RuntimeContext context = new RuntimeContext();
+                GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
+                Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
+
+                long endMillis = System.currentTimeMillis();
                 return "Executed in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
             }
         });
@@ -212,9 +207,9 @@ public final class Commands {
                 MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:commands.compile.compiling'", file.getAbsolutePath());
 
                 long startMillis = System.currentTimeMillis();
-                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().apply(FileUtils.getLines(file));
+                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(FileUtils.getLines(file));
 
-                Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().apply(file, tokens);
+                Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(file, tokens);
                 long endMillis = System.currentTimeMillis();
 
 
@@ -316,5 +311,15 @@ public final class Commands {
                 }
             }
         });
+    }
+
+
+
+    private static void register(String id, Command command) {
+        Registries.COMMANDS.register(MeazyMain.getDefaultIdentifier(id), command);
+    }
+
+    private static void register(Command command) {
+        register(command.getName(), command);
     }
 }

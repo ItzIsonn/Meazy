@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.operator;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 /**
@@ -54,9 +55,10 @@ public abstract class Operator {
     /**
      * Calculates expression value with this operator
      *
+     * @param environment Environment
      * @param value1 First value
      * @param value2 Second value or null if this operator type isn't {@link OperatorType#INFIX}
      * @return Resulted value
      */
-    public abstract RuntimeValue<?> calculate(RuntimeValue<?> value1, RuntimeValue<?> value2);
+    public abstract RuntimeValue<?> calculate(Environment environment, RuntimeValue<?> value1, RuntimeValue<?> value2);
 }

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -80,10 +81,28 @@ public interface Environment {
         return null;
     }
 
+    /**
+     * Finds GlobalEnvironment in parent environments of this environment
+     * @return GlobalEnvironment
+     *
+     * @deprecated Use {@link RuntimeContext#getGlobalEnvironment()}
+     */
+    @Deprecated(forRemoval = true)
     default GlobalEnvironment getGlobalEnvironment() {
         Environment parent = getParent();
         if (parent instanceof GlobalEnvironment globalEnvironment) return globalEnvironment;
         if (parent != null) return parent.getGlobalEnvironment();
+        return null;
+    }
+
+    /**
+     * Finds FileEnvironment in parent environments of this environment
+     * @return FileEnvironment
+     */
+    default FileEnvironment getFileEnvironment() {
+        Environment parent = getParent();
+        if (parent instanceof FileEnvironment fileEnvironment) return fileEnvironment;
+        if (parent != null) return parent.getFileEnvironment();
         return null;
     }
 

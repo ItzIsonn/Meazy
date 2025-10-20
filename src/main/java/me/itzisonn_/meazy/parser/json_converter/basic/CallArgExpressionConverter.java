@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.json_converter.basic;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
@@ -10,7 +11,7 @@ import java.lang.reflect.Type;
 
 public class CallArgExpressionConverter extends Converter<CallArgExpression> {
     public CallArgExpressionConverter() {
-        super(Registries.getDefaultIdentifier("call_arg_expression"));
+        super(MeazyMain.getDefaultIdentifier("call_arg_expression"));
     }
 
     @Override

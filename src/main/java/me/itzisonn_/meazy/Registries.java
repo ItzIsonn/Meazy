@@ -7,24 +7,19 @@ import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
+import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lexer.*;
+import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.parser.data_type.DataTypeFactory;
 import me.itzisonn_.meazy.parser.json_converter.*;
-import me.itzisonn_.meazy.parser.json_converter.basic.CallArgExpressionConverter;
-import me.itzisonn_.meazy.parser.json_converter.basic.ExpressionConverter;
-import me.itzisonn_.meazy.parser.json_converter.basic.ProgramConverter;
-import me.itzisonn_.meazy.parser.json_converter.basic.StatementConverter;
 import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ParsingFunction;
 import me.itzisonn_.meazy.registry.CommandRegistry;
 import me.itzisonn_.meazy.registry.LanguageRegistry;
+import me.itzisonn_.meazy.runtime.EvaluateProgramFunction;
 import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
-import me.itzisonn_.registry.RegistryIdentifier;
-import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.registry.multiple_entry.Pair;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -36,11 +31,7 @@ import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.interpreter.*;
 
-import java.io.File;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 
 /**
@@ -50,6 +41,7 @@ public final class Registries {
     private static boolean isInit = false;
 
     private Registries() {}
+
 
 
     /**
@@ -86,7 +78,7 @@ public final class Registries {
      * @see Token
      * @see Registries#TOKEN_TYPES
      */
-    public static final SingleEntryRegistry<Function<String, List<Token>>> TOKENIZATION_FUNCTION = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<TokenizationFunction> TOKENIZATION_FUNCTION = new SingleEntryRegistryImpl<>();
 
 
 
@@ -106,7 +98,7 @@ public final class Registries {
      * @see ParsingFunction
      * @see Parser
      */
-    public static final OrderedRegistry<ParsingFunction<? extends Statement>> PARSING_FUNCTIONS = new OrderedRegistry<>();
+    public static final OrderedRegistry<ParsingFunction<?>> PARSING_FUNCTIONS = new OrderedRegistry<>();
 
     /**
      * Registry for function that uses {@link Registries#PARSING_FUNCTIONS} to parse tokens into {@link Program}
@@ -114,7 +106,7 @@ public final class Registries {
      * @see ParsingFunction
      * @see Parser
      */
-    public static final SingleEntryRegistry<BiFunction<File, List<Token>, Program>> PARSE_TOKENS_FUNCTION = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<ParseTokensFunction> PARSE_TOKENS_FUNCTION = new SingleEntryRegistryImpl<>();
 
     /**
      * Registry for {@link DataTypeFactory}
@@ -146,7 +138,7 @@ public final class Registries {
      */
     public static void updateGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        for (RegistryEntry<Pair<Class<? extends Statement>, Converter<? extends Statement>>> entry : Registries.CONVERTERS.getEntries()) {
+        for (RegistryEntry<Pair<Class<? extends Statement>, Converter<? extends Statement>>> entry : CONVERTERS.getEntries()) {
             gsonBuilder.registerTypeAdapter(entry.getValue().getKey(), entry.getValue().getValue());
         }
         gson = gsonBuilder.create();
@@ -168,7 +160,7 @@ public final class Registries {
      * @see EvaluationFunction
      * @see Interpreter
      */
-    public static final SingleEntryRegistry<Function<Program, GlobalEnvironment>> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<EvaluateProgramFunction> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
 
 
 
@@ -176,6 +168,10 @@ public final class Registries {
      * Registry for {@link GlobalEnvironmentFactory}
      */
     public static final SingleEntryRegistry<GlobalEnvironmentFactory> GLOBAL_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    /**
+     * Registry for {@link FileEnvironmentFactory}
+     */
+    public static final SingleEntryRegistry<FileEnvironmentFactory> FILE_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
      * Registry for {@link ClassEnvironmentFactory}
@@ -203,42 +199,38 @@ public final class Registries {
     public static final SingleEntryRegistry<EnvironmentFactory> ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
-     * Set of native related {@link GlobalEnvironment}s
+     * Set of native {@link FileEnvironment}s
      */
-    public static final Set<GlobalEnvironment> NATIVE_RELATED_GLOBAL_ENVIRONMENTS = new HashSet<>();
+    public static final Set<FileEnvironment> NATIVE_FILE_ENVIRONMENTS = new HashSet<>();
 
 
 
     /**
-     * Initializes all registries
+     * Initializes Registries
      * <p>
-     * <i>Don't use this method because it's called once at Meazy initialization</i>
+     * <i>Don't use this method because it's called once at {@link MeazyMain} initialization</i>
      *
-     * @throws IllegalStateException If registries have already been initialized
+     * @throws IllegalStateException If Registries has already been initialized
      */
-    public static void INIT() throws IllegalStateException {
+    public static void INIT() {
         if (isInit) throw new IllegalStateException("Registries have already been initialized");
         isInit = true;
 
-        LANGUAGES.register(getDefaultIdentifier("english"), new Language("en", "English"));
-        LANGUAGES.register(getDefaultIdentifier("russian"), new Language("ru", "Русский"));
+        LANGUAGES.register(MeazyMain.getDefaultIdentifier("english"), new Language("en", "English"));
+        LANGUAGES.register(MeazyMain.getDefaultIdentifier("russian"), new Language("ru", "Русский"));
 
-        Commands.INIT();
-        TokenTypes.INIT();
+        Commands.REGISTER();
+        TokenTypes.REGISTER();
+        Converters.REGISTER();
 
-        registerConverter(new StatementConverter());
-        registerConverter(new ExpressionConverter());
-        registerConverter(new ProgramConverter());
-        registerConverter(new CallArgExpressionConverter());
-
-        TOKENIZATION_FUNCTION.register(getDefaultIdentifier("tokens_function"), lines -> {
+        TOKENIZATION_FUNCTION.register(MeazyMain.getDefaultIdentifier("tokens_function"), lines -> {
             List<Token> tokens = new ArrayList<>();
             int lineNumber = 1;
 
             for (int i = 0; i < lines.length(); i++) {
                 String string = lines.substring(i);
                 Token token = null;
-                for (RegistryEntry<TokenType> entry : Registries.TOKEN_TYPES.getEntries()) {
+                for (RegistryEntry<TokenType> entry : TOKEN_TYPES.getEntries()) {
                     TokenType tokenType = entry.getValue();
                     if (tokenType.getPattern() == null) continue;
 
@@ -271,11 +263,12 @@ public final class Registries {
             return tokens;
         });
 
-        PARSE_TOKENS_FUNCTION.register(getDefaultIdentifier("parse_tokens"), (file, tokens) -> {
+        PARSE_TOKENS_FUNCTION.register(MeazyMain.getDefaultIdentifier("parse_tokens"), (file, tokens) -> {
             if (tokens == null) throw new NullPointerException("Tokens can't be null");
-            Parser.setTokens(tokens);
+            ParsingContext parsingContext = new ParsingContext(tokens);
 
-            Parser.moveOverOptionalNewLines();
+            Parser parser = parsingContext.getParser();
+            parser.moveOverOptionalNewLines();
 
             Map<String, Version> requiredAddons = new HashMap<>();
             for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
@@ -284,16 +277,15 @@ public final class Registries {
             }
 
             List<Statement> body = new ArrayList<>();
-            while (!Parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                body.add(Parser.parse(getDefaultIdentifier("global_statement"), Statement.class));
-                Parser.moveOverOptionalNewLines();
+            while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
+                body.add(parser.parse(MeazyMain.getDefaultIdentifier("global_statement"), Statement.class));
+                parser.moveOverOptionalNewLines();
             }
 
             return new Program(file, MeazyMain.VERSION, requiredAddons, body);
         });
-        EVALUATE_PROGRAM_FUNCTION.register(getDefaultIdentifier("evaluate_program"), program -> {
-            if (program.getFile() == null) throw new NullPointerException("Program's file is null");
 
+        EVALUATE_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("evaluate_program"), (program, globalEnvironment) -> {
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
                 if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
@@ -305,34 +297,10 @@ public final class Registries {
                 }
             }
 
-            GlobalEnvironment globalEnvironment = Registries.GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create(program.getFile());
-            Interpreter.evaluate(program, globalEnvironment);
+            FileEnvironment fileEnvironment = FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(globalEnvironment, program.getFile());
+            globalEnvironment.getContext().getInterpreter().evaluate(program, fileEnvironment);
 
-            return globalEnvironment;
+            return fileEnvironment;
         });
-    }
-
-    @SuppressWarnings("unchecked")
-    private static  <T extends Statement> void registerConverter(Converter<T> converter) {
-        CONVERTERS.register(
-                converter.getId(),
-                (Class<T>) ((ParameterizedType) converter.getClass().getGenericSuperclass()).getActualTypeArguments()[0],
-                converter);
-    }
-
-    /**
-     * Creates new RegistryIdentifier with 'meazy' namespace
-     *
-     * @param id Identifier's id that matches {@link RegistryIdentifier#IDENTIFIER_REGEX}
-     * @return New RegistryIdentifier
-     *
-     * @apiNote Recommended to use {@link RegistryIdentifier#of(String, String)} or {@link RegistryIdentifier#of(String)}
-     *          because 'meazy' namespace belongs to core identifiers
-     *
-     * @throws NullPointerException If id is null
-     * @throws IllegalArgumentException If id doesn't match {@link RegistryIdentifier#IDENTIFIER_REGEX}
-     */
-    public static RegistryIdentifier getDefaultIdentifier(String id) throws NullPointerException, IllegalArgumentException {
-        return RegistryIdentifier.of("meazy", id);
     }
 }

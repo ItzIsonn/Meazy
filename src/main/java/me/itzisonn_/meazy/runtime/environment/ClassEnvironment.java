@@ -34,7 +34,9 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
     /**
      * @param id Function's id
      * @param args Function's args
+     *
      * @return Declared operator function with given id and args or null
+     *
      * @throws NullPointerException If either id or args is null
      */
     default FunctionValue getOperatorFunction(String id, List<RuntimeValue<?>> args) throws NullPointerException {
@@ -49,7 +51,7 @@ public interface ClassEnvironment extends Environment, FunctionDeclarationEnviro
                 if (args.size() != callArgExpressions.size()) continue;
 
                 for (int i = 0; i < args.size(); i++) {
-                    if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i), getGlobalEnvironment())) continue main;
+                    if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
                 }
 
                 return functionValue;

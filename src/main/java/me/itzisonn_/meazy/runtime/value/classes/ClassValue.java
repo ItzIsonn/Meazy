@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.value.classes;
 
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 import java.util.Set;
@@ -29,10 +30,11 @@ public interface ClassValue extends RuntimeValue<Object> {
     boolean isMatches(Object value);
 
     /**
+     * @param fileEnvironment File environment
      * @param value Value to check
      * @return Whether given value matches this class value or it's base classes
      */
-    boolean isLikeMatches(Object value);
+    boolean isLikeMatches(FileEnvironment fileEnvironment, Object value);
 
 
 
