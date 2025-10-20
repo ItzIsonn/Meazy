@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
+import lombok.Getter;
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.registry.multiple_entry.Pair;
 import me.itzisonn_.meazy.Registries;
@@ -11,13 +13,17 @@ import me.itzisonn_.meazy.runtime.value.*;
  * Is used to evaluate statements
  * @see Registries#EVALUATION_FUNCTIONS
  */
-public final class Interpreter {
+@Getter
+public class Interpreter {
+    private final RuntimeContext context;
     /**
      * Output of the program
      */
-    public static final StringBuilder OUTPUT = new StringBuilder();
+    private final StringBuilder output = new StringBuilder();
 
-    private Interpreter() {}
+    public Interpreter(RuntimeContext context) {
+        this.context = context;
+    }
 
     /**
      * Evaluates given statement using given environment and extra info
@@ -30,7 +36,7 @@ public final class Interpreter {
      * @throws NullPointerException If either statement or environment is null
      */
     @SuppressWarnings("unchecked")
-    public static RuntimeValue<?> evaluate(Statement statement, Environment environment, Object... extra) throws NullPointerException {
+    public RuntimeValue<?> evaluate(Statement statement, Environment environment, Object... extra) throws NullPointerException {
         if (statement == null) throw new NullPointerException("Statement can't be null");
         if (environment == null) throw new NullPointerException("Environment can't be null");
 
@@ -46,7 +52,7 @@ public final class Interpreter {
             evaluationFunction = (EvaluationFunction<Statement>) getEvaluationFunctionOrNull(parent);
         }
 
-        return evaluationFunction.evaluate(statement, environment, extra);
+        return evaluationFunction.evaluate(statement, context, environment, extra);
     }
 
     /**
@@ -57,7 +63,7 @@ public final class Interpreter {
      *
      * @throws NullPointerException If given cls is null
      */
-    private static EvaluationFunction<? extends Statement> getEvaluationFunctionOrNull(Class<? extends Statement> cls) throws NullPointerException {
+    private EvaluationFunction<? extends Statement> getEvaluationFunctionOrNull(Class<? extends Statement> cls) throws NullPointerException {
         if (cls == null) throw new NullPointerException("Cls can't be null");
 
         RegistryEntry<Pair<Class<? extends Statement>, EvaluationFunction<? extends Statement>>> entry = Registries.EVALUATION_FUNCTIONS.getEntryByKey(cls);

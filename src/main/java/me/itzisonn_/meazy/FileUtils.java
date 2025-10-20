@@ -14,7 +14,7 @@ public final class FileUtils {
      * @param file Target file
      * @return Extension of file
      *
-     * @throws NullPointerException When given file is null
+     * @throws NullPointerException If given file is null
      */
     public static String getExtension(File file) throws NullPointerException {
         if (file == null) throw new NullPointerException("File can't be null");
@@ -33,7 +33,7 @@ public final class FileUtils {
      * @param file Target file
      * @return Lines of file
      *
-     * @throws NullPointerException When given file is null
+     * @throws NullPointerException If given file is null
      */
     public static String getLines(File file) throws NullPointerException {
         if (file == null) throw new NullPointerException("File can't be null");
@@ -52,7 +52,7 @@ public final class FileUtils {
      * @param inputStream Input stream
      * @return Lines of input stream
      *
-     * @throws NullPointerException When given inputStream is null
+     * @throws NullPointerException If given inputStream is null
      */
     public static String getLines(InputStream inputStream) throws NullPointerException {
         if (inputStream == null) throw new NullPointerException("InputStream can't be null");

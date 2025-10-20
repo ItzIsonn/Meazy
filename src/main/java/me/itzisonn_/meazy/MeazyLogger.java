@@ -12,11 +12,15 @@ import java.lang.reflect.Field;
 
 public class MeazyLogger extends Logger {
     private MeazyLogger(Logger logger) {
-        super(getContext(logger), "meazy", getMessageFactory(logger));
+        super(getContext(logger), logger.getName(), getMessageFactory(logger));
+    }
+
+    public MeazyLogger(String id) {
+        this((Logger) LogManager.getLogger(id));
     }
 
     public MeazyLogger() {
-        this((Logger) LogManager.getLogger("meazy"));
+        this("meazy");
     }
 
 

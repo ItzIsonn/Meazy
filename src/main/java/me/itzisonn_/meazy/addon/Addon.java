@@ -4,12 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import lombok.Getter;
 import me.itzisonn_.meazy.FileUtils;
+import me.itzisonn_.meazy.MeazyLogger;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.addon.datagen.DatagenManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
@@ -30,7 +29,7 @@ public abstract class Addon {
     private ClassLoader classLoader = null;
     private JsonElement config = null;
     private File configFile = null;
-    private Logger logger = null;
+    private MeazyLogger logger = null;
 
     public Addon() {
         ClassLoader classLoader = getClass().getClassLoader();
@@ -209,13 +208,13 @@ public abstract class Addon {
         this.dataFolder = dataFolder;
         this.classLoader = classLoader;
         this.configFile = new File(dataFolder, "config.json");
-        this.logger = LogManager.getLogger(addonInfo.getId());
+        this.logger = new MeazyLogger(addonInfo.getId());
     }
 
     /**
      * @return This addon's logger
      */
-    public final Logger getLogger() {
+    public final MeazyLogger getLogger() {
         return logger;
     }
 

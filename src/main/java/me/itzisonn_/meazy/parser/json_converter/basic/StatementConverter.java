@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.json_converter.basic;
 
 import com.google.gson.*;
+import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.json_converter.Converter;
 import me.itzisonn_.meazy.parser.json_converter.InvalidCompiledFileException;
@@ -12,7 +13,7 @@ import java.lang.reflect.Type;
 
 public class StatementConverter extends Converter<Statement> {
     public StatementConverter() {
-        super(Registries.getDefaultIdentifier("statement"));
+        super(MeazyMain.getDefaultIdentifier("statement"));
     }
 
     @Override

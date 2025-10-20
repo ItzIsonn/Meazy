@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.data_type;
 
-import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 /**
@@ -21,10 +21,10 @@ public interface DataType {
      * Checks whether given value matches this data type
      *
      * @param value Value to check
-     * @param globalEnvironment Global environment that contains class with this data type's name
+     * @param fileEnvironment File environment that contains class with this data type's name
      * @return Whether given value matches this data type
      *
      * @throws NullPointerException If given globalEnvironment is null
      */
-    boolean isMatches(RuntimeValue<?> value, GlobalEnvironment globalEnvironment) throws NullPointerException;
+    boolean isMatches(RuntimeValue<?> value, FileEnvironment fileEnvironment) throws NullPointerException;
 }
