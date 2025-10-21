@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Represents global environment
  */
-public interface FileEnvironment extends Environment, FunctionDeclarationEnvironment, ClassDeclarationEnvironment {
+public interface FileEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ClassDeclarationEnvironment {
     /**
      * @return This environment's parent
      */
@@ -40,7 +40,7 @@ public interface FileEnvironment extends Environment, FunctionDeclarationEnviron
      *
      * @throws NullPointerException If given id is null
      *
-     * @apiNote Difference from {@link Environment#getVariable(String)} is that this method
+     * @apiNote Difference from {@link VariableDeclarationEnvironment#getVariable(String)} is that this method
      *          doesn't look for variable in related global environments
      */
     VariableValue getLocalVariable(String id) throws NullPointerException;
