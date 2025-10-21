@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.*;
@@ -17,6 +18,7 @@ import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.registry.CommandRegistry;
 import me.itzisonn_.meazy.registry.LanguageRegistry;
 import me.itzisonn_.meazy.runtime.EvaluateProgramFunction;
+import me.itzisonn_.meazy.runtime.RunProgramFunction;
 import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
@@ -156,11 +158,15 @@ public final class Registries {
 
     /**
      * Registry for function that uses {@link Registries#EVALUATION_FUNCTIONS} to evaluate {@link Program}
-     *
-     * @see EvaluationFunction
-     * @see Interpreter
+     * @see EvaluateProgramFunction
      */
     public static final SingleEntryRegistry<EvaluateProgramFunction> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
+
+    /**
+     * Registry for function that uses {@link Registries#EVALUATE_PROGRAM_FUNCTION} to run {@link Program}
+     * @see RunProgramFunction
+     */
+    public static final SingleEntryRegistry<RunProgramFunction> RUN_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
 
 
 
@@ -301,6 +307,12 @@ public final class Registries {
             globalEnvironment.getContext().getInterpreter().evaluate(program, fileEnvironment);
 
             return fileEnvironment;
+        });
+
+        RUN_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("run_program"), program -> {
+            RuntimeContext context = new RuntimeContext();
+            GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
+            return Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
         });
     }
 }
