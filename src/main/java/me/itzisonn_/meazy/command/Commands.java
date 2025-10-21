@@ -4,12 +4,10 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
-import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.ast.Program;
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.registry.RegistryEntry;
 import org.apache.logging.log4j.Level;
 
@@ -180,10 +178,7 @@ public final class Commands {
                     }
                 }
 
-
-                RuntimeContext context = new RuntimeContext();
-                GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
-                Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
+                Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue().run(program);
 
                 long endMillis = System.currentTimeMillis();
                 return "Executed in " + ((double) (endMillis - startMillis)) / 1000 + "s.";

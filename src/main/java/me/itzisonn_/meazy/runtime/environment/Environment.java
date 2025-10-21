@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -78,20 +77,6 @@ public interface Environment {
         Environment parent = getParent();
         if (predicate.test(parent)) return parent;
         if (parent != null) return parent.getParent(predicate);
-        return null;
-    }
-
-    /**
-     * Finds GlobalEnvironment in parent environments of this environment
-     * @return GlobalEnvironment
-     *
-     * @deprecated Use {@link RuntimeContext#getGlobalEnvironment()}
-     */
-    @Deprecated(forRemoval = true)
-    default GlobalEnvironment getGlobalEnvironment() {
-        Environment parent = getParent();
-        if (parent instanceof GlobalEnvironment globalEnvironment) return globalEnvironment;
-        if (parent != null) return parent.getGlobalEnvironment();
         return null;
     }
 
