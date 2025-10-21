@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.value;
 
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 
@@ -40,7 +40,7 @@ public interface VariableValue extends RuntimeValue<RuntimeValue<?>> {
     /**
      * @return Parent environment
      */
-    Environment getParentEnvironment();
+    VariableDeclarationEnvironment getParentEnvironment();
 
     /**
      * Sets this variable's value to given value

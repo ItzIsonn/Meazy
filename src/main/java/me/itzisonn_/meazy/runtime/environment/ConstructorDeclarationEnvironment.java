@@ -42,14 +42,14 @@ public interface ConstructorDeclarationEnvironment extends Environment {
     }
 
     /**
-     * @return All declared constructors
-     */
-    Set<ConstructorValue> getConstructors();
-
-    /**
      * @return Whether this environment has at least one declared constructor
      */
     default boolean hasConstructor() {
         return !getConstructors().isEmpty();
     }
+
+    /**
+     * @return All declared constructors
+     */
+    Set<ConstructorValue> getConstructors();
 }

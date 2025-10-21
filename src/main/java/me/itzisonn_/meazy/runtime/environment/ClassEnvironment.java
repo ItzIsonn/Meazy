@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Represents environment for classes
  */
-public interface ClassEnvironment extends Environment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
+public interface ClassEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
     /**
      * @return This class environment's id
      */
