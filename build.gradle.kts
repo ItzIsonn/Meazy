@@ -5,23 +5,26 @@ plugins {
 group = "me.itzisonn_.meazy"
 version = "2.7"
 description = "Meazy"
-java.sourceCompatibility = JavaVersion.VERSION_21
+java.sourceCompatibility = JavaVersion.VERSION_25
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("org.apache.logging.log4j:log4j-core:2.24.3")
-    implementation("com.google.code.gson:gson:2.13.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.25.2")
+    implementation("com.google.code.gson:gson:2.13.2")
 
     implementation(files("libs/Registry.jar"))
 
-    compileOnly("org.projectlombok:lombok:1.18.38")
-    annotationProcessor("org.projectlombok:lombok:1.18.38")
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.12.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
+
+
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
@@ -30,6 +33,12 @@ tasks.withType<JavaCompile> {
 tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
 }
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+
 
 abstract class DownloadLibsTask : DefaultTask() {
     @TaskAction
