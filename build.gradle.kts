@@ -7,6 +7,11 @@ version = "2.7"
 description = "Meazy"
 java.sourceCompatibility = JavaVersion.VERSION_25
 
+val lombokVersion = "1.18.42"
+val junitVersion = "6.0.0"
+
+
+
 repositories {
     mavenCentral()
 }
@@ -17,10 +22,11 @@ dependencies {
 
     implementation(files("libs/Registry.jar"))
 
-    compileOnly("org.projectlombok:lombok:1.18.42")
-    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:${junitVersion}")
+    testImplementation("org.junit.platform:junit-platform-suite-api:${junitVersion}")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
