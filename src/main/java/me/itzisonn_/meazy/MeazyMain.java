@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy;
 
+import lombok.Getter;
 import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.datagen.DatagenDeserializers;
@@ -43,7 +44,8 @@ public final class MeazyMain {
      */
     public static final String IDENTIFIER_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*";
 
-    private static boolean isInit = false;
+    @Getter
+    private static boolean isInitialized = false;
 
     private MeazyMain() {}
 
@@ -51,7 +53,7 @@ public final class MeazyMain {
 
     public static void main(String[] args) {
         long startLoadMillis = System.currentTimeMillis();
-        INIT();
+        INITIALIZE();
         long endLoadMillis = System.currentTimeMillis();
 
         if (args.length == 0) {
@@ -86,9 +88,11 @@ public final class MeazyMain {
         }
     }
 
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("MeazyMain have already been initialized");
-        isInit = true;
+
+
+    public static void INITIALIZE() {
+        if (isInitialized) throw new IllegalStateException("MeazyMain have already been initialized");
+        isInitialized = true;
 
         Registries.INIT();
 
