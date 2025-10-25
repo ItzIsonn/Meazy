@@ -71,7 +71,7 @@ public interface Text {
         if (key == null) throw new NullPointerException("Key can't be null");
 
         String[] parts = key.split(":");
-        if (parts.length != 2) throw new IllegalArgumentException("Invalid key");
+        if (parts.length != 2) throw new IllegalArgumentException("Invalid translation key " + key);
 
         String providerId = parts[0];
         String translationKey = parts[1];

@@ -3,7 +3,8 @@ package me.itzisonn_.meazy.command;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.addon.Addon;
-import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import me.itzisonn_.meazy.addon.AddonInfo;
+import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.parser.ast.Program;
@@ -72,7 +73,7 @@ public final class Commands {
             public String execute(String... args) {
                 switch (args[0]) {
                     case "list" -> {
-                        if (MeazyMain.ADDON_MANAGER.getAddons().length == 0) {
+                        if (MeazyMain.ADDON_MANAGER.getAddons().isEmpty()) {
                             MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.empty"));
                             return null;
                         }
@@ -103,7 +104,7 @@ public final class Commands {
 
                     case "downloadDefault" -> {
                         String site = "https://github.com/ItzIsonn/MeazyAddon/releases/download/v" + MeazyMain.VERSION + "/MeazyAddon-v" + MeazyMain.VERSION + ".jar";
-                        String file = MeazyMain.ADDON_MANAGER.getAddonsFolder().getAbsolutePath() + "\\" + Arrays.asList(site.split("/")).getLast();
+                        String file = AddonManager.ADDONS_FOLDER.getAbsolutePath() + "\\" + Arrays.asList(site.split("/")).getLast();
 
                         ReadableByteChannel byteChannel;
                         try {

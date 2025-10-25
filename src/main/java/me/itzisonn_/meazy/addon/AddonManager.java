@@ -1,81 +1,55 @@
 package me.itzisonn_.meazy.addon;
 
-import lombok.Getter;
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import me.itzisonn_.meazy.lang.text.Text;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Represents an AddonManager
  */
 public final class AddonManager {
-    @Getter
-    private final File addonsFolder;
-    @Getter
-    private final AddonLoader addonLoader;
-    private final Map<Pattern, AddonLoader> fileAssociations = new HashMap<>();
-    private final List<Addon> addons = new ArrayList<>();
-    private final Map<String, Addon> lookupIds = new HashMap<>();
+    private static final Pattern FILE_FILTER = Pattern.compile(".+\\.jar$");
+    public static final File ADDONS_FOLDER;
 
-    /**
-     * @param addonsFolder Addons folder
-     *
-     * @throws NullPointerException If given addonsFolder is null
-     * @throws IllegalArgumentException If given addonsFolder doesn't exist or isn't a directory
-     */
-    public AddonManager(File addonsFolder) {
-        if (addonsFolder == null) throw new NullPointerException("AddonsFolder can't be null");
-        if (!addonsFolder.exists()) throw new IllegalArgumentException("AddonsFolder doesn't exist");
-        if (!addonsFolder.isDirectory()) throw new IllegalArgumentException("AddonsFolder must be directory");
-        this.addonsFolder = addonsFolder;
-
-        addonLoader = new AddonLoader();
-
-        Pattern[] patterns = addonLoader.getAddonFileFilters();
-
-        synchronized (this) {
-            for (Pattern pattern : patterns) {
-                fileAssociations.put(pattern, addonLoader);
-            }
+    static {
+        try {
+            ADDONS_FOLDER = new File(new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent() + "/addons/");
         }
+        catch (URISyntaxException e) {
+            throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").getContent(), e);
+        }
+
+        if (!ADDONS_FOLDER.exists() && !ADDONS_FOLDER.mkdirs()) throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").getContent());
     }
 
-    /**
-     * Loads addons in given directory
-     *
-     * @return Array of loaded addons
-     */
-    public Addon[] loadAddons() {
-        List<Addon> result = new ArrayList<>();
-        Set<Pattern> filters = fileAssociations.keySet();
+    private final AddonLoader addonLoader = new AddonLoader();
+    private final List<Addon> addons = new ArrayList<>();
 
+
+
+    /**
+     * Loads addons
+     */
+    public void loadAddons() {
         Map<String, File> addons = new HashMap<>();
         Set<String> loadedAddons = new HashSet<>();
         Map<String, Collection<String>> dependencies = new HashMap<>();
         Map<String, Collection<String>> softDependencies = new HashMap<>();
 
-        File[] listFiles = addonsFolder.listFiles();
+        File[] listFiles = ADDONS_FOLDER.listFiles();
         if (listFiles == null) throw new NullPointerException("AddonsFolder's list of files is null");
 
         for (File file : listFiles) {
-            AddonLoader loader = null;
-            for (Pattern filter : filters) {
-                Matcher match = filter.matcher(file.getName());
-                if (match.find()) {
-                    loader = fileAssociations.get(filter);
-                }
-            }
-
-            if (loader == null) continue;
+            if (!FILE_FILTER.matcher(file.getName()).matches()) continue;
 
             AddonInfo addonInfo;
             try {
-                addonInfo = loader.getAddonInfo(file);
+                addonInfo = addonLoader.getAddonInfo(file);
 
                 if (addonInfo.getCoreDepend() != null && !addonInfo.getCoreDepend().equals(MeazyMain.VERSION)) {
                     MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.unsupported_version", file.getPath(), addonInfo.getCoreDepend());
@@ -168,7 +142,7 @@ public final class AddonManager {
                     missingDependency = false;
 
                     try {
-                        result.add(loadAddon(file));
+                        loadAddon(file);
                         loadedAddons.add(addon);
                     }
                     catch (InvalidAddonException e) {
@@ -190,7 +164,7 @@ public final class AddonManager {
                         addonIterator.remove();
 
                         try {
-                            result.add(loadAddon(file));
+                            loadAddon(file);
                             loadedAddons.add(addon);
                             break;
                         }
@@ -213,94 +187,77 @@ public final class AddonManager {
                 }
             }
         }
-
-        return result.toArray(new Addon[0]);
     }
 
     /**
      * Loads addon from given file
-     *
      * @param file Addon's file
-     * @return Loaded addon
-     * @throws InvalidAddonException When incorrect file is presented
+     *
+     * @throws NullPointerException If given file is null
+     * @throws InvalidAddonException If given file is invalid
      */
-    public synchronized Addon loadAddon(File file) throws InvalidAddonException {
-        if (file == null) throw new IllegalArgumentException("File can't be null");
-
-        Set<Pattern> filters = fileAssociations.keySet();
-        Addon result = null;
-
-        for (Pattern filter : filters) {
-            String name = file.getName();
-            Matcher match = filter.matcher(name);
-
-            if (match.find()) {
-                AddonLoader loader = fileAssociations.get(filter);
-
-                result = loader.loadAddon(file);
-            }
-        }
-
-        if (result != null) {
-            addons.add(result);
-            lookupIds.put(result.getAddonInfo().getId(), result);
-        }
-
-        return result;
+    private void loadAddon(File file) throws NullPointerException, InvalidAddonException {
+        if (file == null) throw new NullPointerException("File can't be null");
+        if (!FILE_FILTER.matcher(file.getName()).matches()) throw new InvalidAddonException("Invalid addon file");
+        addons.add(addonLoader.loadAddon(file));
     }
 
+
+
     /**
-     * Checks if the given addon is loaded and returns it when applicable
-     * <p>
-     * Id of the addon is case-sensitive
-     *
+     * Returns loaded addon with given id
      * @param id Id of the addon to check
+     *
      * @return Addon if it exists, otherwise null
+     * @throws NullPointerException If given id is null
      */
-    public synchronized Addon getAddon(String id) {
-        return lookupIds.get(id.replace(' ', '_'));
-    }
+    public Addon getAddon(String id) throws NullPointerException {
+        if (id == null) throw new NullPointerException("Id can't be null");
 
-    public synchronized Addon[] getAddons() {
-        return addons.toArray(new Addon[0]);
+        for (Addon addon : addons) {
+            if (addon.getAddonInfo().getId().equals(id)) return addon;
+        }
+
+        return null;
     }
 
     /**
-     * Checks if the given addon is enabled or not
-     * <p>
-     * Id of the addon is case-sensitive.
+     * @return List of loaded addons
+     */
+    public List<Addon> getAddons() {
+        return List.copyOf(addons);
+    }
+
+    /**
+     * Checks whether the addon with given id
      *
-     * @param id Id of the addon to check
-     * @return True if the addon is enabled, otherwise false
+     * @param id Id of the addon
+     * @return Whether the addon exists and is enabled
+     *
+     * @throws NullPointerException If given id is null
      */
     public boolean isAddonEnabled(String id) {
-        return isAddonEnabled(getAddon(id));
-    }
+        if (id == null) throw new NullPointerException("Id can't be null");
+        Addon addon = getAddon(id);
 
-    /**
-     * Checks if the given addon is enabled or not
-     *
-     * @param addon Addon to check
-     * @return True if the addon is enabled, otherwise false
-     */
-    public boolean isAddonEnabled(Addon addon) {
-        if (addon != null && addons.contains(addon)) return addon.isEnabled();
-        else return false;
+        if (addon == null) return false;
+        return addon.isEnabled();
     }
 
     /**
      * Enables given addon
-     *
      * @param addon Addon to enable
+     *
+     * @throws NullPointerException If given addon is null
+     * @throws IllegalStateException If given addon has already been enabled
      */
-    public void enableAddon(Addon addon) {
-        if (addon.isEnabled()) return;
+    public void enableAddon(Addon addon) throws NullPointerException, IllegalStateException {
+        addonLoader.enableAddon(addon);
+    }
 
-        try {
-            addon.getAddonLoader().enableAddon(addon);
-        }
-        catch (Throwable e) {
-            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.failed_enable", addon.getAddonInfo().getFullName(), e);
-        }
+
+
+    public Class<?> getClassByName(String name) {
+        return addonLoader.getClassByName(name, null);
     }
 }

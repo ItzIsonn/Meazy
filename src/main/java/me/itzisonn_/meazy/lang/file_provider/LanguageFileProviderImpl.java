@@ -20,7 +20,7 @@ public class LanguageFileProviderImpl implements LanguageFileProvider {
      *
      * @throws NullPointerException If either id or resourceFunction is null
      */
-    public LanguageFileProviderImpl(String id, Function<String, InputStream> resourceFunction) {
+    public LanguageFileProviderImpl(String id, Function<String, InputStream> resourceFunction) throws NullPointerException {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (resourceFunction == null) throw new NullPointerException("ResourceFunction can't be null");
 
