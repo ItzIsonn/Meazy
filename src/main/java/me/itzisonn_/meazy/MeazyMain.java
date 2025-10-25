@@ -25,7 +25,6 @@ import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public final class MeazyMain {
     public static final BundleManager BUNDLE_MANAGER = new BundleManager(MEAZY_LANGUAGE_FILE_PROVIDER);
 
     public static final SettingsManager SETTINGS_MANAGER = new SettingsManager();
-    public static final AddonManager ADDON_MANAGER = new AddonManager(getAddonsDirectory());
+    public static final AddonManager ADDON_MANAGER = new AddonManager();
 
     /**
      * Regex used by all identifiers
@@ -104,23 +103,10 @@ public final class MeazyMain {
         loadAddons();
     }
 
-
-
-    private static File getAddonsDirectory() {
-        File addonsDir;
-        try {
-            addonsDir = new File(new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent() + "/addons/");
-        }
-        catch (URISyntaxException e) {
-            throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").getContent(), e);
-        }
-
-        if (!addonsDir.exists() && !addonsDir.mkdirs()) throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").getContent());
-        return addonsDir;
-    }
-
     private static void loadAddons() {
-        for (Addon addon : ADDON_MANAGER.loadAddons()) {
+        ADDON_MANAGER.loadAddons();
+
+        for (Addon addon : ADDON_MANAGER.getAddons()) {
             if (addon.getLanguageFileProvider() != null) BUNDLE_MANAGER.addLanguageFileProvider(addon.getLanguageFileProvider());
             ADDON_MANAGER.enableAddon(addon);
 
@@ -131,8 +117,6 @@ public final class MeazyMain {
             for (TokenTypeSet tokenTypeSet : addon.getDatagenManager().getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer(addon))) {
                 Registries.TOKEN_TYPE_SETS.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenTypeSet.getId()), tokenTypeSet);
             }
-
-            addon.afterDataLoaded();
 
             RuntimeContext context = new RuntimeContext();
             GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
@@ -147,7 +131,7 @@ public final class MeazyMain {
             }
         }
 
-        int addons = ADDON_MANAGER.getAddons().length;
+        int addons = ADDON_MANAGER.getAddons().size();
         if (addons == 1) LOGGER.log(Level.INFO, Text.translatable("meazy:addons.single_loaded"));
         else LOGGER.log(Level.INFO, Text.translatable("meazy:addons.multiple_loaded"), addons);
     }

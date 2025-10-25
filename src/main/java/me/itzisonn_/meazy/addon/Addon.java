@@ -2,12 +2,11 @@ package me.itzisonn_.meazy.addon;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import lombok.Getter;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.MeazyLogger;
-import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
 import me.itzisonn_.meazy.addon.datagen.DatagenManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
+import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
 import org.apache.logging.log4j.Level;
 
 import java.io.*;
@@ -19,62 +18,37 @@ import java.nio.charset.Charset;
  * Represents an Addon
  */
 public abstract class Addon {
+    private final AddonClassLoader classLoader;
+    private final AddonInfo addonInfo;
+    private final File dataFolder;
+    private final File file;
+    private final DatagenManager datagenManager;
+    private final File configFile;
+    private final MeazyLogger logger;
     private boolean isEnabled = false;
-    private AddonLoader loader = null;
-    private File file = null;
-    @Getter
-    private DatagenManager datagenManager = null;
-    private AddonInfo addonInfo = null;
-    private File dataFolder = null;
-    private ClassLoader classLoader = null;
     private JsonElement config = null;
-    private File configFile = null;
-    private MeazyLogger logger = null;
 
     public Addon() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        if (!(classLoader instanceof AddonClassLoader addonClassLoader)) {
-            throw new IllegalStateException("Addon requires " + AddonClassLoader.class.getName());
+        if (!(getClass().getClassLoader() instanceof AddonClassLoader addonClassLoader)) {
+            throw new IllegalStateException("Addon must be loaded with " + AddonClassLoader.class.getName());
         }
 
-        addonClassLoader.initialize(this);
+        classLoader = addonClassLoader;
+        addonInfo = addonClassLoader.getAddonInfo();
+        dataFolder = addonClassLoader.getDataFolder();
+        file = addonClassLoader.getFile();
+        datagenManager = new DatagenManager(file);
+        configFile = new File(dataFolder, "config.json");
+        logger = new MeazyLogger(addonInfo.getId());
     }
 
-    /**
-     * Gets the associated AddonLoader responsible for this addon
-     *
-     * @return AddonLoader that controls this addon
-     */
-    public final AddonLoader getAddonLoader() {
-        return loader;
-    }
 
-    /**
-     * @return Whether this addon is enabled
-     */
-    public final boolean isEnabled() {
-        return isEnabled;
-    }
-
-    /**
-     * @return File that contains this addon
-     */
-    protected File getFile() {
-        return file;
-    }
 
     /**
      * @return AddonInfo of this addon
      */
     public final AddonInfo getAddonInfo() {
         return addonInfo;
-    }
-
-    /**
-     * @return ClassLoader that holds this addon
-     */
-    protected final ClassLoader getClassLoader() {
-        return classLoader;
     }
 
     /**
@@ -87,10 +61,27 @@ public abstract class Addon {
         return dataFolder;
     }
 
+    /**
+     * @return File that contains this addon
+     */
+    public final File getFile() {
+        return file;
+    }
+
+    /**
+     * @return Datagen manager
+     */
+    public final DatagenManager getDatagenManager() {
+        return datagenManager;
+    }
+
+
+
+    /**
+     * @return Addon's config
+     */
     public JsonElement getConfig() {
-        if (config == null) {
-            reloadConfig();
-        }
+        if (config == null) reloadConfig();
         return config;
     }
 
@@ -116,7 +107,7 @@ public abstract class Addon {
             }
         }
         catch (IOException e) {
-            logger.log(Level.ERROR, "Couldn't save config to {}", configFile, e);
+            logger.logTranslatable(Level.ERROR, "meazy:addons.resource.save_failed_config", configFile.getAbsolutePath(), e);
         }
     }
 
@@ -156,12 +147,10 @@ public abstract class Addon {
                 out.close();
                 in.close();
             }
-            else {
-                logger.log(Level.WARN, "Couldn't save {} to {} because {} already exists", outFile.getName(), outFile, outFile.getName());
-            }
+            else logger.logTranslatable(Level.WARN, "meazy:addons.resource.save_failed_already_exists", outFile);
         }
-        catch (IOException ex) {
-            logger.log(Level.ERROR, "Couldn't save {} to {}", outFile.getName(), outFile, ex);
+        catch (IOException e) {
+            logger.logTranslatable(Level.ERROR, "meazy:addons.resource.save_failed", outFile.getAbsolutePath(), e);
         }
     }
 
@@ -171,7 +160,7 @@ public abstract class Addon {
         }
 
         try {
-            URL url = getClassLoader().getResource(filename);
+            URL url = classLoader.getResource(filename);
 
             if (url == null) {
                 return null;
@@ -181,35 +170,34 @@ public abstract class Addon {
             connection.setUseCaches(false);
             return connection.getInputStream();
         }
-        catch (IOException ex) {
+        catch (IOException e) {
             return null;
         }
     }
 
-    public abstract void onInitialize();
-    public void afterDataLoaded() {}
+
+
+    protected abstract void onEnable();
 
     /**
      * Enables this addon
+     * @throws AddonEnableException If addon has already been enabled
      */
-    protected final void enable() throws AddonEnableException {
-        if (!isEnabled) {
-            isEnabled = true;
-            onInitialize();
-        }
-        else throw new AddonEnableException("Addon has already been enabled");
+    final void enable() throws AddonEnableException {
+        if (isEnabled) throw new AddonEnableException("Addon has already been enabled");
+
+        onEnable();
+        isEnabled = true;
     }
 
-    public final void init(AddonLoader loader, AddonInfo addonInfo, File dataFolder, File file, ClassLoader classLoader) {
-        this.loader = loader;
-        this.file = file;
-        this.addonInfo = addonInfo;
-        this.datagenManager = new DatagenManager(file);
-        this.dataFolder = dataFolder;
-        this.classLoader = classLoader;
-        this.configFile = new File(dataFolder, "config.json");
-        this.logger = new MeazyLogger(addonInfo.getId());
+    /**
+     * @return Whether this addon is enabled
+     */
+    public final boolean isEnabled() {
+        return isEnabled;
     }
+
+
 
     /**
      * @return This addon's logger
@@ -219,70 +207,23 @@ public abstract class Addon {
     }
 
     /**
-     * Returns addon's full name
-     *
-     * @return {@link AddonInfo#getFullName()}
-     */
-    @Override
-    public String toString() {
-        return addonInfo.getFullName();
-    }
-
-    /**
-     * This method provides fast access to the addon that has {@link #getProvidingAddon(Class) provided}
-     * the given addon class, which is usually the addon that implemented it.
-     *
-     * @param addonClass The class desired
-     * @return The addon that provides and implements given class
-     * @throws IllegalArgumentException If addonClass is null or doesn't extend {@link Addon}
-     * @throws IllegalStateException If addonClass wasn't provided by an addon,
-     *     for example, if called with
-     *     <code>Addon.getAddon(Addon.class)</code>
-     *     or called from the static initializer for given Addon
-     * @throws ClassCastException If addon that provided the class doesn't extend the class
-     */
-    public static <T extends Addon> T getAddon(Class<T> addonClass) {
-        if (addonClass == null) throw new IllegalArgumentException("Null class can't have a addon");
-
-        if (!Addon.class.isAssignableFrom(addonClass)) {
-            throw new IllegalArgumentException(addonClass + " doesn't extend " + Addon.class);
-        }
-
-        if (!(addonClass.getClassLoader() instanceof AddonClassLoader addonClassLoader)) {
-            throw new IllegalArgumentException(addonClass + " isn't initialized by " + AddonClassLoader.class);
-        }
-
-        Addon addon = addonClassLoader.addon;
-        if (addon == null) {
-            throw new IllegalStateException("Can't get addon for " + addonClass + " from a static initializer");
-        }
-        return addonClass.cast(addon);
-    }
-
-    /**
-     * This method provides fast access to the addon that has provided the given class.
-     *
-     * @throws IllegalArgumentException If the class is null or isn't provided by an Addon
-     * @throws IllegalStateException If called from the static initializer for given Addon
-     */
-    public static Addon getProvidingAddon(Class<?> addonClass) {
-        if (addonClass == null) throw new IllegalArgumentException("Null class can't have a addon");
-
-        if (!(addonClass.getClassLoader() instanceof AddonClassLoader addonClassLoader)) {
-            throw new IllegalArgumentException(addonClass + " isn't provided by " + AddonClassLoader.class);
-        }
-
-        Addon addon = addonClassLoader.addon;
-        if (addon == null) {
-            throw new IllegalStateException("Can't get addon for " + addonClass + " from a static initializer");
-        }
-        return addon;
-    }
-
-    /**
      * @return LanguageFileProvider for this addon
      */
     public LanguageFileProvider getLanguageFileProvider() {
-        return null;
+        try (InputStream resource = getClass().getClassLoader().getResourceAsStream("lang/")) {
+            if (resource == null) return null;
+        }
+        catch (IOException e) {
+            return null;
+        }
+
+        return new LanguageFileProviderImpl(addonInfo.getId(), getClass().getClassLoader()::getResourceAsStream);
+    }
+
+
+
+    @Override
+    public String toString() {
+        return addonInfo.getFullName();
     }
 }

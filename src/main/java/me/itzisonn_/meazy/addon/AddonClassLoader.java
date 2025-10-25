@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.addon;
 
-import me.itzisonn_.meazy.addon.addon_info.AddonInfo;
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -9,46 +10,55 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A ClassLoader for addons to allow shared classes across multiple addons
  */
 public final class AddonClassLoader extends URLClassLoader {
     private final AddonLoader loader;
-    private final Map<String, Class<?>> classes = new HashMap<>();
+    @Getter(AccessLevel.PACKAGE)
     private final AddonInfo addonInfo;
+    @Getter(AccessLevel.PACKAGE)
     private final File dataFolder;
+    @Getter(AccessLevel.PACKAGE)
     private final File file;
-    final Addon addon;
-    private Addon addonInit;
+    @Getter
+    private final Addon addon;
+    private final Map<String, Class<?>> classesCache = new HashMap<>();
 
-    public AddonClassLoader(final AddonLoader loader, final ClassLoader parent, final AddonInfo addonInfo, final File dataFolder, final File file) throws InvalidAddonException, MalformedURLException {
-        super(new URL[] {file.toURI().toURL()}, parent);
-        if (loader == null) throw new IllegalArgumentException("Loader can't be null");
+    public AddonClassLoader(AddonLoader loader, AddonInfo addonInfo, File dataFolder, File file) throws InvalidAddonException {
+        if (loader == null) throw new NullPointerException("Loader can't be null");
+        if (addonInfo == null) throw new NullPointerException("AddonInfo can't be null");
+        if (dataFolder == null) throw new NullPointerException("DataFolder can't be null");
+        if (file == null) throw new NullPointerException("File can't be null");
+
+        URL url;
+        try {
+            url = file.toURI().toURL();
+        }
+        catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        super("AddonClassLoader(" + addonInfo.getId() + ")", new URL[]{url}, loader.getClass().getClassLoader());
 
         this.loader = loader;
         this.addonInfo = addonInfo;
         this.dataFolder = dataFolder;
         this.file = file;
 
+        Class<? extends Addon> addonClass;
         try {
-            Class<?> jarClass;
-            try {
-                jarClass = Class.forName(addonInfo.getMain(), true, this);
-            }
-            catch (ClassNotFoundException e) {
-                throw new InvalidAddonException("Can't find main class '" + addonInfo.getMain() + "'", e);
-            }
+            addonClass = Class.forName(addonInfo.getClassName(), true, this).asSubclass(Addon.class);
+        }
+        catch (ClassNotFoundException e) {
+            throw new InvalidAddonException("Can't find main class '" + addonInfo.getClassName() + "' of addon " + addonInfo.getId(), e);
+        }
+        catch (ClassCastException e) {
+            throw new InvalidAddonException("Main class of addon " + addonInfo.getId() + " doesn't extend Addon class", e);
+        }
 
-            Class<? extends Addon> addonClass;
-            try {
-                addonClass = jarClass.asSubclass(Addon.class);
-            }
-            catch (ClassCastException e) {
-                throw new InvalidAddonException("Main class '" + addonInfo.getMain() + "' doesn't extend Addon", e);
-            }
-
+        try {
             addon = addonClass.getDeclaredConstructor().newInstance();
         }
         catch (IllegalAccessException e) {
@@ -68,52 +78,25 @@ public final class AddonClassLoader extends URLClassLoader {
     }
 
     public Class<?> findClass(String name, boolean checkGlobal) throws ClassNotFoundException {
-        if (name.startsWith("me.itzisonn_.meazy.")) {
-            throw new ClassNotFoundException(name);
-        }
-        Class<?> result = classes.get(name);
+        if (name.startsWith("me.itzisonn_.meazy.")) throw new ClassNotFoundException(name);
 
-        if (result == null) {
-            if (checkGlobal) {
-                result = loader.getClassByName(name);
-            }
+        Class<?> result = classesCache.get(name);
+        if (result != null) return result;
 
-            if (result == null) {
-                result = super.findClass(name);
+        if (checkGlobal) result = loader.getClassByName(name, this);
+        if (result == null) result = super.findClass(name);
 
-                if (result != null) {
-                    loader.setClass(name, result);
-                }
-            }
-
-            classes.put(name, result);
-        }
-
+        classesCache.put(name, result);
         return result;
     }
 
-    /**
-     * @return All stored classes
-     */
-    public Set<String> getClasses() {
-        return classes.keySet();
-    }
+    @Override
+    public URL getResource(String name) {
+        if (name == null) throw new NullPointerException("Name can't be null");
 
-    /**
-     * Initializes given addon
-     *
-     * @param addon Addon to initialize
-     */
-    public synchronized void initialize(Addon addon) {
-        if (addon == null) throw new IllegalArgumentException("Initializing addon can't be null");
-        if (addon.getClass().getClassLoader() != this) throw new IllegalArgumentException("Can't initialize addon outside of this class loader");
+        URL url = findResource(name);
+        if (url != null) return url;
 
-        if (this.addon != null || this.addonInit != null) {
-            throw new IllegalArgumentException("Addon has already been initialized");
-        }
-
-        this.addonInit = addon;
-
-        addon.init(loader, addonInfo, dataFolder, file, this);
+        return super.getResource(name);
     }
 }

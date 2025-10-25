@@ -31,7 +31,7 @@ public final class DatagenDeserializers {
      * @return Deserializer for {@link TokenType}
      */
     public static JsonDeserializer<TokenTypeSet> getTokenTypeSetDeserializer(Addon addon) {
-        return (jsonElement, type, jsonDeserializationContext) -> {
+        return (jsonElement, _, _) -> {
             JsonObject object = jsonElement.getAsJsonObject();
 
             if (object.get("id") == null) throw new InvalidDatagenJsonException("TokenTypeSet doesn't have field id");
@@ -61,7 +61,7 @@ public final class DatagenDeserializers {
 
 
 
-    private static final JsonDeserializer<TokenType> TOKEN_TYPE = (jsonElement, type, jsonDeserializationContext) -> {
+    private static final JsonDeserializer<TokenType> TOKEN_TYPE = (jsonElement, _, _) -> {
         JsonObject object = jsonElement.getAsJsonObject();
 
         if (object.get("id") == null) throw new InvalidDatagenJsonException("TokenType doesn't have field id");
@@ -83,7 +83,7 @@ public final class DatagenDeserializers {
                 cls = Class.forName(className);
             }
             catch (ClassNotFoundException e) {
-                cls = MeazyMain.ADDON_MANAGER.getAddonLoader().getClassByName(className);
+                cls = MeazyMain.ADDON_MANAGER.getClassByName(className);
                 if (cls == null) throw new RuntimeException("Can't find class for canMatch method in TokenType", e);
             }
 
