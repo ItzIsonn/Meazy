@@ -204,11 +204,6 @@ public final class Registries {
      */
     public static final SingleEntryRegistry<EnvironmentFactory> ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
-    /**
-     * Set of native {@link FileEnvironment}s
-     */
-    public static final Set<FileEnvironment> NATIVE_FILE_ENVIRONMENTS = new HashSet<>();
-
 
 
     /**

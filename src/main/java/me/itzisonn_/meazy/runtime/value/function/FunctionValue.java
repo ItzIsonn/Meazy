@@ -1,18 +1,16 @@
 package me.itzisonn_.meazy.runtime.value.function;
 
-import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
+import me.itzisonn_.meazy.runtime.value.ModifierableRuntimeValue;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Represents function value
  */
-public interface FunctionValue extends RuntimeValue<Object> {
+public interface FunctionValue extends ModifierableRuntimeValue<Object> {
     /**
      * @return Id
      */
@@ -32,11 +30,6 @@ public interface FunctionValue extends RuntimeValue<Object> {
      * @return Parent environment
      */
     FunctionDeclarationEnvironment getParentEnvironment();
-
-    /**
-     * @return Modifiers
-     */
-    Set<Modifier> getModifiers();
 
 
 
