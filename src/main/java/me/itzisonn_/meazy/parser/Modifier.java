@@ -37,7 +37,6 @@ public abstract class Modifier {
     public abstract boolean canUse(ModifierStatement modifierStatement, RuntimeContext context, Environment environment);
 
     /**
-     * @param context Runtime context
      * @param requestEnvironment Environment from which asked an access
      * @param environment Environment that has ModifierStatement in it
      * @param identifier Identifier
@@ -45,7 +44,7 @@ public abstract class Modifier {
      *
      * @return Whether can access object (variable, function, class, etc) with given identifier in given environment from requestEnvironment
      */
-    public abstract boolean canAccess(RuntimeContext context, Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier);
+    public abstract boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier);
 
     @Override
     public String toString() {

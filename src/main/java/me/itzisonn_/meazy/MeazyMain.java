@@ -6,18 +6,13 @@ import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.datagen.DatagenDeserializers;
 import me.itzisonn_.meazy.command.Command;
 import me.itzisonn_.meazy.command.Commands;
-import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.bundle.BundleManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;
-import me.itzisonn_.meazy.parser.ast.Program;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
-import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.settings.SettingsManager;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
@@ -26,7 +21,6 @@ import org.apache.logging.log4j.Level;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.List;
 
 public final class MeazyMain {
     public static final Version VERSION = Version.of("2.7");
@@ -116,18 +110,6 @@ public final class MeazyMain {
 
             for (TokenTypeSet tokenTypeSet : addon.getDatagenManager().getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer(addon))) {
                 Registries.TOKEN_TYPE_SETS.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenTypeSet.getId()), tokenTypeSet);
-            }
-
-            RuntimeContext context = new RuntimeContext();
-            GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
-
-            for (String lines : addon.getDatagenManager().getDatagenFilesLines("program")) {
-                List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(lines);
-                Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(null, tokens);
-
-                FileEnvironment fileEnvironment = Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
-                globalEnvironment.addFileEnvironment(fileEnvironment);
-                Registries.NATIVE_FILE_ENVIRONMENTS.add(fileEnvironment);
             }
         }
 

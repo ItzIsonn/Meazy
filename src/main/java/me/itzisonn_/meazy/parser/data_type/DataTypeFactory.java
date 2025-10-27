@@ -20,4 +20,10 @@ public interface DataTypeFactory {
      * @return New data type
      */
     DataType create(String id);
+
+    /**
+     * Creates nullable data type that accepts any value
+     * @return New data type
+     */
+    DataType create();
 }

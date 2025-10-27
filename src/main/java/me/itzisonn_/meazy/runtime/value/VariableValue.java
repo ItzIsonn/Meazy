@@ -1,17 +1,14 @@
 package me.itzisonn_.meazy.runtime.value;
 
-import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidSyntaxException;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
 
-import java.util.Set;
-
 /**
  * Represents runtime variable value
  */
-public interface VariableValue extends RuntimeValue<RuntimeValue<?>> {
+public interface VariableValue extends ModifierableRuntimeValue<RuntimeValue<?>> {
     /**
      * @return Id
      */
@@ -26,11 +23,6 @@ public interface VariableValue extends RuntimeValue<RuntimeValue<?>> {
      * @return Whether value is constant
      */
     boolean isConstant();
-
-    /**
-     * @return Modifiers
-     */
-    Set<Modifier> getModifiers();
 
     /**
      * @return Whether this variable is argument
