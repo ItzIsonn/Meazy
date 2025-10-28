@@ -3,8 +3,8 @@ package me.itzisonn_.meazy.runtime.environment;
 import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
-import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 
 import java.util.List;
 import java.util.Set;

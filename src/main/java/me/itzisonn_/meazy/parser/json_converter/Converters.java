@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.json_converter;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.json_converter.basic.CallArgExpressionConverter;
+import me.itzisonn_.meazy.parser.json_converter.basic.ParameterExpressionConverter;
 import me.itzisonn_.meazy.parser.json_converter.basic.ExpressionConverter;
 import me.itzisonn_.meazy.parser.json_converter.basic.ProgramConverter;
 import me.itzisonn_.meazy.parser.json_converter.basic.StatementConverter;
@@ -35,7 +35,7 @@ public final class Converters {
         register(new StatementConverter());
         register(new ExpressionConverter());
         register(new ProgramConverter());
-        register(new CallArgExpressionConverter());
+        register(new ParameterExpressionConverter());
     }
 
 
