@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy.runtime.value.function.FunctionValue;
+import me.itzisonn_.meazy.runtime.value.FunctionValue;
 
 import java.util.List;
 import java.util.Set;
@@ -18,11 +18,10 @@ public interface FunctionDeclarationEnvironment extends Environment {
     void declareFunction(FunctionValue value);
 
     /**
-     * @param id Function's id
-     * @param args Function's args
+     * @param id Id
+     * @param args Args
      *
      * @return Declared function with given id and args or null
-     *
      * @throws NullPointerException If either id or args is null
      */
     default FunctionValue getFunction(String id, List<RuntimeValue<?>> args) throws NullPointerException {
@@ -32,12 +31,11 @@ public interface FunctionDeclarationEnvironment extends Environment {
         main:
         for (FunctionValue functionValue : getFunctions()) {
             if (functionValue.getId().equals(id)) {
-                List<CallArgExpression> callArgExpressions = functionValue.getArgs();
-
-                if (args.size() != callArgExpressions.size()) continue;
+                List<ParameterExpression> parameters = functionValue.getParameters();
+                if (args.size() != parameters.size()) continue;
 
                 for (int i = 0; i < args.size(); i++) {
-                    if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
+                    if (!parameters.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
                 }
 
                 return functionValue;

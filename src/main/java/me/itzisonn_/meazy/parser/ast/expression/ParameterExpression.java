@@ -5,22 +5,22 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 
 /**
- * Represents an expression that is used as arg when defining callable statements
+ * Represents an expression that is used as parameter when defining callable statements
  */
 @Getter
 @EqualsAndHashCode
-public class CallArgExpression implements Expression {
+public class ParameterExpression implements Expression {
     private final String id;
     private final DataType dataType;
     private final boolean isConstant;
 
     /**
-     * @param id         CallArgExpression's id
-     * @param dataType   CallArgExpression's DataType
-     * @param isConstant Whether this CallArgExpression is constant
+     * @param id         Id
+     * @param dataType   Data type
+     * @param isConstant Whether this parameter expression is constant
      * @throws NullPointerException If either id or dataType is null
      */
-    public CallArgExpression(String id, DataType dataType, boolean isConstant) {
+    public ParameterExpression(String id, DataType dataType, boolean isConstant) {
         if (id == null) throw new NullPointerException("Id can't be null");
         if (dataType == null) throw new NullPointerException("DataType can't be null");
 
@@ -32,7 +32,6 @@ public class CallArgExpression implements Expression {
     @Override
     public String toCodeString() {
         String declareString = isConstant ? "val" : "var";
-
         return declareString + " " + id + ":" + dataType;
     }
 }

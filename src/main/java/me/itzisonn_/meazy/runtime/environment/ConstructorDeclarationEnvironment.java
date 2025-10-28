@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
-import me.itzisonn_.meazy.runtime.value.constructor.ConstructorValue;
+import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 
 import java.util.List;
 import java.util.Set;
@@ -27,12 +27,11 @@ public interface ConstructorDeclarationEnvironment extends Environment {
 
         main:
         for (ConstructorValue constructorValue : getConstructors()) {
-            List<CallArgExpression> callArgExpressions = constructorValue.getArgs();
-
-            if (args.size() != callArgExpressions.size()) continue;
+            List<ParameterExpression> parameters = constructorValue.getParameters();
+            if (args.size() != parameters.size()) continue;
 
             for (int i = 0; i < args.size(); i++) {
-                if (!callArgExpressions.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
+                if (!parameters.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
             }
 
             return constructorValue;

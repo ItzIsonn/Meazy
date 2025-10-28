@@ -1,13 +1,11 @@
-package me.itzisonn_.meazy.runtime.value.function;
+package me.itzisonn_.meazy.runtime.value;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.parser.data_type.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.CallArgExpression;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.runtime.value.ModifierableRuntimeValue;
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 
 import java.util.List;
 
@@ -21,9 +19,9 @@ public interface FunctionValue extends ModifierableRuntimeValue<Object> {
     String getId();
 
     /**
-     * @return Args
+     * @return Parameters
      */
-    List<CallArgExpression> getArgs();
+    List<ParameterExpression> getParameters();
 
     /**
      * @return Which DataType should this function return
@@ -65,9 +63,9 @@ public interface FunctionValue extends ModifierableRuntimeValue<Object> {
      * @param context Runtime context
      * @param functionEnvironment Unique Environment of this function
      * @param callEnvironment Environment from which this function is called
-     * @param functionArgs Args given to this function
+     * @param args Args given to this function
      *
      * @return Function return value
      */
-    RuntimeValue<?> run(RuntimeContext context, FunctionEnvironment functionEnvironment, Environment callEnvironment, List<RuntimeValue<?>> functionArgs);
+    RuntimeValue<?> run(RuntimeContext context, FunctionEnvironment functionEnvironment, Environment callEnvironment, List<RuntimeValue<?>> args);
 }
