@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.runtime;
+package me.itzisonn_.meazy.runtime.native_annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MeazyNativeClass {
+public @interface NativeContainer {
     /**
      * @return From which files this class's methods are accessible
      */
