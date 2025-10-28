@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.MeazyNativeClass;
+import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.classes.ClassValue;
@@ -23,7 +23,7 @@ public interface FileEnvironment extends VariableDeclarationEnvironment, Functio
 
     /**
      * Adds to this global environment given nativeClass that is used by native statements
-     * @param nativeClass Class that is annotated with {@link MeazyNativeClass}
+     * @param nativeClass Class that is annotated with {@link NativeContainer}
      */
     void addNativeClass(Class<?> nativeClass);
 
