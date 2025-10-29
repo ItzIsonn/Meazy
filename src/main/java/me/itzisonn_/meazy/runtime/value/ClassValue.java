@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.value;
 
 import me.itzisonn_.meazy.context.RuntimeContext;
-import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 
@@ -10,7 +9,7 @@ import java.util.Set;
 /**
  * Represents class value
  */
-public interface ClassValue extends RuntimeValue<Object> {
+public interface ClassValue extends ModifierableRuntimeValue<Object> {
     /**
      * @return Base classes
      */
@@ -42,11 +41,6 @@ public interface ClassValue extends RuntimeValue<Object> {
      * @return Id of this class's environment
      */
     String getId();
-
-    /**
-     * @return All modifiers of this class's environment
-     */
-    Set<Modifier> getModifiers();
 
 
 
