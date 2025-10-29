@@ -4,6 +4,7 @@ import com.google.gson.*;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.addon.Addon;
+import me.itzisonn_.meazy.lexer.NativeCanMatch;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.registry.RegistryEntry;
@@ -84,7 +85,7 @@ public final class DatagenDeserializers {
             }
             catch (ClassNotFoundException e) {
                 cls = MeazyMain.ADDON_MANAGER.getClassByName(className);
-                if (cls == null) throw new RuntimeException("Can't find class for canMatch method in TokenType", e);
+                if (cls == null) throw new RuntimeException("Can't find specified class " + className + " for canMatch method in TokenType with id " + id, e);
             }
 
             Method method;
@@ -92,11 +93,12 @@ public final class DatagenDeserializers {
                 method = cls.getDeclaredMethod(methodName, String.class);
             }
             catch (NoSuchMethodException e) {
-                throw new RuntimeException("Can't find method for canMatch method in TokenType", e);
+                throw new RuntimeException("Can't find specified method " + methodName + " for canMatch method in TokenType with id " + id, e);
             }
 
-            if (!method.canAccess(null)) throw new RuntimeException("Inaccessible method for canMatch method in TokenType");
-            if (!boolean.class.isAssignableFrom(method.getReturnType())) throw new RuntimeException("Invalid method for canMatch method in TokenType");
+            if (!method.isAnnotationPresent(NativeCanMatch.class)) throw new RuntimeException("Specified non-native method for canMatch method in TokenType with id " + id);
+            if (!method.canAccess(null)) throw new RuntimeException("Specified inaccessible method for canMatch method in TokenType with id " + id);
+            if (!boolean.class.isAssignableFrom(method.getReturnType())) throw new RuntimeException("Specifier method with non-boolean return type for canMatch method in TokenType with id " + id);
 
             return new TokenType(id, regex, shouldSkip) {
                 @Override
