@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.command;
 import lombok.Getter;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.lang.text.Text;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public abstract class Command {
      * @param args Args
      * @return Success message that will be logged or null
      */
-    public abstract String execute(String... args);
+    public abstract Text execute(String... args);
 
     /**
      * @return Copy of args' names

@@ -21,10 +21,10 @@ public final class AddonManager {
             ADDONS_FOLDER = new File(new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent() + "/addons/");
         }
         catch (URISyntaxException e) {
-            throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").getContent(), e);
+            throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").toString(), e);
         }
 
-        if (!ADDONS_FOLDER.exists() && !ADDONS_FOLDER.mkdirs()) throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").getContent());
+        if (!ADDONS_FOLDER.exists() && !ADDONS_FOLDER.mkdirs()) throw new RuntimeException(Text.translatable("meazy:addons.cant_load_folder").toString());
     }
 
     private final AddonLoader addonLoader = new AddonLoader();

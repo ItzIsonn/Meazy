@@ -8,9 +8,50 @@
   "addons.single_loaded": "Загружен 1 аддон",
   "addons.multiple_loaded": "Загружено аддонов: {0}",
   "addons.cant_load_folder": "Не удалось загрузить папку с аддонами",
+  "addons.enabling": "Загружается аддон {0}",
+  "addons.failed_enable": "Произошла ошибка при включении {0}. {1}",
+  "addons.duplicate_name": "Одинаковое имя аддона '{0}' у файлов '{1}' и '{2}'",
+  "addons.cant_load.general": "Не удалось загрузить '{0}'. {1}",
+  "addons.cant_load.unsupported_version": "Не удалось загрузить '{0}', потому что он использует неподдерживаемою версию {1}",
+  "addons.cant_load.circular_dependency": "Не удалось загрузить '{0}' из-за цикличной зависимости",
+  "addons.resource.save_failed": "Не удалось сохранить ресурс {0}. {1}",
+  "addons.resource.save_failed_already_exists": "Не удалось сохранить ресурс {0}, потому что он уже существует",
+  "addons.resource.save_failed_config": "Не удалось загрузить конфиг {0}. {1}",
+
+  "file.doesnt_exist": "Файл '{0}' не существует",
+  "file.already_exists": "Файл '{0}' уже существует",
+  "file.failed_read": "Не удалось прочитать файл '{0}'",
+  "file.created": "Создан файл '{0}'",
+  "file.cant_create": "Не удалось создать файл '{0}'",
+  "file.cant_create_parent": "Не удалось создать родительский файл файла '{0}'",
+  "file.unsupported_extension": "Файл '{0}' использует неподдерживаемое расширение '{0}'",
+  "file.output_cant_be_directory": "Выходной файл не может быть папкой",
 
   "commands.unknown": "Неизвестная команда с именем {0}",
   "commands.invalid_args": "Ожидалось аргументов: {0}, но получено: {1}",
   "commands.available": "Доступные команды:",
-  "commands.loaded_info": "Загружено за {0}с. {1}"
+  "commands.loaded_info": "Загружено за {0}с. {1}",
+  "commands.invalid_argument": "Неизвестный аргумент {0}",
+
+  "commands.version": "Версия Meazy {0}",
+
+  "commands.addons.empty": "Аддоны отсутствуют",
+  "commands.addons.loaded": "Загруженные аддоны:",
+  "commands.addons.by": "от",
+  "commands.addons.cant_find_default": "Не удалось найти MeazyAddon для версии {0} Meazy. Скорее всего, он скоро будет выпущен",
+  "commands.addons.loaded_default": "Успешно загружен MeazyAddon v{0}",
+
+  "commands.run.running": "Запуск файла '{0}'",
+  "commands.run.incompatible_version": "Не удалось запустить файл, который был скомпилирован более новой версией Meazy ({0}), в более старой ({1})",
+  "commands.run.unsafe": "Небезопасно запускать файл, который был скомпилирован более старой версией Meazy ({0}), в более новой ({1})",
+  "commands.run.invalid_extension": "Не удалось выполнить файл с расширением '{0}'",
+  "commands.run.info": "Выполнено за {0}с.",
+
+  "commands.compile.compiling": "Компиляция файла '{0}'",
+  "commands.compile.info": "Скомпилировано за {0}с.",
+
+  "commands.decompile.decompiling": "Декомпиляция файла '{0}'",
+  "commands.decompile.incompatible_version": "Не удалось декомпилировать файл, который был скомпилирован более новой версией Meazy ({0}), в более старой ({1})",
+  "commands.decompile.unsafe": "Небезопасно декомпилировать файл, который был скомпилирован более старой версией Meazy ({0}), в более новой ({1})",
+  "commands.decompile.info": "Декомпилировано за {0}с."
 }

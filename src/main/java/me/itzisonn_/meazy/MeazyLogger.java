@@ -26,11 +26,7 @@ public class MeazyLogger extends Logger {
 
 
     public void log(Level level, Text text) {
-        log(level, text.getContent());
-    }
-
-    public void log(Level level, Text text, Object... args) {
-        log(level, text.getContent(args));
+        log(level, text.toString());
     }
 
     public void logTranslatable(Level level, String key) {
@@ -38,7 +34,7 @@ public class MeazyLogger extends Logger {
     }
 
     public void logTranslatable(Level level, String key, Object... args) {
-        log(level, Text.translatable(key).getContent(args));
+        log(level, Text.translatable(key, args));
     }
 
     public void logTranslatable(Level level, LanguageFileProvider languageFileProvider, String key) {
@@ -46,7 +42,7 @@ public class MeazyLogger extends Logger {
     }
 
     public void logTranslatable(Level level, LanguageFileProvider languageFileProvider, String key, Object... args) {
-        log(level, Text.translatable(languageFileProvider, key).getContent(args));
+        log(level, Text.translatable(languageFileProvider, key, args));
     }
 
 

@@ -62,7 +62,7 @@ public final class Commands {
 
         register(new Command("version", List.of()) {
             @Override
-            public String execute(String[] args) {
+            public Text execute(String[] args) {
                 MeazyMain.LOGGER.logTranslatable(Level.INFO, "meazy:commands.version", MeazyMain.VERSION);
                 return null;
             }
@@ -70,7 +70,7 @@ public final class Commands {
 
         register(new Command("addons", List.of("[list | downloadDefault]")) {
             @Override
-            public String execute(String... args) {
+            public Text execute(String... args) {
                 switch (args[0]) {
                     case "list" -> {
                         if (MeazyMain.ADDON_MANAGER.getAddons().isEmpty()) {
@@ -94,10 +94,7 @@ public final class Commands {
                             }
                             else description = "";
 
-                            MeazyMain.LOGGER.log(Level.INFO, Text.literal("    {}{}{}"),
-                                    addonInfo.getFullName(),
-                                    authors,
-                                    description);
+                            MeazyMain.LOGGER.log(Level.INFO, Text.literal("    " + addonInfo.getFullName() + authors + description));
                         }
                         return null;
                     }
@@ -112,7 +109,7 @@ public final class Commands {
                             byteChannel = Channels.newChannel(url.openStream());
                         }
                         catch (FileNotFoundException e) {
-                            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.addons.cant_find_default"), MeazyMain.VERSION);
+                            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.addons.cant_find_default", MeazyMain.VERSION));
                             return null;
                         }
                         catch (URISyntaxException | IOException e) {
@@ -126,12 +123,12 @@ public final class Commands {
                             throw new RuntimeException(e);
                         }
 
-                        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.loaded_default"), MeazyMain.VERSION);
+                        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.loaded_default", MeazyMain.VERSION));
                         return null;
                     }
 
                     default -> {
-                        MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.invalid_argument"), args[0]);
+                        MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.invalid_argument", args[0]));
                         return null;
                     }
                 }
@@ -140,7 +137,7 @@ public final class Commands {
 
         register(new Command("run", List.of("<file_to_run>")) {
             @Override
-            public String execute(String[] args) {
+            public Text execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
                     MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.doesnt_exist", file.getAbsolutePath());
@@ -182,13 +179,13 @@ public final class Commands {
                 Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue().run(program);
 
                 long endMillis = System.currentTimeMillis();
-                return "Executed in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
+                return Text.translatable("meazy:commands.run.info", (double) (endMillis - startMillis) / 1000);
             }
         });
 
         register(new Command("compile", List.of("<file_to_compile>", "<output_file_path>")) {
             @Override
-            public String execute(String[] args) {
+            public Text execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
                     MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.doesnt_exist", file.getAbsolutePath());
@@ -232,20 +229,20 @@ public final class Commands {
                 }
 
                 String json = Registries.getGson().toJson(program, Program.class);
-
                 try (FileWriter fileWriter = new FileWriter(outputFile)) {
                     fileWriter.write(json);
-                    return "Compiled in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
+                return Text.translatable("meazy:commands.compile.info", (double) (endMillis - startMillis) / 1000);
             }
         });
 
         register(new Command("decompile", List.of("<file_to_decompile>", "<output_file_path>")) {
             @Override
-            public String execute(String[] args) {
+            public Text execute(String[] args) {
                 File file = new File(args[0]);
                 if (file.isDirectory() || !file.exists()) {
                     MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:file.doesnt_exist", file.getAbsolutePath());
@@ -300,11 +297,12 @@ public final class Commands {
 
                 try (FileWriter fileWriter = new FileWriter(outputFile)) {
                     fileWriter.write(program.toCodeString(0));
-                    return "Decompiled in " + ((double) (endMillis - startMillis)) / 1000 + "s.";
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
+                return Text.translatable("meazy:commands.decompile.info", (double) (endMillis - startMillis) / 1000);
             }
         });
     }

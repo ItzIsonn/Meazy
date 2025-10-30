@@ -257,7 +257,7 @@ public final class Registries {
                 i += token.getValue().length() - 1;
                 if (!token.getType().isShouldSkip()) tokens.add(token);
 
-                lineNumber += (token.getValue().length() - token.getValue().replace("\n", "").length());
+                lineNumber += token.getValue().length() - token.getValue().replace("\n", "").length();
             }
 
             tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE(), ""));

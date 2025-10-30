@@ -11,25 +11,9 @@ import java.util.List;
  */
 public interface Text {
     /**
-     * @return Content of this text
+     * @return String representation of this text
      */
-    String getContent();
-
-    /**
-     * Replaces placeholders in content with given args
-     *
-     * @param args Args
-     * @return Parsed content of this text
-     */
-    default String getContent(Object... args) {
-        String content = getContent();
-
-        for (int i = 0; i < args.length; i++) {
-            content = content.replace("{" + i + "}", String.valueOf(args[i]));
-        }
-
-        return content;
-    }
+    String toString();
 
     /**
      * Appends to this text given text
@@ -53,8 +37,8 @@ public interface Text {
      *
      * @throws NullPointerException If given text is null
      */
-    static Text literal(String text) throws NullPointerException {
-        return new LiteralText(text);
+    static Text literal(String text, Object... args) throws NullPointerException {
+        return new LiteralText(text, List.of(args));
     }
 
     /**
@@ -67,7 +51,7 @@ public interface Text {
      * @throws IllegalArgumentException If can't find LanguageFileProvider with given id or
      *                                  if can't find bundle with LanguageFileProvider with given id
      */
-    static Text translatable(String key) throws NullPointerException, IllegalArgumentException {
+    static Text translatable(String key, Object... args) throws NullPointerException, IllegalArgumentException {
         if (key == null) throw new NullPointerException("Key can't be null");
 
         String[] parts = key.split(":");
@@ -79,7 +63,7 @@ public interface Text {
         LanguageFileProvider languageFileProvider = MeazyMain.BUNDLE_MANAGER.getLanguageFileProvider(providerId);
         if (languageFileProvider == null) throw new IllegalArgumentException("Can't find LanguageFileProvider with given id");
 
-        return translatable(languageFileProvider, translationKey);
+        return translatable(languageFileProvider, translationKey, args);
     }
 
     /**
@@ -92,12 +76,12 @@ public interface Text {
      * @throws NullPointerException If either languageFileProvider or key is null
      * @throws IllegalArgumentException If can't find bundle with given languageFileProvider
      */
-    static Text translatable(LanguageFileProvider languageFileProvider, String key) throws NullPointerException, IllegalArgumentException {
+    static Text translatable(LanguageFileProvider languageFileProvider, String key, Object... args) throws NullPointerException, IllegalArgumentException {
         if (languageFileProvider == null) throw new NullPointerException("LanguageFileProvider can't be null");
 
         Bundle bundle = MeazyMain.BUNDLE_MANAGER.getBundle(languageFileProvider);
         if (bundle == null) throw new IllegalArgumentException("Can't find bundle with given languageFileProvider");
 
-        return new TranslatableText(bundle, key);
+        return new TranslatableText(bundle, key, List.of(args));
     }
 }

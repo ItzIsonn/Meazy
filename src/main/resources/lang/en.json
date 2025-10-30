@@ -30,7 +30,7 @@
   "commands.unknown": "Unknown command with name {0}",
   "commands.invalid_args": "Expected {0} arguments but found {1}",
   "commands.available": "Available commands:",
-  "commands.loaded_info": "Loaded in {0}s. {1}",
+  "commands.loaded_info": "Loaded in {0}s. ",
   "commands.invalid_argument": "Unknown argument {0}",
 
   "commands.version": "Meazy version {0}",
@@ -42,13 +42,16 @@
   "commands.addons.loaded_default": "Successfully downloaded MeazyAddon v{0}",
 
   "commands.run.running": "Running file '{0}'",
-  "commands.run.incompatible_version": "Can't run file that has been compiled by a more recent version of the Meazy ({0}), in a more older version ({1})",
+  "commands.run.incompatible_version": "Can't run file that has been compiled by a more recent version of the Meazy ({0}) in a more older version ({1})",
   "commands.run.unsafe": "It's unsafe to run file that has been compiled by a more older version of the Meazy ({0}) in a more recent version ({1})",
   "commands.run.invalid_extension": "Can't run file with extension '{0}'",
+  "commands.run.info": "Executed in {0}s.",
 
   "commands.compile.compiling": "Compiling file '{0}'",
+  "commands.compile.info": "Compiled in {0}s.",
 
   "commands.decompile.decompiling": "Decompiling file '{0}'",
-  "commands.decompile.incompatible_version": "Can't decompile file that has been compiled by a more recent version of the Meazy ({0}), in a more older version ({1})",
-  "commands.decompile.unsafe": "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({}) in a more recent version ({})"
+  "commands.decompile.incompatible_version": "Can't decompile file that has been compiled by a more recent version of the Meazy ({0}) in a more older version ({1})",
+  "commands.decompile.unsafe": "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({0}) in a more recent version ({1})",
+  "commands.decompile.info": "Decompiled in {0}s."
 }

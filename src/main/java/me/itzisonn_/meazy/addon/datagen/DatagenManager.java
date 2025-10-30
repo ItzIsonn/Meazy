@@ -106,7 +106,7 @@ public class DatagenManager {
      * @throws NullPointerException If given folderPath is null
      */
     public Set<String> getDatagenFilesLines(String folderPath) throws NullPointerException {
-        return new HashSet<>(getDatagenInputStreams(folderPath, (FileUtils::getLines)));
+        return new HashSet<>(getDatagenInputStreams(folderPath, FileUtils::getLines));
     }
 
     private <T> Set<T> getDatagenInputStreams(String folderPath, Function<InputStream, T> converter) throws NullPointerException {
