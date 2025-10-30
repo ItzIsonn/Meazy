@@ -19,7 +19,6 @@ import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
-import java.io.*;
 import java.util.Arrays;
 
 public final class MeazyMain {
@@ -44,7 +43,7 @@ public final class MeazyMain {
 
 
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         long startLoadMillis = System.currentTimeMillis();
         INITIALIZE();
         long endLoadMillis = System.currentTimeMillis();
@@ -56,25 +55,26 @@ public final class MeazyMain {
 
         Command command = Commands.getByName(args[0]);
         if (command == null) {
-            LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.unknown"), args[0]);
+            LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.unknown", args[0]));
             showAvailableCommandsList();
             return;
         }
 
         String[] commandArgs = Arrays.copyOfRange(args, 1, args.length);
         if (commandArgs.length != command.getArgs().size()) {
-            LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.invalid_args"), command.getArgs().size(), commandArgs.length);
+            LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.invalid_args", command.getArgs().size(), commandArgs.length));
             return;
         }
 
-        String message = command.execute(commandArgs);
-        if (message != null) {
-            LOGGER.log(Level.INFO, Text.translatable("meazy:commands.loaded_info"), ((double) endLoadMillis - (double) startLoadMillis) / 1000, message);
+        Text log = command.execute(commandArgs);
+        if (log != null) {
+            LOGGER.log(Level.INFO, Text.translatable("meazy:commands.loaded_info", ((double) endLoadMillis - (double) startLoadMillis) / 1000).append(log));
         }
     }
 
     private static void showAvailableCommandsList() {
         LOGGER.log(Level.INFO, Text.translatable("meazy:commands.available"));
+
         for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
             Command command = entry.getValue();
             LOGGER.log(Level.INFO, Text.translatable("    " + command.getName() + " " + String.join(" ", command.getArgs())));
@@ -91,7 +91,7 @@ public final class MeazyMain {
 
         String stringLanguage = SETTINGS_MANAGER.getSettings().getLanguage();
         RegistryEntry<Language> languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage);
-        if (languagesEntry == null) MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:settings.unknown_language"), stringLanguage);
+        if (languagesEntry == null) MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:settings.unknown_language", stringLanguage));
         else BUNDLE_MANAGER.setLanguage(languagesEntry.getValue());
 
         loadAddons();
@@ -115,7 +115,7 @@ public final class MeazyMain {
 
         int addons = ADDON_MANAGER.getAddons().size();
         if (addons == 1) LOGGER.log(Level.INFO, Text.translatable("meazy:addons.single_loaded"));
-        else LOGGER.log(Level.INFO, Text.translatable("meazy:addons.multiple_loaded"), addons);
+        else LOGGER.log(Level.INFO, Text.translatable("meazy:addons.multiple_loaded", addons));
     }
 
     /**

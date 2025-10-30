@@ -54,7 +54,7 @@ public class Bundle {
         }
 
         if (translations.keySet().removeIf(key -> !key.matches("[a-zA-Z_.]+"))) {
-            MeazyMain.LOGGER.log(Level.INFO, Text.literal("Some of the keys were removed from bundle with provider {} due to invalid format"), languageFileProvider.getId());
+            MeazyMain.LOGGER.log(Level.INFO, Text.literal("Some of the keys were removed from bundle with provider {0} due to invalid format", languageFileProvider.getId()));
         }
     }
 

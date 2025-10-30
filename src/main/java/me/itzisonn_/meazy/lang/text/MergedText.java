@@ -25,27 +25,8 @@ public class MergedText implements Text {
     }
 
     @Override
-    public String getContent() {
-        return texts.stream().map(Text::getContent).collect(Collectors.joining());
-    }
-
-    @Override
-    public String getContent(Object... args) {
-        StringBuilder content = new StringBuilder();
-
-        int argsI = 0;
-        for (Text text : texts) {
-            String textContent = text.getContent();
-
-            for (int i = 0; argsI < args.length && textContent.contains("{" + i + "}"); i++) {
-                textContent = textContent.replace("{" + i + "}", String.valueOf(args[argsI]));
-                argsI++;
-            }
-
-            content.append(textContent);
-        }
-
-        return content.toString();
+    public String toString() {
+        return texts.stream().map(Text::toString).collect(Collectors.joining());
     }
 
     @Override

@@ -22,12 +22,12 @@ public class SettingsManager {
             settingsFile = new File(new File(MeazyMain.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent() + "/settings.json");
 
             if (!settingsFile.exists()) {
-                if (!settingsFile.createNewFile()) throw new RuntimeException(Text.translatable("meazy:settings.cant_load_file").getContent());
+                if (!settingsFile.createNewFile()) throw new RuntimeException(Text.translatable("meazy:settings.cant_load_file").toString());
                 saveDefaultSettings(settingsFile);
             }
         }
         catch (URISyntaxException | IOException e) {
-            throw new RuntimeException(Text.translatable("meazy:settings.cant_load_file").getContent(), e);
+            throw new RuntimeException(Text.translatable("meazy:settings.cant_load_file").toString(), e);
         }
 
         Settings settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);
@@ -36,7 +36,7 @@ public class SettingsManager {
             saveDefaultSettings(settingsFile);
 
             settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);
-            if (settings == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_create_default").getContent());
+            if (settings == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_create_default").toString());
         }
 
         this.settings = settings;
@@ -44,7 +44,7 @@ public class SettingsManager {
 
     private void saveDefaultSettings(File settingsFile) {
         InputStream in = MeazyMain.class.getClassLoader().getResourceAsStream("settings.json");
-        if (in == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_find_default").getContent());
+        if (in == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_find_default").toString());
 
         try {
             OutputStream out = new FileOutputStream(settingsFile);
@@ -59,7 +59,7 @@ public class SettingsManager {
             in.close();
         }
         catch (IOException e) {
-            throw new RuntimeException(Text.translatable("meazy:settings.cant_create_default").getContent(), e);
+            throw new RuntimeException(Text.translatable("meazy:settings.cant_create_default").toString(), e);
         }
     }
 }
