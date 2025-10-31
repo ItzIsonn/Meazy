@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.context.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;
@@ -58,6 +59,49 @@ public class Parser {
         return tokens.get(pos);
     }
 
+
+
+    /**
+     * Increments position by 1
+     */
+    public void next() {
+        pos++;
+    }
+
+    /**
+     * Increments position by 1
+     *
+     * @param tokenType Required TokenType
+     * @param text Exception's text=
+     *
+     * @throws UnexpectedTokenException If token's type doesn't match required
+     */
+    public void next(TokenType tokenType, Text text) throws NullPointerException, UnexpectedTokenException {
+        if (tokenType == null) throw new NullPointerException("TokenType can't be null");
+        if (text == null) throw new NullPointerException("Text can't be null");
+
+        if (!getCurrent().getType().equals(tokenType)) throw new UnexpectedTokenException(getCurrent().getLine(), text);
+        next();
+    }
+
+    /**
+     * Increments position by 1
+     *
+     * @param tokenTypeSet Required TokenTypeSet
+     * @param text Exception's text
+     *
+     * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
+     */
+    public void next(TokenTypeSet tokenTypeSet, Text text) throws NullPointerException, UnexpectedTokenException {
+        if (tokenTypeSet == null) throw new NullPointerException("TokenTypeSet can't be null");
+        if (text == null) throw new NullPointerException("Message can't be null");
+
+        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) throw new UnexpectedTokenException(getCurrent().getLine(), text);
+        next();
+    }
+
+
+
     /**
      * Returns token at current position and increments position by 1
      * @return Token at {@link Parser#pos} in {@link Parser#tokens}
@@ -72,16 +116,16 @@ public class Parser {
      * Returns token at current position increments position by 1
      *
      * @param tokenType Required TokenType
-     * @param message Exception's message
+     * @param text Exception's text
      * @return Token at {@link Parser#pos} in {@link Parser#tokens}
      *
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
-    public Token getCurrentAndNext(TokenType tokenType, String message) throws NullPointerException, UnexpectedTokenException {
+    public Token getCurrentAndNext(TokenType tokenType, Text text) throws NullPointerException, UnexpectedTokenException {
         if (tokenType == null) throw new NullPointerException("TokenType can't be null");
-        if (message == null) throw new NullPointerException("Message can't be null");
+        if (text == null) throw new NullPointerException("Text can't be null");
 
-        if (!getCurrent().getType().equals(tokenType)) throw new UnexpectedTokenException(message, getCurrent().getLine());
+        if (!getCurrent().getType().equals(tokenType)) throw new UnexpectedTokenException(getCurrent().getLine(), text);
         return getCurrentAndNext();
     }
 
@@ -89,16 +133,16 @@ public class Parser {
      * Returns token at current position and increments position by 1
      *
      * @param tokenTypeSet Required TokenTypeSet
-     * @param message Exception's message
+     * @param text Exception's text
      * @return Token at {@link Parser#pos} in {@link Parser#tokens}
      *
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
-    public Token getCurrentAndNext(TokenTypeSet tokenTypeSet, String message) throws NullPointerException, UnexpectedTokenException {
+    public Token getCurrentAndNext(TokenTypeSet tokenTypeSet, Text text) throws NullPointerException, UnexpectedTokenException {
         if (tokenTypeSet == null) throw new NullPointerException("TokenTypeSet can't be null");
-        if (message == null) throw new NullPointerException("Message can't be null");
+        if (text == null) throw new NullPointerException("Message can't be null");
 
-        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) throw new UnexpectedTokenException(message, getCurrent().getLine());
+        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) throw new UnexpectedTokenException(getCurrent().getLine(), text);
         return getCurrentAndNext();
     }
 

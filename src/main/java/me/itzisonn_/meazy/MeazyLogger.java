@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy;
 
-import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.text.Text;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -26,55 +25,51 @@ public class MeazyLogger extends Logger {
 
 
     public void log(Level level, Text text) {
-        log(level, text.toString());
-    }
-
-    public void logTranslatable(Level level, String key) {
-        log(level, Text.translatable(key));
-    }
-
-    public void logTranslatable(Level level, String key, Object... args) {
-        log(level, Text.translatable(key, args));
-    }
-
-    public void logTranslatable(Level level, LanguageFileProvider languageFileProvider, String key) {
-        log(level, Text.translatable(languageFileProvider, key));
-    }
-
-    public void logTranslatable(Level level, LanguageFileProvider languageFileProvider, String key, Object... args) {
-        log(level, Text.translatable(languageFileProvider, key, args));
+        super.log(level, text.toString());
     }
 
 
 
     @Override
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void log(Level level, String message) {
         super.log(level, message);
     }
 
     @Override
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void log(Level level, String message, Object p1) {
         super.log(level, message, p1);
     }
 
     @Override
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void log(Level level, String message, Object p1, Object p2) {
         super.log(level, message, p1, p2);
     }
 
     @Override
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void log(Level level, String message, Object p1, Object p2, Object p3) {
         super.log(level, message, p1, p2, p3);
     }
 
     @Override
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public void log(Level level, String message, Object p1, Object p2, Object p3, Object p4) {
         super.log(level, message, p1, p2, p3, p4);
+    }
+
+    @Override
+    @Deprecated(forRemoval = true)
+    public void log(Level level, String message, Object p1, Object p2, Object p3, Object p4, Object p5) {
+        super.log(level, message, p1, p2, p3, p4, p5);
+    }
+
+    @Override
+    @Deprecated(forRemoval = true)
+    public void log(Level level, String message, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+        super.log(level, message, p1, p2, p3, p4, p5, p6);
     }
 
 

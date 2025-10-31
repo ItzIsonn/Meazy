@@ -11,7 +11,7 @@ import java.util.List;
 public class TranslatableText implements Text {
     private final Bundle bundle;
     private final String key;
-    private final List<Object> args;
+    private final List<String> args;
 
     /**
      *
@@ -21,7 +21,7 @@ public class TranslatableText implements Text {
      * @throws NullPointerException If either bundle or key is null
      * @throws IllegalArgumentException If given key is blank
      */
-    protected TranslatableText(Bundle bundle, String key, List<Object> args) throws NullPointerException, IllegalArgumentException {
+    protected TranslatableText(Bundle bundle, String key, List<String> args) throws NullPointerException, IllegalArgumentException {
         if (bundle == null) throw new NullPointerException("Bundle can't be null");
         if (key == null) throw new NullPointerException("Key can't be null");
         if (key.isBlank()) throw new IllegalArgumentException("Key can't be blank");

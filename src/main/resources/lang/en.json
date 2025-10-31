@@ -53,5 +53,10 @@
   "commands.decompile.decompiling": "Decompiling file '{0}'",
   "commands.decompile.incompatible_version": "Can't decompile file that has been compiled by a more recent version of the Meazy ({0}) in a more older version ({1})",
   "commands.decompile.unsafe": "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({0}) in a more recent version ({1})",
-  "commands.decompile.info": "Decompiled in {0}s."
+  "commands.decompile.info": "Decompiled in {0}s.",
+
+  "lexer.unknown_token": "Unknown token at line {0}: {1}",
+  "parser.unexpected_token": "Unexpected token at line {0}: {1}",
+  "parser.invalid_statement": "Invalid statement at line {0}: {1}",
+  "parser.invalid_syntax": "Invalid syntax at line {0}: {1}"
 }

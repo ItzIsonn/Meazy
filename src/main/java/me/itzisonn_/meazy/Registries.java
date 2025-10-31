@@ -251,7 +251,7 @@ public final class Registries {
                     String errorString = string.split("\n")[0];
                     if (errorString.length() > 20) errorString = errorString.substring(0, 20) + "...";
 
-                    throw new UnknownTokenException("At line " + lineNumber + ": " + errorString);
+                    throw new UnknownTokenException(lineNumber, errorString);
                 }
 
                 i += token.getValue().length() - 1;

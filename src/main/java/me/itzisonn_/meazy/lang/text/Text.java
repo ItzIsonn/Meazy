@@ -4,6 +4,9 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.bundle.Bundle;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +41,7 @@ public interface Text {
      * @throws NullPointerException If given text is null
      */
     static Text literal(String text, Object... args) throws NullPointerException {
-        return new LiteralText(text, List.of(args));
+        return new LiteralText(text, convertArgs(args));
     }
 
     /**
@@ -82,6 +85,24 @@ public interface Text {
         Bundle bundle = MeazyMain.BUNDLE_MANAGER.getBundle(languageFileProvider);
         if (bundle == null) throw new IllegalArgumentException("Can't find bundle with given languageFileProvider");
 
-        return new TranslatableText(bundle, key, List.of(args));
+        return new TranslatableText(bundle, key, convertArgs(args));
+    }
+
+
+
+    private static List<String> convertArgs(Object... args) {
+        List<String> list = new ArrayList<>();
+
+        for (Object arg : args) {
+            if (arg instanceof Throwable throwable) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw, true);
+                (throwable.getCause() == null ? throwable : throwable.getCause()).printStackTrace(pw);
+                list.add(sw.getBuffer().toString());
+            }
+            else list.add(String.valueOf(arg));
+        }
+
+        return list;
     }
 }

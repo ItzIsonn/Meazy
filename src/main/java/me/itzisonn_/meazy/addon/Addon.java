@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.MeazyLogger;
 import me.itzisonn_.meazy.addon.datagen.DatagenManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
+import me.itzisonn_.meazy.lang.text.Text;
 import org.apache.logging.log4j.Level;
 
 import java.io.*;
@@ -107,7 +108,7 @@ public abstract class Addon {
             }
         }
         catch (IOException e) {
-            logger.logTranslatable(Level.ERROR, "meazy:addons.resource.save_failed_config", configFile.getAbsolutePath(), e);
+            logger.log(Level.ERROR, Text.translatable("meazy:addons.resource.save_failed_config", configFile.getAbsolutePath(), e));
         }
     }
 
@@ -147,10 +148,10 @@ public abstract class Addon {
                 out.close();
                 in.close();
             }
-            else logger.logTranslatable(Level.WARN, "meazy:addons.resource.save_failed_already_exists", outFile);
+            else logger.log(Level.WARN, Text.translatable("meazy:addons.resource.save_failed_already_exists", outFile));
         }
         catch (IOException e) {
-            logger.logTranslatable(Level.ERROR, "meazy:addons.resource.save_failed", outFile.getAbsolutePath(), e);
+            logger.log(Level.ERROR, Text.translatable("meazy:addons.resource.save_failed", outFile.getAbsolutePath(), e));
         }
     }
 
