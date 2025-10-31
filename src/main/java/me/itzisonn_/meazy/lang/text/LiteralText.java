@@ -7,18 +7,18 @@ import java.util.List;
  */
 public class LiteralText implements Text {
     private final String text;
-    private final List<Object> args;
+    private final List<String> args;
 
     /**
      * @param text Text
      * @throws NullPointerException If given text is null
      */
-    protected LiteralText(String text, List<Object> args) throws NullPointerException {
+    protected LiteralText(String text, List<String> args) throws NullPointerException {
         if (text == null) throw new NullPointerException("Text can't be null");
         if (args == null) throw new NullPointerException("Args can't be null");
 
         this.text = text;
-        this.args = args;
+        this.args = List.copyOf(args);
     }
 
     @Override

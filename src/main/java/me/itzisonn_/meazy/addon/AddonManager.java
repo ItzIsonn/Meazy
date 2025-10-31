@@ -52,18 +52,18 @@ public final class AddonManager {
                 addonInfo = addonLoader.getAddonInfo(file);
 
                 if (addonInfo.getCoreDepend() != null && !addonInfo.getCoreDepend().equals(MeazyMain.VERSION)) {
-                    MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.unsupported_version", file.getPath(), addonInfo.getCoreDepend());
+                    MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.cant_load.unsupported_version", file.getPath(), addonInfo.getCoreDepend()));
                     continue;
                 }
             }
             catch (InvalidAddonInfoException e) {
-                MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), e);
+                MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.cant_load.general", file.getPath(), e));
                 continue;
             }
 
             File replacedFile = addons.put(addonInfo.getId(), file);
             if (replacedFile != null) {
-                MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.duplicate_name", addonInfo.getId(), file.getPath(), replacedFile.getPath());
+                MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.duplicate_name", addonInfo.getId(), file.getPath(), replacedFile.getPath()));
             }
 
             Collection<String> softDependencySet = addonInfo.getSoftDepend();
@@ -119,7 +119,7 @@ public final class AddonManager {
                             softDependencies.remove(addon);
                             dependencies.remove(addon);
 
-                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), new UnknownDependencyException(dependency));
+                            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.cant_load.general", file.getPath(), new UnknownDependencyException(dependency)));
                             break;
                         }
                     }
@@ -146,7 +146,7 @@ public final class AddonManager {
                         loadedAddons.add(addon);
                     }
                     catch (InvalidAddonException e) {
-                        MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), e);
+                        MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.cant_load.general", file.getPath(), e));
                     }
                 }
             }
@@ -169,7 +169,7 @@ public final class AddonManager {
                             break;
                         }
                         catch (InvalidAddonException e) {
-                            MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.general", file.getPath(), e);
+                            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.cant_load.general", file.getPath(), e));
                         }
                     }
                 }
@@ -182,7 +182,7 @@ public final class AddonManager {
                     while (failedAddonIterator.hasNext()) {
                         File file = failedAddonIterator.next();
                         failedAddonIterator.remove();
-                        MeazyMain.LOGGER.logTranslatable(Level.ERROR, "meazy:addons.cant_load.circular_dependency", file.getPath());
+                        MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.cant_load.circular_dependency", file.getPath()));
                     }
                 }
             }
