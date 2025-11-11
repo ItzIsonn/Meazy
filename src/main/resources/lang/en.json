@@ -58,5 +58,7 @@
   "lexer.unknown_token": "Unknown token at line {0}: {1}",
   "parser.unexpected_token": "Unexpected token at line {0}: {1}",
   "parser.invalid_statement": "Invalid statement at line {0}: {1}",
-  "parser.invalid_syntax": "Invalid syntax at line {0}: {1}"
+  "parser.invalid_syntax": "Invalid syntax at line {0}: {1}",
+  "runtime.variable.cant_find": "Can't find variable with id '{0}'",
+  "runtime.operator": "Can't evaluate expression with operator '{0}'"
 }

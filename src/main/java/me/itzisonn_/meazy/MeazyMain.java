@@ -77,7 +77,7 @@ public final class MeazyMain {
 
         for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
             Command command = entry.getValue();
-            LOGGER.log(Level.INFO, Text.translatable("    " + command.getName() + " " + String.join(" ", command.getArgs())));
+            LOGGER.log(Level.INFO, Text.literal("    " + command.getName() + " " + String.join(" ", command.getArgs())));
         }
     }
 

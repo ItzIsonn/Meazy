@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.runtime.interpreter.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -45,7 +46,7 @@ public interface VariableDeclarationEnvironment extends Environment {
         if (value == null) throw new NullPointerException("Value can't be null");
 
         VariableValue variableValue = getVariable(id);
-        if (variableValue == null) throw new InvalidIdentifierException("Can't find variable with id " + id);
+        if (variableValue == null) throw new InvalidIdentifierException(Text.translatable("meazy:runtime.variable.cant_find", id));
 
         variableValue.setValue(value);
     }
