@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 @Getter
 public class TokenType {
     /**
-     * Id that matches {@link MeazyMain#IDENTIFIER_REGEX}
+     * Id
      */
     private final String id;
     /**
@@ -28,7 +28,7 @@ public class TokenType {
     /**
      * Main constructor
      *
-     * @param id Id that matches {@link MeazyMain#IDENTIFIER_REGEX}
+     * @param id Id
      * @param pattern Pattern that is used to match this token type
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
      *
@@ -51,7 +51,7 @@ public class TokenType {
     /**
      * Constructor with regex that is compiled into pattern
      *
-     * @param id Id that matches {@link MeazyMain#IDENTIFIER_REGEX}
+     * @param id Id
      * @param regex Regex that is compiled into {@link Pattern}
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
      *

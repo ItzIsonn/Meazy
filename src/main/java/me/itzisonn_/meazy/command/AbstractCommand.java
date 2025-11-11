@@ -11,7 +11,7 @@ import java.util.List;
  * Represents command
  * @see Registries#COMMANDS
  */
-public abstract class Command {
+public abstract class AbstractCommand {
     /**
      * Name
      */
@@ -29,7 +29,7 @@ public abstract class Command {
      * @throws NullPointerException If either name or args is null
      * @throws IllegalArgumentException If either name or any of args doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
      */
-    public Command(String name, List<String> args) throws NullPointerException, IllegalArgumentException {
+    public AbstractCommand(String name, List<String> args) throws NullPointerException, IllegalArgumentException {
         if (name == null) throw new NullPointerException("Name can't be null");
         if (args == null) throw new NullPointerException("Args can't be null");
 
@@ -42,7 +42,7 @@ public abstract class Command {
 
     /**
      * Executes this command with given args.
-     * Args' amount matches {@link Command#args}' size
+     * Args' amount matches {@link AbstractCommand#args}' size
      *
      * @param args Args
      * @return Success message that will be logged or null

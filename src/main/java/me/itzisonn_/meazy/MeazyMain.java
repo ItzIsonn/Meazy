@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.datagen.DatagenDeserializers;
-import me.itzisonn_.meazy.command.Command;
+import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
@@ -53,7 +53,7 @@ public final class MeazyMain {
             return;
         }
 
-        Command command = Commands.getByName(args[0]);
+        AbstractCommand command = Commands.getByName(args[0]);
         if (command == null) {
             LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.unknown", args[0]));
             showAvailableCommandsList();
@@ -75,8 +75,8 @@ public final class MeazyMain {
     private static void showAvailableCommandsList() {
         LOGGER.log(Level.INFO, Text.translatable("meazy:commands.available"));
 
-        for (RegistryEntry<Command> entry : Registries.COMMANDS.getEntries()) {
-            Command command = entry.getValue();
+        for (RegistryEntry<AbstractCommand> entry : Registries.COMMANDS.getEntries()) {
+            AbstractCommand command = entry.getValue();
             LOGGER.log(Level.INFO, Text.literal("    " + command.getName() + " " + String.join(" ", command.getArgs())));
         }
     }
