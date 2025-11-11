@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
-import me.itzisonn_.meazy.command.Command;
+import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.context.RuntimeContext;
@@ -58,7 +58,7 @@ public final class Registries {
     /**
      * Registry for all Commands
      *
-     * @see Command
+     * @see AbstractCommand
      */
     public static final CommandRegistry COMMANDS = new CommandRegistry();
 

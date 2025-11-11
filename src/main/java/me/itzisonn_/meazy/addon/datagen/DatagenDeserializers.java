@@ -52,7 +52,7 @@ public final class DatagenDeserializers {
                     tokenTypeEntry = Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenTypeId));
                 }
 
-                if (tokenTypeEntry == null) throw new InvalidDatagenJsonException("TokenType with id " + tokenTypeId + " doesn't exist");
+                if (tokenTypeEntry == null) throw new InvalidDatagenJsonException("TokenType with id '" + tokenTypeId + "' doesn't exist");
                 tokenTypes.add(tokenTypeEntry.getValue());
             }
 
