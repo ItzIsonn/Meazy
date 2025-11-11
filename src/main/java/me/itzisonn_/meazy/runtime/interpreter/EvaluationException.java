@@ -4,13 +4,13 @@ import me.itzisonn_.meazy.lang.TextException;
 import me.itzisonn_.meazy.lang.text.Text;
 
 /**
- * Is thrown when EvaluationFunction encounters invalid value
+ * Is thrown by {@link EvaluationFunction}
  */
-public class InvalidValueException extends TextException {
+public class EvaluationException extends TextException {
     /**
      * @param text Text
      */
-    public InvalidValueException(Text text) {
+    public EvaluationException(Text text) {
         super(text);
     }
 }

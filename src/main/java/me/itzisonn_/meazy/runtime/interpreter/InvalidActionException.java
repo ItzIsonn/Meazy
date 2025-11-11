@@ -1,13 +1,16 @@
 package me.itzisonn_.meazy.runtime.interpreter;
 
+import me.itzisonn_.meazy.lang.TextException;
+import me.itzisonn_.meazy.lang.text.Text;
+
 /**
  * Is thrown when {@link EvaluationFunction} finds invalid action
  */
-public class InvalidActionException extends RuntimeException {
+public class InvalidActionException extends TextException {
     /**
-     * @param message Message
+     * @param text Text
      */
-    public InvalidActionException(String message) {
-        super(message);
+    public InvalidActionException(Text text) {
+        super(text);
     }
 }

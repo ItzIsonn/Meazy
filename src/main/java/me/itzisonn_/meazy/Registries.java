@@ -242,7 +242,7 @@ public final class Registries {
                         if (!tokenType.canMatch(matched)) continue;
 
                         if (token == null || token.getValue().length() < matched.length()) {
-                            token = new Token(lineNumber, tokenType, matched);
+                            token = new Token(lineNumber, i, end, tokenType, matched);
                         }
                     }
                 }
@@ -260,7 +260,7 @@ public final class Registries {
                 lineNumber += token.getValue().length() - token.getValue().replace("\n", "").length();
             }
 
-            tokens.add(new Token(lineNumber, TokenTypes.END_OF_FILE(), ""));
+            tokens.add(new Token(lineNumber, lines.length(), lines.length(), TokenTypes.END_OF_FILE(), ""));
             return tokens;
         });
 

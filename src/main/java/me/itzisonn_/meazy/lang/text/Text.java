@@ -95,10 +95,9 @@ public interface Text {
 
         for (Object arg : args) {
             if (arg instanceof Throwable throwable) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw, true);
-                (throwable.getCause() == null ? throwable : throwable.getCause()).printStackTrace(pw);
-                list.add(sw.getBuffer().toString());
+                StringWriter writer = new StringWriter();
+                throwable.printStackTrace(new PrintWriter(writer, true));
+                list.add(writer.getBuffer().toString());
             }
             else list.add(String.valueOf(arg));
         }
