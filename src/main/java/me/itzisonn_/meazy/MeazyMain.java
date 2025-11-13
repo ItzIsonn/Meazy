@@ -2,8 +2,6 @@ package me.itzisonn_.meazy;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.addon.AddonManager;
-import me.itzisonn_.meazy.addon.Addon;
-import me.itzisonn_.meazy.addon.datagen.DatagenDeserializers;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lang.Language;
@@ -11,8 +9,6 @@ import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.bundle.BundleManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.lexer.TokenType;
-import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.settings.SettingsManager;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
@@ -94,28 +90,7 @@ public final class MeazyMain {
         if (languagesEntry == null) MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:settings.unknown_language", stringLanguage));
         else BUNDLE_MANAGER.setLanguage(languagesEntry.getValue());
 
-        loadAddons();
-    }
-
-    private static void loadAddons() {
-        ADDON_MANAGER.loadAddons();
-
-        for (Addon addon : ADDON_MANAGER.getAddons()) {
-            if (addon.getLanguageFileProvider() != null) BUNDLE_MANAGER.addLanguageFileProvider(addon.getLanguageFileProvider());
-            ADDON_MANAGER.enableAddon(addon);
-
-            for (TokenType tokenType : addon.getDatagenManager().getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.getTokenTypeDeserializer())) {
-                Registries.TOKEN_TYPES.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenType.getId()), tokenType);
-            }
-
-            for (TokenTypeSet tokenTypeSet : addon.getDatagenManager().getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer(addon))) {
-                Registries.TOKEN_TYPE_SETS.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenTypeSet.getId()), tokenTypeSet);
-            }
-        }
-
-        int addons = ADDON_MANAGER.getAddons().size();
-        if (addons == 1) LOGGER.log(Level.INFO, Text.translatable("meazy:addons.single_loaded"));
-        else LOGGER.log(Level.INFO, Text.translatable("meazy:addons.multiple_loaded", addons));
+        ADDON_MANAGER.enableAddons();
     }
 
     /**
