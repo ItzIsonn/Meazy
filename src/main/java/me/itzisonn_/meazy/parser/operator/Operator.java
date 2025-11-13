@@ -10,6 +10,10 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 @Getter
 public abstract class Operator {
     /**
+     * Id
+     */
+    private final String id;
+    /**
      * Symbol
      */
     private final String symbol;
@@ -25,16 +29,19 @@ public abstract class Operator {
     /**
      * Main constructor
      *
+     * @param id Id
      * @param symbol Symbol
      * @param operatorType Operator type
      * @param isOverridable Whether this operator is overridable by operator functions
      *
-     * @throws NullPointerException If either symbol or operatorType is null
+     * @throws NullPointerException If either id, symbol or operatorType is null
      */
-    public Operator(String symbol, OperatorType operatorType, boolean isOverridable) throws NullPointerException {
+    public Operator(String id, String symbol, OperatorType operatorType, boolean isOverridable) throws NullPointerException {
+        if (id == null) throw new NullPointerException("Id can't be null");
         if (symbol == null) throw new NullPointerException("Symbol can't be null");
         if (operatorType == null) throw new NullPointerException("OperatorType can't be null");
 
+        this.id = id;
         this.symbol = symbol;
         this.operatorType = operatorType;
         this.isOverridable = isOverridable;
@@ -43,13 +50,14 @@ public abstract class Operator {
     /**
      * Constructor with isOverridable set to true
      *
+     * @param id Id
      * @param symbol Symbol
      * @param operatorType Operator type
      *
-     * @throws NullPointerException If either symbol or operatorType is null
+     * @throws NullPointerException If either id, symbol or operatorType is null
      */
-    public Operator(String symbol, OperatorType operatorType) throws NullPointerException {
-        this(symbol, operatorType, true);
+    public Operator(String id, String symbol, OperatorType operatorType) throws NullPointerException {
+        this(id, symbol, operatorType, true);
     }
 
     /**
