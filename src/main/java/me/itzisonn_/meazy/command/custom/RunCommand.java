@@ -6,8 +6,8 @@ import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
+import me.itzisonn_.meazy.logging.LogLevel;
 import me.itzisonn_.meazy.parser.ast.Program;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.util.List;
@@ -21,11 +21,11 @@ public class RunCommand extends AbstractCommand {
     public Text execute(String[] args) {
         File file = new File(args[0]);
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
             return null;
         }
 
-        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.run.running", file.getAbsolutePath()));
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.getAbsolutePath()));
 
         String extension = FileUtils.getExtension(file);
         long startMillis = System.currentTimeMillis();
@@ -39,20 +39,20 @@ public class RunCommand extends AbstractCommand {
             case "meac" -> {
                 program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
                 if (program == null) {
-                    MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.failed_read", file.getAbsolutePath()));
+                    MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.failed_read", file.getAbsolutePath()));
                     return null;
                 }
                 if (MeazyMain.VERSION.isBefore(program.getVersion())) {
-                    MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.run.incompatible_version", program.getVersion(), MeazyMain.VERSION));
+                    MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:commands.run.incompatible_version", program.getVersion(), MeazyMain.VERSION));
                     return null;
                 }
                 if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-                    MeazyMain.LOGGER.log(Level.WARN, Text.translatable("meazy:commands.run.unsafe", program.getVersion(), MeazyMain.VERSION));
+                    MeazyMain.LOGGER.log(LogLevel.WARNING, Text.translatable("meazy:commands.run.unsafe", program.getVersion(), MeazyMain.VERSION));
                 }
                 program.setFile(file);
             }
             default -> {
-                MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.unsupported_extension", extension));
+                MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", extension));
                 return null;
             }
         }

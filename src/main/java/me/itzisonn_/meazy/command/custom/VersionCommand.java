@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.command.custom;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
-import org.apache.logging.log4j.Level;
+import me.itzisonn_.meazy.logging.LogLevel;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class VersionCommand extends AbstractCommand {
 
     @Override
     public Text execute(String[] args) {
-        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.version", MeazyMain.VERSION));
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.version", MeazyMain.VERSION));
         return null;
     }
 }

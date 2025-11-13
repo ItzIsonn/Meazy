@@ -6,8 +6,8 @@ import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
+import me.itzisonn_.meazy.logging.LogLevel;
 import me.itzisonn_.meazy.parser.ast.Program;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,16 +23,16 @@ public class CompileCommand extends AbstractCommand {
     public Text execute(String[] args) {
         File file = new File(args[0]);
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
             return null;
         }
 
         if (!FileUtils.getExtension(file).equals("mea")) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.unsupported_extension", FileUtils.getExtension(file)));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", FileUtils.getExtension(file)));
             return null;
         }
 
-        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.compile.compiling'", file.getAbsolutePath()));
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.compile.compiling'", file.getAbsolutePath()));
 
         long startMillis = System.currentTimeMillis();
         List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(FileUtils.getLines(file));
@@ -43,22 +43,22 @@ public class CompileCommand extends AbstractCommand {
 
         File outputFile = new File(args[1]);
         if (file.isDirectory()) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.output_cant_be_directory"));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.output_cant_be_directory"));
             return null;
         }
         if (!outputFile.getParentFile().exists()) {
             if (outputFile.getParentFile().mkdirs()) {
                 try {
-                    if (outputFile.createNewFile()) MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:file.created", args[1]));
-                    else MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:file.already_exists", args[1]));
+                    if (outputFile.createNewFile()) MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:file.created", args[1]));
+                    else MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:file.already_exists", args[1]));
                 }
                 catch (Exception e) {
-                    MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.cant_create", args[1]));
+                    MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.cant_create", args[1]));
                     return null;
                 }
             }
             else {
-                MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.cant_create_parent", args[1]));
+                MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.cant_create_parent", args[1]));
                 return null;
             }
         }

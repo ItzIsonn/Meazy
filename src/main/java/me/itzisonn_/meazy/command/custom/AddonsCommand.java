@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
-import org.apache.logging.log4j.Level;
+import me.itzisonn_.meazy.logging.LogLevel;
 
 import java.util.List;
 
@@ -17,11 +17,11 @@ public class AddonsCommand extends AbstractCommand {
     @Override
     public Text execute(String[] args) {
         if (MeazyMain.ADDON_MANAGER.getAddons().isEmpty()) {
-            MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.empty"));
+            MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.addons.empty"));
             return null;
         }
 
-        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.addons.loaded"));
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.addons.loaded"));
         for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
             AddonInfo addonInfo = addon.getAddonInfo();
 
@@ -37,7 +37,7 @@ public class AddonsCommand extends AbstractCommand {
             }
             else description = "";
 
-            MeazyMain.LOGGER.log(Level.INFO, Text.literal("    " + addonInfo.getFullName() + authors + description));
+            MeazyMain.LOGGER.log(LogLevel.INFO, Text.literal("    " + addonInfo.getFullName() + authors + description));
         }
 
         return null;

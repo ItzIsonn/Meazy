@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.text.Text;
-import org.apache.logging.log4j.Level;
+import me.itzisonn_.meazy.logging.LogLevel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +54,7 @@ public class Bundle {
         }
 
         if (translations.keySet().removeIf(key -> !key.matches("[a-zA-Z_.]+"))) {
-            MeazyMain.LOGGER.log(Level.INFO, Text.literal("Some of the keys were removed from bundle with provider {0} due to invalid format", languageFileProvider.getId()));
+            MeazyMain.LOGGER.log(LogLevel.INFO, Text.literal("Some of the keys were removed from bundle with provider {0} due to invalid format", languageFileProvider.getId()));
         }
     }
 

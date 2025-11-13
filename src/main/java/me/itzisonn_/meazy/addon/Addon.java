@@ -3,12 +3,12 @@ package me.itzisonn_.meazy.addon;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import me.itzisonn_.meazy.FileUtils;
-import me.itzisonn_.meazy.MeazyLogger;
+import me.itzisonn_.meazy.logging.LogLevel;
+import me.itzisonn_.meazy.logging.Logger;
 import me.itzisonn_.meazy.addon.datagen.DatagenManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
 import me.itzisonn_.meazy.lang.text.Text;
-import org.apache.logging.log4j.Level;
 
 import java.io.*;
 import java.net.URL;
@@ -25,7 +25,7 @@ public abstract class Addon {
     private final File file;
     private final DatagenManager datagenManager;
     private final File configFile;
-    private final MeazyLogger logger;
+    private final Logger logger;
     private boolean isEnabled = false;
     private JsonElement config = null;
 
@@ -40,7 +40,7 @@ public abstract class Addon {
         file = addonClassLoader.getFile();
         datagenManager = new DatagenManager(file);
         configFile = new File(dataFolder, "config.json");
-        logger = new MeazyLogger(addonInfo.getId());
+        logger = new Logger(addonInfo.getId());
     }
 
 
@@ -108,7 +108,7 @@ public abstract class Addon {
             }
         }
         catch (IOException e) {
-            logger.log(Level.ERROR, Text.translatable("meazy:addons.resource.save_failed_config", configFile.getAbsolutePath(), e));
+            logger.log(LogLevel.ERROR, Text.translatable("meazy:addons.resource.save_failed_config", configFile.getAbsolutePath(), e));
         }
     }
 
@@ -148,10 +148,10 @@ public abstract class Addon {
                 out.close();
                 in.close();
             }
-            else logger.log(Level.WARN, Text.translatable("meazy:addons.resource.save_failed_already_exists", outFile));
+            else logger.log(LogLevel.WARNING, Text.translatable("meazy:addons.resource.save_failed_already_exists", outFile));
         }
         catch (IOException e) {
-            logger.log(Level.ERROR, Text.translatable("meazy:addons.resource.save_failed", outFile.getAbsolutePath(), e));
+            logger.log(LogLevel.ERROR, Text.translatable("meazy:addons.resource.save_failed", outFile.getAbsolutePath(), e));
         }
     }
 
@@ -203,7 +203,7 @@ public abstract class Addon {
     /**
      * @return This addon's logger
      */
-    public final MeazyLogger getLogger() {
+    public final Logger getLogger() {
         return logger;
     }
 

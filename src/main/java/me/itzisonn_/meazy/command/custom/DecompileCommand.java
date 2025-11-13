@@ -5,8 +5,8 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.logging.LogLevel;
 import me.itzisonn_.meazy.parser.ast.Program;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -22,29 +22,29 @@ public class DecompileCommand extends AbstractCommand {
     public Text execute(String[] args) {
         File file = new File(args[0]);
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
             return null;
         }
 
         if (!FileUtils.getExtension(file).equals("meac")) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.unsupported_extension", FileUtils.getExtension(file)));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", FileUtils.getExtension(file)));
             return null;
         }
 
-        MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:commands.decompile.decompiling", file.getAbsolutePath()));
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.decompile.decompiling", file.getAbsolutePath()));
 
         long startMillis = System.currentTimeMillis();
         Program program = Registries.getGson().fromJson(FileUtils.getLines(file), Program.class);
         if (program == null) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.failed_read", file.getAbsolutePath()));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.failed_read", file.getAbsolutePath()));
             return null;
         }
         if (MeazyMain.VERSION.isBefore(program.getVersion())) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:commands.decompile.incompatible_version", program.getVersion(), MeazyMain.VERSION));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:commands.decompile.incompatible_version", program.getVersion(), MeazyMain.VERSION));
             return null;
         }
         if (MeazyMain.VERSION.isAfter(program.getVersion())) {
-            MeazyMain.LOGGER.log(Level.WARN, Text.translatable("meazy:commands.decompile.unsafe", program.getVersion(), MeazyMain.VERSION));
+            MeazyMain.LOGGER.log(LogLevel.WARNING, Text.translatable("meazy:commands.decompile.unsafe", program.getVersion(), MeazyMain.VERSION));
         }
         program.setFile(file);
         long endMillis = System.currentTimeMillis();
@@ -52,22 +52,22 @@ public class DecompileCommand extends AbstractCommand {
 
         File outputFile = new File(args[1]);
         if (file.isDirectory()) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.output_cant_be_directory"));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.output_cant_be_directory"));
             return null;
         }
         if (!outputFile.getParentFile().exists()) {
             if (outputFile.getParentFile().mkdirs()) {
                 try {
-                    if (outputFile.createNewFile()) MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:file.created", args[1]));
-                    else MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:file.already_exists", args[1]));
+                    if (outputFile.createNewFile()) MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:file.created", args[1]));
+                    else MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:file.already_exists", args[1]));
                 }
                 catch (Exception e) {
-                    MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.cant_create", args[1]));
+                    MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.cant_create", args[1]));
                     return null;
                 }
             }
             else {
-                MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:file.cant_create_parent"));
+                MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.cant_create_parent"));
                 return null;
             }
         }
