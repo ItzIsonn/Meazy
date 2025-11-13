@@ -14,9 +14,9 @@ import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.parser.data_type.DataTypeFactory;
 import me.itzisonn_.meazy.parser.json_converter.*;
-import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.registry.CommandRegistry;
 import me.itzisonn_.meazy.registry.LanguageRegistry;
+import me.itzisonn_.meazy.registry.OperatorRegistry;
 import me.itzisonn_.meazy.runtime.EvaluateProgramFunction;
 import me.itzisonn_.meazy.runtime.RunProgramFunction;
 import me.itzisonn_.meazy.runtime.environment.factory.*;
@@ -92,7 +92,7 @@ public final class Registries {
     /**
      * Registry for all Operators
      */
-    public static final SetRegistry<Operator> OPERATORS = new SetRegistry<>();
+    public static final OperatorRegistry OPERATORS = new OperatorRegistry();
 
     /**
      * Registry for all ParsingFunctions
