@@ -17,9 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.apache.logging.log4j:log4j-core:2.25.2")
     implementation("com.google.code.gson:gson:2.13.2")
-
     implementation(files("libs/Registry.jar"))
 
     compileOnly("org.projectlombok:lombok:${lombokVersion}")

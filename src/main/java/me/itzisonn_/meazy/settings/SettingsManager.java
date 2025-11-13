@@ -6,7 +6,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.text.Text;
-import org.apache.logging.log4j.Level;
+import me.itzisonn_.meazy.logging.LogLevel;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -32,7 +32,7 @@ public class SettingsManager {
 
         Settings settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);
         if (settings == null) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:settings.invalid_file"));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:settings.invalid_file"));
             saveDefaultSettings(settingsFile);
 
             settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);

@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.addon;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.text.Text;
-import org.apache.logging.log4j.Level;
+import me.itzisonn_.meazy.logging.LogLevel;
 
 import java.io.*;
 import java.util.*;
@@ -108,11 +108,11 @@ public class AddonLoader {
         if (addon.isEnabled()) throw new IllegalStateException("Addon has already been enabled");
 
         try {
-            MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:addons.enabling", addon.getAddonInfo().getFullName()));
+            MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:addons.enabling", addon.getAddonInfo().getFullName()));
             addon.enable();
         }
         catch (Throwable e) {
-            MeazyMain.LOGGER.log(Level.ERROR, Text.translatable("meazy:addons.failed_enable", addon.getAddonInfo().getFullName(), e));
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:addons.failed_enable", addon.getAddonInfo().getFullName(), e));
         }
     }
 }
