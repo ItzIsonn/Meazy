@@ -1,7 +1,7 @@
 {
   "settings.cant_load_file": "Can't load settings file",
-  "settings.cant_find_default": "Can't find default settings file",
-  "settings.cant_create_default": "Can't create default settings file",
+  "settings.cant_find_file": "Can't find default settings file",
+  "settings.cant_create_file": "Can't create default settings file",
   "settings.invalid_file": "Invalid settings file. Creating default",
   "settings.unknown_language": "Unknown language {0}. Using default",
 
@@ -17,6 +17,9 @@
   "addons.resource.save_failed": "Failed to save resource {0}. {1}",
   "addons.resource.save_failed_already_exists": "Failed to save resource {0} because it already exists",
   "addons.resource.save_failed_config": "Failed to save config {0}. {1}",
+  "addons.default.cant_load_file": "Can't load default addon file",
+  "addons.default.cant_find_file": "Can't find default addon file",
+  "addons.default.cant_create_file": "Can't create default addon file",
 
   "file.doesnt_exist": "File '{0}' doesn't exist",
   "file.already_exists": "File '{0}' already exists",
@@ -38,8 +41,6 @@
   "commands.addons.empty": "No addons present",
   "commands.addons.loaded": "Loaded addons:",
   "commands.addons.by": "by",
-  "commands.addons.cant_find_default": "Can't find MeazyAddon for {0} Meazy version. It'll probably release soon",
-  "commands.addons.loaded_default": "Successfully downloaded MeazyAddon v{0}",
 
   "commands.run.running": "Running file '{0}'",
   "commands.run.incompatible_version": "Can't run file that has been compiled by a more recent version of the Meazy ({0}) in a more older version ({1})",

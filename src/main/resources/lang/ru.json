@@ -1,7 +1,7 @@
 {
   "settings.cant_load_file": "Не удалось загрузить файл настроек",
-  "settings.cant_find_default": "Не удалось найти файл настроек по умолчанию",
-  "settings.cant_create_default": "Не удалось создать файл настроек по умолчанию",
+  "settings.cant_find_file": "Не удалось найти файл настроек по умолчанию",
+  "settings.cant_create_file": "Не удалось создать файл настроек по умолчанию",
   "settings.invalid_file": "Неверный файл настроек. Создание нового",
   "settings.unknown_language": "Неизвестный язык {0}. Будет использоваться язык по умолчанию",
 
@@ -17,6 +17,9 @@
   "addons.resource.save_failed": "Не удалось сохранить ресурс {0}. {1}",
   "addons.resource.save_failed_already_exists": "Не удалось сохранить ресурс {0}, потому что он уже существует",
   "addons.resource.save_failed_config": "Не удалось загрузить конфиг {0}. {1}",
+  "addons.default.cant_load_file": "Не удалось загрузить файл стандартного аддона",
+  "addons.default.cant_find_file": "Не удалось найти файл стандартного аддона",
+  "addons.default.cant_create_file": "Не удалось создать файл стандартного аддона",
 
   "file.doesnt_exist": "Файл '{0}' не существует",
   "file.already_exists": "Файл '{0}' уже существует",
@@ -38,8 +41,6 @@
   "commands.addons.empty": "Аддоны отсутствуют",
   "commands.addons.loaded": "Загруженные аддоны:",
   "commands.addons.by": "от",
-  "commands.addons.cant_find_default": "Не удалось найти MeazyAddon для версии {0} Meazy. Скорее всего, он скоро будет выпущен",
-  "commands.addons.loaded_default": "Успешно загружен MeazyAddon v{0}",
 
   "commands.run.running": "Запуск файла '{0}'",
   "commands.run.incompatible_version": "Не удалось запустить файл, который был скомпилирован более новой версией Meazy ({0}), в более старой ({1})",
@@ -53,5 +54,12 @@
   "commands.decompile.decompiling": "Декомпиляция файла '{0}'",
   "commands.decompile.incompatible_version": "Не удалось декомпилировать файл, который был скомпилирован более новой версией Meazy ({0}), в более старой ({1})",
   "commands.decompile.unsafe": "Небезопасно декомпилировать файл, который был скомпилирован более старой версией Meazy ({0}), в более новой ({1})",
-  "commands.decompile.info": "Декомпилировано за {0}с."
+  "commands.decompile.info": "Декомпилировано за {0}с.",
+
+  "lexer.unknown_token": "Неизвестный токен на строке {0}: {1}",
+  "parser.unexpected_token": "Непредвиденный токен на строке {0}: {1}",
+  "parser.invalid_statement": "Неверная команда на строке {0}: {1}",
+  "parser.invalid_syntax": "Неверный синтаксис на строке {0}: {1}",
+  "runtime.variable.cant_find": "Не удалось найти переменную с айди '{0}'",
+  "runtime.operator": "Не удалось вычислить выражение с оператором '{0}'"
 }

@@ -36,7 +36,7 @@ public class SettingsManager {
             saveDefaultSettings(settingsFile);
 
             settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);
-            if (settings == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_create_default").toString());
+            if (settings == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_create_file").toString());
         }
 
         this.settings = settings;
@@ -44,7 +44,7 @@ public class SettingsManager {
 
     private void saveDefaultSettings(File settingsFile) {
         InputStream in = MeazyMain.class.getClassLoader().getResourceAsStream("settings.json");
-        if (in == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_find_default").toString());
+        if (in == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_find_file").toString());
 
         try {
             OutputStream out = new FileOutputStream(settingsFile);
@@ -59,7 +59,7 @@ public class SettingsManager {
             in.close();
         }
         catch (IOException e) {
-            throw new RuntimeException(Text.translatable("meazy:settings.cant_create_default").toString(), e);
+            throw new RuntimeException(Text.translatable("meazy:settings.cant_create_file").toString(), e);
         }
     }
 }

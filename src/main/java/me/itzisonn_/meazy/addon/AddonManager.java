@@ -1,10 +1,15 @@
 package me.itzisonn_.meazy.addon;
 
 import me.itzisonn_.meazy.MeazyMain;
+import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.addon.datagen.DatagenDeserializers;
 import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.lexer.TokenType;
+import me.itzisonn_.meazy.lexer.TokenTypeSet;
+import me.itzisonn_.registry.RegistryIdentifier;
 import org.apache.logging.log4j.Level;
 
-import java.io.File;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -200,6 +205,67 @@ public final class AddonManager {
         if (file == null) throw new NullPointerException("File can't be null");
         if (!FILE_FILTER.matcher(file.getName()).matches()) throw new InvalidAddonException("Invalid addon file");
         addons.add(addonLoader.loadAddon(file));
+    }
+
+
+
+    /**
+     * Enables addons
+     */
+    public void enableAddons() {
+        if (MeazyMain.SETTINGS_MANAGER.getSettings().isEnableDefaultAddon()) loadDefaultAddon();
+        loadAddons();
+
+        for (Addon addon : getAddons()) {
+            if (addon.getLanguageFileProvider() != null) MeazyMain.BUNDLE_MANAGER.addLanguageFileProvider(addon.getLanguageFileProvider());
+            enableAddon(addon);
+
+            for (TokenType tokenType : addon.getDatagenManager().getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.getTokenTypeDeserializer())) {
+                Registries.TOKEN_TYPES.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenType.getId()), tokenType);
+            }
+
+            for (TokenTypeSet tokenTypeSet : addon.getDatagenManager().getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer(addon))) {
+                Registries.TOKEN_TYPE_SETS.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenTypeSet.getId()), tokenTypeSet);
+            }
+        }
+
+        int addons = getAddons().size();
+        if (addons == 1) MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:addons.single_loaded"));
+        else MeazyMain.LOGGER.log(Level.INFO, Text.translatable("meazy:addons.multiple_loaded", addons));
+    }
+
+    private void loadDefaultAddon() {
+        String fileName = "MeazyAddon-v" + MeazyMain.VERSION + ".jar";
+
+        File addonFile;
+        try {
+            addonFile = new File(ADDONS_FOLDER.getAbsolutePath() + "/" + fileName);
+
+            if (addonFile.exists()) return;
+            if (!addonFile.createNewFile()) throw new RuntimeException(Text.translatable("meazy:addons.cant_load_file").toString());
+        }
+        catch (IOException e) {
+            throw new RuntimeException(Text.translatable("meazy:addons.cant_load_file").toString(), e);
+        }
+
+        InputStream in = MeazyMain.class.getClassLoader().getResourceAsStream(fileName);
+        if (in == null) throw new RuntimeException(Text.translatable("meazy:addons.default.cant_find_file").toString());
+
+        try {
+            OutputStream out = new FileOutputStream(addonFile);
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+
+            out.close();
+            in.close();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(Text.translatable("meazy:addons.cant_create_file").toString(), e);
+        }
     }
 
 
