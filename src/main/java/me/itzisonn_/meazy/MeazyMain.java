@@ -65,7 +65,7 @@ public final class MeazyMain {
 
         Text log = command.execute(commandArgs);
         if (log != null) {
-            LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.loaded_info", ((double) endLoadMillis - (double) startLoadMillis) / 1000).append(log));
+            LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.loaded_info", ((double) endLoadMillis - (double) startLoadMillis) / 1000).append(Text.literal(". ")).append(log));
         }
     }
 

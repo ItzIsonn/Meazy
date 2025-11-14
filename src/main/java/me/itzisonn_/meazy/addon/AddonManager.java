@@ -68,7 +68,7 @@ public final class AddonManager {
 
             File replacedFile = addons.put(addonInfo.getId(), file);
             if (replacedFile != null) {
-                MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:addons.duplicate_name", addonInfo.getId(), file.getPath(), replacedFile.getPath()));
+                MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:addons.duplicate_id", addonInfo.getId(), file.getPath(), replacedFile.getPath()));
             }
 
             Collection<String> softDependencySet = addonInfo.getSoftDepend();
@@ -242,10 +242,10 @@ public final class AddonManager {
             addonFile = new File(ADDONS_FOLDER.getAbsolutePath() + "/" + fileName);
 
             if (addonFile.exists()) return;
-            if (!addonFile.createNewFile()) throw new RuntimeException(Text.translatable("meazy:addons.cant_load_file").toString());
+            if (!addonFile.createNewFile()) throw new RuntimeException(Text.translatable("meazy:addons.default.cant_load_file").toString());
         }
         catch (IOException e) {
-            throw new RuntimeException(Text.translatable("meazy:addons.cant_load_file").toString(), e);
+            throw new RuntimeException(Text.translatable("meazy:addons.default.cant_load_file").toString(), e);
         }
 
         InputStream in = MeazyMain.class.getClassLoader().getResourceAsStream(fileName);
@@ -264,7 +264,7 @@ public final class AddonManager {
             in.close();
         }
         catch (IOException e) {
-            throw new RuntimeException(Text.translatable("meazy:addons.cant_create_file").toString(), e);
+            throw new RuntimeException(Text.translatable("meazy:addons.default.cant_create_file").toString(), e);
         }
     }
 
