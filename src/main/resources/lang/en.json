@@ -44,15 +44,15 @@
   "commands.run.running": "Running file '{0}'",
   "commands.run.incompatible_version": "Can't run file that has been compiled by a more recent version of the Meazy ({0}) in a more older version ({1})",
   "commands.run.unsafe": "It's unsafe to run file that has been compiled by a more older version of the Meazy ({0}) in a more recent version ({1})",
-  "commands.run.info": "Executed in {0}s.",
+  "commands.run.info": "Executed in {0}s",
 
   "commands.compile.compiling": "Compiling file '{0}'",
-  "commands.compile.info": "Compiled in {0}s.",
+  "commands.compile.info": "Compiled in {0}s",
 
   "commands.decompile.decompiling": "Decompiling file '{0}'",
   "commands.decompile.incompatible_version": "Can't decompile file that has been compiled by a more recent version of the Meazy ({0}) in a more older version ({1})",
   "commands.decompile.unsafe": "It's unsafe to decompile file that has been compiled by a more older version of the Meazy ({0}) in a more recent version ({1})",
-  "commands.decompile.info": "Decompiled in {0}s.",
+  "commands.decompile.info": "Decompiled in {0}s",
 
   "lexer.unknown_token": "Unknown token at line {0}: {1}",
   "parser.unexpected_token": "Unexpected token at line {0}: {1}",

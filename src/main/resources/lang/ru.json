@@ -44,15 +44,15 @@
   "commands.run.running": "Запуск файла '{0}'",
   "commands.run.incompatible_version": "Не удалось запустить файл, который был скомпилирован более новой версией Meazy ({0}), в более старой ({1})",
   "commands.run.unsafe": "Небезопасно запускать файл, который был скомпилирован более старой версией Meazy ({0}), в более новой ({1})",
-  "commands.run.info": "Выполнено за {0}с.",
+  "commands.run.info": "Выполнено за {0}с",
 
   "commands.compile.compiling": "Компиляция файла '{0}'",
-  "commands.compile.info": "Скомпилировано за {0}с.",
+  "commands.compile.info": "Скомпилировано за {0}с",
 
   "commands.decompile.decompiling": "Декомпиляция файла '{0}'",
   "commands.decompile.incompatible_version": "Не удалось декомпилировать файл, который был скомпилирован более новой версией Meazy ({0}), в более старой ({1})",
   "commands.decompile.unsafe": "Небезопасно декомпилировать файл, который был скомпилирован более старой версией Meazy ({0}), в более новой ({1})",
-  "commands.decompile.info": "Декомпилировано за {0}с.",
+  "commands.decompile.info": "Декомпилировано за {0}с",
 
   "lexer.unknown_token": "Неизвестный токен на строке {0}: {1}",
   "parser.unexpected_token": "Непредвиденный токен на строке {0}: {1}",
