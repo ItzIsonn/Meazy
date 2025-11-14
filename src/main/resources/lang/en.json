@@ -9,8 +9,8 @@
   "addons.multiple_loaded": "{0} addons loaded",
   "addons.cant_load_folder": "Can't load addons folder",
   "addons.enabling": "Enabling addon {0}",
-  "addons.failed_enable": "Error occurred while enabling {0}. {1}",
-  "addons.duplicate_name": "Duplicate addon name '{0}' for files '{1}' and '{2}'",
+  "addons.failed_enable": "Failed to enable addon {0}. {1}",
+  "addons.duplicate_id": "Duplicate addon id '{0}' for files '{1}' and '{2}'",
   "addons.cant_load.general": "Can't load '{0}'. {1}",
   "addons.cant_load.unsupported_version": "Can't load '{0}' because it has unsupported version {1}",
   "addons.cant_load.circular_dependency": "Can't load '{0}' because of circular dependency",
@@ -33,8 +33,7 @@
   "commands.unknown": "Unknown command with name {0}",
   "commands.invalid_args": "Expected {0} arguments but found {1}",
   "commands.available": "Available commands:",
-  "commands.loaded_info": "Loaded in {0}s. ",
-  "commands.invalid_argument": "Unknown argument {0}",
+  "commands.loaded_info": "Loaded in {0}s",
 
   "commands.version": "Meazy version {0}",
 
@@ -45,7 +44,6 @@
   "commands.run.running": "Running file '{0}'",
   "commands.run.incompatible_version": "Can't run file that has been compiled by a more recent version of the Meazy ({0}) in a more older version ({1})",
   "commands.run.unsafe": "It's unsafe to run file that has been compiled by a more older version of the Meazy ({0}) in a more recent version ({1})",
-  "commands.run.invalid_extension": "Can't run file with extension '{0}'",
   "commands.run.info": "Executed in {0}s.",
 
   "commands.compile.compiling": "Compiling file '{0}'",
@@ -58,8 +56,5 @@
 
   "lexer.unknown_token": "Unknown token at line {0}: {1}",
   "parser.unexpected_token": "Unexpected token at line {0}: {1}",
-  "parser.invalid_statement": "Invalid statement at line {0}: {1}",
-  "parser.invalid_syntax": "Invalid syntax at line {0}: {1}",
-  "runtime.variable.cant_find": "Can't find variable with id '{0}'",
-  "runtime.operator": "Can't evaluate expression with operator '{0}'"
+  "runtime.variable.cant_find": "Can't find variable with id '{0}'"
 }

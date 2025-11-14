@@ -9,8 +9,8 @@
   "addons.multiple_loaded": "Загружено аддонов: {0}",
   "addons.cant_load_folder": "Не удалось загрузить папку с аддонами",
   "addons.enabling": "Загружается аддон {0}",
-  "addons.failed_enable": "Произошла ошибка при включении {0}. {1}",
-  "addons.duplicate_name": "Одинаковое имя аддона '{0}' у файлов '{1}' и '{2}'",
+  "addons.failed_enable": "Не удалось включить аддон {0}. {1}",
+  "addons.duplicate_id": "Одинаковый айди аддона '{0}' у файлов '{1}' и '{2}'",
   "addons.cant_load.general": "Не удалось загрузить '{0}'. {1}",
   "addons.cant_load.unsupported_version": "Не удалось загрузить '{0}', потому что он использует неподдерживаемою версию {1}",
   "addons.cant_load.circular_dependency": "Не удалось загрузить '{0}' из-за цикличной зависимости",
@@ -33,8 +33,7 @@
   "commands.unknown": "Неизвестная команда с именем {0}",
   "commands.invalid_args": "Ожидалось аргументов: {0}, но получено: {1}",
   "commands.available": "Доступные команды:",
-  "commands.loaded_info": "Загружено за {0}с. {1}",
-  "commands.invalid_argument": "Неизвестный аргумент {0}",
+  "commands.loaded_info": "Загружено за {0}с",
 
   "commands.version": "Версия Meazy {0}",
 
@@ -45,7 +44,6 @@
   "commands.run.running": "Запуск файла '{0}'",
   "commands.run.incompatible_version": "Не удалось запустить файл, который был скомпилирован более новой версией Meazy ({0}), в более старой ({1})",
   "commands.run.unsafe": "Небезопасно запускать файл, который был скомпилирован более старой версией Meazy ({0}), в более новой ({1})",
-  "commands.run.invalid_extension": "Не удалось выполнить файл с расширением '{0}'",
   "commands.run.info": "Выполнено за {0}с.",
 
   "commands.compile.compiling": "Компиляция файла '{0}'",
@@ -58,8 +56,5 @@
 
   "lexer.unknown_token": "Неизвестный токен на строке {0}: {1}",
   "parser.unexpected_token": "Непредвиденный токен на строке {0}: {1}",
-  "parser.invalid_statement": "Неверная команда на строке {0}: {1}",
-  "parser.invalid_syntax": "Неверный синтаксис на строке {0}: {1}",
-  "runtime.variable.cant_find": "Не удалось найти переменную с айди '{0}'",
-  "runtime.operator": "Не удалось вычислить выражение с оператором '{0}'"
+  "runtime.variable.cant_find": "Не удалось найти переменную с айди '{0}'"
 }
