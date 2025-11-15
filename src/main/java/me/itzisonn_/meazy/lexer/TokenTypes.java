@@ -42,7 +42,7 @@ public final class TokenTypes {
         if (hasRegistered) throw new IllegalStateException("TokenTypes have already been initialized");
         hasRegistered = true;
 
-        register(new TokenType("new_line", "\n+", false));
+        register(new TokenType("new_line", "\n", false));
         register(new TokenType("white_space", "(?!\n)\\s", true));
         register(new TokenType("end_of_file", (Pattern) null, false));
     }
