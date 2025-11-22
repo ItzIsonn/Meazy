@@ -32,7 +32,7 @@ public class CompileCommand extends AbstractCommand {
             return null;
         }
 
-        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.compile.compiling'", file.getAbsolutePath()));
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.compile.compiling", file.getAbsolutePath()));
 
         long startMillis = System.currentTimeMillis();
         List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(FileUtils.getLines(file));
