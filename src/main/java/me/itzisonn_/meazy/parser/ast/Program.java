@@ -91,7 +91,7 @@ public class Program implements Statement {
     public String toCodeString(int offset) throws IllegalArgumentException {
         StringBuilder requiredAddonsBuilder = new StringBuilder();
         for (String addonId : requiredAddons.keySet()) {
-            requiredAddonsBuilder.append(Statement.getOffset(offset)).append("require ").append(addonId);
+            requiredAddonsBuilder.append(Statement.getOffset(offset)).append("require \"").append(addonId).append("\"");
 
             Version addonVersion = requiredAddons.get(addonId);
             if (addonVersion != null) requiredAddonsBuilder.append(" \"").append(addonVersion).append("\"");

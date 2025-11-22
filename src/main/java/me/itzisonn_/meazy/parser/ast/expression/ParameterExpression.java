@@ -32,6 +32,6 @@ public class ParameterExpression implements Expression {
     @Override
     public String toCodeString() {
         String declareString = isConstant ? "val" : "var";
-        return declareString + " " + id + ":" + dataType;
+        return declareString + " " + id + " : " + dataType;
     }
 }
