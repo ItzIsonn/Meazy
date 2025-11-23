@@ -173,6 +173,26 @@ public class Parser {
         return false;
     }
 
+    /**
+     * Checks current line for presence of token with type inside given tokenTypeSet
+     *
+     * @param tokenTypeSet Required TokenTypeSet
+     * @return Whether current line has token with type inside given tokenTypeSet
+     *
+     * @throws NullPointerException If given tokenTypeSet is null
+     */
+    public boolean currentLineHasToken(TokenTypeSet tokenTypeSet) throws NullPointerException {
+        if (tokenTypeSet == null) throw new NullPointerException("TokenTypeSet can't be null");
+
+        for (int i = pos; i < tokens.size(); i++) {
+            TokenType current = tokens.get(i).getType();
+            if (current.equals(TokenTypes.NEW_LINE())) return false;
+            if (tokenTypeSet.contains(current)) return true;
+        }
+
+        return false;
+    }
+
 
 
     /**
