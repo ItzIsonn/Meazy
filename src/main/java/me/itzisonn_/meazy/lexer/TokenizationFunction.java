@@ -1,7 +1,6 @@
-package me.itzisonn_.meazy.parser;
+package me.itzisonn_.meazy.lexer;
 
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.lexer.Token;
 
 import java.util.List;
 

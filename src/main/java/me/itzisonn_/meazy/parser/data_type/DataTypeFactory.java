@@ -7,7 +7,7 @@ public interface DataTypeFactory {
     /**
      * Creates data type
      *
-     * @param id Id
+     * @param id Class id
      * @param isNullable Whether this data type accepts null values
      * @return New data type
      */
@@ -16,7 +16,7 @@ public interface DataTypeFactory {
     /**
      * Creates nullable data type
      *
-     * @param id Id
+     * @param id Class id
      * @return New data type
      */
     DataType create(String id);

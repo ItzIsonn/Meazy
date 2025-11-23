@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
  */
 public interface DataType {
     /**
-     * @return Id
+     * @return Class id
      */
     String getId();
 
