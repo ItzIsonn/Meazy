@@ -88,7 +88,7 @@ public final class MeazyMain {
 
         String stringLanguage = SETTINGS_MANAGER.getSettings().getLanguage();
         RegistryEntry<Language> languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage);
-        if (languagesEntry == null) MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:settings.unknown_language", stringLanguage));
+        if (languagesEntry == null) LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:settings.unknown_language", stringLanguage));
         else BUNDLE_MANAGER.setLanguage(languagesEntry.getValue());
 
         ADDON_MANAGER.enableAddons();

@@ -38,9 +38,7 @@ public interface Environment {
         if (environment == null) throw new NullPointerException("Environment can't be null");
 
         Environment parent = getParent();
-        if (environment.equals(parent)) return true;
-        if (parent != null) return parent.hasParent(environment);
-        return false;
+        return environment.equals(parent) || parent != null && parent.hasParent(environment);
     }
 
     /**
@@ -55,9 +53,7 @@ public interface Environment {
         if (predicate == null) throw new NullPointerException("Predicate can't be null");
 
         Environment parent = getParent();
-        if (predicate.test(parent)) return true;
-        if (parent != null) return parent.hasParent(predicate);
-        return false;
+        return predicate.test(parent) || parent != null && parent.hasParent(predicate);
     }
 
     /**

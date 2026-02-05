@@ -10,6 +10,8 @@ import me.itzisonn_.meazy.logging.LogLevel;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class SettingsManager {
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Settings.class, new SettingsDeserializer()).create();
@@ -47,16 +49,7 @@ public class SettingsManager {
         if (in == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_find_file").toString());
 
         try {
-            OutputStream out = new FileOutputStream(settingsFile);
-
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-
-            out.close();
-            in.close();
+            Files.copy(in, settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e) {
             throw new RuntimeException(Text.translatable("meazy:settings.cant_create_file").toString(), e);

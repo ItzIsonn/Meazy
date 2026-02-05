@@ -71,8 +71,7 @@ public final class DatagenDeserializers {
         if (object.get("regex") == null) throw new InvalidDatagenJsonException("TokenType doesn't have field regex");
         String regex = object.get("regex").getAsString();
 
-        boolean shouldSkip = false;
-        if (object.get("should_skip") != null) shouldSkip = object.get("should_skip").getAsBoolean();
+        boolean shouldSkip = object.get("should_skip") != null && object.get("should_skip").getAsBoolean();
 
         if (object.get("can_match") != null) {
             String[] path = object.get("can_match").getAsString().split("#");

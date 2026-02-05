@@ -11,6 +11,7 @@ import me.itzisonn_.meazy.lexer.Token;
  * @param <T> Type of Statement to parse into
  * @see Registries#PARSING_FUNCTIONS
  */
+@FunctionalInterface
 public interface ParsingFunction<T extends Statement> {
     /**
      * Parses tokens, which is stored in {@link Parser}, into {@link T}

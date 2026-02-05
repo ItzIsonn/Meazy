@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 /**
  * Represents factory for creating {@link GlobalEnvironment}s
  */
+@FunctionalInterface
 public interface GlobalEnvironmentFactory {
     /**
      * Creates global environment

@@ -128,11 +128,11 @@ public class DatagenManager {
                 result.add(converter.apply(zipFile.getInputStream(zipEntry)));
                 zipEntry = inputStream.getNextEntry();
             }
+
+            return result;
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        return result;
     }
 }

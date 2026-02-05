@@ -8,6 +8,7 @@ import java.io.File;
 /**
  * Represents factory for creating {@link FileEnvironment}s
  */
+@FunctionalInterface
 public interface FileEnvironmentFactory {
     /**
      * Creates file environment

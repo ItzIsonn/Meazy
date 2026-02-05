@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
  * Logger for {@link Text} messages
  */
 public class Logger {
-    private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     private final String id;
 
     /**
