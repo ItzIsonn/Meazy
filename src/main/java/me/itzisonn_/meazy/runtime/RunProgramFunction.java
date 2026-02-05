@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
  * Represents function that is used to run {@link Program}s
  * @see Registries#RUN_PROGRAM_FUNCTION
  */
+@FunctionalInterface
 public interface RunProgramFunction {
     /**
      * Runs given program

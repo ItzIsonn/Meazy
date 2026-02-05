@@ -5,8 +5,6 @@ import me.itzisonn_.meazy.command.custom.*;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.registry.RegistryEntry;
 
-import java.io.*;
-
 /**
  * Commands registrar
  *

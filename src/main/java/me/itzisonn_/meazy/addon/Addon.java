@@ -14,6 +14,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Represents an Addon
@@ -27,7 +29,7 @@ public abstract class Addon {
     private final File configFile;
     private final Logger logger;
     private boolean isEnabled = false;
-    private JsonElement config = null;
+    private JsonElement config;
 
     public Addon() {
         if (!(getClass().getClassLoader() instanceof AddonClassLoader addonClassLoader)) {
@@ -138,16 +140,7 @@ public abstract class Addon {
         }
 
         try {
-            if (!outFile.exists() || replace) {
-                OutputStream out = new FileOutputStream(outFile);
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                out.close();
-                in.close();
-            }
+            if (!outFile.exists() || replace) Files.copy(in, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             else logger.log(LogLevel.WARNING, Text.translatable("meazy:addons.resource.save_failed_already_exists", outFile));
         }
         catch (IOException e) {

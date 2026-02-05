@@ -21,9 +21,9 @@ public class Bundle {
     private final LanguageFileProvider languageFileProvider;
     private final Map<String, String> translations = new HashMap<>();
 
-    private final static Gson gson = new Gson();
+    private static final Gson gson = new Gson();
     @SuppressWarnings("unchecked")
-    private final static TypeToken<Map<String, String>> mapTypeToken = (TypeToken<Map<String, String>>) TypeToken.getParameterized(Map.class, String.class, String.class);
+    private static final TypeToken<Map<String, String>> mapTypeToken = (TypeToken<Map<String, String>>) TypeToken.getParameterized(Map.class, String.class, String.class);
 
     /**
      * @param bundleManager BundleManager

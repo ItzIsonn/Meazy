@@ -9,6 +9,7 @@ import java.util.List;
  * @see Registries#TOKENIZATION_FUNCTION
  * @see Token
  */
+@FunctionalInterface
 public interface TokenizationFunction {
     /**
      * Tokenizes given string

@@ -131,7 +131,7 @@ public final class Registries {
      * @see Registries#CONVERTERS
      */
     @Getter
-    private static Gson gson = null;
+    private static Gson gson;
 
     /**
      * Updates {@link Registries#gson}
@@ -307,7 +307,7 @@ public final class Registries {
         RUN_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("run_program"), program -> {
             RuntimeContext context = new RuntimeContext();
             GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
-            return Registries.EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
+            return EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
         });
     }
 }

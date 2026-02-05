@@ -53,10 +53,8 @@ public class Version {
             if (part1 > part2) return false;
         }
 
-        if (type.ordinal() < version.getType().ordinal()) return true;
-        if (type.ordinal() > version.getType().ordinal()) return false;
+        return type.ordinal() < version.getType().ordinal() || (type.ordinal() == version.getType().ordinal() && ordinal < version.getOrdinal());
 
-        return ordinal < version.getOrdinal();
     }
 
     /**

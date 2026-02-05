@@ -11,6 +11,8 @@ import me.itzisonn_.registry.RegistryIdentifier;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -252,16 +254,7 @@ public final class AddonManager {
         if (in == null) throw new RuntimeException(Text.translatable("meazy:addons.default.cant_find_file").toString());
 
         try {
-            OutputStream out = new FileOutputStream(addonFile);
-
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-
-            out.close();
-            in.close();
+            Files.copy(in, addonFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e) {
             throw new RuntimeException(Text.translatable("meazy:addons.default.cant_create_file").toString(), e);
@@ -306,8 +299,7 @@ public final class AddonManager {
         if (id == null) throw new NullPointerException("Id can't be null");
         Addon addon = getAddon(id);
 
-        if (addon == null) return false;
-        return addon.isEnabled();
+        return addon != null && addon.isEnabled();
     }
 
     /**

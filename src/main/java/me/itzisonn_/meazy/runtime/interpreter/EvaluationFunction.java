@@ -12,6 +12,7 @@ import me.itzisonn_.meazy.runtime.value.RuntimeValue;
  * @param <T> Type of Statement to evaluate
  * @see Registries#EVALUATION_FUNCTIONS
  */
+@FunctionalInterface
 public interface EvaluationFunction<T extends Statement> {
     /**
      * Evaluates given statement using given environment and extra info

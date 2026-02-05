@@ -11,6 +11,7 @@ import java.util.List;
  * Represents function that is used to parse {@link Token}s
  * @see Registries#PARSE_TOKENS_FUNCTION
  */
+@FunctionalInterface
 public interface ParseTokensFunction {
     /**
      * Parses given tokens into a Program

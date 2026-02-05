@@ -9,6 +9,7 @@ import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
  * Represents function that is used to evaluate {@link Program}s
  * @see Registries#EVALUATE_PROGRAM_FUNCTION
  */
+@FunctionalInterface
 public interface EvaluateProgramFunction {
     /**
      * Evaluates given program using given globalEnvironment
