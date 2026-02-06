@@ -9,6 +9,7 @@ import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
+import org.jspecify.annotations.NullMarked;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,6 +19,7 @@ import java.util.Set;
 /**
  * All basic datagen deserializers
  */
+@NullMarked
 public final class DatagenDeserializers {
     private DatagenDeserializers() {}
 
@@ -101,6 +103,7 @@ public final class DatagenDeserializers {
 
             return new TokenType(id, regex, shouldSkip) {
                 @Override
+                @NullMarked
                 public boolean canMatch(String string) {
                     try {
                         return (boolean) method.invoke(null, string);

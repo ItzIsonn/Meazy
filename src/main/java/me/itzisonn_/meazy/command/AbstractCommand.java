@@ -4,6 +4,8 @@ import lombok.Getter;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.lang.text.Text;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -11,6 +13,7 @@ import java.util.List;
  * Represents command
  * @see Registries#COMMANDS
  */
+@NullMarked
 public abstract class AbstractCommand {
     /**
      * Name
@@ -18,21 +21,16 @@ public abstract class AbstractCommand {
     @Getter
     private final String name;
     /**
-     * List of args' names
+     * List of args names
      */
     private final List<String> args;
 
     /**
      * @param name Name
-     * @param args List of args' names
-     *
-     * @throws NullPointerException If either name or args is null
+     * @param args List of args names
      * @throws IllegalArgumentException If either name or any of args doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
      */
-    public AbstractCommand(String name, List<String> args) throws NullPointerException, IllegalArgumentException {
-        if (name == null) throw new NullPointerException("Name can't be null");
-        if (args == null) throw new NullPointerException("Args can't be null");
-
+    public AbstractCommand(String name, List<String> args) throws IllegalArgumentException {
         if (!name.matches(MeazyMain.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid command's name");
         if (!args.isEmpty() && args.stream().allMatch(arg -> arg.matches(MeazyMain.IDENTIFIER_REGEX))) throw new IllegalArgumentException("Invalid arg's name");
 
@@ -47,10 +45,11 @@ public abstract class AbstractCommand {
      * @param args Args
      * @return Success message that will be logged or null
      */
+    @Nullable
     public abstract Text execute(String... args);
 
     /**
-     * @return Copy of args' names
+     * @return Copy of args names
      */
     public List<String> getArgs() {
         return List.copyOf(args);

@@ -2,6 +2,8 @@ package me.itzisonn_.meazy.addon;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +16,7 @@ import java.util.Map;
 /**
  * A ClassLoader for addons to allow shared classes across multiple addons
  */
+@NullMarked
 public final class AddonClassLoader extends URLClassLoader {
     private final AddonLoader loader;
     @Getter(AccessLevel.PACKAGE)
@@ -24,14 +27,9 @@ public final class AddonClassLoader extends URLClassLoader {
     private final File file;
     @Getter
     private final Addon addon;
-    private final Map<String, Class<?>> classesCache = new HashMap<>();
+    private final Map<String, @Nullable Class<?>> classesCache = new HashMap<>();
 
     public AddonClassLoader(AddonLoader loader, AddonInfo addonInfo, File dataFolder, File file) throws InvalidAddonException {
-        if (loader == null) throw new NullPointerException("Loader can't be null");
-        if (addonInfo == null) throw new NullPointerException("AddonInfo can't be null");
-        if (dataFolder == null) throw new NullPointerException("DataFolder can't be null");
-        if (file == null) throw new NullPointerException("File can't be null");
-
         URL url;
         try {
             url = file.toURI().toURL();
@@ -73,10 +71,12 @@ public final class AddonClassLoader extends URLClassLoader {
     }
 
     @Override
+    @Nullable
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         return findClass(name, true);
     }
 
+    @Nullable
     public Class<?> findClass(String name, boolean checkGlobal) throws ClassNotFoundException {
         if (name.startsWith("me.itzisonn_.meazy.")) throw new ClassNotFoundException(name);
 
@@ -91,9 +91,8 @@ public final class AddonClassLoader extends URLClassLoader {
     }
 
     @Override
+    @Nullable
     public URL getResource(String name) {
-        if (name == null) throw new NullPointerException("Name can't be null");
-
         URL url = findResource(name);
         if (url != null) return url;
 

@@ -8,6 +8,8 @@ import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.logging.LogLevel;
 import me.itzisonn_.registry.RegistryIdentifier;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -19,6 +21,7 @@ import java.util.regex.Pattern;
 /**
  * Represents an AddonManager
  */
+@NullMarked
 public final class AddonManager {
     private static final Pattern FILE_FILTER = Pattern.compile(".+\\.jar$");
     public static final File ADDONS_FOLDER;
@@ -73,8 +76,8 @@ public final class AddonManager {
                 MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:addons.duplicate_id", addonInfo.getId(), file.getPath(), replacedFile.getPath()));
             }
 
-            Collection<String> softDependencySet = addonInfo.getSoftDepend();
-            if (softDependencySet != null && !softDependencySet.isEmpty()) {
+            List<String> softDependencySet = addonInfo.getSoftDepend();
+            if (!softDependencySet.isEmpty()) {
                 if (softDependencies.containsKey(addonInfo.getId())) {
                     softDependencies.get(addonInfo.getId()).addAll(softDependencySet);
                 } else {
@@ -82,13 +85,13 @@ public final class AddonManager {
                 }
             }
 
-            Collection<String> dependencySet = addonInfo.getDepend();
-            if (dependencySet != null && !dependencySet.isEmpty()) {
+            List<String> dependencySet = addonInfo.getDepend();
+            if (!dependencySet.isEmpty()) {
                 dependencies.put(addonInfo.getId(), new LinkedList<>(dependencySet));
             }
 
-            Collection<String> loadBeforeSet = addonInfo.getLoadBefore();
-            if (loadBeforeSet != null && !loadBeforeSet.isEmpty()) {
+            List<String> loadBeforeSet = addonInfo.getLoadBefore();
+            if (!loadBeforeSet.isEmpty()) {
                 for (String loadBeforeTarget : loadBeforeSet) {
                     if (softDependencies.containsKey(loadBeforeTarget)) {
                         softDependencies.get(loadBeforeTarget).add(addonInfo.getId());
@@ -199,12 +202,9 @@ public final class AddonManager {
     /**
      * Loads addon from given file
      * @param file Addon's file
-     *
-     * @throws NullPointerException If given file is null
      * @throws InvalidAddonException If given file is invalid
      */
-    private void loadAddon(File file) throws NullPointerException, InvalidAddonException {
-        if (file == null) throw new NullPointerException("File can't be null");
+    private void loadAddon(File file) throws InvalidAddonException {
         if (!FILE_FILTER.matcher(file.getName()).matches()) throw new InvalidAddonException("Invalid addon file");
         addons.add(addonLoader.loadAddon(file));
     }
@@ -266,13 +266,10 @@ public final class AddonManager {
     /**
      * Returns loaded addon with given id
      * @param id Id of the addon to check
-     *
      * @return Addon if it exists, otherwise null
-     * @throws NullPointerException If given id is null
      */
-    public Addon getAddon(String id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
+    @Nullable
+    public Addon getAddon(String id) {
         for (Addon addon : addons) {
             if (addon.getAddonInfo().getId().equals(id)) return addon;
         }
@@ -292,29 +289,24 @@ public final class AddonManager {
      *
      * @param id Id of the addon
      * @return Whether the addon exists and is enabled
-     *
-     * @throws NullPointerException If given id is null
      */
     public boolean isAddonEnabled(String id) {
-        if (id == null) throw new NullPointerException("Id can't be null");
         Addon addon = getAddon(id);
-
         return addon != null && addon.isEnabled();
     }
 
     /**
      * Enables given addon
      * @param addon Addon to enable
-     *
-     * @throws NullPointerException If given addon is null
      * @throws IllegalStateException If given addon has already been enabled
      */
-    public void enableAddon(Addon addon) throws NullPointerException, IllegalStateException {
+    public void enableAddon(Addon addon) throws IllegalStateException {
         addonLoader.enableAddon(addon);
     }
 
 
 
+    @Nullable
     public Class<?> getClassByName(String name) {
         return addonLoader.getClassByName(name, null);
     }

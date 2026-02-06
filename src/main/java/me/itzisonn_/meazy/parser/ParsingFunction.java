@@ -1,9 +1,10 @@
 package me.itzisonn_.meazy.parser;
 
-import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.lexer.Token;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents function that is used to parse {@link Token}s into {@link Statement}
@@ -12,6 +13,7 @@ import me.itzisonn_.meazy.lexer.Token;
  * @see Registries#PARSING_FUNCTIONS
  */
 @FunctionalInterface
+@NullMarked
 public interface ParsingFunction<T extends Statement> {
     /**
      * Parses tokens, which is stored in {@link Parser}, into {@link T}
@@ -20,5 +22,5 @@ public interface ParsingFunction<T extends Statement> {
      * @param extra Extra info
      * @return Parsed {@link T} Statement
      */
-    T parse(ParsingContext context, Object... extra);
+    T parse(ParsingContext context, @Nullable Object... extra);
 }

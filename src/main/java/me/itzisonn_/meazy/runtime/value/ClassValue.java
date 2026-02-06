@@ -1,15 +1,21 @@
 package me.itzisonn_.meazy.runtime.value;
 
-import me.itzisonn_.meazy.context.RuntimeContext;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 
 /**
  * Represents class value
  */
-public interface ClassValue extends ModifierableRuntimeValue<Object> {
+@NullMarked
+public interface ClassValue extends ModifierableRuntimeValue {
+    /**
+     * @return Id of this class's environment
+     */
+    String getId();
+
     /**
      * @return Base classes
      */
@@ -34,28 +40,4 @@ public interface ClassValue extends ModifierableRuntimeValue<Object> {
      * @return Whether given value matches this class value or it's base classes
      */
     boolean isLikeMatches(FileEnvironment fileEnvironment, Object value);
-
-
-
-    /**
-     * @return Id of this class's environment
-     */
-    String getId();
-
-
-
-    /**
-     * Setups given class environment
-     * @param context Runtime context
-     * @param classEnvironment Class environment
-     */
-    void setupEnvironment(RuntimeContext context, ClassEnvironment classEnvironment);
-
-    /**
-     * Creates new instance of this class value
-     *
-     * @param classEnvironment Class environment
-     * @return New instance of this class value
-     */
-    ClassValue newInstance(ClassEnvironment classEnvironment);
 }

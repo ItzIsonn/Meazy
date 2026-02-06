@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.logging;
 
 import me.itzisonn_.meazy.lang.text.Text;
+import org.jspecify.annotations.NullMarked;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,16 +9,15 @@ import java.time.format.DateTimeFormatter;
 /**
  * Logger for {@link Text} messages
  */
+@NullMarked
 public class Logger {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     private final String id;
 
     /**
      * @param id Id
-     * @throws NullPointerException If given id is null
      */
-    public Logger(String id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
+    public Logger(String id) {
         this.id = id;
     }
 
@@ -27,21 +27,10 @@ public class Logger {
      *
      * @param level Level of logging
      * @param text Text to log
-     *
-     * @throws NullPointerException If either level or text is null
      */
-    public void log(LogLevel level, Text text) throws NullPointerException {
-        if (level == null) throw new NullPointerException("Level can't be null");
-        if (text == null) throw new NullPointerException("Text can't be null");
-        rawLog(level, text.toString());
-    }
-
-    private void rawLog(LogLevel logLevel, String text) {
-        LocalDateTime now = LocalDateTime.now();
-        String time = now.format(DATE_TIME_FORMATTER);
-
-        String level = logLevel.getId().toUpperCase();
-
-        System.out.println(time + " [" + level + "] " + id + ": " + text);
+    public void log(LogLevel level, Text text) {
+        String time = LocalDateTime.now().format(DATE_TIME_FORMATTER);
+        String levelString = level.getId().toUpperCase();
+        System.out.println(time + " [" + levelString + "] " + id + ": " + text);
     }
 }

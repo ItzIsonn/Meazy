@@ -4,14 +4,16 @@ import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Represents environment for classes
  */
+@NullMarked
 public interface ClassEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
     /**
      * @return This class environment's id
@@ -34,14 +36,10 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
     /**
      * @param id Id
      * @param args Args
-     *
      * @return Declared operator function with given id and args or null
-     * @throws NullPointerException If either id or args is null
      */
-    default FunctionValue getOperatorFunction(String id, List<RuntimeValue<?>> args) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-        if (args == null) throw new NullPointerException("Args can't be null");
-
+    @Nullable
+    default FunctionValue getOperatorFunction(String id, List<RuntimeValue> args) {
         main:
         for (FunctionValue functionValue : getOperatorFunctions()) {
             if (functionValue.getId().equals(id)) {
@@ -66,58 +64,23 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
 
 
-    /**
-     * Adds given classEnvironment as base class
-     * @param classEnvironment ClassEnvironment to add
-     */
-    void addBaseClass(ClassEnvironment classEnvironment);
-
-    /**
-     * @param id Class's id
-     * @return Base class of this class environment with given id or null
-     * @throws NullPointerException If given id is null
-     */
-    default ClassEnvironment getBaseClass(String id) {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
-        for (ClassEnvironment classEnvironment : getBaseClasses()) {
-            if (classEnvironment.getId().equals(id)) return classEnvironment;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param id Class's id
-     * @return Base class of this class environment and it's base classes with given id or null
-     * @throws NullPointerException If given id is null
-     */
-    default ClassEnvironment getDeepBaseClass(String id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
-        for (ClassEnvironment classEnvironment : getDeepBaseClasses()) {
-            if (classEnvironment.getId().equals(id)) return classEnvironment;
-        }
-
-        return null;
-    }
-
-    /**
+    /** TODO javadoc
      * @return All base classes of this class environment
      */
-    Set<ClassEnvironment> getBaseClasses();
+    @Nullable
+    String getBaseClass();
 
-    /**
-     * @return All base classes of this class environment and their base classes
-     */
-    default Set<ClassEnvironment> getDeepBaseClasses() {
-        Set<ClassEnvironment> baseClasses = new HashSet<>();
-
-        for (ClassEnvironment baseClass : getBaseClasses()) {
-            baseClasses.add(baseClass);
-            baseClasses.addAll(baseClass.getDeepBaseClasses());
-        }
-
-        return baseClasses;
-    }
+//    /**
+//     * @return All base classes of this class environment and their base classes
+//     */
+//    default List<String> getAllBaseClasses() {
+//        Set<ClassEnvironment> baseClasses = new HashSet<>();
+//
+//        for (ClassEnvironment baseClass : getBaseClasses()) {
+//            baseClasses.add(baseClass);
+//            baseClasses.addAll(baseClass.getDeepBaseClasses());
+//        }
+//
+//        return baseClasses;
+//    }
 }

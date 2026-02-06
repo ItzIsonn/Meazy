@@ -1,12 +1,15 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.runtime.value.ClassValue;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 /**
  * Adds to Environment ability to declare classes
  */
+@NullMarked
 public interface ClassDeclarationEnvironment extends Environment {
     /**
      * Declares given class in this environment
@@ -17,11 +20,9 @@ public interface ClassDeclarationEnvironment extends Environment {
     /**
      * @param id Class's id
      * @return Declared class with given id or null
-     * @throws NullPointerException If given id is null
      */
-    default ClassValue getClass(String id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
+    @Nullable
+    default ClassValue getClass(String id) {
         for (ClassValue classValue : getClasses()) {
             if (classValue.getId().equals(id)) return classValue;
         }

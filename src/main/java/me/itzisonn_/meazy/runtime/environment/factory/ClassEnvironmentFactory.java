@@ -3,13 +3,16 @@ package me.itzisonn_.meazy.runtime.environment.factory;
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 /**
  * Represents factory for creating {@link ClassEnvironment}s
  */
-public interface ClassEnvironmentFactory {
+@NullMarked
+public interface ClassEnvironmentFactory { //TODO javadoc for baseclass
     /**
      * Creates class environment
      *
@@ -19,7 +22,7 @@ public interface ClassEnvironmentFactory {
      * @param modifiers Modifiers
      * @return New class environment
      */
-    ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, String id, Set<Modifier> modifiers);
+    ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, String id, @Nullable String baseClass, Set<Modifier> modifiers);
 
     /**
      * Creates class environment with empty modifiers
@@ -29,7 +32,7 @@ public interface ClassEnvironmentFactory {
      * @param id Id
      * @return New class environment
      */
-    ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, String id);
+    ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, String id, @Nullable String baseClass);
 
     /**
      * Creates non-shared class environment
@@ -39,7 +42,7 @@ public interface ClassEnvironmentFactory {
      * @param modifiers Modifiers
      * @return New class environment
      */
-    ClassEnvironment create(ClassDeclarationEnvironment parent, String id, Set<Modifier> modifiers);
+    ClassEnvironment create(ClassDeclarationEnvironment parent, String id, @Nullable String baseClass, Set<Modifier> modifiers);
 
     /**
      * Creates non-shared class environment with empty modifiers
@@ -48,5 +51,5 @@ public interface ClassEnvironmentFactory {
      * @param id Id
      * @return New class environment
      */
-    ClassEnvironment create(ClassDeclarationEnvironment parent, String id);
+    ClassEnvironment create(ClassDeclarationEnvironment parent, String id, @Nullable String baseClass);
 }

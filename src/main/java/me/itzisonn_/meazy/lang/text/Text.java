@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.lang.text;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.bundle.Bundle;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * Represents text
  */
+@NullMarked
 public interface Text {
     /**
      * @return String representation of this text
@@ -23,10 +25,8 @@ public interface Text {
      * 
      * @param text Text to append
      * @return New text
-     * 
-     * @throws NullPointerException If given text is null
      */
-    default Text append(Text text) throws NullPointerException {
+    default Text append(Text text) {
         return new MergedText(List.of(this, text));
     }
 
@@ -37,10 +37,8 @@ public interface Text {
      *
      * @param text Text
      * @return Literal text
-     *
-     * @throws NullPointerException If given text is null
      */
-    static Text literal(String text, Object... args) throws NullPointerException {
+    static Text literal(String text, Object... args) {
         return new LiteralText(text, convertArgs(args));
     }
 
@@ -50,13 +48,10 @@ public interface Text {
      * @param key Translation key
      * @return Translatable text
      *
-     * @throws NullPointerException If given key is null
-     * @throws IllegalArgumentException If can't find LanguageFileProvider with given id or
-     *                                  if can't find bundle with LanguageFileProvider with given id
+     * @throws IllegalArgumentException When can't find LanguageFileProvider with given id or
+     *                                  when can't find bundle with LanguageFileProvider with given id
      */
-    static Text translatable(String key, Object... args) throws NullPointerException, IllegalArgumentException {
-        if (key == null) throw new NullPointerException("Key can't be null");
-
+    static Text translatable(String key, Object... args) throws IllegalArgumentException {
         String[] parts = key.split(":");
         if (parts.length != 2) throw new IllegalArgumentException("Invalid translation key " + key);
 
@@ -76,12 +71,9 @@ public interface Text {
      * @param key Translation key
      * @return Translatable text
      *
-     * @throws NullPointerException If either languageFileProvider or key is null
-     * @throws IllegalArgumentException If can't find bundle with given languageFileProvider
+     * @throws IllegalArgumentException When can't find bundle with given languageFileProvider
      */
-    static Text translatable(LanguageFileProvider languageFileProvider, String key, Object... args) throws NullPointerException, IllegalArgumentException {
-        if (languageFileProvider == null) throw new NullPointerException("LanguageFileProvider can't be null");
-
+    static Text translatable(LanguageFileProvider languageFileProvider, String key, Object... args) throws IllegalArgumentException {
         Bundle bundle = MeazyMain.BUNDLE_MANAGER.getBundle(languageFileProvider);
         if (bundle == null) throw new IllegalArgumentException("Can't find bundle with given languageFileProvider");
 

@@ -2,11 +2,15 @@ package me.itzisonn_.meazy.runtime.environment.factory;
 
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
+import org.jspecify.annotations.NullMarked;
+
+import java.util.UUID;
 
 /**
  * Represents factory for creating {@link ConstructorEnvironment}s
  */
-public interface ConstructorEnvironmentFactory {
+@NullMarked
+public interface ConstructorEnvironmentFactory { //TODO javadoc
     /**
      * Creates constructor environment
      *
@@ -14,7 +18,7 @@ public interface ConstructorEnvironmentFactory {
      * @param isShared Whether constructor environment is shared
      * @return New constructor environment
      */
-    ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, boolean isShared);
+    ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, UUID startLabel, UUID endLabel, boolean isShared);
 
     /**
      * Creates non-shared constructor environment
@@ -22,5 +26,5 @@ public interface ConstructorEnvironmentFactory {
      * @param parent Parent
      * @return New constructor environment
      */
-    ConstructorEnvironment create(ConstructorDeclarationEnvironment parent);
+    ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, UUID startLabel, UUID endLabel);
 }

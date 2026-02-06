@@ -4,7 +4,9 @@ import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
 import me.itzisonn_.registry.multiple_entry.SetRegistry;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class CommandRegistry extends SetRegistry<AbstractCommand> {
     @Override
     public void register(RegistryIdentifier identifier, AbstractCommand value, boolean overridable) {

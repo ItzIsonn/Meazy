@@ -1,15 +1,18 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.lang.constant.ClassDesc;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Adds to Environment ability to declare functions
  */
+@NullMarked
 public interface FunctionDeclarationEnvironment extends Environment {
     /**
      * Declares given function in this environment
@@ -19,23 +22,19 @@ public interface FunctionDeclarationEnvironment extends Environment {
 
     /**
      * @param id Id
-     * @param args Args
-     *
+     * @param parameters Parameters
      * @return Declared function with given id and args or null
-     * @throws NullPointerException If either id or args is null
      */
-    default FunctionValue getFunction(String id, List<RuntimeValue<?>> args) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-        if (args == null) throw new NullPointerException("Args can't be null");
-
+    @Nullable
+    default FunctionValue getFunction(String id, List<ClassDesc> parameters) {
         main:
         for (FunctionValue functionValue : getFunctions()) {
             if (functionValue.getId().equals(id)) {
-                List<ParameterExpression> parameters = functionValue.getParameters();
-                if (args.size() != parameters.size()) continue;
+                List<ParameterExpression> functionParameters = functionValue.getParameters();
+                if (functionParameters.size() != parameters.size()) continue;
 
-                for (int i = 0; i < args.size(); i++) {
-                    if (!parameters.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
+                for (int i = 0; i < parameters.size(); i++) {
+                    if (!functionParameters.get(i).getDataType().getClassDescriptor(this).equals(parameters.get(i))) continue main;
                 }
 
                 return functionValue;
@@ -53,15 +52,13 @@ public interface FunctionDeclarationEnvironment extends Environment {
 
 
     @Override
-    default FunctionDeclarationEnvironment getFunctionDeclarationEnvironment(String id, List<RuntimeValue<?>> args) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-        if (args == null) throw new NullPointerException("Args can't be null");
-
-        FunctionValue functionValue = getFunction(id, args);
+    @Nullable
+    default FunctionDeclarationEnvironment getFunctionDeclarationEnvironment(String id, List<ClassDesc> parameters) {
+        FunctionValue functionValue = getFunction(id, parameters);
         if (functionValue != null) return functionValue.getParentEnvironment();
 
         Environment parent = getParent();
         if (parent == null) return null;
-        return parent.getFunctionDeclarationEnvironment(id, args);
+        return parent.getFunctionDeclarationEnvironment(id, parameters);
     }
 }

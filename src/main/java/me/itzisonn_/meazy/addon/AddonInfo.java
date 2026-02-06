@@ -5,6 +5,8 @@ import lombok.Getter;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.version.Version;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.util.*;
@@ -13,12 +15,14 @@ import java.util.*;
  * Stores information about {@link Addon}
  */
 @Getter
+@NullMarked
 public class AddonInfo {
     private final String id;
     private final Version version;
     private final String className;
     private final String description;
     private final List<String> authors;
+    @Nullable
     private final Version coreDepend;
     private final List<String> depend;
     private final List<String> softDepend;
@@ -37,15 +41,10 @@ public class AddonInfo {
      * @param softDepend  List of other addons that the addon requires for full functionality
      * @param loadBefore  List of addons that should consider this addon a soft-dependency
      *
-     * @throws NullPointerException If either id, version or main is null
      * @throws IllegalArgumentException If either id, depend, softDepend or loadBefore doesn't match Identifier Regex
      */
-    public AddonInfo(String id, Version version, String className, String description, List<String> authors, Version coreDepend,
-                     List<String> depend, List<String> softDepend, List<String> loadBefore) throws NullPointerException, IllegalArgumentException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-        if (version == null) throw new NullPointerException("Version can't be null");
-        if (className == null) throw new NullPointerException("Main can't be null");
-
+    public AddonInfo(String id, Version version, String className, @Nullable String description, @Nullable List<String> authors, @Nullable Version coreDepend,
+                     @Nullable List<String> depend, @Nullable List<String> softDepend, @Nullable List<String> loadBefore) throws IllegalArgumentException {
         if (!id.matches(MeazyMain.IDENTIFIER_REGEX))
             throw new IllegalArgumentException("Id doesn't match Identifier Regex");
 
@@ -71,14 +70,10 @@ public class AddonInfo {
 
     /**
      * Constructor that uses given inputStream to get info
-     *
      * @param inputStream InputStream
-     *
-     * @throws NullPointerException If given inputStream is null
      * @throws InvalidAddonInfoException If
      */
-    public AddonInfo(InputStream inputStream) throws NullPointerException, InvalidAddonInfoException {
-        if (inputStream == null) throw new NullPointerException("InputStream can't be null");
+    public AddonInfo(InputStream inputStream) throws InvalidAddonInfoException {
         JsonElement jsonElement = JsonParser.parseString(FileUtils.getLines(inputStream));
 
         if (!jsonElement.isJsonObject()) throw new InvalidAddonInfoException("AddonInfo must be object");
@@ -133,7 +128,8 @@ public class AddonInfo {
 
 
 
-    private static String matchesIdentifierRegex(List<String> list) {
+    @Nullable
+    private static String matchesIdentifierRegex(@Nullable List<String> list) {
         if (list == null) return null;
 
         for (String string : list) {

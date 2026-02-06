@@ -2,10 +2,12 @@ package me.itzisonn_.meazy.parser;
 
 import me.itzisonn_.meazy.lang.TextException;
 import me.itzisonn_.meazy.lang.text.Text;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Is thrown when {@link ParsingFunction} meets unexpected token
  */
+@NullMarked
 public class UnexpectedTokenException extends TextException {
     /**
      * @param lineNumber Line number

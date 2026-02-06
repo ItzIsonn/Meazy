@@ -6,6 +6,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import me.itzisonn_.meazy.FileUtils;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +22,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Provides methods for working with datagen
  */
+@NullMarked
 public class DatagenManager {
     /**
      * Addon's file
@@ -29,15 +31,13 @@ public class DatagenManager {
 
     /**
      * @param file Addon's file
-     * @throws NullPointerException If given file is null
      */
-    public DatagenManager(File file) throws NullPointerException {
-        if (file == null) throw new NullPointerException("File can't be null");
+    public DatagenManager(File file) {
         this.file = file;
     }
 
     /**
-     * Gets all lines inside folder with given folderPath and deserializes them using given deserializer. Accepts only single value in json
+     * Gets all lines inside folder with given folderPath and deserializes them using given deserializer. Accepts only single value in JSON
      *
      * @param folderPath Path to datagen folder
      * @param cls Class of deserialized values
@@ -45,13 +45,8 @@ public class DatagenManager {
      *
      * @return Set of all values inside folder with given folderPath
      * @param <T> Type of deserialized values
-     *
-     * @throws NullPointerException If either folderPath, cls or deserializer is null
      */
-    public <T> Set<T> getDeserializedSingle(String folderPath, Class<T> cls, JsonDeserializer<T> deserializer) throws NullPointerException {
-        if (cls == null) throw new NullPointerException("Class can't be null");
-        if (deserializer == null) throw new NullPointerException("Deserializer can't be null");
-
+    public <T> Set<T> getDeserializedSingle(String folderPath, Class<T> cls, JsonDeserializer<T> deserializer) {
         Set<T> result = new HashSet<>();
         Gson gson = new GsonBuilder().registerTypeAdapter(cls, deserializer).create();
 
@@ -64,7 +59,7 @@ public class DatagenManager {
     }
 
     /**
-     * Gets all lines inside folder with given folderPath and deserializes them using given deserializer. Accepts array and single value in json
+     * Gets all lines inside folder with given folderPath and deserializes them using given deserializer. Accepts an array and single value in JSON
      *
      * @param folderPath Path to datagen folder
      * @param cls Class of deserialized values
@@ -72,14 +67,9 @@ public class DatagenManager {
      *
      * @return Set of all values inside folder with given folderPath
      * @param <T> Type of deserialized values
-     *
-     * @throws NullPointerException If either folderPath, cls or deserializer is null
      */
     @SuppressWarnings("unchecked")
-    public <T> Set<T> getDeserializedMultiple(String folderPath, Class<T> cls, JsonDeserializer<T> deserializer) throws NullPointerException {
-        if (cls == null) throw new NullPointerException("Class can't be null");
-        if (deserializer == null) throw new NullPointerException("Deserializer can't be null");
-
+    public <T> Set<T> getDeserializedMultiple(String folderPath, Class<T> cls, JsonDeserializer<T> deserializer) {
         Set<T> result = new HashSet<>();
 
         Gson gson = new GsonBuilder().registerTypeAdapter(cls, deserializer).create();
@@ -102,17 +92,12 @@ public class DatagenManager {
     /**
      * @param folderPath Path to datagen folder
      * @return Set of all files' lines inside folder with given folderPath
-     *
-     * @throws NullPointerException If given folderPath is null
      */
-    public Set<String> getDatagenFilesLines(String folderPath) throws NullPointerException {
+    public Set<String> getDatagenFilesLines(String folderPath) {
         return new HashSet<>(getDatagenInputStreams(folderPath, FileUtils::getLines));
     }
 
-    private <T> Set<T> getDatagenInputStreams(String folderPath, Function<InputStream, T> converter) throws NullPointerException {
-        if (folderPath == null) throw new NullPointerException("FolderPath can't be null");
-        if (converter == null) throw new NullPointerException("Converter can't be null");
-
+    private <T> Set<T> getDatagenInputStreams(String folderPath, Function<InputStream, T> converter) {
         Set<T> result = new HashSet<>();
 
         try (ZipFile zipFile = new ZipFile(file)) {

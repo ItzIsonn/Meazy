@@ -1,14 +1,16 @@
 package me.itzisonn_.meazy.runtime.value;
 
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.data_type.DataType;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidActionException;
-import me.itzisonn_.meazy.runtime.interpreter.InvalidValueException;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents runtime variable value
  */
-public interface VariableValue extends ModifierableRuntimeValue<RuntimeValue<?>> {
+@NullMarked
+public interface VariableValue extends ModifierableRuntimeValue {
     /**
      * @return Id
      */
@@ -24,23 +26,14 @@ public interface VariableValue extends ModifierableRuntimeValue<RuntimeValue<?>>
      */
     boolean isConstant();
 
-    /**
-     * @return Whether this variable is argument
-     */
-    boolean isArgument();
+    //TODO
+    int getSlot();
+
+    @Nullable
+    Expression getInitializer();
 
     /**
      * @return Parent environment
      */
     VariableDeclarationEnvironment getParentEnvironment();
-
-    /**
-     * Sets this variable's value to given value
-     *
-     * @param value New value
-     *
-     * @throws InvalidActionException If this variable is constant and already have a value
-     * @throws InvalidValueException If given value doesn't match this variable's data type
-     */
-    void setValue(RuntimeValue<?> value) throws InvalidActionException, InvalidValueException;
 }

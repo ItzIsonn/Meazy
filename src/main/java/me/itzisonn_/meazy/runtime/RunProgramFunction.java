@@ -1,19 +1,22 @@
 package me.itzisonn_.meazy.runtime;
 
 import me.itzisonn_.meazy.Registries;
-import me.itzisonn_.meazy.parser.ast.Program;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import me.itzisonn_.meazy.parser.ast.program.Program;
+import org.jspecify.annotations.NullMarked;
+
+import java.lang.constant.ClassDesc;
+import java.util.Map;
 
 /**
  * Represents function that is used to run {@link Program}s
  * @see Registries#RUN_PROGRAM_FUNCTION
  */
 @FunctionalInterface
+@NullMarked
 public interface RunProgramFunction {
     /**
      * Runs given program
-     * @param program Program to run
-     * @return File environment of given program
+     * @param classes Program to run TODO
      */
-    FileEnvironment run(Program program);
+    void run(Map<ClassDesc, byte[]> classes);
 }

@@ -19,7 +19,7 @@ import me.itzisonn_.registry.RegistryIdentifier;
 import java.util.Arrays;
 
 public final class MeazyMain {
-    public static final Version VERSION = Version.of("2.7");
+    public static final Version VERSION = Version.of("3.0");
     public static final Logger LOGGER = new Logger("meazy");
 
     public static final LanguageFileProvider MEAZY_LANGUAGE_FILE_PROVIDER = new LanguageFileProviderImpl("meazy", MeazyMain.class.getClassLoader()::getResourceAsStream);
@@ -103,10 +103,9 @@ public final class MeazyMain {
      * @apiNote Recommended to use {@link RegistryIdentifier#of(String, String)} or {@link RegistryIdentifier#of(String)}
      *          because 'meazy' namespace belongs to core identifiers
      *
-     * @throws NullPointerException If id is null
      * @throws IllegalArgumentException If id doesn't match {@link RegistryIdentifier#IDENTIFIER_REGEX}
      */
-    public static RegistryIdentifier getDefaultIdentifier(String id) throws NullPointerException, IllegalArgumentException {
+    public static RegistryIdentifier getDefaultIdentifier(String id) throws IllegalArgumentException {
         return RegistryIdentifier.of("meazy", id);
     }
 }
