@@ -2,7 +2,9 @@ package me.itzisonn_.meazy.parser;
 
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.parser.ast.Program;
+import me.itzisonn_.meazy.parser.ast.program.Program;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
  * @see Registries#PARSE_TOKENS_FUNCTION
  */
 @FunctionalInterface
+@NullMarked
 public interface ParseTokensFunction {
     /**
      * Parses given tokens into a Program
@@ -21,5 +24,5 @@ public interface ParseTokensFunction {
      *
      * @return Parsed program
      */
-    Program parse(File file, List<Token> tokens);
+    Program parse(@Nullable File file, List<Token> tokens);
 }

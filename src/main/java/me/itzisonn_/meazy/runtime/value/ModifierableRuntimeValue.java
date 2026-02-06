@@ -2,21 +2,20 @@ package me.itzisonn_.meazy.runtime.value;
 
 import me.itzisonn_.meazy.parser.Modifier;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 
 /**
  * Represents value in runtime that can have modifiers
- * @param <T> Type of stored value
  */
-public interface ModifierableRuntimeValue<T> extends RuntimeValue<T> {
+@NullMarked
+public interface ModifierableRuntimeValue extends RuntimeValue {
     /**
      * @param target Target modifier
      * @return Whether this runtime value has given modifier
      */
     default boolean hasModifier(Modifier target) {
-        if (target == null) throw new NullPointerException("Target can't be null");
-
         for (Modifier modifier : getModifiers()) {
             if (modifier == target) return true;
         }
@@ -29,8 +28,6 @@ public interface ModifierableRuntimeValue<T> extends RuntimeValue<T> {
      * @return Whether this runtime value has modifier with given id
      */
     default boolean hasModifier(String id) {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
         for (Modifier modifier : getModifiers()) {
             if (modifier.getId().equals(id)) return true;
         }

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "me.itzisonn_.meazy"
-version = "2.7"
+version = "3.0"
 description = "Meazy"
 java.sourceCompatibility = JavaVersion.VERSION_25
 
@@ -19,6 +19,8 @@ repositories {
 dependencies {
     implementation("com.google.code.gson:gson:2.13.2")
     implementation(files("libs/Registry.jar"))
+
+    implementation("org.jspecify:jspecify:1.0.0")
 
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
@@ -52,7 +54,7 @@ abstract class DownloadLibsTask : DefaultTask() {
         download(sourceUrl, path)
     }
 
-    private fun download(url: String, path: String){
+    private fun download(url: String, path: String) {
         val destinationFile = File(path)
         if (!destinationFile.exists()) {
             destinationFile.parentFile.mkdirs()

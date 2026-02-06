@@ -9,6 +9,8 @@ import me.itzisonn_.meazy.addon.datagen.DatagenManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
 import me.itzisonn_.meazy.lang.text.Text;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.net.URL;
@@ -20,6 +22,7 @@ import java.nio.file.StandardCopyOption;
 /**
  * Represents an Addon
  */
+@NullMarked
 public abstract class Addon {
     private final AddonClassLoader classLoader;
     private final AddonInfo addonInfo;
@@ -29,6 +32,7 @@ public abstract class Addon {
     private final File configFile;
     private final Logger logger;
     private boolean isEnabled = false;
+    @Nullable
     private JsonElement config;
 
     public Addon() {
@@ -93,8 +97,6 @@ public abstract class Addon {
     }
 
     public void saveConfig() {
-        if (configFile == null) throw new IllegalArgumentException("File can't be null");
-
         try {
             File parent = configFile.getCanonicalFile().getParentFile();
             if (parent != null) {
@@ -103,6 +105,7 @@ public abstract class Addon {
                 }
             }
 
+            if (config == null) throw new NullPointerException("No config file found");
             String data = config.toString();
 
             try (Writer writer = new OutputStreamWriter(new FileOutputStream(configFile), Charset.defaultCharset())) {
@@ -121,7 +124,7 @@ public abstract class Addon {
     }
 
     public void saveResource(String resourcePath, boolean replace) {
-        if (resourcePath == null || resourcePath.isEmpty()) {
+        if (resourcePath.isEmpty()) {
             throw new IllegalArgumentException("ResourcePath can't be null or empty");
         }
 
@@ -148,11 +151,8 @@ public abstract class Addon {
         }
     }
 
+    @Nullable
     public InputStream getResource(String filename) {
-        if (filename == null) {
-            throw new IllegalArgumentException("Filename can't be null");
-        }
-
         try {
             URL url = classLoader.getResource(filename);
 
@@ -203,6 +203,7 @@ public abstract class Addon {
     /**
      * @return LanguageFileProvider for this addon
      */
+    @Nullable
     public LanguageFileProvider getLanguageFileProvider() {
         try (InputStream resource = getClass().getClassLoader().getResourceAsStream("lang/")) {
             if (resource == null) return null;

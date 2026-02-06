@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.lexer;
 
 import me.itzisonn_.meazy.Registries;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * @see Token
  */
 @FunctionalInterface
+@NullMarked
 public interface TokenizationFunction {
     /**
      * Tokenizes given string

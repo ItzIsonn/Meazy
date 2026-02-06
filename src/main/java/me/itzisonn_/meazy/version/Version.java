@@ -1,10 +1,12 @@
 package me.itzisonn_.meazy.version;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,7 +14,7 @@ import java.util.regex.Pattern;
  * Represents version
  */
 @Getter
-@EqualsAndHashCode
+@NullMarked
 public class Version {
     private final List<Integer> parts;
     private final VersionType type;
@@ -22,13 +24,10 @@ public class Version {
      * @param parts Parts
      * @param type Type
      * @param ordinal Ordinal
-     * @throws NullPointerException If either parts or type is null
      * @throws IllegalArgumentException If given parts is empty
      */
     public Version(List<Integer> parts, VersionType type, int ordinal) {
-        if (parts == null) throw new NullPointerException("Parts can't be null");
         if (parts.isEmpty()) throw new IllegalArgumentException("Parts can't be empty");
-        if (type == null) throw new NullPointerException("Type can't be null");
 
         this.parts = List.copyOf(parts);
         this.type = type;
@@ -68,6 +67,29 @@ public class Version {
     }
 
     @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Version version)) return false;
+
+        List<Integer> parts1 = parts;
+        List<Integer> parts2 = version.getParts();
+
+        for (int i = 0; i < Math.max(parts1.size(), parts2.size()); i++) {
+            int part1 = i < parts1.size() ? parts1.get(i) : 0;
+            int part2 = i < parts2.size() ? parts2.get(i) : 0;
+
+            if (part1 != part2) return false;
+        }
+
+        return type.ordinal() == version.getType().ordinal() && ordinal == version.getOrdinal();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(parts, type, ordinal);
+    }
+
+    @Override
     public String toString() {
         String partsString = String.join(".", parts.stream().map(String::valueOf).toList());
 
@@ -78,7 +100,7 @@ public class Version {
             ordinalString = "";
         }
         else {
-            typeString = "-" + type.toString();
+            typeString = "-" + type;
             ordinalString = String.valueOf(ordinal);
         }
 
@@ -98,12 +120,9 @@ public class Version {
      *
      * @param version String to parse
      * @return Parsed version
-     * @throws NullPointerException     If given version is null
      * @throws IllegalArgumentException If given version is in invalid format
      */
-    public static Version of(String version) throws NullPointerException, IllegalArgumentException {
-        if (version == null) throw new NullPointerException("Version can't be null");
-
+    public static Version of(String version) throws IllegalArgumentException {
         Matcher matcher = versionPattern.matcher(version);
         if (!matcher.matches()) throw new IllegalArgumentException("Invalid version '" + version + "'");
 

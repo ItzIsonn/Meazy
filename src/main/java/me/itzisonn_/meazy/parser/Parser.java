@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.context.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
@@ -11,6 +10,8 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
  * Is used to store and parse tokens
  * @see Registries#PARSING_FUNCTIONS
  */
+@NullMarked
 public class Parser {
     private final ParsingContext context;
     private final List<Token> tokens;
@@ -33,12 +35,8 @@ public class Parser {
      *
      * @param context Parsing context
      * @param tokens List of tokens
-     * @throws NullPointerException If either context or tokens is null
      */
-    public Parser(ParsingContext context, List<Token> tokens) throws NullPointerException {
-        if (context == null) throw new NullPointerException("Context can't be null");
-        if (tokens == null) throw new NullPointerException("Tokens can't be null");
-
+    public Parser(ParsingContext context, List<Token> tokens) {
         this.context = context;
         this.tokens = tokens;
     }
@@ -76,11 +74,11 @@ public class Parser {
      *
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
-    public void next(TokenType tokenType, Text text) throws NullPointerException, UnexpectedTokenException {
-        if (tokenType == null) throw new NullPointerException("TokenType can't be null");
-        if (text == null) throw new NullPointerException("Text can't be null");
+    public void next(TokenType tokenType, Text text) throws UnexpectedTokenException {
+        if (!getCurrent().getType().equals(tokenType)) {
+            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+        }
 
-        if (!getCurrent().getType().equals(tokenType)) throw new UnexpectedTokenException(getCurrent().getLine(), text);
         next();
     }
 
@@ -92,11 +90,11 @@ public class Parser {
      *
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
-    public void next(TokenTypeSet tokenTypeSet, Text text) throws NullPointerException, UnexpectedTokenException {
-        if (tokenTypeSet == null) throw new NullPointerException("TokenTypeSet can't be null");
-        if (text == null) throw new NullPointerException("Message can't be null");
+    public void next(TokenTypeSet tokenTypeSet, Text text) throws UnexpectedTokenException {
+        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) {
+            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+        }
 
-        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) throw new UnexpectedTokenException(getCurrent().getLine(), text);
         next();
     }
 
@@ -121,11 +119,11 @@ public class Parser {
      *
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
-    public Token getCurrentAndNext(TokenType tokenType, Text text) throws NullPointerException, UnexpectedTokenException {
-        if (tokenType == null) throw new NullPointerException("TokenType can't be null");
-        if (text == null) throw new NullPointerException("Text can't be null");
+    public Token getCurrentAndNext(TokenType tokenType, Text text) throws UnexpectedTokenException {
+        if (!getCurrent().getType().equals(tokenType)) {
+            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+        }
 
-        if (!getCurrent().getType().equals(tokenType)) throw new UnexpectedTokenException(getCurrent().getLine(), text);
         return getCurrentAndNext();
     }
 
@@ -138,11 +136,11 @@ public class Parser {
      *
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
-    public Token getCurrentAndNext(TokenTypeSet tokenTypeSet, Text text) throws NullPointerException, UnexpectedTokenException {
-        if (tokenTypeSet == null) throw new NullPointerException("TokenTypeSet can't be null");
-        if (text == null) throw new NullPointerException("Message can't be null");
+    public Token getCurrentAndNext(TokenTypeSet tokenTypeSet, Text text) throws UnexpectedTokenException {
+        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) {
+            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+        }
 
-        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) throw new UnexpectedTokenException(getCurrent().getLine(), text);
         return getCurrentAndNext();
     }
 
@@ -158,12 +156,8 @@ public class Parser {
      *
      * @param tokenType Required TokenType
      * @return Whether current line has token with given tokenType
-     *
-     * @throws NullPointerException If given tokenType is null
      */
-    public boolean currentLineHasToken(TokenType tokenType) throws NullPointerException {
-        if (tokenType == null) throw new NullPointerException("TokenType can't be null");
-
+    public boolean currentLineHasToken(TokenType tokenType) {
         for (int i = pos; i < tokens.size(); i++) {
             TokenType current = tokens.get(i).getType();
             if (current.equals(TokenTypes.NEW_LINE())) return false;
@@ -178,12 +172,8 @@ public class Parser {
      *
      * @param tokenTypeSet Required TokenTypeSet
      * @return Whether current line has token with type inside given tokenTypeSet
-     *
-     * @throws NullPointerException If given tokenTypeSet is null
      */
-    public boolean currentLineHasToken(TokenTypeSet tokenTypeSet) throws NullPointerException {
-        if (tokenTypeSet == null) throw new NullPointerException("TokenTypeSet can't be null");
-
+    public boolean currentLineHasToken(TokenTypeSet tokenTypeSet) {
         for (int i = pos; i < tokens.size(); i++) {
             TokenType current = tokens.get(i).getType();
             if (current.equals(TokenTypes.NEW_LINE())) return false;
@@ -202,16 +192,11 @@ public class Parser {
      * @param extra Extra info
      * @return Parsed statement
      *
-     * @throws NullPointerException If either id or extra is null
-     * @throws IllegalArgumentException If can't find ParsingFunction with given id
+     * @throws IllegalArgumentException When can't find ParsingFunction with given id
      */
-    public Statement parse(RegistryIdentifier id, Object... extra) throws NullPointerException, IllegalArgumentException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-        if (extra == null) throw new NullPointerException("Extra can't be null");
-
+    public Statement parse(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
         ParsingFunction<? extends Statement> parsingFunction = getParsingFunctionOrNull(id);
         if (parsingFunction == null) throw new IllegalArgumentException("Can't find ParsingFunction with id " + id);
-
         return parsingFunction.parse(context, extra);
     }
 
@@ -224,16 +209,16 @@ public class Parser {
      * @param <T> Returned statement's type
      * @return Parsed statement
      *
-     * @throws NullPointerException If either id, cls or extra is null
-     * @throws IllegalArgumentException If can't find ParsingFunction with given id
+     * @throws IllegalArgumentException When can't find ParsingFunction with given id
      *                                  or return type of ParsingFunction doesn't match requested
      */
     @SuppressWarnings("unchecked")
-    public <T extends Statement> T parse(RegistryIdentifier id, Class<T> cls, Object... extra) throws NullPointerException, IllegalArgumentException {
-        if (cls == null) throw new NullPointerException("Class can't be null");
-
+    public <T extends Statement> T parse(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
         Statement statement = parse(id, extra);
-        if (!cls.isInstance(statement)) throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
+
+        if (!cls.isInstance(statement)) {
+            throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
+        }
 
         return (T) statement;
     }
@@ -245,13 +230,9 @@ public class Parser {
      * @param extra Extra info
      * @return Parsed statement
      *
-     * @throws NullPointerException If either id or extra is null
-     * @throws IllegalArgumentException If can't find ParsingFunction with given id
+     * @throws IllegalArgumentException When can't find ParsingFunction with given id
      */
-    public Statement parseAfter(RegistryIdentifier id, Object... extra) throws NullPointerException, IllegalArgumentException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-        if (extra == null) throw new NullPointerException("Extra can't be null");
-
+    public Statement parseAfter(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
         ParsingFunction<? extends Statement> parsingFunction = getParsingFunctionAfterOrNull(id);
         if (parsingFunction == null) throw new IllegalArgumentException("Can't find ParsingFunction with id " + id);
 
@@ -267,16 +248,16 @@ public class Parser {
      * @param <T> Returned statement's type
      * @return Parsed statement
      *
-     * @throws NullPointerException If either id, cls or extra is null
-     * @throws IllegalArgumentException If can't find ParsingFunction with given id
+     * @throws IllegalArgumentException When can't find ParsingFunction with given id
      *                                  or return type of ParsingFunction doesn't match requested
      */
     @SuppressWarnings("unchecked")
-    public <T extends Statement> T parseAfter(RegistryIdentifier id, Class<T> cls, Object... extra) throws NullPointerException, IllegalArgumentException {
-        if (cls == null) throw new NullPointerException("Class can't be null");
-
+    public <T extends Statement> T parseAfter(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
         Statement statement = parseAfter(id, extra);
-        if (!cls.isInstance(statement)) throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
+
+        if (!cls.isInstance(statement)) {
+            throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
+        }
 
         return (T) statement;
     }
@@ -287,16 +268,12 @@ public class Parser {
      * Finds ParsingFunction with given id
      *
      * @param id Id
-     * @return ParsingFunction with give id or null
-     *
-     * @throws NullPointerException If given id is null
+     * @return ParsingFunction with given id or null
      */
-    private ParsingFunction<? extends Statement> getParsingFunctionOrNull(RegistryIdentifier id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
+    @Nullable
+    private ParsingFunction<? extends Statement> getParsingFunctionOrNull(RegistryIdentifier id) {
         RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTIONS.getEntry(id);
         if (entry == null) return null;
-
         return entry.getValue();
     }
 
@@ -305,12 +282,9 @@ public class Parser {
      *
      * @param id Id
      * @return ParsingFunction after ParsingFunction with given id or null
-     *
-     * @throws NullPointerException If given id is null
      */
-    private ParsingFunction<? extends Statement> getParsingFunctionAfterOrNull(RegistryIdentifier id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
+    @Nullable
+    private ParsingFunction<? extends Statement> getParsingFunctionAfterOrNull(RegistryIdentifier id) {
         RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTIONS.getEntryAfter(id);
         if (entry == null) return null;
 

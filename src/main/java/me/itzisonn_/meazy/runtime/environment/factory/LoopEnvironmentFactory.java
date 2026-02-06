@@ -2,11 +2,15 @@ package me.itzisonn_.meazy.runtime.environment.factory;
 
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
+import org.jspecify.annotations.NullMarked;
+
+import java.util.UUID;
 
 /**
  * Represents factory for creating {@link LoopEnvironment}s
  */
-public interface LoopEnvironmentFactory {
+@NullMarked
+public interface LoopEnvironmentFactory {//TODO
     /**
      * Creates loop environment
      *
@@ -14,7 +18,7 @@ public interface LoopEnvironmentFactory {
      * @param isShared Whether loop environment is shared
      * @return New loop environment
      */
-    LoopEnvironment create(Environment parent, boolean isShared);
+    LoopEnvironment create(Environment parent, UUID startLabel, UUID endLabel, boolean isShared);
 
     /**
      * Creates non-shared loop environment
@@ -22,5 +26,5 @@ public interface LoopEnvironmentFactory {
      * @param parent Parent
      * @return New loop environment
      */
-    LoopEnvironment create(Environment parent);
+    LoopEnvironment create(Environment parent, UUID startLabel, UUID endLabel);
 }

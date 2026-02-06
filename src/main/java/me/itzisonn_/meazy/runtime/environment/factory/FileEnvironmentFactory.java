@@ -2,13 +2,15 @@ package me.itzisonn_.meazy.runtime.environment.factory;
 
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 
 /**
  * Represents factory for creating {@link FileEnvironment}s
  */
-@FunctionalInterface
+@NullMarked
 public interface FileEnvironmentFactory {
     /**
      * Creates file environment
@@ -17,5 +19,5 @@ public interface FileEnvironmentFactory {
      * @param parentFile Parent file
      * @return New file environment
      */
-    FileEnvironment create(GlobalEnvironment parent, File parentFile);
+    FileEnvironment create(GlobalEnvironment parent, @Nullable File parentFile);
 }

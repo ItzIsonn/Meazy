@@ -4,6 +4,8 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.command.custom.*;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.registry.RegistryEntry;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Commands registrar
@@ -23,7 +25,8 @@ public final class Commands {
      * @param name AbstractCommand's name
      * @return AbstractCommand with given name or null
      */
-    public static AbstractCommand getByName(String name) {
+    @Nullable
+    public static AbstractCommand getByName(@NonNull String name) {
         for (RegistryEntry<AbstractCommand> entry : Registries.COMMANDS.getEntries()) {
             if (entry.getValue().getName().equals(name)) return entry.getValue();
         }
@@ -48,7 +51,7 @@ public final class Commands {
         register(new AddonsCommand());
         register(new RunCommand());
         register(new CompileCommand());
-        register(new DecompileCommand());
+        register(new CompileAndRunCommand());
     }
 
 

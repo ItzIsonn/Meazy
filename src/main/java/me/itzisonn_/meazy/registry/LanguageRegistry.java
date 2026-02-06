@@ -4,7 +4,10 @@ import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
 import me.itzisonn_.registry.multiple_entry.SetRegistry;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class LanguageRegistry extends SetRegistry<Language> {
     @Override
     public void register(RegistryIdentifier identifier, Language value, boolean overridable) {
@@ -17,12 +20,9 @@ public class LanguageRegistry extends SetRegistry<Language> {
      *
      * @param id Language's id
      * @return Entry with language with given id
-     *
-     * @throws NullPointerException If given id is null
      */
+    @Nullable
     public RegistryEntry<Language> getEntry(String id) {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
         for (RegistryEntry<Language> entry : getEntries()) {
             if (entry.getValue().getId().equals(id)) {
                 return entry;

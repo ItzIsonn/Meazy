@@ -1,11 +1,13 @@
 package me.itzisonn_.meazy.lexer;
 
 import lombok.Getter;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Represents code unit
  */
 @Getter
+@NullMarked
 public class Token {
     private final int line;
     private final int start;
@@ -21,14 +23,11 @@ public class Token {
      * @param value String that matches this token's type
      *
      * @throws IllegalArgumentException If line is negative
-     * @throws NullPointerException If either type or value is null
      */
     public Token(int line, int start, int end, TokenType type, String value) {
         if (line < 0) throw new IllegalArgumentException("Line can't be negative");
         if (start < 0) throw new IllegalArgumentException("Start can't be negative");
         if (end < 0) throw new IllegalArgumentException("End can't be negative");
-        if (type == null) throw new NullPointerException("Type can't be null");
-        if (value == null) throw new NullPointerException("Value can't be null");
 
         this.start = start;
         this.end = end;

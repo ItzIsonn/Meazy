@@ -1,10 +1,14 @@
 package me.itzisonn_.meazy.version;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Map;
 
 /**
  * Represents different types of version
  */
+@NullMarked
 public enum VersionType {
     /**
      * Alpha version type
@@ -27,6 +31,7 @@ public enum VersionType {
      * @param string String representation of {@link VersionType}
      * @return Version type that matches given string or null
      */
+    @Nullable
     public static VersionType of(String string) {
         return VERSION_TYPES.get(string.toUpperCase());
     }

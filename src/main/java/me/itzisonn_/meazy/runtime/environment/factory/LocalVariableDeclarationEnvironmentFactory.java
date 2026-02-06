@@ -1,0 +1,30 @@
+package me.itzisonn_.meazy.runtime.environment.factory;
+
+import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
+import org.jspecify.annotations.NullMarked;
+
+import java.util.UUID;
+
+/**
+ * Represents factory for creating {@link LocalVariableDeclarationEnvironment}s
+ */
+@NullMarked
+public interface LocalVariableDeclarationEnvironmentFactory {//TODO
+    /**
+     * Creates loop environment
+     *
+     * @param parent Parent
+     * @param isShared Whether loop environment is shared
+     * @return New loop environment
+     */
+    LocalVariableDeclarationEnvironment create(Environment parent, UUID startLabel, UUID endLabel, boolean isShared);
+
+    /**
+     * Creates non-shared loop environment
+     *
+     * @param parent Parent
+     * @return New loop environment
+     */
+    LocalVariableDeclarationEnvironment create(Environment parent, UUID startLabel, UUID endLabel);
+}

@@ -1,8 +1,11 @@
 package me.itzisonn_.meazy.parser.data_type;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Represents factory for creating {@link DataType}s
  */
+@NullMarked
 public interface DataTypeFactory {
     /**
      * Creates data type

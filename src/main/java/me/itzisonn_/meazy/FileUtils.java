@@ -1,30 +1,38 @@
 package me.itzisonn_.meazy;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.io.*;
 
 /**
  * File utils
  */
+@NullMarked
 public final class FileUtils {
     private FileUtils() {}
 
     /**
-     * Returns extension of given file
-     *
      * @param file Target file
-     * @return Extension of file
-     *
-     * @throws NullPointerException If given file is null
+     * @return Extension of given file
      */
-    public static String getExtension(File file) throws NullPointerException {
-        if (file == null) throw new NullPointerException("File can't be null");
+    public static String getExtension(File file) {
         String name = file.getName();
 
         int i = name.lastIndexOf('.');
-        if (i > 0) {
-            return name.substring(i + 1);
-        }
+        if (i > 0) return name.substring(i + 1);
         return "";
+    }
+
+    /**
+     * @param file Target file
+     * @return Name of given file without extension
+     */
+    public static String getNameWithoutExtension(File file) {
+        String name = file.getName();
+
+        int i = name.lastIndexOf('.');
+        if (i > 0) return name.substring(0, i);
+        return name;
     }
 
     /**
@@ -32,12 +40,8 @@ public final class FileUtils {
      *
      * @param file Target file
      * @return Lines of file
-     *
-     * @throws NullPointerException If given file is null
      */
-    public static String getLines(File file) throws NullPointerException {
-        if (file == null) throw new NullPointerException("File can't be null");
-
+    public static String getLines(File file) {
         try {
             return getLines(new FileInputStream(file));
         }
@@ -51,12 +55,8 @@ public final class FileUtils {
      *
      * @param inputStream Input stream
      * @return Lines of input stream
-     *
-     * @throws NullPointerException If given inputStream is null
      */
-    public static String getLines(InputStream inputStream) throws NullPointerException {
-        if (inputStream == null) throw new NullPointerException("InputStream can't be null");
-
+    public static String getLines(InputStream inputStream) {
         StringBuilder stringBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line = reader.readLine();

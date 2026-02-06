@@ -5,6 +5,8 @@ import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.registry.RegistryEntry;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Map;
 /**
  * Represents bundle manager
  */
+@NullMarked
 public class BundleManager {
     /**
      * Language
@@ -22,17 +25,13 @@ public class BundleManager {
 
     /**
      * Main constructor
-     *
      * @param language Language
-     * @throws NullPointerException If given language is null
+     * TODO javadoc
      */
-    public BundleManager(Language language, LanguageFileProvider... languageFileProviders) throws NullPointerException {
-        if (language == null) throw new NullPointerException("Language can't be null");
-
+    public BundleManager(Language language, LanguageFileProvider... languageFileProviders) {
         this.language = language;
         bundles = new HashMap<>();
 
-        if (languageFileProviders == null) return;
         for (LanguageFileProvider languageFileProvider : languageFileProviders) {
             addLanguageFileProvider(languageFileProvider);
         }
@@ -54,12 +53,9 @@ public class BundleManager {
     /**
      * Adds given languageFileProvider
      * @param languageFileProvider LanguageFileProvider
-     *
-     * @throws NullPointerException If given languageFileProvider is null
      * @throws IllegalArgumentException If LanguageFileProvider with given languageFileProvider's id already exist
      */
-    public void addLanguageFileProvider(LanguageFileProvider languageFileProvider) throws NullPointerException, IllegalArgumentException {
-        if (languageFileProvider == null) throw new NullPointerException("LanguageFileProvider can't be null");
+    public void addLanguageFileProvider(LanguageFileProvider languageFileProvider) throws IllegalArgumentException {
         if (getLanguageFileProvider(languageFileProvider.getId()) != null) {
             throw new IllegalArgumentException("LanguageFileProvider with given id already exists");
         }
@@ -70,11 +66,9 @@ public class BundleManager {
     /**
      * @param id Id
      * @return LanguageFileProvider with given id or null
-     * @throws NullPointerException If given id is null
      */
-    public LanguageFileProvider getLanguageFileProvider(String id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
-
+    @Nullable
+    public LanguageFileProvider getLanguageFileProvider(String id) {
         for (LanguageFileProvider languageFileProvider : bundles.keySet()) {
             if (languageFileProvider.getId().equals(id)) return languageFileProvider;
         }
@@ -84,12 +78,9 @@ public class BundleManager {
 
     /**
      * Updates language
-     *
-     * @param language Language
-     * @throws NullPointerException If given language is null
+     * @param language New language
      */
-    public void setLanguage(Language language) throws NullPointerException {
-        if (language == null) throw new NullPointerException("Language can't be null");
+    public void setLanguage(Language language) {
         this.language = language;
 
         for (Bundle bundle : bundles.values()) {
@@ -100,11 +91,9 @@ public class BundleManager {
     /**
      * @param languageFileProvider LanguageFileProvider
      * @return Bundle that corresponds to given languageFileProvider
-     *
-     * @throws NullPointerException If given languageFileProvider is null
      */
-    public Bundle getBundle(LanguageFileProvider languageFileProvider) throws NullPointerException {
-        if (languageFileProvider == null) throw new NullPointerException("LanguageFileProvider can't be null");
+    @Nullable
+    public Bundle getBundle(LanguageFileProvider languageFileProvider) {
         return bundles.get(languageFileProvider);
     }
 }

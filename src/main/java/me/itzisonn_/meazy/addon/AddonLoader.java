@@ -3,6 +3,8 @@ package me.itzisonn_.meazy.addon;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.logging.LogLevel;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.util.*;
@@ -12,12 +14,12 @@ import java.util.jar.JarFile;
 /**
  * Represents an AddonLoader, allowing addons in the form of .jar
  */
+@NullMarked
 public class AddonLoader {
     private final Map<String, Class<?>> classesCache = new HashMap<>();
     private final Map<String, AddonClassLoader> loaders = new LinkedHashMap<>();
 
-    public Addon loadAddon(File file) throws NullPointerException, InvalidAddonException {
-        if (file == null) throw new NullPointerException("File can't be null");
+    public Addon loadAddon(File file) throws InvalidAddonException {
         if (!file.exists()) throw new InvalidAddonException(new FileNotFoundException(file.getPath() + " doesn't exist"));
 
         AddonInfo addonInfo;
@@ -53,13 +55,9 @@ public class AddonLoader {
      *
      * @param file Addon's jar file
      * @return Addon info contained in the given file
-     *
-     * @throws NullPointerException If given file is null
      * @throws InvalidAddonInfoException If given file is invalid
      */
-    public AddonInfo getAddonInfo(File file) throws NullPointerException, InvalidAddonInfoException {
-        if (file == null) throw new NullPointerException("File can't be null");
-
+    public AddonInfo getAddonInfo(File file) throws InvalidAddonInfoException {
         try (JarFile jar = new JarFile(file)) {
             JarEntry entry = jar.getJarEntry("addon.json");
             if (entry == null) throw new InvalidAddonInfoException("Addon jar doesn't contain addon.json");
@@ -73,7 +71,8 @@ public class AddonLoader {
         }
     }
 
-    public Class<?> getClassByName(String name, AddonClassLoader exclude) {
+    @Nullable
+    public Class<?> getClassByName(String name, @Nullable AddonClassLoader exclude) {
         Class<?> cachedClass = classesCache.get(name);
         if (cachedClass != null) return cachedClass;
 
@@ -99,12 +98,9 @@ public class AddonLoader {
     /**
      * Enables given addon
      * @param addon Addon to enable
-     *
-     * @throws NullPointerException If given addon is null
      * @throws IllegalStateException If given addon has already been enabled
      */
-    public void enableAddon(Addon addon) throws NullPointerException, IllegalStateException {
-        if (addon == null) throw new NullPointerException("Addon can't be null");
+    public void enableAddon(Addon addon) throws IllegalStateException {
         if (addon.isEnabled()) throw new IllegalStateException("Addon has already been enabled");
 
         try {

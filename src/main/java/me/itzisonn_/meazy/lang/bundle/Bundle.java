@@ -7,6 +7,8 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.logging.LogLevel;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +18,7 @@ import java.util.Map;
 /**
  * Represents translations bundle
  */
+@NullMarked
 public class Bundle {
     private final BundleManager bundleManager;
     private final LanguageFileProvider languageFileProvider;
@@ -28,13 +31,8 @@ public class Bundle {
     /**
      * @param bundleManager BundleManager
      * @param languageFileProvider LanguageFileProvider
-     *
-     * @throws NullPointerException If either bundleManager or languageFileProvider is null
      */
-    public Bundle(BundleManager bundleManager, LanguageFileProvider languageFileProvider) throws NullPointerException {
-        if (bundleManager == null) throw new NullPointerException("BundleManager can't be null");
-        if (languageFileProvider == null) throw new NullPointerException("LanguageFileProvider can't be null");
-
+    public Bundle(BundleManager bundleManager, LanguageFileProvider languageFileProvider) {
         this.bundleManager = bundleManager;
         this.languageFileProvider = languageFileProvider;
         updateTranslations();
@@ -62,6 +60,7 @@ public class Bundle {
      * @param key Translation key
      * @return Translation that corresponds to given key
      */
+    @Nullable
     public String getTranslation(String key) {
         return translations.get(key);
     }

@@ -1,17 +1,19 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.native_annotation.NativeContainer;
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+import java.lang.constant.ClassDesc;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Represents global environment
  */
+@NullMarked
 public interface FileEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ClassDeclarationEnvironment {
     /**
      * @return This environment's parent
@@ -23,14 +25,13 @@ public interface FileEnvironment extends VariableDeclarationEnvironment, Functio
 
     /**
      * Adds to this global environment given nativeClass that is used by native statements
-     * @param nativeClass Class that is annotated with {@link NativeContainer}
      */
-    void addNativeClass(Class<?> nativeClass);
+    void addImport(String name);
 
     /**
      * @return All native classes
      */
-    Set<Class<?>> getNativeClasses();
+    Map<String, ClassDesc> getImports();
 
 
 
@@ -38,33 +39,30 @@ public interface FileEnvironment extends VariableDeclarationEnvironment, Functio
      * @param id Variable's id
      * @return Declared variable with given id
      *
-     * @throws NullPointerException If given id is null
-     *
      * @apiNote Difference from {@link VariableDeclarationEnvironment#getVariable(String)} is that this method
      *          doesn't look for variable in related global environments
      */
-    VariableValue getLocalVariable(String id) throws NullPointerException;
+    @Nullable
+    VariableValue getLocalVariable(String id);
 
     /**
      * @param id Function's id
      * @param args Function's args
      * @return Declared function with given id and args or null
      *
-     * @throws NullPointerException If either id or args is null
-     *
      * @apiNote Difference from {@link FunctionDeclarationEnvironment#getFunction(String, List)} is that this method
      *          doesn't look for function in related global environments
      */
-    FunctionValue getLocalFunction(String id, List<RuntimeValue<?>> args) throws NullPointerException;
+    @Nullable
+    FunctionValue getLocalFunction(String id, List<ClassDesc> args);
 
     /**
      * @param id Class's id
      * @return Declared class with given id or null
      *
-     * @throws NullPointerException If given id is null
-     *
      * @apiNote Difference from {@link ClassDeclarationEnvironment#getClass(String)} is that this method
      *          doesn't look for class in related global environments
      */
-    ClassValue getLocalClass(String id) throws NullPointerException;
+    @Nullable
+    ClassValue getLocalClass(String id);
 }

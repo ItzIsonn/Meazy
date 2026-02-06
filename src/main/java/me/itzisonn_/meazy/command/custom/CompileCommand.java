@@ -7,19 +7,25 @@ import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.logging.LogLevel;
-import me.itzisonn_.meazy.parser.ast.Program;
+import me.itzisonn_.meazy.parser.ast.program.Program;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.constant.ClassDesc;
+import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 
+@NullMarked
 public class CompileCommand extends AbstractCommand {
     public CompileCommand() {
-        super("compile", List.of("<file_to_compile>", "<output_file_path>"));
+        super("compile", List.of("<target_file>", "<output_directory_path>"));
     }
 
     @Override
+    @Nullable
     public Text execute(String[] args) {
         File file = new File(args[0]);
         if (file.isDirectory() || !file.exists()) {
@@ -27,50 +33,39 @@ public class CompileCommand extends AbstractCommand {
             return null;
         }
 
-        if (!FileUtils.getExtension(file).equals("mea")) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", FileUtils.getExtension(file)));
+        String extension = FileUtils.getExtension(file);
+        if (!extension.equals("mea")) {
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", extension));
             return null;
         }
 
         MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.compile.compiling", file.getAbsolutePath()));
-
         long startMillis = System.currentTimeMillis();
+
         List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(FileUtils.getLines(file));
-
         Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(file, tokens);
+        Map<ClassDesc, byte[]> classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue().compile(program);
+
+        File outputDirectory = new File(args[1]);
+        if (!outputDirectory.exists()) {
+            if (!outputDirectory.mkdirs()) {
+                throw new RuntimeException("Failed to create output directory"); //TODO
+            }
+        }
+
+        for (ClassDesc classDesc : classes.keySet()) {
+            byte[] classFile = classes.get(classDesc);
+            File outputFile = new File(outputDirectory, classDesc.displayName() + ".class");
+
+            try {
+                Files.write(outputFile.toPath(), classFile);
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         long endMillis = System.currentTimeMillis();
-
-
-        File outputFile = new File(args[1]);
-        if (file.isDirectory()) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.output_cant_be_directory"));
-            return null;
-        }
-        if (!outputFile.getParentFile().exists()) {
-            if (outputFile.getParentFile().mkdirs()) {
-                try {
-                    if (outputFile.createNewFile()) MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:file.created", args[1]));
-                    else MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:file.already_exists", args[1]));
-                }
-                catch (Exception e) {
-                    MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.cant_create", args[1]));
-                    return null;
-                }
-            }
-            else {
-                MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.cant_create_parent", args[1]));
-                return null;
-            }
-        }
-
-        String json = Registries.getGson().toJson(program, Program.class);
-        try (FileWriter fileWriter = new FileWriter(outputFile)) {
-            fileWriter.write(json);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         return Text.translatable("meazy:commands.compile.info", (double) (endMillis - startMillis) / 1000);
     }
 }

@@ -6,13 +6,14 @@ import lombok.Getter;
 import me.itzisonn_.meazy.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.logging.LogLevel;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+@NullMarked
 public class SettingsManager {
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Settings.class, new SettingsDeserializer()).create();
     @Getter
@@ -32,16 +33,7 @@ public class SettingsManager {
             throw new RuntimeException(Text.translatable("meazy:settings.cant_load_file").toString(), e);
         }
 
-        Settings settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);
-        if (settings == null) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:settings.invalid_file"));
-            saveDefaultSettings(settingsFile);
-
-            settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);
-            if (settings == null) throw new RuntimeException(Text.translatable("meazy:settings.cant_create_file").toString());
-        }
-
-        this.settings = settings;
+        settings = gson.fromJson(FileUtils.getLines(settingsFile), Settings.class);
     }
 
     private void saveDefaultSettings(File settingsFile) {

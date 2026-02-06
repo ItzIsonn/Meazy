@@ -1,18 +1,14 @@
 package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
+import org.jspecify.annotations.NullMarked;
 
 @Getter
+@NullMarked
 public abstract class Identifier implements Expression {
     protected final String id;
 
-    public Identifier(String id) throws NullPointerException {
-        if (id == null) throw new NullPointerException("Id can't be null");
+    public Identifier(String id) {
         this.id = id;
-    }
-
-    @Override
-    public String toCodeString() {
-        return id;
     }
 }

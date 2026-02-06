@@ -1,20 +1,14 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.context.RuntimeContext;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 
 /**
  * Represents global environment
  */
+@NullMarked
 public interface GlobalEnvironment extends Environment {
-    /**
-     * @return Context containing this global environment
-     */
-    RuntimeContext getContext();
-
-
-
     /**
      * Adds to this global environment file environment
      * @param fileEnvironment FileEnvironment to add

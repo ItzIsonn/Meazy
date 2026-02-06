@@ -3,10 +3,12 @@ package me.itzisonn_.meazy.lexer;
 import me.itzisonn_.meazy.Registries;
 import me.itzisonn_.meazy.lang.TextException;
 import me.itzisonn_.meazy.lang.text.Text;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Is thrown when {@link Registries#TOKENIZATION_FUNCTION} can't recognize token
  */
+@NullMarked
 public class UnknownTokenException extends TextException {
     /**
      * @param lineNumber Line number

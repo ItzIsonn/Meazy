@@ -1,38 +1,37 @@
 package me.itzisonn_.meazy;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import lombok.Getter;
 import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
-import me.itzisonn_.meazy.context.ParsingContext;
-import me.itzisonn_.meazy.context.RuntimeContext;
+import me.itzisonn_.meazy.lang.TextException;
+import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.instruction.Instruction;
+import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.*;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders;
+import me.itzisonn_.meazy.parser.ast.program.ProgramFactory;
 import me.itzisonn_.meazy.parser.data_type.DataTypeFactory;
-import me.itzisonn_.meazy.parser.json_converter.*;
 import me.itzisonn_.meazy.registry.CommandRegistry;
 import me.itzisonn_.meazy.registry.LanguageRegistry;
-import me.itzisonn_.meazy.registry.OperatorRegistry;
-import me.itzisonn_.meazy.runtime.EvaluateProgramFunction;
+import me.itzisonn_.meazy.runtime.ClassLoaderHelper;
 import me.itzisonn_.meazy.runtime.RunProgramFunction;
 import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
-import me.itzisonn_.meazy.parser.ast.Program;
-import me.itzisonn_.registry.multiple_entry.Pair;
+import me.itzisonn_.meazy.parser.ast.program.Program;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.registry.multiple_entry.OrderedRegistry;
-import me.itzisonn_.registry.multiple_entry.PairRegistry;
 import me.itzisonn_.registry.multiple_entry.SetRegistry;
 import me.itzisonn_.registry.single_entry.SingleEntryRegistry;
 import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.interpreter.*;
 
+import java.lang.constant.ClassDesc;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -90,11 +89,6 @@ public final class Registries {
     public static final SetRegistry<Modifier> MODIFIERS = new SetRegistry<>();
 
     /**
-     * Registry for all Operators
-     */
-    public static final OperatorRegistry OPERATORS = new OperatorRegistry();
-
-    /**
      * Registry for all ParsingFunctions
      *
      * @see ParsingFunction
@@ -115,55 +109,21 @@ public final class Registries {
      */
     public static final SingleEntryRegistry<DataTypeFactory> DATA_TYPE_FACTORY = new SingleEntryRegistryImpl<>();
 
-
-
     /**
-     * Registry for all Converters that is used to compile and decompile Statements
-     *
-     * @see Converter
-     * @see Statement
+     * Registry for {@link ProgramFactory}
      */
-    public static final PairRegistry<Class<? extends Statement>, Converter<? extends Statement>> CONVERTERS = new PairRegistry<>();
+    public static final SingleEntryRegistry<ProgramFactory> PROGRAM_FACTORY = new SingleEntryRegistryImpl<>();
+
+
 
     /**
-     * Returns Gson with all registered converters
-     *
-     * @see Registries#CONVERTERS
+     * Registry for function that compiles {@link Program} to bytecode
+     * @see CompileProgramFunction
      */
-    @Getter
-    private static Gson gson;
+    public static final SingleEntryRegistry<CompileProgramFunction> COMPILE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
 
     /**
-     * Updates {@link Registries#gson}
-     *
-     * @see Registries#CONVERTERS
-     */
-    public static void updateGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        for (RegistryEntry<Pair<Class<? extends Statement>, Converter<? extends Statement>>> entry : CONVERTERS.getEntries()) {
-            gsonBuilder.registerTypeAdapter(entry.getValue().getKey(), entry.getValue().getValue());
-        }
-        gson = gsonBuilder.create();
-    }
-
-
-
-    /**
-     * Registry for EvaluationFunctions
-     *
-     * @see EvaluationFunction
-     * @see Interpreter
-     */
-    public static final PairRegistry<Class<? extends Statement>, EvaluationFunction<? extends Statement>> EVALUATION_FUNCTIONS = new PairRegistry<>();
-
-    /**
-     * Registry for function that uses {@link Registries#EVALUATION_FUNCTIONS} to evaluate {@link Program}
-     * @see EvaluateProgramFunction
-     */
-    public static final SingleEntryRegistry<EvaluateProgramFunction> EVALUATE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
-
-    /**
-     * Registry for function that uses {@link Registries#EVALUATE_PROGRAM_FUNCTION} to run {@link Program}
+     * Registry for function that runs {@link Program}
      * @see RunProgramFunction
      */
     public static final SingleEntryRegistry<RunProgramFunction> RUN_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
@@ -200,9 +160,9 @@ public final class Registries {
     public static final SingleEntryRegistry<LoopEnvironmentFactory> LOOP_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
-     * Registry for {@link EnvironmentFactory}
+     * Registry for {@link LocalVariableDeclarationEnvironmentFactory}
      */
-    public static final SingleEntryRegistry<EnvironmentFactory> ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    public static final SingleEntryRegistry<LocalVariableDeclarationEnvironmentFactory> LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
 
 
 
@@ -222,7 +182,6 @@ public final class Registries {
 
         Commands.REGISTER();
         TokenTypes.REGISTER();
-        Converters.REGISTER();
 
         TOKENIZATION_FUNCTION.register(MeazyMain.getDefaultIdentifier("tokens_function"), lines -> {
             List<Token> tokens = new ArrayList<>();
@@ -265,7 +224,6 @@ public final class Registries {
         });
 
         PARSE_TOKENS_FUNCTION.register(MeazyMain.getDefaultIdentifier("parse_tokens"), (file, tokens) -> {
-            if (tokens == null) throw new NullPointerException("Tokens can't be null");
             ParsingContext parsingContext = new ParsingContext(tokens);
 
             Parser parser = parsingContext.getParser();
@@ -283,31 +241,58 @@ public final class Registries {
                 parser.moveOverOptionalNewLines();
             }
 
-            return new Program(file, MeazyMain.VERSION, requiredAddons, body);
+            return PROGRAM_FACTORY.getEntry().getValue().create(file, MeazyMain.VERSION, requiredAddons, body);
         });
 
-        EVALUATE_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("evaluate_program"), (program, globalEnvironment) -> {
+        COMPILE_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("compile_program"), program -> {
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
-                if (addon == null) throw new RuntimeException("Can't find required addon with id " + addonId);
+                if (addon == null) throw new TextException(Text.translatable("meazy_addon:addons.cant_find", addonId)){};
 
                 Version addonVersion = program.getRequiredAddons().get(addonId);
                 if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonVersion)) {
-                    throw new RuntimeException("Can't find required addon with id " + addonId + " of version " + addonVersion +
-                            " (found version " + addon.getAddonInfo().getVersion() + ")");
+                    throw new TextException(Text.translatable("meazy_addon:addons.cant_find_version", addonId, addonVersion, addon.getAddonInfo().getVersion())){};
                 }
             }
 
-            FileEnvironment fileEnvironment = FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(globalEnvironment, program.getFile());
-            globalEnvironment.getContext().getInterpreter().evaluate(program, fileEnvironment);
+            GlobalEnvironment globalEnvironment = GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create();
 
-            return fileEnvironment;
+            BytecodeBuilders bytecodeBuilders = BytecodeBuilders.of(null, null);
+            InstructionsSet instructionsSet = new InstructionsSet(bytecodeBuilders);
+            program.emit(instructionsSet, globalEnvironment, null);
+
+            for (Instruction instruction : instructionsSet.getInstructions()) {
+                instruction.emit(bytecodeBuilders);
+            }
+
+            return bytecodeBuilders.getClasses();
         });
 
-        RUN_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("run_program"), program -> {
-            RuntimeContext context = new RuntimeContext();
-            GlobalEnvironment globalEnvironment = context.getGlobalEnvironment();
-            return EVALUATE_PROGRAM_FUNCTION.getEntry().getValue().evaluate(program, globalEnvironment);
+        RUN_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("run_program"), classes -> {
+            for (ClassDesc classDesc : classes.keySet()) {
+                byte[] classFile = classes.get(classDesc);
+
+                Class<?> loadedClass = ClassLoaderHelper.defineClass(classFile);
+                try {
+                    Method method = loadedClass.getDeclaredMethod("main");
+                    if (method.getReturnType() != void.class) {
+                        System.err.println("Main method has invalid signature in class" + classDesc); //TODO
+                        continue;
+                    }
+                    if (!method.canAccess(null)) {
+                        System.err.println("Main method is inaccessible in class" + classDesc);
+                        continue;
+                    }
+
+                    method.invoke(null);
+                }
+                catch (NoSuchMethodException _) {
+                    System.err.println("No method main in class" + classDesc);
+                }
+                catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         });
     }
 }

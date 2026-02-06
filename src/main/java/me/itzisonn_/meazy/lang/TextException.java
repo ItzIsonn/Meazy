@@ -1,17 +1,17 @@
 package me.itzisonn_.meazy.lang;
 
 import me.itzisonn_.meazy.lang.text.Text;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Exception that accepts {@link Text} instead of {@link String}
  */
+@NullMarked
 public abstract class TextException extends RuntimeException {
     /**
      * @param text Text
-     * @throws NullPointerException If given text is null
      */
-    public TextException(Text text) throws NullPointerException {
-        if (text == null) throw new NullPointerException("Text can't be null");
+    public TextException(Text text) {
         super(text.toString());
     }
 }
