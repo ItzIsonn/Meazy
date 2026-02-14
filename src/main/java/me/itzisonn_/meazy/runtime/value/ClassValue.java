@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import org.jspecify.annotations.NullMarked;
 
+import java.lang.constant.ClassDesc;
 import java.util.Set;
 
 /**
@@ -16,6 +17,8 @@ public interface ClassValue extends ModifierableRuntimeValue {
      */
     String getId();
 
+    boolean isInterface();
+
     /**
      * @return Base classes
      */
@@ -26,6 +29,12 @@ public interface ClassValue extends ModifierableRuntimeValue {
      */
     ClassEnvironment getEnvironment();
 
+
+
+    //TODO
+    default ClassDesc asClassDesc() {
+        return ClassDesc.of(getEnvironment().getPackageName() + "." + getId());
+    }
 
 
     /**

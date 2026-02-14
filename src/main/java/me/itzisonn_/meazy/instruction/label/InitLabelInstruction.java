@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.instruction.conditional_goto;
+package me.itzisonn_.meazy.instruction.label;
 
 import lombok.AllArgsConstructor;
 import me.itzisonn_.meazy.instruction.Instruction;
@@ -7,17 +7,19 @@ import org.jspecify.annotations.NullMarked;
 
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
-import java.util.function.Supplier;
+import java.util.UUID;
 
 @NullMarked
 @AllArgsConstructor
-public final class GotoLabelIfEqualsZeroInstruction implements Instruction {
-    private final Supplier<Label> supplier;
+public final class InitLabelInstruction implements Instruction {
+    private final UUID uuid;
 
     @Override
     public void emit(BytecodeBuilders bytecodeBuilders) {
         CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
         if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-        codeBuilder.ifeq(supplier.get());
+
+        Label label = codeBuilder.newLabel();
+        bytecodeBuilders.setLabel(uuid, label);
     }
 }

@@ -2,11 +2,13 @@ package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.constant.ClassDesc;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +17,9 @@ import java.util.Set;
  */
 @NullMarked
 public interface ClassEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
+    @Override
+    ClassDeclarationEnvironment getParent();
+
     /**
      * @return This class environment's id
      */
@@ -24,6 +29,8 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
      * @return This class environment's modifiers
      */
     Set<Modifier> getModifiers();
+
+    boolean isInterface();
 
 
 
@@ -47,7 +54,7 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
                 if (args.size() != parameters.size()) continue;
 
                 for (int i = 0; i < args.size(); i++) {
-                    if (!parameters.get(i).getDataType().isMatches(args.get(i), getFileEnvironment())) continue main;
+                    if (!parameters.get(i).getDataType().equals(args.get(i))) continue main; //FIXME
                 }
 
                 return functionValue;
@@ -68,19 +75,7 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
      * @return All base classes of this class environment
      */
     @Nullable
-    String getBaseClass();
+    ClassDesc getBaseClass();
 
-//    /**
-//     * @return All base classes of this class environment and their base classes
-//     */
-//    default List<String> getAllBaseClasses() {
-//        Set<ClassEnvironment> baseClasses = new HashSet<>();
-//
-//        for (ClassEnvironment baseClass : getBaseClasses()) {
-//            baseClasses.add(baseClass);
-//            baseClasses.addAll(baseClass.getDeepBaseClasses());
-//        }
-//
-//        return baseClasses;
-//    }
+    Set<ClassDesc> getInterfaces();
 }

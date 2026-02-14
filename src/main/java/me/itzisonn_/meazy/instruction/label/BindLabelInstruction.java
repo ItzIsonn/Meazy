@@ -6,18 +6,17 @@ import me.itzisonn_.meazy.instruction.BytecodeBuilders;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.classfile.CodeBuilder;
-import java.lang.classfile.Label;
-import java.util.function.Supplier;
+import java.util.UUID;
 
 @NullMarked
 @AllArgsConstructor
 public final class BindLabelInstruction implements Instruction {
-    private final Supplier<Label> supplier;
+    private final UUID uuid;
 
     @Override
     public void emit(BytecodeBuilders bytecodeBuilders) {
         CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
         if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-        codeBuilder.labelBinding(supplier.get());
+        codeBuilder.labelBinding(bytecodeBuilders.getLabel(uuid));
     }
 }

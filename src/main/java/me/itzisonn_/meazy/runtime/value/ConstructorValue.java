@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.value;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface ConstructorValue extends ModifierableRuntimeValue {
     List<ParameterExpression> getParameters();
 
     /**
-     * @return Parent environment
+     * @return Parent environment TODO
      */
-    ConstructorDeclarationEnvironment getParentEnvironment();
+    ConstructorEnvironment getEnvironment();
 }

@@ -13,9 +13,9 @@ import java.util.Set;
 public interface ClassDeclarationEnvironment extends Environment {
     /**
      * Declares given class in this environment
-     * @param value ClassValue
+     * TODO
      */
-    void declareClass(ClassValue value);
+    ClassValue declareClass(ClassEnvironment classEnvironment);
 
     /**
      * @param id Class's id
@@ -34,4 +34,17 @@ public interface ClassDeclarationEnvironment extends Environment {
      * @return All declared classes
      */
     Set<ClassValue> getClasses();
+
+
+
+    @Override
+    @Nullable
+    default ClassDeclarationEnvironment getClassDeclarationEnvironment(String id) {
+        ClassValue classValue = getClass(id);
+        if (classValue != null) return classValue.getEnvironment().getParent();
+
+        Environment parent = getParent();
+        if (parent == null) return null;
+        return parent.getClassDeclarationEnvironment(id);
+    }
 }

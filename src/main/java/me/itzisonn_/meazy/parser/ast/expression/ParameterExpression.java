@@ -4,11 +4,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.data_type.DataType;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import org.jspecify.annotations.NullMarked;
-
-import java.lang.constant.ClassDesc;
 
 /**
  * Represents an expression that is used as parameter when defining callable statements
@@ -36,7 +34,7 @@ public class ParameterExpression implements Expression {
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {}
 
     @Override
-    public ClassDesc getType(Environment environment, Statement parent) {
-        return dataType.getClassDescriptor(environment);
+    public DataType getType(Environment environment, Statement parent) {
+        return dataType;
     }
 }

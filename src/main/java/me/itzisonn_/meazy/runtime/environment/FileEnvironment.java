@@ -1,5 +1,8 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
@@ -7,21 +10,22 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents global environment
  */
 @NullMarked
 public interface FileEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ClassDeclarationEnvironment {
-    /**
-     * @return This environment's parent
-     */
     @Override
     GlobalEnvironment getParent();
-
-
 
     /**
      * Adds to this global environment given nativeClass that is used by native statements

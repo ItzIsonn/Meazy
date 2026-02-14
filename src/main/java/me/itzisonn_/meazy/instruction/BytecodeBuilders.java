@@ -11,10 +11,7 @@ import java.lang.classfile.ClassFile;
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
 import java.lang.constant.ClassDesc;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Getter
@@ -26,7 +23,7 @@ public final class BytecodeBuilders {
     @Nullable
     private final CodeBuilder codeBuilder;
     private final LinkedHashMap<ClassDesc, byte[]> classes;
-    private final Map<UUID, Label> labels;
+    private final Map<UUID, Optional<Label>> labels;
 
     public static BytecodeBuilders of(@Nullable ClassBuilder classBuilder, @Nullable CodeBuilder codeBuilder) {
         return new BytecodeBuilders(classBuilder, codeBuilder, new LinkedHashMap<>(), new HashMap<>());
@@ -45,13 +42,25 @@ public final class BytecodeBuilders {
         return new LinkedHashMap<>(classes);
     }
 
-    @Nullable
     public Label getLabel(UUID uuid) {
-        return labels.get(uuid);
+        return labels.getOrDefault(uuid, Optional.empty()).orElseThrow();
+    }
+
+    public boolean hasLabel(UUID uuid) {
+        return labels.containsKey(uuid);
+    }
+
+    public boolean hasInitializedLabel(UUID uuid) {
+        return labels.getOrDefault(uuid, Optional.empty()).isPresent();
     }
 
     public void setLabel(UUID uuid, Label label) {
-        labels.put(uuid, label);
+        if (!labels.containsKey(uuid)) throw new IllegalArgumentException("Label with UUID " + uuid + " does not exist");
+        labels.put(uuid, Optional.of(label));
+    }
+
+    public void addLabel(UUID uuid) {
+        labels.put(uuid, Optional.empty());
     }
 
 

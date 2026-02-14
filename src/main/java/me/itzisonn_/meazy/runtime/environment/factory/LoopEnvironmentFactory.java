@@ -12,15 +12,6 @@ import java.util.UUID;
 @NullMarked
 public interface LoopEnvironmentFactory {//TODO
     /**
-     * Creates loop environment
-     *
-     * @param parent Parent
-     * @param isShared Whether loop environment is shared
-     * @return New loop environment
-     */
-    LoopEnvironment create(Environment parent, UUID startLabel, UUID endLabel, boolean isShared);
-
-    /**
      * Creates non-shared loop environment
      *
      * @param parent Parent

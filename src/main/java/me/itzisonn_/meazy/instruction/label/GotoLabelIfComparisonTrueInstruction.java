@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.instruction.conditional_goto;
+package me.itzisonn_.meazy.instruction.label;
 
 import lombok.AllArgsConstructor;
 import me.itzisonn_.meazy.instruction.Instruction;
@@ -8,21 +8,21 @@ import org.jspecify.annotations.NullMarked;
 
 import java.lang.classfile.CodeBuilder;
 import java.lang.classfile.Label;
-import java.util.function.Supplier;
+import java.util.UUID;
 
 @NullMarked
 @AllArgsConstructor
 public final class GotoLabelIfComparisonTrueInstruction implements Instruction {
     private final NumberType type;
     private final ComparisonOperation operation;
-    private final Supplier<Label> supplier;
+    private final UUID uuid;
 
     @Override
     public void emit(BytecodeBuilders bytecodeBuilders) {
         CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
         if (codeBuilder == null) throw new RuntimeException("Code builder is null");
 
-        Label label = supplier.get();
+        Label label = bytecodeBuilders.getLabel(uuid);
 
         if (type == NumberType.INT) {
             switch (operation) {

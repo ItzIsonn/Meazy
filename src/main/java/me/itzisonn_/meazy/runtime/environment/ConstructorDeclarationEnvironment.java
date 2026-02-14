@@ -16,9 +16,9 @@ import java.util.Set;
 public interface ConstructorDeclarationEnvironment extends Environment {
     /**
      * Declares given constructor in this environment
-     * @param value Constructor value
+     * TODO
      */
-    void declareConstructor(ConstructorValue value);
+    void declareConstructor(List<ParameterExpression> parameters, ConstructorEnvironment constructorEnvironment);
 
     /**
      * @param parameters Constructor's args TODO
@@ -32,7 +32,9 @@ public interface ConstructorDeclarationEnvironment extends Environment {
             if (parameters.size() != constructorParameters.size()) continue;
 
             for (int i = 0; i < parameters.size(); i++) {
-                if (!constructorParameters.get(i).getDataType().getClassDescriptor(this).equals(parameters.get(i))) continue main;
+                ClassDesc constructorParameterClassDesc = constructorParameters.get(i).getDataType().getClassDesc();
+                ClassDesc parameterClassDesc = parameters.get(i);
+                if (!isInstanceOf(parameterClassDesc, constructorParameterClassDesc)) continue main;
             }
 
             return constructorValue;
