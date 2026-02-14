@@ -1,6 +1,17 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.parser.DataType;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents environment for functions
  */
-public interface FunctionEnvironment extends LocalVariableDeclarationEnvironment {}
+@NullMarked
+public interface FunctionEnvironment extends LocalVariableDeclarationEnvironment {
+    @Nullable
+    DataType getReturnDataType();
+
+    @Override
+    FunctionDeclarationEnvironment getParent();
+}

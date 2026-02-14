@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.runtime.value;
 
-import me.itzisonn_.meazy.parser.data_type.DataType;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -30,9 +30,9 @@ public interface FunctionValue extends ModifierableRuntimeValue {
     DataType getReturnDataType();
 
     /**
-     * @return Parent environment
+     * @return Parent environment tODO
      */
-    FunctionDeclarationEnvironment getParentEnvironment();
+    FunctionEnvironment getEnvironment();
 
 
 

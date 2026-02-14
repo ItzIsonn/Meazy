@@ -3,21 +3,21 @@ package me.itzisonn_.meazy.instruction;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.array.NewReferenceArrayInstruction;
 import me.itzisonn_.meazy.instruction.array.StoreReferenceIntoArrayInstruction;
-import me.itzisonn_.meazy.instruction.conditional_goto.GotoLabelIfComparisonTrueInstruction;
-import me.itzisonn_.meazy.instruction.conditional_goto.GotoLabelIfComparisonTrueInstruction.ComparisonOperation;
-import me.itzisonn_.meazy.instruction.conditional_goto.GotoLabelIfEqualsZeroInstruction;
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction;
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation;
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfEqualsZeroInstruction;
 import me.itzisonn_.meazy.instruction.field.GetFieldInstruction;
 import me.itzisonn_.meazy.instruction.field.StoreFieldInstruction;
 import me.itzisonn_.meazy.instruction.field.WithFieldInstruction;
 import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction;
 import me.itzisonn_.meazy.instruction.method.*;
 import me.itzisonn_.meazy.instruction.label.BindLabelInstruction;
-import me.itzisonn_.meazy.instruction.conditional_goto.GotoLabelIfNonNullInstruction;
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfNonNullInstruction;
 import me.itzisonn_.meazy.instruction.label.GotoLabelInstruction;
-import me.itzisonn_.meazy.instruction.label.NewLabelInstruction;
-import me.itzisonn_.meazy.instruction.load.LoadConstantInstruction;
+import me.itzisonn_.meazy.instruction.label.InitLabelInstruction;
+import me.itzisonn_.meazy.instruction.stack.LoadConstantInstruction;
 import me.itzisonn_.meazy.instruction.local.GetLocalInstruction;
-import me.itzisonn_.meazy.instruction.load.LoadThisReferenceInstruction;
+import me.itzisonn_.meazy.instruction.stack.LoadThisReferenceInstruction;
 import me.itzisonn_.meazy.instruction.local.StoreLocalInstruction;
 import me.itzisonn_.meazy.instruction.misc.CheckCastInstruction;
 import me.itzisonn_.meazy.instruction.misc.InstanceOfInstruction;
@@ -32,11 +32,8 @@ import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.classfile.Label;
 import java.lang.classfile.attribute.InnerClassesAttribute;
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDesc;
-import java.lang.constant.MethodTypeDesc;
+import java.lang.constant.*;
 import java.lang.reflect.AccessFlag;
 import java.util.*;
 import java.util.function.Consumer;
@@ -115,6 +112,10 @@ public class InstructionsSet {
         with(new InvokeMethodInstruction(owner, id, methodTypeDesc, argsInstructions, invokeType));
     }
 
+    public void invokeDynamicMethod(DirectMethodHandleDesc bootstrapMethod, String id, MethodTypeDesc methodTypeDesc, ConstantDesc... args) {
+        with(new InvokeDynamicMethodInstruction(bootstrapMethod, id, methodTypeDesc, List.of(args)));
+    }
+
     public void invokeConstructor(ClassDesc owner, MethodTypeDesc constructorTypeDesc, Consumer<InstructionsSet> argsInstructions) {
         with(new InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, false));
     }
@@ -151,12 +152,8 @@ public class InstructionsSet {
         with(new StoreLocalInstruction(type, slot));
     }
 
-    public void setLocalName(int slot, String id, ClassDesc type, Label startLabel, Label endLabel) {
-        with(new SetLocalNameInstruction(slot, id, type, () -> startLabel, () -> endLabel));
-    }
-
     public void setLocalName(int slot, String id, ClassDesc type, UUID startLabelUuid, UUID endLabelUuid) {
-        with(new SetLocalNameInstruction(slot, id, type, () -> getNullSafeLabel(startLabelUuid),() -> getNullSafeLabel(endLabelUuid)));
+        with(new SetLocalNameInstruction(slot, id, type, startLabelUuid, endLabelUuid));
     }
 
 
@@ -193,6 +190,10 @@ public class InstructionsSet {
 
     public void convertToNumberType(ClassDesc from, NumberType to) {
         convertToNumberType(getNullSafeNumberType(from), to);
+    }
+
+    public void convertToBooleanType(boolean isFromBoxed, boolean isToBoxed) {
+        with(new ConvertToBooleanTypeInstruction(isFromBoxed, isToBoxed));
     }
 
     public void arithmeticOperation(NumberType type, ArithmeticOperation operation) {
@@ -245,56 +246,42 @@ public class InstructionsSet {
 
 
 
-    public UUID newLabel() {
+    public UUID createLabel() {
         UUID uuid = UUID.randomUUID();
-        with(new NewLabelInstruction(label -> bytecodeBuilders.setLabel(uuid, label)));
+        bytecodeBuilders.addLabel(uuid);
         return uuid;
     }
 
-    public void bindLabel(Label label) {
-        with(new BindLabelInstruction(() -> label));
+    public void initLabel(UUID uuid) {
+        with(new InitLabelInstruction(uuid));
+    }
+
+    public UUID createAndInitLabel() {
+        UUID uuid = createLabel();
+        initLabel(uuid);
+        return uuid;
     }
 
     public void bindLabel(UUID uuid) {
-        with(new BindLabelInstruction(() -> getNullSafeLabel(uuid)));
-    }
-
-    public void gotoLabel(Label label) {
-        with(new GotoLabelInstruction(() -> label));
+        with(new BindLabelInstruction(uuid));
     }
 
     public void gotoLabel(UUID uuid) {
-        with(new GotoLabelInstruction(() -> getNullSafeLabel(uuid)));
+        with(new GotoLabelInstruction(uuid));
     }
 
 
-
-    public void gotoLabelIfNonNull(Label label) {
-        with(new GotoLabelIfNonNullInstruction(() -> label));
-    }
 
     public void gotoLabelIfNonNull(UUID uuid) {
-        with(new GotoLabelIfNonNullInstruction(() -> getNullSafeLabel(uuid)));
-    }
-
-    public void gotoLabelIfEqualsZero(Label label) {
-        with(new GotoLabelIfEqualsZeroInstruction(() -> label));
+        with(new GotoLabelIfNonNullInstruction(uuid));
     }
 
     public void gotoLabelIfEqualsZero(UUID uuid) {
-        with(new GotoLabelIfEqualsZeroInstruction(() -> getNullSafeLabel(uuid)));
-    }
-
-    public void gotoLabelIfComparisonTrue(NumberType type, ComparisonOperation operation, Label label) {
-        with(new GotoLabelIfComparisonTrueInstruction(type, operation, () -> label));
-    }
-
-    public void gotoLabelIfComparisonTrue(ClassDesc type, ComparisonOperation operation, Label label) {
-        gotoLabelIfComparisonTrue(getNullSafeNumberType(type), operation, label);
+        with(new GotoLabelIfEqualsZeroInstruction(uuid));
     }
 
     public void gotoLabelIfComparisonTrue(NumberType type, ComparisonOperation operation, UUID uuid) {
-        with(new GotoLabelIfComparisonTrueInstruction(type, operation, () -> getNullSafeLabel(uuid)));
+        with(new GotoLabelIfComparisonTrueInstruction(type, operation, uuid));
     }
 
     public void gotoLabelIfComparisonTrue(ClassDesc type, ComparisonOperation operation, UUID uuid) {
@@ -302,12 +289,6 @@ public class InstructionsSet {
     }
 
 
-
-    private Label getNullSafeLabel(UUID uuid) {
-        Label label = bytecodeBuilders.getLabel(uuid);
-        if (label == null) throw new NullPointerException("Label with UUID " +  uuid + " is null");
-        return label;
-    }
 
     private NumberType getNullSafeNumberType(ClassDesc type) {
         NumberType numberType = NumberType.valueOf(type);

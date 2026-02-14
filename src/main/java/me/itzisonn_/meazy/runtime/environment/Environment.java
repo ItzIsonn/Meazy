@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.io.File;
 import java.lang.constant.ClassDesc;
 import java.util.List;
 import java.util.function.Predicate;
@@ -14,13 +14,31 @@ import java.util.function.Predicate;
 @NullMarked
 public interface Environment {
     /**
-     * @return Parent file of this environment
+     * @return Parent file of this environment //TODO
      */
+    default String getPackageName() {
+        Environment parent = getParent();
+        if (parent == null) throw new NullPointerException("Parent is null");
+        return parent.getPackageName();
+    }
+
     @Nullable
-    default File getParentFile() {
+    default String getClassName() {
         Environment parent = getParent();
         if (parent == null) return null;
-        return parent.getParentFile();
+        return parent.getClassName();
+    }
+
+    default ClassDesc resolveClassDesc(ClassDesc classDesc) {
+        if (classDesc.isPrimitive()) return classDesc;
+
+        ClassDeclarationEnvironment classDeclarationEnvironment = getClassDeclarationEnvironment(classDesc);
+        if (classDeclarationEnvironment == null) throw new RuntimeException("Can't find class " + classDesc);
+
+        ClassValue classValue = classDeclarationEnvironment.getClass(classDesc.displayName());
+        if (classValue == null) throw new RuntimeException("Can't find class " + classDesc);
+
+        return classValue.asClassDesc();
     }
 
 
@@ -83,7 +101,11 @@ public interface Environment {
     /**
      * @return Whether this environment is shared
      */
-    boolean isShared();
+    default boolean isShared() {
+        Environment parent = getParent();
+        if (parent == null) return false;
+        return parent.isShared();
+    }
 
 
 
@@ -112,5 +134,41 @@ public interface Environment {
         Environment parent = getParent();
         if (parent == null) return null;
         return parent.getFunctionDeclarationEnvironment(id, parameters);
+    }
+
+    //TODO
+    @Nullable
+    default ClassDeclarationEnvironment getClassDeclarationEnvironment(String id) {
+        return getClassDeclarationEnvironment(ClassDesc.of(id));
+    }
+
+    //TODO
+    @Nullable
+    default ClassDeclarationEnvironment getClassDeclarationEnvironment(ClassDesc classDesc) {
+        Environment parent = getParent();
+        if (parent == null) return null;
+        return parent.getClassDeclarationEnvironment(classDesc);
+    }
+
+    @Nullable
+    default ClassValue getClassValue(ClassDesc classDesc) {
+        ClassDeclarationEnvironment classDeclarationEnvironment = getClassDeclarationEnvironment(classDesc);
+        if (classDeclarationEnvironment == null) return null;
+        return classDeclarationEnvironment.getClass(classDesc.displayName());
+    }
+
+    default boolean isInstanceOf(ClassDesc classDesc, ClassDesc target) {
+        if (classDesc.equals(target)) return true;
+
+        ClassValue classValue = getClassValue(classDesc);
+        if (classValue == null) return false;
+
+        if (classValue.getEnvironment().getBaseClass() != null && isInstanceOf(classValue.getEnvironment().getBaseClass(), target)) return true;
+
+        for (ClassDesc interfaceClassDesc : classValue.getEnvironment().getInterfaces()) {
+            if (isInstanceOf(interfaceClassDesc, target)) return true;
+        }
+
+        return false;
     }
 }

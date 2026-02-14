@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy;
 
 import me.itzisonn_.meazy.addon.Addon;
-import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.lang.TextException;
@@ -13,7 +12,6 @@ import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.instruction.BytecodeBuilders;
 import me.itzisonn_.meazy.parser.ast.program.ProgramFactory;
-import me.itzisonn_.meazy.parser.data_type.DataTypeFactory;
 import me.itzisonn_.meazy.registry.CommandRegistry;
 import me.itzisonn_.meazy.registry.LanguageRegistry;
 import me.itzisonn_.meazy.runtime.ClassLoaderHelper;
@@ -22,7 +20,6 @@ import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.meazy.parser.ast.program.Program;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.registry.multiple_entry.OrderedRegistry;
 import me.itzisonn_.registry.multiple_entry.SetRegistry;
 import me.itzisonn_.registry.single_entry.SingleEntryRegistry;
@@ -103,11 +100,6 @@ public final class Registries {
      * @see Parser
      */
     public static final SingleEntryRegistry<ParseTokensFunction> PARSE_TOKENS_FUNCTION = new SingleEntryRegistryImpl<>();
-
-    /**
-     * Registry for {@link DataTypeFactory}
-     */
-    public static final SingleEntryRegistry<DataTypeFactory> DATA_TYPE_FACTORY = new SingleEntryRegistryImpl<>();
 
     /**
      * Registry for {@link ProgramFactory}
@@ -223,27 +215,6 @@ public final class Registries {
             return tokens;
         });
 
-        PARSE_TOKENS_FUNCTION.register(MeazyMain.getDefaultIdentifier("parse_tokens"), (file, tokens) -> {
-            ParsingContext parsingContext = new ParsingContext(tokens);
-
-            Parser parser = parsingContext.getParser();
-            parser.moveOverOptionalNewLines();
-
-            Map<String, Version> requiredAddons = new HashMap<>();
-            for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
-                AddonInfo addonInfo = addon.getAddonInfo();
-                requiredAddons.put(addonInfo.getId(), addonInfo.getVersion());
-            }
-
-            List<Statement> body = new ArrayList<>();
-            while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                body.add(parser.parse(MeazyMain.getDefaultIdentifier("global_statement"), Statement.class));
-                parser.moveOverOptionalNewLines();
-            }
-
-            return PROGRAM_FACTORY.getEntry().getValue().create(file, MeazyMain.VERSION, requiredAddons, body);
-        });
-
         COMPILE_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("compile_program"), program -> {
             for (String addonId : program.getRequiredAddons().keySet()) {
                 Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
@@ -280,14 +251,14 @@ public final class Registries {
                         continue;
                     }
                     if (!method.canAccess(null)) {
-                        System.err.println("Main method is inaccessible in class" + classDesc);
+                        System.err.println("Main method is inaccessible in class " + classDesc);
                         continue;
                     }
 
                     method.invoke(null);
                 }
                 catch (NoSuchMethodException _) {
-                    System.err.println("No method main in class" + classDesc);
+                    System.err.println("No method main in class " + classDesc);
                 }
                 catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException(e);

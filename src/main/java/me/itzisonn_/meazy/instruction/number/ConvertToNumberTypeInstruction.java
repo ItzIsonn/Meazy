@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.instruction.BytecodeBuilders;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.classfile.CodeBuilder;
+import java.lang.constant.MethodTypeDesc;
 
 @NullMarked
 @AllArgsConstructor
@@ -19,6 +20,13 @@ public final class ConvertToNumberTypeInstruction implements Instruction {
         CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
         if (codeBuilder == null) throw new RuntimeException("Code builder is null");
 
+        if (!from.isBoxed() && !to.isBoxed()) emitUnboxed(codeBuilder, from, to);
+        else if (from.isBoxed() && !to.isBoxed()) emitBoxedToUnboxed(codeBuilder, from, to);
+        else if (!from.isBoxed()) emitUnboxedToBoxed(codeBuilder, from, to);
+        else emitBoxed(codeBuilder, from, to);
+    }
+
+    private void emitUnboxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
         switch (from) {
             case INT -> {
                 switch (to) {
@@ -56,5 +64,27 @@ public final class ConvertToNumberTypeInstruction implements Instruction {
                 }
             }
         }
+    }
+
+    private void emitBoxedToUnboxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
+        String methodName = switch (to) {
+            case INT -> "intValue";
+            case LONG -> "longValue";
+            case FLOAT -> "floatValue";
+            case DOUBLE -> "doubleValue";
+            default -> null;
+        };
+
+        codeBuilder.invokevirtual(from.getClassDesc(), methodName, MethodTypeDesc.of(to.getClassDesc()));
+    }
+
+    private void emitUnboxedToBoxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
+        emitUnboxed(codeBuilder, from, to.unbox());
+        codeBuilder.invokestatic(to.getClassDesc(), "valueOf", MethodTypeDesc.of(to.getClassDesc(), to.unbox().getClassDesc()));
+    }
+
+    private void emitBoxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
+        emitBoxedToUnboxed(codeBuilder, from, from.unbox());
+        emitUnboxedToBoxed(codeBuilder, from.unbox(), to);
     }
 }
