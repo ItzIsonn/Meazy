@@ -3,10 +3,10 @@ package me.itzisonn_.meazy.runtime.environment;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -24,8 +24,7 @@ public interface ConstructorDeclarationEnvironment extends Environment {
      * @param parameters Constructor's args TODO
      * @return Declared constructor with given args or null
      */
-    @Nullable
-    default ConstructorValue getConstructor(List<ClassDesc> parameters) {
+    default Optional<ConstructorValue> getConstructor(List<ClassDesc> parameters) {
         main:
         for (ConstructorValue constructorValue : getConstructors()) {
             List<ParameterExpression> constructorParameters = constructorValue.getParameters();
@@ -34,13 +33,13 @@ public interface ConstructorDeclarationEnvironment extends Environment {
             for (int i = 0; i < parameters.size(); i++) {
                 ClassDesc constructorParameterClassDesc = constructorParameters.get(i).getDataType().getClassDesc();
                 ClassDesc parameterClassDesc = parameters.get(i);
-                if (!isInstanceOf(parameterClassDesc, constructorParameterClassDesc)) continue main;
+                if (!EnvironmentUtils.isInstanceOf(this, parameterClassDesc, constructorParameterClassDesc)) continue main;
             }
 
-            return constructorValue;
+            return Optional.of(constructorValue);
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**

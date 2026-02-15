@@ -2,6 +2,8 @@ package me.itzisonn_.meazy.parser;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
@@ -35,6 +37,24 @@ public final class DataType {
 
 
 
+    public DataType with(ClassDesc classDesc) {
+        return of(classDesc, isNullable);
+    }
+
+    public DataType with(boolean isNullable) {
+        return of(classDesc, isNullable);
+    }
+
+    public DataType asNullable() {
+        return ofNullable(classDesc);
+    }
+
+    public DataType asNonNull() {
+        return ofNonNull(classDesc);
+    }
+
+
+
     public static DataType of(ClassDesc classDesc, boolean isNullable) {
         return new DataType(classDesc, isNullable);
     }
@@ -57,5 +77,23 @@ public final class DataType {
 
     public static DataType anyNonNull() {
         return any(false);
+    }
+
+
+
+    public static DataType commonOf(Environment environment, DataType dataType1, DataType dataType2) {
+        ClassDesc classDesc = EnvironmentUtils.getCommonOf(environment, dataType1.getClassDesc(), dataType2.getClassDesc());
+
+        return of(
+                classDesc == null ? ConstantDescs.CD_Object : classDesc,
+                dataType1.isNullable() || dataType2.isNullable()
+        );
+    }
+
+    public static DataType resolve(Environment environment, DataType dataType) {
+        return of(
+                EnvironmentUtils.resolveClassDesc(environment, dataType.getClassDesc()),
+                dataType.isNullable()
+        );
     }
 }

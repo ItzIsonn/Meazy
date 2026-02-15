@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -26,8 +27,7 @@ public interface FunctionDeclarationEnvironment extends Environment {
      * @param parameters Parameters
      * @return Declared function with given id and args or null
      */
-    @Nullable
-    default FunctionValue getFunction(String id, List<ClassDesc> parameters) {
+    default Optional<FunctionValue> getFunction(String id, List<ClassDesc> parameters) {
         main:
         for (FunctionValue functionValue : getFunctions()) {
             if (!functionValue.getId().equals(id)) continue;
@@ -38,30 +38,17 @@ public interface FunctionDeclarationEnvironment extends Environment {
             for (int i = 0; i < parameters.size(); i++) {
                 ClassDesc functionParameterClassDesc = functionParameters.get(i).getDataType().getClassDesc();
                 ClassDesc parameterClassDesc = parameters.get(i);
-                if (!isInstanceOf(parameterClassDesc, functionParameterClassDesc)) continue main;
+                if (!EnvironmentUtils.isInstanceOf(this, parameterClassDesc, functionParameterClassDesc)) continue main;
             }
 
-            return functionValue;
+            return Optional.of(functionValue);
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
      * @return All declared functions
      */
     Set<FunctionValue> getFunctions();
-
-
-
-    @Override
-    @Nullable
-    default FunctionDeclarationEnvironment getFunctionDeclarationEnvironment(String id, List<ClassDesc> parameters) {
-        FunctionValue functionValue = getFunction(id, parameters);
-        if (functionValue != null) return functionValue.getEnvironment().getParent();
-
-        Environment parent = getParent();
-        if (parent == null) return null;
-        return parent.getFunctionDeclarationEnvironment(id, parameters);
-    }
 }

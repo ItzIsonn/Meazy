@@ -30,7 +30,7 @@ public interface FunctionValue extends ModifierableRuntimeValue {
     DataType getReturnDataType();
 
     /**
-     * @return Parent environment tODO
+     * @return Function environment
      */
     FunctionEnvironment getEnvironment();
 

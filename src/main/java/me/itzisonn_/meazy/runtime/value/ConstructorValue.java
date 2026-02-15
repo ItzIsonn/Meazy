@@ -17,7 +17,7 @@ public interface ConstructorValue extends ModifierableRuntimeValue {
     List<ParameterExpression> getParameters();
 
     /**
-     * @return Parent environment TODO
+     * @return Constructor environment
      */
     ConstructorEnvironment getEnvironment();
 }
