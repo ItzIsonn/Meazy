@@ -2,14 +2,13 @@ package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.Modifier;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
-import me.itzisonn_.meazy.runtime.value.RuntimeValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -42,26 +41,27 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
     /**
      * @param id Id
-     * @param args Args
+     * @param parameters Parameters
      * @return Declared operator function with given id and args or null
      */
-    @Nullable
-    default FunctionValue getOperatorFunction(String id, List<RuntimeValue> args) {
+    default Optional<FunctionValue> getOperatorFunction(String id, List<ClassDesc> parameters) {
         main:
         for (FunctionValue functionValue : getOperatorFunctions()) {
             if (functionValue.getId().equals(id)) {
-                List<ParameterExpression> parameters = functionValue.getParameters();
-                if (args.size() != parameters.size()) continue;
+                List<ParameterExpression> functionParameters = functionValue.getParameters();
+                if (parameters.size() != functionParameters.size()) continue;
 
-                for (int i = 0; i < args.size(); i++) {
-                    if (!parameters.get(i).getDataType().equals(args.get(i))) continue main; //FIXME
+                for (int i = 0; i < parameters.size(); i++) {
+                    ClassDesc functionParameterClassDesc = functionParameters.get(i).getDataType().getClassDesc();
+                    ClassDesc parameterClassDesc = parameters.get(i);
+                    if (!EnvironmentUtils.isInstanceOf(this, parameterClassDesc, functionParameterClassDesc)) continue main;
                 }
 
-                return functionValue;
+                return Optional.of(functionValue);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**

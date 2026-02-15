@@ -5,6 +5,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -18,13 +19,12 @@ public interface GlobalEnvironment extends Environment {
      */
     void addFileEnvironment(FileEnvironment fileEnvironment);
 
-    @Nullable
-    default FileEnvironment getFileEnvironment(String packageName) {
+    default Optional<FileEnvironment> getFileEnvironment(String packageName) {
         for (FileEnvironment fileEnvironment : getFileEnvironments()) {
-            if (fileEnvironment.getPackageName().equals(packageName)) return fileEnvironment;
+            if (packageName.equals(fileEnvironment.getPackageName())) return Optional.of(fileEnvironment);
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -32,16 +32,7 @@ public interface GlobalEnvironment extends Environment {
      */
     Set<FileEnvironment> getFileEnvironments();
 
-    @Override
-    @Nullable
-    default ClassDeclarationEnvironment getClassDeclarationEnvironment(ClassDesc classDesc) {
-//        System.out.println("Inside Global Looking for classDesc " + classDesc);
 
-        FileEnvironment fileEnvironment = getFileEnvironment(classDesc.packageName());
-        if (fileEnvironment == null) return null;
 
-        ClassValue classValue = fileEnvironment.getLocalClass(classDesc.packageName());
-        if (classValue != null) return classValue.getEnvironment().getParent();
-        return null;
-    }
+    Optional<ClassValue> resolveJavaClass(ClassDesc classDesc);
 }

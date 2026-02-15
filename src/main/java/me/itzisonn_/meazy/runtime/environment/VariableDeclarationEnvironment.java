@@ -7,6 +7,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Adds to Environment ability to declare variables
@@ -23,30 +24,16 @@ public interface VariableDeclarationEnvironment extends Environment {
      * @param id Variable's id
      * @return Declared variable with given id
      */
-    @Nullable
-    default VariableValue getVariable(String id) {
+    default Optional<VariableValue> getVariable(String id) {
         for (VariableValue variableValue : getVariables()) {
-            if (id.equals(variableValue.getId())) return variableValue;
+            if (id.equals(variableValue.getId())) return Optional.of(variableValue);
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
      * @return All declared variables
      */
     List<VariableValue> getVariables();
-
-
-
-    @Override
-    @Nullable
-    default VariableDeclarationEnvironment getVariableDeclarationEnvironment(String id) {
-        VariableValue variableValue = getVariable(id);
-        if (variableValue != null) return variableValue.getParentEnvironment();
-
-        Environment parent = getParent();
-        if (parent == null) return null;
-        return parent.getVariableDeclarationEnvironment(id);
-    }
 }
