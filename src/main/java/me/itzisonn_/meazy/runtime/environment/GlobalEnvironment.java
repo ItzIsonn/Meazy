@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.Optional;

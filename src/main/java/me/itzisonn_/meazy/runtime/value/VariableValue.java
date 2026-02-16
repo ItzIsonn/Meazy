@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
  * Represents runtime variable value
  */
 @NullMarked
-public interface VariableValue extends ModifierableRuntimeValue {
+public interface VariableValue extends ModifierableValue {
     /**
      * @return Id
      */

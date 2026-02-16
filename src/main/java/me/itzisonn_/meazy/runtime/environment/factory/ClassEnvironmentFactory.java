@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.factory;
 
-import me.itzisonn_.meazy.parser.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import org.jspecify.annotations.NullMarked;

@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.addon;
 
 import com.google.gson.*;
 import lombok.Getter;
-import me.itzisonn_.meazy.FileUtils;
+import me.itzisonn_.meazy.util.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.version.Version;
 import org.jspecify.annotations.NullMarked;

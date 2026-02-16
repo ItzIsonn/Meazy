@@ -27,7 +27,7 @@ public final class WithClassInstruction implements Instruction {
                     classBuilder.withFlags(flags);
                     for (var attribute : attributes) classBuilder.with(attribute);
 
-                    BytecodeBuilders classBytecodeBuilders = bytecodeBuilders.copy(classBuilder, null);
+                    BytecodeBuilders classBytecodeBuilders = bytecodeBuilders.copy(classBuilder);
                     InstructionsSet instructionsSet = new InstructionsSet(classBytecodeBuilders);
                     classInstructions.accept(instructionsSet);
 

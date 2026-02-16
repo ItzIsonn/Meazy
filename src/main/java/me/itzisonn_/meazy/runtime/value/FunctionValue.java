@@ -12,7 +12,7 @@ import java.util.List;
  * Represents function value
  */
 @NullMarked
-public interface FunctionValue extends ModifierableRuntimeValue {
+public interface FunctionValue extends ModifierableValue {
     /**
      * @return Id
      */

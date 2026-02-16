@@ -70,10 +70,10 @@ public final class BytecodeBuilders {
     }
 
     public BytecodeBuilders copy(@Nullable ClassBuilder classBuilder) {
-        return new BytecodeBuilders(classBuilder, codeBuilder, classes, labels);
+        return copy(classBuilder, null);
     }
 
     public BytecodeBuilders copy(@Nullable CodeBuilder codeBuilder) {
-        return new BytecodeBuilders(classBuilder, codeBuilder, classes, labels);
+        return copy(classBuilder, codeBuilder);
     }
 }

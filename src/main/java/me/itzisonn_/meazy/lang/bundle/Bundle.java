@@ -2,11 +2,11 @@ package me.itzisonn_.meazy.lang.bundle;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import me.itzisonn_.meazy.FileUtils;
+import me.itzisonn_.meazy.util.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.logging.LogLevel;
+import me.itzisonn_.meazy.util.logger.LogLevel;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 

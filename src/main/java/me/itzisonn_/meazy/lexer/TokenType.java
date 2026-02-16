@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.lexer;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -59,8 +59,8 @@ public class TokenType {
      *
      * @throws IllegalArgumentException If given id doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
      */
-    public TokenType(String id, String regex, boolean shouldSkip) throws IllegalArgumentException {
-        this(id, Pattern.compile(regex, Pattern.DOTALL), shouldSkip);
+    public TokenType(String id, @Nullable String regex, boolean shouldSkip) throws IllegalArgumentException {
+        this(id, regex == null ? null : Pattern.compile(regex, Pattern.DOTALL), shouldSkip);
     }
 
     /**

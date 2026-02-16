@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime;
 
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.parser.ast.program.Program;
 import org.jspecify.annotations.NullMarked;
 

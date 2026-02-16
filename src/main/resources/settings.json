@@ -1,5 +1,4 @@
 {
   "language": "en",
-  "exception_absent_key": false,
-  "enable_default_addon": true
+  "exception_absent_key": false
 }

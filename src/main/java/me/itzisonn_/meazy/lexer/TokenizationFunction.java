@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.lexer;
 
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
