@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser;
 
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.lexer.Token;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

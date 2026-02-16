@@ -138,7 +138,7 @@ public class Version {
         String versionTypeGroup = matcher.group(4);
         if (versionTypeGroup == null) versionType = VersionType.RELEASE;
         else {
-            versionType = VersionType.VERSION_TYPES.get(versionTypeGroup.toUpperCase());
+            versionType = VersionType.of(versionTypeGroup);
             if (versionType == null) throw new IllegalArgumentException("Invalid version '" + version + "'");
         }
 

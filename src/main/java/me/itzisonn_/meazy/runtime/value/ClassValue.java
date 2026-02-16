@@ -11,7 +11,7 @@ import java.util.Set;
  * Represents class value
  */
 @NullMarked
-public interface ClassValue extends ModifierableRuntimeValue {
+public interface ClassValue extends ModifierableValue {
     /**
      * @return Id of this class's environment
      */

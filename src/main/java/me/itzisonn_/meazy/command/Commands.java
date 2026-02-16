@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.command;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.command.custom.*;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.registry.RegistryEntry;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

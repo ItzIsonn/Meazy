@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.command;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.lang.text.Text;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

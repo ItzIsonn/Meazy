@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.logging.LogLevel;
+import me.itzisonn_.meazy.util.logger.LogLevel;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 

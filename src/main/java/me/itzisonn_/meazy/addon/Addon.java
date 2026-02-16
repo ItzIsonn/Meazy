@@ -2,10 +2,10 @@ package me.itzisonn_.meazy.addon;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import me.itzisonn_.meazy.FileUtils;
-import me.itzisonn_.meazy.logging.LogLevel;
-import me.itzisonn_.meazy.logging.Logger;
-import me.itzisonn_.meazy.addon.datagen.DatagenManager;
+import me.itzisonn_.meazy.util.FileUtils;
+import me.itzisonn_.meazy.util.logger.LogLevel;
+import me.itzisonn_.meazy.util.logger.Logger;
+import me.itzisonn_.meazy.datagen.manager.AddonDatagenManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
 import me.itzisonn_.meazy.lang.text.Text;
@@ -28,7 +28,7 @@ public abstract class Addon {
     private final AddonInfo addonInfo;
     private final File dataFolder;
     private final File file;
-    private final DatagenManager datagenManager;
+    private final AddonDatagenManager datagenManager;
     private final File configFile;
     private final Logger logger;
     private boolean isEnabled = false;
@@ -44,7 +44,7 @@ public abstract class Addon {
         addonInfo = addonClassLoader.getAddonInfo();
         dataFolder = addonClassLoader.getDataFolder();
         file = addonClassLoader.getFile();
-        datagenManager = new DatagenManager(file);
+        datagenManager = new AddonDatagenManager(file);
         configFile = new File(dataFolder, "config.json");
         logger = new Logger(addonInfo.getId());
     }
@@ -78,7 +78,7 @@ public abstract class Addon {
     /**
      * @return Datagen manager
      */
-    public final DatagenManager getDatagenManager() {
+    public final AddonDatagenManager getDatagenManager() {
         return datagenManager;
     }
 

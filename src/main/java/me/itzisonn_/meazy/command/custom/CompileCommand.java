@@ -1,12 +1,12 @@
 package me.itzisonn_.meazy.command.custom;
 
-import me.itzisonn_.meazy.FileUtils;
+import me.itzisonn_.meazy.util.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.logging.LogLevel;
+import me.itzisonn_.meazy.util.logger.LogLevel;
 import me.itzisonn_.meazy.parser.ast.program.Program;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

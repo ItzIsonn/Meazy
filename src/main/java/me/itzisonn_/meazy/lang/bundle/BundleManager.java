@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.lang.bundle;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.Registries;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.registry.RegistryEntry;

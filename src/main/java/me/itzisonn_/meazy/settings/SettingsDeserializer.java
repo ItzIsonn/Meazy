@@ -15,9 +15,6 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
         if (object.get("exception_absent_key") == null) throw new InvalidSettingsException("Settings doesn't have field exception_absent_key");
         boolean exceptionAbsentKey = object.get("exception_absent_key").getAsBoolean();
 
-        if (object.get("enable_default_addon") == null) throw new InvalidSettingsException("Settings doesn't have field enable_default_addon");
-        boolean enableDefaultAddon = object.get("enable_default_addon").getAsBoolean();
-
-        return new Settings(language, exceptionAbsentKey, enableDefaultAddon);
+        return new Settings(language, exceptionAbsentKey);
     }
 }

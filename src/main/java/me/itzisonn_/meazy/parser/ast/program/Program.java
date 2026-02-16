@@ -29,7 +29,7 @@ public interface Program extends Statement {
      * @throws IllegalStateException If this program already have had file
      * @throws IllegalArgumentException If file doesn't exist or is a directory
      */
-    void setFile(File file) throws IllegalStateException;
+    void setFile(File file) throws IllegalStateException, IllegalArgumentException;
 
     /**
      * Version

@@ -1,0 +1,26 @@
+{
+  "id": "keywords",
+  "token_types": [
+    "require",
+    "import",
+    "using",
+    "variable",
+    "function",
+    "class",
+    "constructor",
+    "base",
+    "if",
+    "else",
+    "for",
+    "in",
+    "while",
+    "return",
+    "continue",
+    "break",
+    "is",
+    "is_like",
+    "null",
+    "boolean",
+    "this"
+  ]
+}

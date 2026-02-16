@@ -10,7 +10,7 @@ import java.util.List;
  * Represents constructor value
  */
 @NullMarked
-public interface ConstructorValue extends ModifierableRuntimeValue {
+public interface ConstructorValue extends ModifierableValue {
     /**
      * @return Parameters
      */

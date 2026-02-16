@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.settings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
-import me.itzisonn_.meazy.FileUtils;
+import me.itzisonn_.meazy.util.FileUtils;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lang.text.Text;
 import org.jspecify.annotations.NullMarked;

@@ -1,0 +1,44 @@
+package me.itzisonn_.meazy.parser.pasing_function.statement;
+
+import me.itzisonn_.meazy.MeazyMain;
+import me.itzisonn_.meazy.lexer.TokenTypes;
+import me.itzisonn_.meazy.parser.ParsingContext;
+import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.parser.Parser;
+import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.InvalidStatementException;
+import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
+import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
+import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Set;
+
+@NullMarked
+public class ClassBodyStatementParsingFunction extends AbstractParsingFunction<Statement> {
+    public ClassBodyStatementParsingFunction() {
+        super("class_body_statement");
+    }
+
+    @Override
+    public Statement parse(ParsingContext context, @Nullable Object... extra) {
+        Parser parser = context.getParser();
+        Set<Modifier> modifiers = ParsingHelper.parseModifiers(context);
+
+        if (parser.getCurrent().getType().equals(TokenTypes.FUNCTION())) {
+            return parser.parse(MeazyMain.getDefaultIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
+        }
+        if (parser.getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            return parser.parse(MeazyMain.getDefaultIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);
+        }
+        if (parser.getCurrent().getType().equals(TokenTypes.CONSTRUCTOR())) {
+            return parser.parse(MeazyMain.getDefaultIdentifier("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
+        }
+
+        throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.expected.statement", "class_body"));
+    }
+}

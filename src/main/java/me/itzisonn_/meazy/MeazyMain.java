@@ -2,15 +2,20 @@ package me.itzisonn_.meazy;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.addon.AddonManager;
+import me.itzisonn_.meazy.datagen.DatagenDeserializers;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
+import me.itzisonn_.meazy.datagen.manager.MeazyDatagenManager;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.bundle.BundleManager;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.logging.LogLevel;
-import me.itzisonn_.meazy.logging.Logger;
+import me.itzisonn_.meazy.lexer.TokenType;
+import me.itzisonn_.meazy.lexer.TokenTypeSet;
+import me.itzisonn_.meazy.util.logger.LogLevel;
+import me.itzisonn_.meazy.util.logger.Logger;
+import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.settings.SettingsManager;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
@@ -90,6 +95,16 @@ public final class MeazyMain {
         RegistryEntry<Language> languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage);
         if (languagesEntry == null) LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:settings.unknown_language", stringLanguage));
         else BUNDLE_MANAGER.setLanguage(languagesEntry.getValue());
+
+        MeazyDatagenManager meazyDatagenManager = new MeazyDatagenManager();
+
+        for (TokenType tokenType : meazyDatagenManager.getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.getTokenTypeDeserializer())) {
+            Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.getId()), tokenType);
+        }
+
+        for (TokenTypeSet tokenTypeSet : meazyDatagenManager.getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer("meazy"))) {
+            Registries.TOKEN_TYPE_SETS.register(getDefaultIdentifier(tokenTypeSet.getId()), tokenTypeSet);
+        }
 
         ADDON_MANAGER.enableAddons();
     }
