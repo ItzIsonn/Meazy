@@ -43,7 +43,8 @@ public class ForeachStatement implements Statement {
                 null,
                 DataType.ofNonNull(ClassDesc.of("java.lang.Iterable")),
                 true,
-                null);
+                null
+        );
 
         collection.emit(instructionsSet, environment, this);
 
