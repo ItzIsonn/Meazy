@@ -55,7 +55,6 @@ public class IfStatement implements Statement {
             throw new RuntimeException("If statement must always use boolean TODO but uses " + condition.getType(environment, this));
         }
 
-
         UUID endLabel = instructionsSet.createAndInitLabel();
         condition.emit(instructionsSet, environment, this);
         instructionsSet.convertToBooleanType(conditionType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
