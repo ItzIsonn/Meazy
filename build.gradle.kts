@@ -7,8 +7,8 @@ version = "3.0"
 description = "Meazy"
 java.sourceCompatibility = JavaVersion.VERSION_25
 
-val lombokVersion = "1.18.42"
-val junitVersion = "6.0.0"
+val lombokVersion = "1.18.46"
+val junitVersion = "6.1.0"
 
 
 
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.13.2")
+    implementation("com.google.code.gson:gson:2.14.0")
     implementation(files("libs/Registry.jar"))
 
     implementation("org.jspecify:jspecify:1.0.0")
