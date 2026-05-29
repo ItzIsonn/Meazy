@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
@@ -25,14 +24,7 @@ public class ThisLiteral implements Expression {
                 () -> new IllegalArgumentException("Parent environment for THIS expression must be ClassEnvironment")
         );
 
-        String className;
-        if (classEnvironment.getModifiers().contains(Modifiers.OPEN())) {
-            className = EnvironmentUtils.getPackageName(classEnvironment).orElseThrow() + "." + classEnvironment.getId();
-        }
-        else {
-            className = EnvironmentUtils.getPackageName(classEnvironment).orElseThrow() + "." + EnvironmentUtils.getFileEnvironment(classEnvironment).orElseThrow().getClassName()  + "$" + classEnvironment.getId();
-        }
-
+        String className = classEnvironment.getFullClassName();
         return DataType.ofNonNull(ClassDesc.of(className));
     }
 }

@@ -116,7 +116,7 @@ public class ProgramImpl implements Program {
         List<InnerClassesAttribute> attributes = new ArrayList<>();
         for (Statement statement : body) {
             if (!(statement instanceof ClassDeclarationStatement classDeclarationStatement)) continue;
-            if (classDeclarationStatement.getModifiers().contains(Modifiers.OPEN())) continue;
+            if (!classDeclarationStatement.getModifiers().contains(Modifiers.PRIVATE())) continue;
             attributes.add(classDeclarationStatement.getInnerClassesAttribute(fileEnvironment));
         }
 

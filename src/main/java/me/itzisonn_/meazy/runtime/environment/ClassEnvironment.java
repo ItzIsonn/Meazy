@@ -31,6 +31,9 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
     boolean isInterface();
 
+    @Override
+    String getFullClassName();
+
 
 
     /**

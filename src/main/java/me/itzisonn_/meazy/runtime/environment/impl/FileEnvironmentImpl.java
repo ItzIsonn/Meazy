@@ -105,4 +105,9 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
     public Set<ClassValue> getClasses() {
         return new HashSet<>(classes);
     }
+
+    @Override
+    public String getFullClassName() {
+        return packageName + "." + className;
+    }
 }

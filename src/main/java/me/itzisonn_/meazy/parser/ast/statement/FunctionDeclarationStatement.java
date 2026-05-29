@@ -104,12 +104,12 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         );
 
         int accessFlags = 0;
-        if (modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.PUBLIC.mask();
-        else if (modifiers.contains(Modifiers.PRIVATE()) || environment instanceof FileEnvironment) accessFlags |= AccessFlag.PRIVATE.mask();
+        if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
         else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
+        else accessFlags |= AccessFlag.PUBLIC.mask();
 
         if (isShared) accessFlags |= AccessFlag.STATIC.mask();
-        if (modifiers.contains(Modifiers.FINAL())) accessFlags |= AccessFlag.FINAL.mask();
+        if (!modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.FINAL.mask();
 
         instructionsSet.withMethod(
                 functionValue.getId(),

@@ -80,8 +80,8 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             int accessFlags = AccessFlag.STATIC.mask();
             if (isConstant) accessFlags |= AccessFlag.FINAL.mask();
 
-            if (modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.PUBLIC.mask();
-            else accessFlags |= AccessFlag.PRIVATE.mask();
+            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
+            else accessFlags |= AccessFlag.PUBLIC.mask();
 
             instructionsSet.withField(id, classDesc, accessFlags);
             return;
@@ -89,9 +89,9 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
 
         if (environment instanceof ClassEnvironment) {
             int accessFlags = 0;
-            if (modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.PUBLIC.mask();
-            else if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
+            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
             else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
+            else accessFlags |= AccessFlag.PUBLIC.mask();
 
             if (modifiers.contains(Modifiers.SHARED())) accessFlags |= AccessFlag.STATIC.mask();
             if (isConstant) accessFlags |= AccessFlag.FINAL.mask();

@@ -18,4 +18,9 @@ public interface Environment {
      * @return Whether this environment is shared
      */
     boolean isShared();
+
+    @Nullable
+    default String getFullClassName() {
+        return null;
+    }
 }
