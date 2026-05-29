@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -30,34 +31,36 @@ public class ReturnStatement implements LocalStatement {
                 () -> new IllegalArgumentException("Parent environment for RETURN statement must be FunctionEnvironment TODO")
         );
 
+        DataType returnDataType = functionEnvironment.getReturnDataType();
+
         if (value == null) {
-            if (functionEnvironment.getReturnDataType() != null) {
-                throw new IllegalArgumentException("Function must not return value TODO");
+            if (returnDataType != null) {
+                throw new RuntimeException("Function must return value TODO");
             }
 
             instructionsSet.returnVoid();
             return;
         }
 
-        if (functionEnvironment.getReturnDataType() == null) {
-            throw new IllegalArgumentException("Function must return value TODO");
+        if (returnDataType == null) {
+            throw new RuntimeException("Function must not return value TODO");
         }
 
         value.emit(instructionsSet, environment, this);
-        ClassDesc valueType = value.getType(environment, this).getClassDesc();
-        ClassDesc returnType = functionEnvironment.getReturnDataType() == null ? null : functionEnvironment.getReturnDataType().getClassDesc();
+        ClassDesc valueClassDesc = value.getType(environment, this).getClassDesc();
+        ClassDesc returnTypeClassDesc = returnDataType.getClassDesc();
 
-        if (!valueType.equals(returnType) && returnType != null) {
-            if (NumberType.isNumberType(returnType) && NumberType.isNumberType(valueType)) {
-                instructionsSet.convertToNumberType(valueType, returnType);
+        if (!EnvironmentUtils.isInstanceOf(functionEnvironment, valueClassDesc, returnTypeClassDesc)) {
+            if (NumberType.isNumberType(returnTypeClassDesc) && NumberType.isNumberType(valueClassDesc)) {
+                instructionsSet.convertToNumberType(valueClassDesc, returnTypeClassDesc);
             }
-
-            else if (MiscUtils.isBoolean(returnType) && MiscUtils.isBoolean(valueType)) {
-                instructionsSet.convertToBooleanType(valueType.isClassOrInterface(), returnType.isClassOrInterface());
+            else if (MiscUtils.isBoolean(returnTypeClassDesc) && MiscUtils.isBoolean(valueClassDesc)) {
+                instructionsSet.convertToBooleanType(valueClassDesc.isClassOrInterface(), returnTypeClassDesc.isClassOrInterface());
             }
+            else throw new RuntimeException("Function's return value not matches its return data type TODO");
         }
 
-        instructionsSet.returnValue(returnType);
+        instructionsSet.returnValue(returnTypeClassDesc);
     }
 
     @Override
