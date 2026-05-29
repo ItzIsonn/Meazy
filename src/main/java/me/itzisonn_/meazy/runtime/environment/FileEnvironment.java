@@ -27,6 +27,9 @@ public interface FileEnvironment extends VariableDeclarationEnvironment, Functio
     @Nullable
     String getClassName();
 
+    @Override
+    String getFullClassName();
+
 
 
     /**

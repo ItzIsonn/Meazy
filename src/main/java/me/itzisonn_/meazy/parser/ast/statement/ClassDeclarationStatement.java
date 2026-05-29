@@ -47,7 +47,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Stat
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
         if (!(environment instanceof FileEnvironment fileEnvironment)) throw new IllegalArgumentException("Environment must be file TODO");
 
-        boolean isInner = !getModifiers().contains(Modifiers.OPEN());
+        boolean isInner = getModifiers().contains(Modifiers.PRIVATE());
 
         ClassDesc classDesc;
         if (isInner) classDesc = ClassDesc.of(fileEnvironment.getPackageName() + "." + fileEnvironment.getClassName() + "$" + id);
@@ -70,8 +70,9 @@ public class ClassDeclarationStatement extends ModifierStatement implements Stat
 
         if (isInner) attributes.add(getInnerClassesAttribute(fileEnvironment));
         else {
-            if (modifiers.contains(Modifiers.OPEN())) flags |= AccessFlag.PUBLIC.mask();
-            if (modifiers.contains(Modifiers.FINAL())) flags |= AccessFlag.FINAL.mask();
+            if (modifiers.contains(Modifiers.PRIVATE())) flags |= AccessFlag.PRIVATE.mask();
+            else flags |= AccessFlag.PUBLIC.mask();
+            if (!modifiers.contains(Modifiers.OPEN())) flags |= AccessFlag.FINAL.mask();
         }
 
         instructionsSet.withClass(

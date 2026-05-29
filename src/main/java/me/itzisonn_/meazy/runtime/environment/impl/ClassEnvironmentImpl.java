@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
@@ -162,5 +163,14 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     @Override
     public Set<Modifier> getModifiers() {
         return new HashSet<>(modifiers);
+    }
+
+    @Override
+    public String getFullClassName() {
+        String classSpecifier;
+        if (modifiers.contains(Modifiers.PRIVATE())) classSpecifier = EnvironmentUtils.getFileEnvironment(this).orElseThrow().getClassName() + "$";
+        else classSpecifier = "";
+
+        return EnvironmentUtils.getPackageName(this).orElseThrow() + "." + classSpecifier + id;
     }
 }

@@ -52,9 +52,9 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
         );
 
         int accessFlags = 0;
-        if (modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.PUBLIC.mask();
-        else if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
+        if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
         else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
+        else accessFlags |= AccessFlag.PUBLIC.mask();
 
         instructionsSet.withConstructor(
                 methodTypeDesc,

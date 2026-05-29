@@ -19,7 +19,7 @@ public class AbstractModifier extends Modifier {
     @Override
     public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
         if (modifierStatement.getModifiers().contains(Modifiers.PRIVATE()) || modifierStatement.getModifiers().contains(Modifiers.SHARED()) ||
-                modifierStatement.getModifiers().contains(Modifiers.FINAL()) || modifierStatement.getModifiers().contains(Modifiers.ENUM())) return false;
+                modifierStatement.getModifiers().contains(Modifiers.OPEN()) || modifierStatement.getModifiers().contains(Modifiers.ENUM())) return false;
 
         if (modifierStatement instanceof ClassDeclarationStatement) return true;
         if (modifierStatement instanceof FunctionDeclarationStatement && environment instanceof ClassEnvironment classEnvironment) {

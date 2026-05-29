@@ -63,6 +63,10 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             }
             else javaFileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(this, packageName);
 
+            Set<me.itzisonn_.meazy.parser.modifier.Modifier> classEnvironmentModifiers = new HashSet<>();
+            if (!Modifier.isFinal(cls.getModifiers())) classEnvironmentModifiers.add(Modifiers.OPEN());
+            if (Modifier.isPrivate(cls.getModifiers())) classEnvironmentModifiers.add(Modifiers.PRIVATE());
+
             ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                     javaFileEnvironment,
                     false,
@@ -70,13 +74,11 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                     classDesc.displayName(),
                     cls.getSuperclass() == null ? null : cls.getSuperclass().describeConstable().orElseThrow(),
                     Arrays.stream(cls.getInterfaces()).map(c -> c.describeConstable().orElseThrow()).collect(Collectors.toSet()),
-                    Set.of(Modifiers.OPEN())
+                    classEnvironmentModifiers
             );
 
             ClassValue classValue = javaFileEnvironment.declareClass(classEnvironment);
             addFileEnvironment(javaFileEnvironment);
-
-//            System.out.println("Declared class " + classDesc.descriptorString()); FIXME delete
 
             if (classEnvironment.getBaseClass() != null) resolveJavaClass(classEnvironment.getBaseClass());
             for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {

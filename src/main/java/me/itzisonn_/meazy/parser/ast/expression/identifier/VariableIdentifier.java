@@ -69,19 +69,7 @@ public class VariableIdentifier extends Identifier {
         VariableValue variableValue = resolveMeazyVariable(environment, parent);
         if (variableValue == null) throw new RuntimeException("Can't find variable " + id);
 
-        String className;
-        if (variableValue.getParentEnvironment() instanceof ClassEnvironment classEnvironment) {
-            if (classEnvironment.getModifiers().contains(Modifiers.OPEN())) {
-                className = EnvironmentUtils.getPackageName(classEnvironment).orElseThrow() + "." + classEnvironment.getId();
-            }
-            else {
-                className = EnvironmentUtils.getPackageName(classEnvironment).orElseThrow() + "." + EnvironmentUtils.getFileEnvironment(classEnvironment).orElseThrow().getClassName() + "$" + classEnvironment.getId();
-            }
-        }
-        else if (variableValue.getParentEnvironment() instanceof FileEnvironment fileEnvironment) {
-            className = fileEnvironment.getPackageName() + "." + fileEnvironment.getClassName();
-        }
-        else className = null;
+        String className = variableValue.getParentEnvironment().getFullClassName();
 
         Expression target;
         if (parent instanceof MemberExpression memberExpression) {

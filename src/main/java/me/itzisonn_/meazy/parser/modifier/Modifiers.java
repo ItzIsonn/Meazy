@@ -51,10 +51,6 @@ public final class Modifiers {
         return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("data")).getValue();
     }
 
-    public static Modifier FINAL() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("final")).getValue();
-    }
-
     public static Modifier OPERATOR() {
         return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("operator")).getValue();
     }
@@ -101,7 +97,6 @@ public final class Modifiers {
         register(new GetModifier());
         register(new SetModifier());
         register(new DataModifier());
-        register(new FinalModifier());
         register(new OperatorModifier());
         register(new EnumModifier());
     }
