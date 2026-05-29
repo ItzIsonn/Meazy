@@ -186,7 +186,10 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         if (classValue != null) return classValue.asClassDesc();
 
         ClassDesc fullClassDesc = fileEnvironment.getImports().get(classDesc.displayName());
-        if (fullClassDesc != null) fullId = (fullClassDesc.packageName().isEmpty() ? "" : fullClassDesc.packageName() + ".") + fullClassDesc.displayName();
+        if (fullClassDesc != null) {
+            if (fullClassDesc.isPrimitive() || classDesc.isArray()) return fullClassDesc;
+            fullId = (fullClassDesc.packageName().isEmpty() ? "" : fullClassDesc.packageName() + ".") + fullClassDesc.displayName();
+        }
         else fullId = classDesc.displayName();
 
         classValue = getClassValue(environment, fullId).orElse(null);

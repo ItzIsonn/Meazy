@@ -76,6 +76,9 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         DataType returnDataType = functionValue.getReturnDataType();
         if (returnDataType != null) returnDataType.resolve(environment);
 
+        DataType environmentReturnDataType = functionValue.getReturnDataType();
+        if (environmentReturnDataType != null) environmentReturnDataType.resolve(environment);
+
         functionValue.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));
     }
 
@@ -109,7 +112,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         if (modifiers.contains(Modifiers.FINAL())) accessFlags |= AccessFlag.FINAL.mask();
 
         instructionsSet.withMethod(
-                id,
+                functionValue.getId(),
                 methodTypeDesc,
                 accessFlags,
                 bodyInstructions -> {
