@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
@@ -32,19 +33,25 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
     @Nullable
     private final DataType returnDataType;
     @Nullable
+    private final Expression returnDataTypeValue;
+    @Nullable
     private FunctionValue functionValue;
 
-    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, @Nullable String classId, List<ParameterExpression> parameters, List<LocalStatement> body, @Nullable DataType returnDataType) {
+    public FunctionDeclarationStatement(
+            Set<Modifier> modifiers, String id, @Nullable String classId, List<ParameterExpression> parameters,
+            List<LocalStatement> body, @Nullable DataType returnDataType, @Nullable Expression returnDataTypeValue
+    ) {
         super(modifiers);
         this.id = id;
         this.classId = classId;
         this.parameters = parameters;
         this.body = body;
         this.returnDataType = returnDataType;
+        this.returnDataTypeValue = returnDataTypeValue;
     }
 
     public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, List<ParameterExpression> parameters, List<LocalStatement> body, @Nullable DataType returnDataType) {
-        this(modifiers, id, null, parameters, body, returnDataType);
+        this(modifiers, id, null, parameters, body, returnDataType, null);
     }
 
     @Override
@@ -84,10 +91,18 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
             throw new RuntimeException("Function isn't declared TODO");
         }
 
-        DataType returnDataType = functionValue.getReturnDataType();
+        DataType returnDataType;
+        if (functionValue.getReturnDataType() != null) returnDataType = functionValue.getReturnDataType();
+        else if (returnDataTypeValue != null) {
+            returnDataType = returnDataTypeValue.getType(environment, this);
+            functionValue.setReturnDataType(returnDataType);
+            functionValue.getEnvironment().setReturnDataType(returnDataType);
+        }
+        else returnDataType = null;
+
         if (returnDataType != null) returnDataType.resolve(environment);
 
-        DataType environmentReturnDataType = functionValue.getReturnDataType();
+        DataType environmentReturnDataType = functionValue.getEnvironment().getReturnDataType();
         if (environmentReturnDataType != null) environmentReturnDataType.resolve(environment);
 
         functionValue.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));

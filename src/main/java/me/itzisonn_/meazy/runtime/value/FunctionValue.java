@@ -28,6 +28,7 @@ public interface FunctionValue extends ModifierableValue {
      */
     @Nullable
     DataType getReturnDataType();
+    void setReturnDataType(@Nullable DataType returnDataType);
 
     /**
      * @return Function environment
