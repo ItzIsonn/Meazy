@@ -93,11 +93,4 @@ public final class DataType {
                 dataType1.isNullable() || dataType2.isNullable()
         );
     }
-
-    public static DataType resolve(Environment environment, DataType dataType) {
-        return of(
-                EnvironmentUtils.resolveClassDesc(environment, dataType.getClassDesc()),
-                dataType.isNullable()
-        );
-    }
 }

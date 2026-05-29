@@ -138,9 +138,6 @@ public class CallExpression implements Expression {
             className = EnvironmentUtils.getPackageName(functionValue.getEnvironment()).orElseThrow() + "." + EnvironmentUtils.getClassName(functionValue.getEnvironment()).orElseThrow();
         }
 
-        DataType returnDataType = functionValue.getReturnDataType();
-        if (returnDataType != null) System.out.println("Resolved function " + functionValue.getId() + " with return type " + returnDataType.getClassDesc().descriptorString());
-
         Expression target;
         if (parent instanceof MemberExpression memberExpression) {
              target = memberExpression.getObject() instanceof ClassIdentifier ? null : memberExpression.getObject();
@@ -151,6 +148,8 @@ public class CallExpression implements Expression {
         else {
             target = new ThisLiteral();
         }
+
+        DataType returnDataType = functionValue.getReturnDataType();
 
         return new ResolvedCallable(
                 ClassDesc.of(className),
