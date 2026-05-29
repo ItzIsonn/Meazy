@@ -11,6 +11,7 @@ import org.jspecify.annotations.Nullable;
 public interface FunctionEnvironment extends LocalVariableDeclarationEnvironment {
     @Nullable
     DataType getReturnDataType();
+    void setReturnDataType(@Nullable DataType returnDataType);
 
     @Override
     FunctionDeclarationEnvironment getParent();

@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -12,8 +13,9 @@ import java.util.UUID;
 @NullMarked
 public class FunctionEnvironmentImpl extends LocalVariableDeclarationEnvironmentImpl implements FunctionEnvironment {
     @Getter
+    @Setter
     @Nullable
-    private final DataType returnDataType;
+    private DataType returnDataType;
     @Getter
     private final boolean isShared;
 

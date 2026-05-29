@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.value.impl;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Identifier;
@@ -26,7 +27,8 @@ public class FunctionValueImpl extends ModifierableValueImpl implements Function
     protected final String id;
     protected final List<ParameterExpression> parameters;
     @Nullable
-    protected final DataType returnDataType;
+    @Setter
+    protected DataType returnDataType;
     protected final FunctionEnvironment environment;
     protected boolean isOverridden = false;
 
