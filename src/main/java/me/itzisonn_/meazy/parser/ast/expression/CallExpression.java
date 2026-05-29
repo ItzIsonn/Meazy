@@ -86,10 +86,6 @@ public class CallExpression implements Expression {
                             resolvedFunction.isInterface() ? InvokeType.INTERFACE : InvokeType.VIRTUAL
             );
 
-//            if (resolvedFunction.getMethodTypeDesc().returnType().isPrimitive()) {
-//                MiscUtils.boxPrimitive(instructionsSet, resolvedFunction.getMethodTypeDesc().returnType());
-//            }
-
             if (endLabel != null) {
                 instructionsSet.bindLabel(endLabel);
             }
@@ -115,8 +111,9 @@ public class CallExpression implements Expression {
     @Override
     public DataType getType(Environment environment, Statement parent) {
         if (caller instanceof FunctionIdentifier) {
-            ClassDesc returnType = resolveFunction(environment, parent).getMethodTypeDesc().returnType();
-            return DataType.of(returnType, !returnType.isPrimitive());
+            ResolvedCallable function = resolveFunction(environment, parent);
+            ClassDesc returnType = function.getMethodTypeDesc().returnType();
+            return DataType.of(returnType, function.isReturnTypeNullable());
         }
 
         if (caller instanceof ClassIdentifier) {
@@ -157,6 +154,7 @@ public class CallExpression implements Expression {
                         returnDataType == null ? ConstantDescs.CD_void : returnDataType.getClassDesc(),
                         functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList()
                 ),
+                returnDataType != null && returnDataType.isNullable(),
                 target,
                 functionValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment && classEnvironment.isInterface()
         );
@@ -196,6 +194,7 @@ public class CallExpression implements Expression {
         return new ResolvedCallable(
                 ClassDesc.of(className),
                 MethodTypeDesc.of(ConstantDescs.CD_void, parameters),
+                false,
                 null,
                 false
         );
@@ -219,6 +218,7 @@ public class CallExpression implements Expression {
     private static class ResolvedCallable {
         private final ClassDesc classDesc;
         private final MethodTypeDesc methodTypeDesc;
+        private final boolean returnTypeNullable;
         @Nullable
         private final Expression target;
         private final boolean isInterface;
