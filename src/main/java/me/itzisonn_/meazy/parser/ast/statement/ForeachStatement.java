@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class ForeachStatement implements Statement {
+public class ForeachStatement implements LocalBodyStatement {
     private final boolean isConstant;
     private final String id;
     private final DataType dataType;
@@ -106,5 +106,16 @@ public class ForeachStatement implements Statement {
 
         instructionsSet.gotoLabel(conditionLabel);
         instructionsSet.bindLabel(endLabel);
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        for (Statement statement : body) {
+            if (statement instanceof LocalBodyStatement localBodyStatement) {
+                if (localBodyStatement.alwaysReturns()) return true;
+            }
+        }
+
+        return false;
     }
 }

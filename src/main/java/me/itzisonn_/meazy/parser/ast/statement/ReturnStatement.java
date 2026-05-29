@@ -16,7 +16,7 @@ import java.lang.constant.ClassDesc;
 
 @Getter
 @NullMarked
-public class ReturnStatement implements Statement {
+public class ReturnStatement implements LocalBodyStatement {
     @Nullable
     private final Expression value;
 
@@ -58,5 +58,10 @@ public class ReturnStatement implements Statement {
         }
 
         instructionsSet.returnValue(returnType);
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        return true;
     }
 }

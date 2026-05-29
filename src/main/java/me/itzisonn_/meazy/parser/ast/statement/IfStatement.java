@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class IfStatement implements Statement {
+public class IfStatement implements LocalBodyStatement {
     @Nullable
     private final Expression condition;
     private final List<Statement> body;
@@ -72,5 +72,18 @@ public class IfStatement implements Statement {
         }
 
         instructionsSet.bindLabel(endLabel);
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        if (elseStatement == null) return false;
+
+        for (Statement statement : body) {
+            if (statement instanceof LocalBodyStatement localBodyStatement) {
+                if (!localBodyStatement.alwaysReturns()) return false;
+            }
+        }
+
+        return elseStatement.alwaysReturns();
     }
 }

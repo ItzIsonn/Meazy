@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class WhileStatement implements Statement {
+public class WhileStatement implements LocalBodyStatement {
     private final Expression condition;
     private final List<Statement> body;
 
@@ -45,5 +45,16 @@ public class WhileStatement implements Statement {
 
         instructionsSet.gotoLabel(conditionLabel);
         instructionsSet.bindLabel(endLabel);
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        for (Statement statement : body) {
+            if (statement instanceof LocalBodyStatement localBodyStatement) {
+                if (localBodyStatement.alwaysReturns()) return true;
+            }
+        }
+
+        return false;
     }
 }

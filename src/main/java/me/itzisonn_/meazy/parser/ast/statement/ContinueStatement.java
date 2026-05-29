@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class ContinueStatement implements Statement {
+public class ContinueStatement implements LocalBodyStatement {
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
         LoopEnvironment loopEnvironment = EnvironmentUtils.getParentOrSelf(environment, LoopEnvironment.class).orElseThrow(
@@ -16,5 +16,10 @@ public class ContinueStatement implements Statement {
         );
 
         instructionsSet.gotoLabel(loopEnvironment.getStartLabel());
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
     }
 }
