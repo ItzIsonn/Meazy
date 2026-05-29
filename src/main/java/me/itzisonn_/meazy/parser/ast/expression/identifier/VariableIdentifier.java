@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.util.MiscUtils;
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral;
 import org.jspecify.annotations.NullMarked;
@@ -58,16 +57,12 @@ public class VariableIdentifier extends Identifier {
                 instructionsSet.getField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
             }
         }
-
-        if (resolvedVariable.getType().isPrimitive()) {
-            MiscUtils.boxPrimitive(instructionsSet, resolvedVariable.getType());
-        }
     }
 
     @Override
     public DataType getType(Environment environment, Statement parent) {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
-        return DataType.of(MiscUtils.getBoxedType(resolvedVariable.getType()), resolvedVariable.isNullable());
+        return DataType.of(resolvedVariable.getType(), resolvedVariable.isNullable());
     }
 
     private ResolvedVariable resolveVariable(Environment environment, Statement parent) {

@@ -165,7 +165,7 @@ public class CallExpression implements Expression {
     @Nullable
     private FunctionValue resolveMeazyFunction(Environment environment, Statement parent) {
         String id = caller.getId();
-        List<ClassDesc> parameters = args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
+        List<ClassDesc> args = this.args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
 
         if (parent instanceof MemberExpression memberExpression) {
             ClassDesc classDesc = memberExpression.getObject().getType(environment, this).getClassDesc();
@@ -173,10 +173,10 @@ public class CallExpression implements Expression {
             ClassValue classValue = EnvironmentUtils.getClassValue(environment, classDesc).orElse(null);
             if (classValue == null) return null;
 
-            return classValue.getEnvironment().getFunction(id, parameters).orElse(null);
+            return classValue.getEnvironment().getFunction(id, args).orElse(null);
         }
 
-        return EnvironmentUtils.getFunctionValue(environment, id, parameters).orElse(null);
+        return EnvironmentUtils.getFunctionValue(environment, id, args).orElse(null);
     }
 
 
