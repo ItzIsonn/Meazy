@@ -57,7 +57,7 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
     @Override
     public void resolve(Environment environment) {
         if (variableValue == null) {
-            throw new RuntimeException("Declared variable is unresolved TODO");
+            throw new RuntimeException("Variable isn't declared TODO");
         }
 
         variableValue.getDataType().resolve(environment);

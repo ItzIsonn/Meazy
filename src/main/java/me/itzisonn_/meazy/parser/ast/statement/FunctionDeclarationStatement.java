@@ -70,7 +70,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
     @Override
     public void resolve(Environment environment) {
         if (functionValue == null) {
-            throw new RuntimeException("Declared function is unresolved TODO");
+            throw new RuntimeException("Function isn't declared TODO");
         }
 
         DataType returnDataType = functionValue.getReturnDataType();

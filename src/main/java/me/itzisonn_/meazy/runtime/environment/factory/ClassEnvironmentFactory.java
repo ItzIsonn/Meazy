@@ -24,4 +24,15 @@ public interface ClassEnvironmentFactory { //TODO javadoc for baseclass
      * @return New class environment
      */
     ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, boolean isInterface, String id, @Nullable ClassDesc baseClass, Set<ClassDesc> interfaces, Set<Modifier> modifiers);
+
+    /**
+     * Creates class environment
+     *
+     * @param parent Parent
+     * @param isShared Whether class environment is shared
+     * @param id Id
+     * @param modifiers Modifiers
+     * @return New class environment
+     */
+    ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, boolean isInterface, String id, Set<String> unresolvedBaseClasses, Set<Modifier> modifiers);
 }

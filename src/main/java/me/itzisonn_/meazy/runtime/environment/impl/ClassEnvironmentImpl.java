@@ -34,8 +34,9 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     protected final Set<ConstructorValue> constructors;
     @Getter
     @Nullable
-    protected final ClassDesc baseClass;
+    protected ClassDesc baseClass;
     protected final Set<ClassDesc> interfaces;
+    protected final Set<String> unresolvedBaseClasses;
     protected final Set<Modifier> modifiers;
     protected final Set<FunctionValue> operatorFunctions;
 
@@ -47,6 +48,20 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         constructors = new HashSet<>();
         this.baseClass = baseClass;
         this.interfaces = interfaces;
+        unresolvedBaseClasses = new HashSet<>();
+        this.modifiers = modifiers;
+        operatorFunctions = new HashSet<>();
+    }
+
+    public ClassEnvironmentImpl(ClassDeclarationEnvironment parent, boolean isShared, boolean isInterface, String id, Set<String> unresolvedBaseClasses, Set<Modifier> modifiers) {
+        super(parent, isShared);
+        this.id = id;
+        this.isInterface = isInterface;
+        variables = new ArrayList<>();
+        constructors = new HashSet<>();
+        baseClass = null;
+        interfaces = new HashSet<>();
+        this.unresolvedBaseClasses = unresolvedBaseClasses;
         this.modifiers = modifiers;
         operatorFunctions = new HashSet<>();
     }
@@ -61,6 +76,20 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     @Override
     public Set<ClassDesc> getInterfaces() {
         return new HashSet<>(interfaces);
+    }
+
+    @Override
+    public void resolveBaseClasses() {
+        for (String unresolvedBaseClass : unresolvedBaseClasses) {
+            ClassValue baseClassValue = EnvironmentUtils.getClassValue(parent, unresolvedBaseClass).orElseThrow();
+            if (baseClassValue.isInterface()) interfaces.add(baseClassValue.asClassDesc());
+            else {
+                if (baseClass != null) throw new RuntimeException("Class can't have more than one base class TODO");
+                baseClass = baseClassValue.asClassDesc();
+            }
+        }
+
+        unresolvedBaseClasses.clear();
     }
 
 

@@ -81,4 +81,6 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
     ClassDesc getBaseClass();
 
     Set<ClassDesc> getInterfaces();
+
+    void resolveBaseClasses();
 }

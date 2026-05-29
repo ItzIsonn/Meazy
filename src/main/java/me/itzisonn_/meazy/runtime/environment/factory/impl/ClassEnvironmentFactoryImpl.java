@@ -17,4 +17,9 @@ public class ClassEnvironmentFactoryImpl implements ClassEnvironmentFactory {
     public ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, boolean isInterface, String id, @Nullable ClassDesc baseClass, Set<ClassDesc> interfaces, Set<Modifier> modifiers) {
         return new ClassEnvironmentImpl(parent, isShared, isInterface, id, baseClass, interfaces, modifiers);
     }
+
+    @Override
+    public ClassEnvironment create(ClassDeclarationEnvironment parent, boolean isShared, boolean isInterface, String id, Set<String> unresolvedBaseClasses, Set<Modifier> modifiers) {
+        return new ClassEnvironmentImpl(parent, isShared, isInterface, id, unresolvedBaseClasses, modifiers);
+    }
 }
