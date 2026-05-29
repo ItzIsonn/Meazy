@@ -74,11 +74,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         }
 
         DataType returnDataType = functionValue.getReturnDataType();
-        if (returnDataType != null) {
-            var old = returnDataType.getClassDesc().descriptorString();
-            returnDataType.resolve(environment);
-            System.out.println("Resolved return type for " + functionValue.getId() + " from " + old + " to " + returnDataType.getClassDesc().descriptorString());
-        }
+        if (returnDataType != null) returnDataType.resolve(environment);
 
         functionValue.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));
     }
@@ -96,8 +92,8 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         functionEnvironment.setStartLabel(startLabel);
         functionEnvironment.setEndLabel(endLabel);
 
-        boolean isShared = modifiers.contains(Modifiers.SHARED()) || environment instanceof FileEnvironment;
-        DataType returnDataType = this.returnDataType == null ? null : DataType.resolve(environment, this.returnDataType);
+        boolean isShared = functionEnvironment.isShared();
+        DataType returnDataType = functionValue.getReturnDataType();
 
         MethodTypeDesc methodTypeDesc = MethodTypeDesc.of(
                 returnDataType == null ? ConstantDescs.CD_void : returnDataType.getClassDesc(),
@@ -132,7 +128,6 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                     }
 
                     bodyInstructions.bindLabel(startLabel);
-                    System.out.println("Processing " + id);
                     for (Statement statement : body) {
                         statement.emit(bodyInstructions, functionEnvironment, this);
                     }
