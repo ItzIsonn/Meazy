@@ -3,7 +3,7 @@
   { "id": "import", "regex": "import" },
   { "id": "using", "regex": "using" },
   { "id": "variable", "regex": "var|val" },
-  { "id": "function", "regex": "function|fun" },
+  { "id": "function", "regex": "fun" },
   { "id": "class", "regex": "class" },
   { "id": "constructor", "regex": "constructor" },
   { "id": "base", "regex": "base" },
