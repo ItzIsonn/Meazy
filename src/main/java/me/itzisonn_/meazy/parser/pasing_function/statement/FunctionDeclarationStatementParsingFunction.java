@@ -4,9 +4,9 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
@@ -48,10 +48,10 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
             return new FunctionDeclarationStatement(modifiers, id, parameters, new ArrayList<>(), dataType);
         }
 
-        List<Statement> body;
+        List<LocalStatement> body;
         if (parser.getCurrent().getType().equals(TokenTypes.ARROW())) {
             parser.next();
-            body = new ArrayList<>(List.of(parser.parse(MeazyMain.getDefaultIdentifier("statement"))));
+            body = new ArrayList<>(List.of(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class)));
         }
         else {
             parser.next(TokenTypes.LEFT_BRACE(), Text.translatable("meazy:parser.expected.start", "left_brace", "function_body"));

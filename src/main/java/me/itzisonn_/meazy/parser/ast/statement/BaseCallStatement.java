@@ -20,7 +20,7 @@ import java.util.List;
 
 @Getter
 @NullMarked
-public class BaseCallStatement implements LocalBodyStatement {
+public class BaseCallStatement implements LocalStatement {
     protected final List<Expression> args;
 
     public BaseCallStatement(List<Expression> args) {

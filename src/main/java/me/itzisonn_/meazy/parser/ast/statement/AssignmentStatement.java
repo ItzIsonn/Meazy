@@ -22,7 +22,7 @@ import java.lang.constant.ClassDesc;
 
 @Getter
 @NullMarked
-public class AssignmentStatement implements LocalBodyStatement {
+public class AssignmentStatement implements LocalStatement {
     private final Expression id;
     private final Expression value;
 

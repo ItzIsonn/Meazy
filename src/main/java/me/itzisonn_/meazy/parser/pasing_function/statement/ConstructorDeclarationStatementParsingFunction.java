@@ -44,7 +44,7 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         List<Statement> body = new ArrayList<>();
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             if (parser.getCurrent().getType().equals(TokenTypes.BASE())) body.add(parser.parse(MeazyMain.getDefaultIdentifier("base_call_statement")));
-            else body.add(parser.parse(MeazyMain.getDefaultIdentifier("statement")));
+            else body.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement")));
             parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
         }

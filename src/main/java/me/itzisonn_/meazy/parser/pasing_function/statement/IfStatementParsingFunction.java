@@ -5,9 +5,9 @@ import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.IfStatement;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
 import org.jspecify.annotations.NullMarked;
@@ -32,14 +32,14 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
         Expression condition = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
         parser.next(TokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy:parser.expected.end", "right_parenthesis", "if_condition"));
 
-        List<Statement> body = new ArrayList<>();
+        List<LocalStatement> body = new ArrayList<>();
         if (parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
             parser.next();
             body = ParsingHelper.parseBody(context);
             parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "if_body"));
 
         }
-        else body.add(parser.parse(MeazyMain.getDefaultIdentifier("statement")));
+        else body.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
 
         int elsePos = parser.getPos() + 1;
         if (elsePos < parser.getTokens().size() && parser.getTokens().get(elsePos).getType().equals(TokenTypes.ELSE())) {
@@ -53,13 +53,13 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
                 elseStatement = parser.parse(MeazyMain.getDefaultIdentifier("if_statement"), IfStatement.class);
             }
             else {
-                List<Statement> elseBody = new ArrayList<>();
+                List<LocalStatement> elseBody = new ArrayList<>();
                 if (parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
                     parser.next();
                     elseBody = ParsingHelper.parseBody(context);
                     parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "if_body"));
                 }
-                else elseBody.add(parser.parse(MeazyMain.getDefaultIdentifier("statement")));
+                else elseBody.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
 
                 elseStatement = new IfStatement(null, elseBody, null);
             }

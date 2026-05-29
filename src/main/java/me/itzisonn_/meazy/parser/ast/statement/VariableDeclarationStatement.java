@@ -20,7 +20,7 @@ import java.util.Set;
 
 @Getter
 @NullMarked
-public class VariableDeclarationStatement extends ModifierStatement implements DeclarationStatement, LocalBodyStatement {
+public class VariableDeclarationStatement extends ModifierStatement implements DeclarationStatement, LocalStatement {
     private final boolean isConstant;
     private final String id;
     @Nullable

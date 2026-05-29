@@ -28,13 +28,13 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
     @Nullable
     private final String classId;
     private final List<ParameterExpression> parameters;
-    private final List<Statement> body;
+    private final List<LocalStatement> body;
     @Nullable
     private final DataType returnDataType;
     @Nullable
     private FunctionValue functionValue;
 
-    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, @Nullable String classId, List<ParameterExpression> parameters, List<Statement> body, @Nullable DataType returnDataType) {
+    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, @Nullable String classId, List<ParameterExpression> parameters, List<LocalStatement> body, @Nullable DataType returnDataType) {
         super(modifiers);
         this.id = id;
         this.classId = classId;
@@ -43,7 +43,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         this.returnDataType = returnDataType;
     }
 
-    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, List<ParameterExpression> parameters, List<Statement> body, @Nullable DataType returnDataType) {
+    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, List<ParameterExpression> parameters, List<LocalStatement> body, @Nullable DataType returnDataType) {
         this(modifiers, id, null, parameters, body, returnDataType);
     }
 
@@ -66,10 +66,8 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                 functionEnvironment
         );
 
-        for (Statement statement : body) {
-            if (statement instanceof LocalBodyStatement localBodyStatement) {
-                if (localBodyStatement.alwaysReturns()) return;
-            }
+        for (LocalStatement localStatement : body) {
+            if (localStatement.alwaysReturns()) return;
         }
 
         if (returnDataType == null) {

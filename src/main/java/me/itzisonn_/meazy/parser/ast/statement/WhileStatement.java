@@ -16,11 +16,11 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class WhileStatement implements LocalBodyStatement {
+public class WhileStatement implements LocalStatement {
     private final Expression condition;
-    private final List<Statement> body;
+    private final List<LocalStatement> body;
 
-    public WhileStatement(Expression condition, List<Statement> body) {
+    public WhileStatement(Expression condition, List<LocalStatement> body) {
         this.condition = condition;
         this.body = body;
     }
@@ -49,10 +49,8 @@ public class WhileStatement implements LocalBodyStatement {
 
     @Override
     public boolean alwaysReturns() {
-        for (Statement statement : body) {
-            if (statement instanceof LocalBodyStatement localBodyStatement) {
-                if (localBodyStatement.alwaysReturns()) return true;
-            }
+        for (LocalStatement localStatement : body) {
+            if (localStatement.alwaysReturns()) return true;
         }
 
         return false;

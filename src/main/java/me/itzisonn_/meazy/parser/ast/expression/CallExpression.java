@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
@@ -26,7 +27,7 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class CallExpression implements Expression {
+public class CallExpression implements Expression, LocalStatement {
     private final Identifier caller;
     private final List<Expression> args;
 
@@ -209,6 +210,11 @@ public class CallExpression implements Expression {
         if (classValue == null) return null;
 
         return classValue.getEnvironment().getConstructor(parameters).orElse(null);
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
     }
 
 

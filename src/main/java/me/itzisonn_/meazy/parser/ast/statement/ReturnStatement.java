@@ -16,7 +16,7 @@ import java.lang.constant.ClassDesc;
 
 @Getter
 @NullMarked
-public class ReturnStatement implements LocalBodyStatement {
+public class ReturnStatement implements LocalStatement {
     @Nullable
     private final Expression value;
 

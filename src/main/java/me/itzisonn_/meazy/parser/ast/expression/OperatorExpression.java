@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.operator.Operator;
 import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.parser.operator.Operators;
@@ -13,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 
 @Getter
 @NullMarked
-public class OperatorExpression implements Expression {
+public class OperatorExpression implements Expression, LocalStatement {
     private final Expression left;
     @Nullable
     private final Expression right;
@@ -50,5 +51,10 @@ public class OperatorExpression implements Expression {
     @Override
     public DataType getType(Environment environment, Statement parent) {
         return operator.getType(environment, this);
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
     }
 }

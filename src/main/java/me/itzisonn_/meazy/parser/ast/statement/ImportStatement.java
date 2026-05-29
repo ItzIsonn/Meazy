@@ -8,7 +8,7 @@ import org.jspecify.annotations.NullMarked;
 
 @Getter
 @NullMarked
-public class ImportStatement implements LocalBodyStatement {
+public class ImportStatement implements LocalStatement {
     private final String name;
 
     public ImportStatement(String name) {

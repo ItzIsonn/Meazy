@@ -10,6 +10,7 @@ import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.ast.statement.ForeachStatement;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
 import org.jspecify.annotations.NullMarked;
@@ -44,7 +45,7 @@ public class ForeachStatementParsingFunction extends AbstractParsingFunction<Sta
         parser.next(TokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy:parser.expected.end", "right_parenthesis", "for_condition"));
 
         parser.next(TokenTypes.LEFT_BRACE(), Text.translatable("meazy:parser.expected.start", "left_brace", "for_body"));
-        List<Statement> body = ParsingHelper.parseBody(context);
+        List<LocalStatement> body = ParsingHelper.parseBody(context);
         parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "for_body"));
 
         return new ForeachStatement(isConstant, id, dataType, collection, body);
