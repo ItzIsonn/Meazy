@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
-import me.itzisonn_.meazy.util.MiscUtils;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral;
@@ -87,9 +86,9 @@ public class CallExpression implements Expression {
                             resolvedFunction.isInterface() ? InvokeType.INTERFACE : InvokeType.VIRTUAL
             );
 
-            if (resolvedFunction.getMethodTypeDesc().returnType().isPrimitive()) {
-                MiscUtils.boxPrimitive(instructionsSet, resolvedFunction.getMethodTypeDesc().returnType());
-            }
+//            if (resolvedFunction.getMethodTypeDesc().returnType().isPrimitive()) {
+//                MiscUtils.boxPrimitive(instructionsSet, resolvedFunction.getMethodTypeDesc().returnType());
+//            }
 
             if (endLabel != null) {
                 instructionsSet.bindLabel(endLabel);
@@ -117,7 +116,7 @@ public class CallExpression implements Expression {
     public DataType getType(Environment environment, Statement parent) {
         if (caller instanceof FunctionIdentifier) {
             ClassDesc returnType = resolveFunction(environment, parent).getMethodTypeDesc().returnType();
-            return DataType.of(MiscUtils.getBoxedType(returnType), !returnType.isPrimitive());
+            return DataType.of(returnType, !returnType.isPrimitive());
         }
 
         if (caller instanceof ClassIdentifier) {
