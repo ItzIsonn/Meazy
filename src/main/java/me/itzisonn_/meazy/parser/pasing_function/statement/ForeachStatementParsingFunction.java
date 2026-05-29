@@ -2,21 +2,19 @@ package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.InvalidSyntaxException;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
 import me.itzisonn_.meazy.parser.ast.statement.ForeachStatement;
-import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.List;
 
 @NullMarked
@@ -32,12 +30,13 @@ public class ForeachStatementParsingFunction extends AbstractParsingFunction<Sta
         parser.next(TokenTypes.FOR(), Text.translatable("meazy:parser.expected.keyword", "for"));
         parser.next(TokenTypes.LEFT_PARENTHESIS(), Text.translatable("meazy:parser.expected.start", "left_parenthesis", "for_condition"));
 
+        boolean isConstant = parser.getCurrentAndNext(TokenTypes.VARIABLE(), Text.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
+        String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected", "id")).getValue();
+
         int lineNumber = parser.getCurrent().getLine();
 
-        VariableDeclarationStatement variableDeclarationStatement = parser.parse(MeazyMain.getDefaultIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, new HashSet<>(), true);
-        if (variableDeclarationStatement.getValue() != null && !(variableDeclarationStatement.getValue() instanceof NullLiteral)) {
-            throw new InvalidSyntaxException(lineNumber, Text.translatable("meazy:parser.exception.foreach_variable_wth_value"));
-        }
+        DataType dataType = ParsingHelper.parseDataType(context);
+        if (dataType == null) throw new InvalidSyntaxException(lineNumber, Text.translatable("meazy:parser.exception.foreach_variable_without_datatype"));
 
         parser.next(TokenTypes.IN(), Text.translatable("meazy:parser.expected.after_statement", "in", "variable_declaration"));
         Expression collection = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
@@ -48,6 +47,6 @@ public class ForeachStatementParsingFunction extends AbstractParsingFunction<Sta
         List<Statement> body = ParsingHelper.parseBody(context);
         parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "for_body"));
 
-        return new ForeachStatement(variableDeclarationStatement, collection, body);
+        return new ForeachStatement(isConstant, id, dataType, collection, body);
     }
 }

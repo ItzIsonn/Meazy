@@ -23,12 +23,16 @@ import java.util.UUID;
 @Getter
 @NullMarked
 public class ForeachStatement implements Statement {
-    private final VariableDeclarationStatement variableDeclarationStatement;
+    private final boolean isConstant;
+    private final String id;
+    private final DataType dataType;
     private final Expression collection;
     private final List<Statement> body;
 
-    public ForeachStatement(VariableDeclarationStatement variableDeclarationStatement, Expression collection, List<Statement> body) {
-        this.variableDeclarationStatement = variableDeclarationStatement;
+    public ForeachStatement(boolean isConstant, String id, DataType dataType, Expression collection, List<Statement> body) {
+        this.isConstant = isConstant;
+        this.id = id;
+        this.dataType = dataType;
         this.collection = collection;
         this.body = body;
     }
@@ -83,13 +87,13 @@ public class ForeachStatement implements Statement {
                 InvokeType.INTERFACE
         );
 
-        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, variableDeclarationStatement.getDataType().getClassDesc());
+        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType.getClassDesc());
         instructionsSet.checkCast(classDesc);
 
         VariableValue variableValue = localVariableDeclarationEnvironment.declareVariable(
-                variableDeclarationStatement.getId(),
-                DataType.of(classDesc, variableDeclarationStatement.getDataType().isNullable()),
-                variableDeclarationStatement.isConstant(),
+                id,
+                DataType.of(classDesc, dataType.isNullable()),
+                isConstant,
                 null
         );
 

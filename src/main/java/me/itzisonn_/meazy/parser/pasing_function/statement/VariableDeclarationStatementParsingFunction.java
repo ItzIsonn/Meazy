@@ -30,19 +30,16 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
 
         if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
-        if (!(extra[1] instanceof Boolean canWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
+        if (!(extra[1] instanceof Boolean canBeConstantWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
 
         boolean isConstant = parser.getCurrentAndNext(TokenTypes.VARIABLE(), Text.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
-
         String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected", "id")).getValue();
-
         DataType dataType = ParsingHelper.parseDataType(context);
-        if (dataType == null) dataType = DataType.anyNullable();
 
         if (!parser.getCurrent().getType().equals(TokenTypes.ASSIGN())) {
-            if (canWithoutValue) {
-                return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, null);
-            }
+            if (dataType == null) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("parser.exception.variable_without_datatype_and_value"));
+
+            if (canBeConstantWithoutValue) return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, null);
             if (isConstant) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.constant_without_value"));
             return new VariableDeclarationStatement(modifiers, false, id, dataType, new NullLiteral());
         }
