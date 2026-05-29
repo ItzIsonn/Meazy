@@ -30,7 +30,6 @@ public class StatementParsingFunction extends AbstractParsingFunction<Statement>
     }
 
     @Override
-    @Nullable
     public Statement parse(ParsingContext context, @Nullable Object... extra) {
         Parser parser = context.getParser();
 

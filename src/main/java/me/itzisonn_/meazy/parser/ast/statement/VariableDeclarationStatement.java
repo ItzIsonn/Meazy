@@ -23,13 +23,14 @@ import java.util.Set;
 public class VariableDeclarationStatement extends ModifierStatement implements DeclarationStatement {
     private final boolean isConstant;
     private final String id;
+    @Nullable
     private final DataType dataType;
     @Nullable
     private final Expression value;
     @Nullable
     private VariableValue variableValue;
 
-    public VariableDeclarationStatement(Set<Modifier> modifiers, boolean isConstant, String id, DataType dataType, @Nullable Expression value) {
+    public VariableDeclarationStatement(Set<Modifier> modifiers, boolean isConstant, String id, @Nullable DataType dataType, @Nullable Expression value) {
         super(modifiers);
         this.isConstant = isConstant;
         this.id = id;
@@ -41,6 +42,13 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
     public void declare(Environment environment) {
         if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
             throw new RuntimeException("CANT DECLARE variable HERE TODO");
+        }
+
+        DataType dataType;
+        if (this.dataType != null) dataType = this.dataType;
+        else {
+            if (value == null) throw new RuntimeException("Variable without a data type must have initializer TODO");
+            else dataType = value.getType(environment, this);
         }
 
         variableValue = variableDeclarationEnvironment.declareVariable(id, dataType, isConstant, value);
