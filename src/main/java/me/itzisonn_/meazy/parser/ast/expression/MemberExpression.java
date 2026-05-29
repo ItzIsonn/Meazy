@@ -4,14 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import org.jspecify.annotations.NullMarked;
 
 @Getter
 @NullMarked
-public class MemberExpression implements Expression {
+public class MemberExpression implements Expression, LocalStatement {
     @Setter
     private Expression object;
     private final Expression member;
@@ -31,5 +31,10 @@ public class MemberExpression implements Expression {
     @Override
     public DataType getType(Environment environment, Statement parent) {
         return member.getType(environment, this);
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
     }
 }

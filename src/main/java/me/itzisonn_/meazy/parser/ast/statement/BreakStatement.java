@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class BreakStatement implements LocalBodyStatement {
+public class BreakStatement implements LocalStatement {
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
         LoopEnvironment loopEnvironment = EnvironmentUtils.getParentOrSelf(environment, LoopEnvironment.class).orElseThrow(

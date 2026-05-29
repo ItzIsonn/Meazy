@@ -17,14 +17,14 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class IfStatement implements LocalBodyStatement {
+public class IfStatement implements LocalStatement {
     @Nullable
     private final Expression condition;
-    private final List<Statement> body;
+    private final List<LocalStatement> body;
     @Nullable
     private final IfStatement elseStatement;
 
-    public IfStatement(@Nullable Expression condition, List<Statement> body, @Nullable IfStatement elseStatement) {
+    public IfStatement(@Nullable Expression condition, List<LocalStatement> body, @Nullable IfStatement elseStatement) {
         this.condition = condition;
         this.body = body;
         this.elseStatement = elseStatement;
@@ -78,10 +78,8 @@ public class IfStatement implements LocalBodyStatement {
     public boolean alwaysReturns() {
         if (elseStatement == null) return false;
 
-        for (Statement statement : body) {
-            if (statement instanceof LocalBodyStatement localBodyStatement) {
-                if (!localBodyStatement.alwaysReturns()) return false;
-            }
+        for (LocalStatement localStatement : body) {
+            if (!localStatement.alwaysReturns()) return false;
         }
 
         return elseStatement.alwaysReturns();

@@ -5,9 +5,9 @@ import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenTypes;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
@@ -112,15 +112,15 @@ public final class ParsingHelper {
         return null;
     }
 
-    public static List<Statement> parseBody(ParsingContext context) {
+    public static List<LocalStatement> parseBody(ParsingContext context) {
         Parser parser = context.getParser();
 
-        List<Statement> body = new ArrayList<>();
+        List<LocalStatement> body = new ArrayList<>();
         parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy:parser.expected", "new_line"));
         parser.moveOverOptionalNewLines();
 
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-            body.add(parser.parse(MeazyMain.getDefaultIdentifier("statement")));
+            body.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
             parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
         }

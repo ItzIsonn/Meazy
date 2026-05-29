@@ -5,8 +5,8 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.ast.statement.WhileStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
@@ -32,7 +32,7 @@ public class WhileStatementParsingFunction extends AbstractParsingFunction<While
         parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy:parser.expected.end", "right_parenthesis", "while_condition"));
 
         parser.getCurrentAndNext(TokenTypes.LEFT_BRACE(), Text.translatable("meazy:parser.expected.start", "left_brace", "while_body"));
-        List<Statement> body = ParsingHelper.parseBody(context);
+        List<LocalStatement> body = ParsingHelper.parseBody(context);
         parser.getCurrentAndNext(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "while_body"));
 
         return new WhileStatement(condition, body);

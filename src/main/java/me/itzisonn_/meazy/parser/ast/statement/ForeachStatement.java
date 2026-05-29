@@ -22,14 +22,14 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class ForeachStatement implements LocalBodyStatement {
+public class ForeachStatement implements LocalStatement {
     private final boolean isConstant;
     private final String id;
     private final DataType dataType;
     private final Expression collection;
-    private final List<Statement> body;
+    private final List<LocalStatement> body;
 
-    public ForeachStatement(boolean isConstant, String id, DataType dataType, Expression collection, List<Statement> body) {
+    public ForeachStatement(boolean isConstant, String id, DataType dataType, Expression collection, List<LocalStatement> body) {
         this.isConstant = isConstant;
         this.id = id;
         this.dataType = dataType;
@@ -110,10 +110,8 @@ public class ForeachStatement implements LocalBodyStatement {
 
     @Override
     public boolean alwaysReturns() {
-        for (Statement statement : body) {
-            if (statement instanceof LocalBodyStatement localBodyStatement) {
-                if (localBodyStatement.alwaysReturns()) return true;
-            }
+        for (LocalStatement localStatement : body) {
+            if (localStatement.alwaysReturns()) return true;
         }
 
         return false;

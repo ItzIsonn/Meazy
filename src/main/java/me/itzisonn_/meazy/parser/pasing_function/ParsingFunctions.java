@@ -44,7 +44,7 @@ public final class ParsingFunctions {
         register(new VariableDeclarationStatementParsingFunction());
         register(new ConstructorDeclarationStatementParsingFunction());
         register(new BaseCallStatementParsingFunction());
-        register(new StatementParsingFunction());
+        register(new LocalStatementParsingFunction());
         register(new IfStatementParsingFunction());
         register(new ForeachStatementParsingFunction());
         register(new WhileStatementParsingFunction());
