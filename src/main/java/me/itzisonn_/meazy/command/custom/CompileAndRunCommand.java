@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.constant.ClassDesc;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,7 @@ public class CompileAndRunCommand extends AbstractCommand {
                 throw new RuntimeException("Failed to create output directory"); //TODO
             }
         }
+        else Arrays.stream(outputDirectory.listFiles()).forEach(File::delete);
 
         for (ClassDesc classDesc : classes.keySet()) {
             byte[] classFile = classes.get(classDesc);
