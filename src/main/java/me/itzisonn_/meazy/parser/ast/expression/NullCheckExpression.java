@@ -3,11 +3,12 @@ package me.itzisonn_.meazy.parser.ast.expression;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.util.MiscUtils;
 import org.jspecify.annotations.NullMarked;
 
+import java.lang.constant.ClassDesc;
 import java.util.UUID;
 
 @Getter
@@ -23,6 +24,12 @@ public class NullCheckExpression implements Expression {
 
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+        DataType checkExpressionType = checkExpression.getType(environment, this);
+        if (!checkExpressionType.isNullable()) {
+            checkExpression.emit(instructionsSet, environment, this);
+            return;
+        }
+
         UUID endLabel = instructionsSet.createAndInitLabel();
 
         checkExpression.emit(instructionsSet, environment, this);
@@ -31,6 +38,8 @@ public class NullCheckExpression implements Expression {
 
         instructionsSet.pop();
         nullExpression.emit(instructionsSet, environment, this);
+        ClassDesc nullExpressionClassDesc = nullExpression.getType(environment, this).getClassDesc();
+        if (nullExpressionClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructionsSet, nullExpressionClassDesc);
         instructionsSet.gotoLabel(endLabel);
 
         instructionsSet.bindLabel(endLabel);
@@ -38,6 +47,13 @@ public class NullCheckExpression implements Expression {
 
     @Override
     public DataType getType(Environment environment, Statement parent) {
-        return DataType.commonOf(environment, checkExpression.getType(environment, this), nullExpression.getType(environment, this));
+        DataType checkExpressionType = checkExpression.getType(environment, this);
+        if (!checkExpressionType.isNullable()) return checkExpressionType;
+
+        DataType nullExpressionType = nullExpression.getType(environment, this);
+        ClassDesc nullExpressionClassDesc = nullExpressionType.getClassDesc();
+        if (nullExpressionClassDesc.isPrimitive()) nullExpressionClassDesc = MiscUtils.getBoxedType(nullExpressionClassDesc);
+
+        return DataType.commonOf(environment, checkExpressionType.with(false), nullExpressionType.with(nullExpressionClassDesc));
     }
 }
