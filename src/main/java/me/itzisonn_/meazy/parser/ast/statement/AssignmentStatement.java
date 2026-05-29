@@ -22,7 +22,7 @@ import java.lang.constant.ClassDesc;
 
 @Getter
 @NullMarked
-public class AssignmentStatement implements Statement {
+public class AssignmentStatement implements LocalBodyStatement {
     private final Expression id;
     private final Expression value;
 
@@ -65,6 +65,13 @@ public class AssignmentStatement implements Statement {
             instructionsSet.storeField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
         }
     }
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
+    }
+
+
 
     private ResolvedVariable resolveVariable(Environment environment, Statement parent) {
         VariableValue variableValue = resolveMeazyVariable(environment);

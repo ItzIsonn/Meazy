@@ -20,7 +20,7 @@ import java.util.Set;
 
 @Getter
 @NullMarked
-public class VariableDeclarationStatement extends ModifierStatement implements DeclarationStatement {
+public class VariableDeclarationStatement extends ModifierStatement implements DeclarationStatement, LocalBodyStatement {
     private final boolean isConstant;
     private final String id;
     @Nullable
@@ -127,5 +127,10 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
                     localDeclarationEnvironment.getStartLabel(), localDeclarationEnvironment.getEndLabel()
             );
         }
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
     }
 }

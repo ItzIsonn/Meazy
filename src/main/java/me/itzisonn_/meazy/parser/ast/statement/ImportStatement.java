@@ -8,7 +8,7 @@ import org.jspecify.annotations.NullMarked;
 
 @Getter
 @NullMarked
-public class ImportStatement implements Statement {
+public class ImportStatement implements LocalBodyStatement {
     private final String name;
 
     public ImportStatement(String name) {
@@ -17,4 +17,9 @@ public class ImportStatement implements Statement {
 
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {}
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
+    }
 }

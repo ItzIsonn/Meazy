@@ -65,6 +65,19 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                 returnDataType,
                 functionEnvironment
         );
+
+        for (Statement statement : body) {
+            if (statement instanceof LocalBodyStatement localBodyStatement) {
+                if (localBodyStatement.alwaysReturns()) return;
+            }
+        }
+
+        if (returnDataType == null) {
+            body.add(new ReturnStatement(null));
+            return;
+        }
+
+        throw new RuntimeException("Function with id " + id + " doesn't always return a value");
     }
 
     @Override

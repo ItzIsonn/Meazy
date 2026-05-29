@@ -20,7 +20,7 @@ import java.util.List;
 
 @Getter
 @NullMarked
-public class BaseCallStatement implements Statement {
+public class BaseCallStatement implements LocalBodyStatement {
     protected final List<Expression> args;
 
     public BaseCallStatement(List<Expression> args) {
@@ -40,6 +40,11 @@ public class BaseCallStatement implements Statement {
                     }
                 }
         );
+    }
+
+    @Override
+    public boolean alwaysReturns() {
+        return false;
     }
 
 
