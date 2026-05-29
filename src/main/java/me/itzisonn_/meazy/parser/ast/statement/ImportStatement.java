@@ -4,7 +4,6 @@ import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import org.jspecify.annotations.NullMarked;
 
 @Getter
@@ -17,8 +16,5 @@ public class ImportStatement implements Statement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
-        if (!(environment instanceof FileEnvironment fileEnvironment)) throw new RuntimeException("Not in file environment TODO");
-        fileEnvironment.addImport(name);
-    }
+    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {}
 }

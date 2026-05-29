@@ -248,6 +248,8 @@ public final class Registries {
 
             BytecodeBuilders bytecodeBuilders = BytecodeBuilders.of(null, null);
             InstructionsSet instructionsSet = new InstructionsSet(bytecodeBuilders);
+            program.declare(globalEnvironment);
+            program.resolve(globalEnvironment);
             program.emit(instructionsSet, globalEnvironment, null);
 
             for (Instruction instruction : instructionsSet.getInstructions()) {

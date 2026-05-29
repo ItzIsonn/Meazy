@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy.parser.ast.program.impl;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.statement.DeclarationStatement;
+import me.itzisonn_.meazy.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy.util.FileUtils;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
@@ -37,6 +39,8 @@ public class ProgramImpl implements Program {
     private final Version version;
     private final Map<String, @Nullable Version> requiredAddons;
     private final List<Statement> body;
+    @Nullable
+    private FileEnvironment fileEnvironment;
 
     ProgramImpl(@Nullable File file, Version version, Map<String, @Nullable Version> requiredAddons, List<Statement> body) throws IllegalArgumentException {
         if (file != null) {
@@ -61,8 +65,44 @@ public class ProgramImpl implements Program {
     }
 
     @Override
+    public void declare(GlobalEnvironment globalEnvironment) {
+        if (file == null) throw new IllegalArgumentException("File can't be null"); //TODO make file actually nonnull
+        List<String> path = List.of(file.getAbsolutePath().split("\\\\"));
+
+        String id = FileUtils.getNameWithoutExtension(file);
+        id = id.substring(0, 1).toUpperCase() + id.substring(1);
+
+        fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                globalEnvironment, path.get(path.size() - 2), id
+        );
+
+        for (Statement statement : body) {
+            if (statement instanceof ImportStatement importStatement) {
+                fileEnvironment.addImport(importStatement.getName());
+            }
+        }
+
+        for (Statement statement : body) {
+            if (statement instanceof DeclarationStatement declarationStatement) {
+                declarationStatement.declare(fileEnvironment);
+            }
+        }
+    }
+
+    @Override
+    public void resolve(GlobalEnvironment globalEnvironment) {
+        if (fileEnvironment == null) throw new IllegalArgumentException("Program must be resolved TODO");
+
+        for (Statement statement : body) {
+            if (statement instanceof DeclarationStatement declarationStatement) {
+                declarationStatement.resolve(fileEnvironment);
+            }
+        }
+    }
+
+    @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, @Nullable Statement parent) {
-        if (!(environment instanceof GlobalEnvironment globalEnvironment)) throw new IllegalArgumentException("Environment must be global TODO");
+        if (fileEnvironment == null) throw new IllegalArgumentException("Program must be resolved TODO");
         if (file == null) throw new IllegalArgumentException("File can't be null"); //TODO make file actually nonnull
 
         List<String> path = List.of(file.getAbsolutePath().split("\\\\"));
@@ -70,10 +110,7 @@ public class ProgramImpl implements Program {
         String id = FileUtils.getNameWithoutExtension(file);
         id = id.substring(0, 1).toUpperCase() + id.substring(1);
 
-        FileEnvironment fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                globalEnvironment, path.get(path.size() - 2), id
-        );
-
+        FileEnvironment fileEnvironment = this.fileEnvironment;
         ClassDesc classDesc = ClassDesc.of(path.get(path.size() - 2), id);
 
         List<InnerClassesAttribute> attributes = new ArrayList<>();

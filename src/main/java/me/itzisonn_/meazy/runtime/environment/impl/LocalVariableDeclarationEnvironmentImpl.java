@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
@@ -18,12 +19,13 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@Setter
 @NullMarked
 public class LocalVariableDeclarationEnvironmentImpl extends VariableDeclarationEnvironmentImpl implements LocalVariableDeclarationEnvironment {
     @Nullable
-    private final UUID startLabel;
+    private UUID startLabel;
     @Nullable
-    private final UUID endLabel;
+    private UUID endLabel;
 
     public LocalVariableDeclarationEnvironmentImpl(Environment parent, @Nullable UUID startLabel, @Nullable UUID endLabel) {
         super(parent);

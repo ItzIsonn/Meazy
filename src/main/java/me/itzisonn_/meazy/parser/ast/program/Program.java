@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.program;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.version.Version;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -45,6 +46,8 @@ public interface Program extends Statement {
      */
     List<Statement> getBody();
 
+    void declare(GlobalEnvironment environment);
+    void resolve(GlobalEnvironment environment);
     @Override
     void emit(InstructionsSet instructionsSet, Environment environment, @Nullable Statement parent);
 }

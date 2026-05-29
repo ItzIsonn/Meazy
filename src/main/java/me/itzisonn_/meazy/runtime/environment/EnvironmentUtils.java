@@ -175,6 +175,10 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         if (classDesc.isPrimitive() || classDesc.isArray()) return classDesc;
         if (!classDesc.packageName().isEmpty()) return classDesc;
 
+        if (classDesc.descriptorString().equals("LList;")) {
+            System.out.println("Trying to resolve " + classDesc.descriptorString());
+        }
+
         String fullId;
         FileEnvironment fileEnvironment = getParentOrSelf(environment, FileEnvironment.class).orElse(null);
         if (fileEnvironment == null) return classDesc;
