@@ -65,7 +65,8 @@ public class ProgramImpl implements Program {
     }
 
     @Override
-    public void declare(GlobalEnvironment globalEnvironment) {
+    public void declare(Environment environment) {
+        if (!(environment instanceof GlobalEnvironment globalEnvironment)) throw new RuntimeException("Environment must be global");
         if (file == null) throw new IllegalArgumentException("File can't be null"); //TODO make file actually nonnull
         List<String> path = List.of(file.getAbsolutePath().split("\\\\"));
 
@@ -90,7 +91,7 @@ public class ProgramImpl implements Program {
     }
 
     @Override
-    public void resolve(GlobalEnvironment globalEnvironment) {
+    public void resolve(Environment environment) {
         if (fileEnvironment == null) throw new IllegalArgumentException("Program must be resolved TODO");
 
         for (Statement statement : body) {
