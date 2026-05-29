@@ -34,6 +34,8 @@ public class AssignmentStatement implements Statement {
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
+        if (resolvedVariable.isConstant()) throw new RuntimeException("Can't reassign constant variable " + resolvedVariable.getId() + " TODO");
+
         ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, resolvedVariable.getType());
         ClassDesc valueType = value.getType(environment, this).getClassDesc();
 
@@ -91,6 +93,7 @@ public class AssignmentStatement implements Statement {
         return new ResolvedVariable(
                 className == null ? null : ClassDesc.of(className),
                 className == null ? variableValue.getSlot() : -1,
+                variableValue.isConstant(),
                 variableValue.getId(),
                 variableValue.getDataType().getClassDesc(),
                 target
@@ -124,6 +127,7 @@ public class AssignmentStatement implements Statement {
         @Nullable
         private final ClassDesc classDesc;
         private final int slot;
+        private final boolean isConstant;
         private final String id;
         private final ClassDesc type;
         @Nullable
