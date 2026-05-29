@@ -19,7 +19,7 @@ public final class DataType {
     /**
      * TODO
      */
-    private final ClassDesc classDesc;
+    private ClassDesc classDesc;
     /**
      * Whether this data type accepts null values
      */
@@ -33,6 +33,10 @@ public final class DataType {
     @Override
     public String toString() {
         return classDesc.displayName() + (isNullable ? "?" : "");
+    }
+
+    public void resolve(Environment environment) {
+        classDesc = EnvironmentUtils.resolveClassDesc(environment, classDesc);
     }
 
 

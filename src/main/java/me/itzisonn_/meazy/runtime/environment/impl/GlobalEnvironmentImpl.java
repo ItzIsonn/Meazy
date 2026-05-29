@@ -79,7 +79,7 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             ClassValue classValue = javaFileEnvironment.declareClass(classEnvironment);
             addFileEnvironment(javaFileEnvironment);
 
-            System.out.println("Declared class " + classDesc.descriptorString());
+//            System.out.println("Declared class " + classDesc.descriptorString()); FIXME delete
 
             if (classEnvironment.getBaseClass() != null) resolveJavaClass(classEnvironment.getBaseClass());
             for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {

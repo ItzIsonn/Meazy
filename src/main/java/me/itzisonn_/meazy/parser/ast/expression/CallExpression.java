@@ -139,6 +139,7 @@ public class CallExpression implements Expression {
         }
 
         DataType returnDataType = functionValue.getReturnDataType();
+        if (returnDataType != null) System.out.println("Resolved function " + functionValue.getId() + " with return type " + returnDataType.getClassDesc().descriptorString());
 
         Expression target;
         if (parent instanceof MemberExpression memberExpression) {

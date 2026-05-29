@@ -17,6 +17,8 @@ public interface LocalVariableDeclarationEnvironment extends VariableDeclaration
     VariableValue declareVariable(@Nullable String id, DataType type, boolean isConstant, @Nullable Expression value);
 
     //TODO
+    void setStartLabel(UUID startLabel);
+    void setEndLabel(UUID endLabel);
     @Nullable
     UUID getStartLabel();
     @Nullable

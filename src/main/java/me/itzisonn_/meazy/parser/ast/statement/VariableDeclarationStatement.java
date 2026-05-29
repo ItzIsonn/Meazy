@@ -20,12 +20,14 @@ import java.util.Set;
 
 @Getter
 @NullMarked
-public class VariableDeclarationStatement extends ModifierStatement implements Statement {
+public class VariableDeclarationStatement extends ModifierStatement implements DeclarationStatement {
     private final boolean isConstant;
     private final String id;
     private final DataType dataType;
     @Nullable
     private final Expression value;
+    @Nullable
+    private VariableValue variableValue;
 
     public VariableDeclarationStatement(Set<Modifier> modifiers, boolean isConstant, String id, DataType dataType, @Nullable Expression value) {
         super(modifiers);
@@ -36,23 +38,48 @@ public class VariableDeclarationStatement extends ModifierStatement implements S
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
-        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType.getClassDesc());
-        DataType dataType = DataType.of(classDesc, this.dataType.isNullable());
+    public void declare(Environment environment) {
+        if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
+            throw new RuntimeException("CANT DECLARE variable HERE TODO");
+        }
 
-        if (environment instanceof FileEnvironment fileEnvironment) {
+        variableValue = variableDeclarationEnvironment.declareVariable(id, dataType, isConstant, value);
+    }
+
+    @Override
+    public void resolve(Environment environment) {
+        if (variableValue == null) {
+            throw new RuntimeException("Declared variable is unresolved TODO");
+        }
+
+        variableValue.getDataType().resolve(environment);
+    }
+
+    @Override
+    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+        if (variableValue == null) {
+            if (!(environment instanceof FileEnvironment) && !(environment instanceof ClassEnvironment)) {
+                declare(environment);
+                resolve(environment);
+            }
+            else throw new RuntimeException("Declared variable is unresolved TODO");
+        }
+
+        DataType dataType = variableValue.getDataType();
+        ClassDesc classDesc = dataType.getClassDesc();
+
+        if (environment instanceof FileEnvironment) {
             int accessFlags = AccessFlag.STATIC.mask();
             if (isConstant) accessFlags |= AccessFlag.FINAL.mask();
 
             if (modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.PUBLIC.mask();
             else accessFlags |= AccessFlag.PRIVATE.mask();
 
-            fileEnvironment.declareVariable(id, dataType, isConstant, value);
             instructionsSet.withField(id, classDesc, accessFlags);
             return;
         }
 
-        if (environment instanceof ClassEnvironment classEnvironment) {
+        if (environment instanceof ClassEnvironment) {
             int accessFlags = 0;
             if (modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.PUBLIC.mask();
             else if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
@@ -61,13 +88,11 @@ public class VariableDeclarationStatement extends ModifierStatement implements S
             if (modifiers.contains(Modifiers.SHARED())) accessFlags |= AccessFlag.STATIC.mask();
             if (isConstant) accessFlags |= AccessFlag.FINAL.mask();
 
-            classEnvironment.declareVariable(id, dataType, isConstant, value);
             instructionsSet.withField(id, classDesc, accessFlags);
             return;
         }
 
-        if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) throw new RuntimeException("TODO " + environment.getClass().getName());
-        VariableValue variableValue = variableDeclarationEnvironment.declareVariable(id, dataType, isConstant, value);
+
 
         if (value != null) {
             value.emit(instructionsSet, environment, this);

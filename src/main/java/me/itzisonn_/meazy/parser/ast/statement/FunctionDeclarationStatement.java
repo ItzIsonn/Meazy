@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class FunctionDeclarationStatement extends ModifierStatement implements Statement {
+public class FunctionDeclarationStatement extends ModifierStatement implements DeclarationStatement {
     private final String id;
     @Nullable
     private final String classId;
@@ -31,6 +31,8 @@ public class FunctionDeclarationStatement extends ModifierStatement implements S
     private final List<Statement> body;
     @Nullable
     private final DataType returnDataType;
+    @Nullable
+    private FunctionValue functionValue;
 
     public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, @Nullable String classId, List<ParameterExpression> parameters, List<Statement> body, @Nullable DataType returnDataType) {
         super(modifiers);
@@ -46,31 +48,56 @@ public class FunctionDeclarationStatement extends ModifierStatement implements S
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void declare(Environment environment) {
         if (!(environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
             throw new RuntimeException("CANT DECLARE FUNCTION HERE TODO");
+        }
+
+        boolean isShared = modifiers.contains(Modifiers.SHARED()) || environment instanceof FileEnvironment;
+
+        FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                functionDeclarationEnvironment, null, null, returnDataType, isShared
+        );
+
+        functionValue = functionDeclarationEnvironment.declareFunction(
+                id,
+                parameters,
+                returnDataType,
+                functionEnvironment
+        );
+    }
+
+    @Override
+    public void resolve(Environment environment) {
+        if (functionValue == null) {
+            throw new RuntimeException("Declared function is unresolved TODO");
+        }
+
+        DataType returnDataType = functionValue.getReturnDataType();
+        if (returnDataType != null) {
+            var old = returnDataType.getClassDesc().descriptorString();
+            returnDataType.resolve(environment);
+            System.out.println("Resolved return type for " + functionValue.getId() + " from " + old + " to " + returnDataType.getClassDesc().descriptorString());
+        }
+
+        functionValue.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));
+    }
+
+    @Override
+    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+        if (functionValue == null) {
+            throw new RuntimeException("Declared function is unresolved TODO");
         }
 
         UUID startLabel = instructionsSet.createLabel();
         UUID endLabel = instructionsSet.createLabel();
 
+        FunctionEnvironment functionEnvironment = functionValue.getEnvironment();
+        functionEnvironment.setStartLabel(startLabel);
+        functionEnvironment.setEndLabel(endLabel);
+
         boolean isShared = modifiers.contains(Modifiers.SHARED()) || environment instanceof FileEnvironment;
         DataType returnDataType = this.returnDataType == null ? null : DataType.resolve(environment, this.returnDataType);
-
-        FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                functionDeclarationEnvironment, startLabel, endLabel, returnDataType, isShared
-        );
-
-        FunctionValue functionValue = functionDeclarationEnvironment.declareFunction(
-                id,
-                parameters.stream().map(parameter -> new ParameterExpression(
-                        parameter.getId(),
-                        DataType.resolve(environment, parameter.getDataType()),
-                        parameter.isConstant()
-                )).toList(),
-                returnDataType,
-                functionEnvironment
-        );
 
         MethodTypeDesc methodTypeDesc = MethodTypeDesc.of(
                 returnDataType == null ? ConstantDescs.CD_void : returnDataType.getClassDesc(),
@@ -105,6 +132,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements S
                     }
 
                     bodyInstructions.bindLabel(startLabel);
+                    System.out.println("Processing " + id);
                     for (Statement statement : body) {
                         statement.emit(bodyInstructions, functionEnvironment, this);
                     }
