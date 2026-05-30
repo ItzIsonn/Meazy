@@ -45,18 +45,25 @@ public class CallExpression implements Expression, LocalStatement {
             if (resolvedFunction.getTarget() != null) {
                 resolvedFunction.getTarget().emit(instructionsSet, environment, this);
 
-                if (parent instanceof MemberExpression memberExpression && memberExpression.isNullSafe()) {
-                    UUID nonnullLabel = instructionsSet.createAndInitLabel();
-                    endLabel = instructionsSet.createAndInitLabel();
+                if (parent instanceof MemberExpression memberExpression) {
+                    if (!memberExpression.isNullSafe()) {
+                        if (resolvedFunction.getTarget().getType(environment, this).isNullable()) {
+                            throw new RuntimeException("Unsafe member call of function " + caller.getId() + " on object of type " + resolvedFunction.getClassDesc().descriptorString());
+                        }
+                    }
+                    else {
+                        UUID nonnullLabel = instructionsSet.createAndInitLabel();
+                        endLabel = instructionsSet.createAndInitLabel();
 
-                    instructionsSet.duplicate();
-                    instructionsSet.gotoLabelIfNonNull(nonnullLabel);
+                        instructionsSet.duplicate();
+                        instructionsSet.gotoLabelIfNonNull(nonnullLabel);
 
-                    instructionsSet.pop();
-                    instructionsSet.loadNull();
-                    instructionsSet.gotoLabel(endLabel);
+                        instructionsSet.pop();
+                        instructionsSet.loadNull();
+                        instructionsSet.gotoLabel(endLabel);
 
-                    instructionsSet.bindLabel(nonnullLabel);
+                        instructionsSet.bindLabel(nonnullLabel);
+                    }
                 }
             }
 

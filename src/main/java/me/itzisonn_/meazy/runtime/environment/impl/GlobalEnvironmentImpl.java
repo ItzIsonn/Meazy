@@ -129,9 +129,17 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             }
 
             for (Field field : cls.getDeclaredFields()) {
+                boolean isNullable;
+                if (field.getType().isPrimitive()) isNullable = false;
+                else if (Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) {
+                    if (field.trySetAccessible()) isNullable = field.get(null) == null;
+                    else isNullable = true;
+                }
+                else isNullable = true;
+
                 classEnvironment.declareVariable(
                         field.getName(),
-                        DataType.of(field.getType().describeConstable().orElseThrow(), !field.getType().isPrimitive()),
+                        DataType.of(field.getType().describeConstable().orElseThrow(), isNullable),
                         Modifier.isFinal(field.getModifiers()),
                         null
                 );
@@ -141,6 +149,9 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
         }
         catch (ClassNotFoundException e) {
             throw new RuntimeException("Unknown class " + (classDesc.packageName().isEmpty() ? "" : classDesc.packageName() + ".") + classDesc.displayName());
+        }
+        catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }
