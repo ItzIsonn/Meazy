@@ -45,6 +45,7 @@ public class LocalStatementParsingFunction extends AbstractParsingFunction<Local
         if (parser.getCurrent().getType().equals(TokenTypes.RETURN())) return parser.parse(MeazyMain.getDefaultIdentifier("return_statement"), ReturnStatement.class);
         if (parser.getCurrent().getType().equals(TokenTypes.CONTINUE())) return parser.parse(MeazyMain.getDefaultIdentifier("continue_statement"), ContinueStatement.class);
         if (parser.getCurrent().getType().equals(TokenTypes.BREAK())) return parser.parse(MeazyMain.getDefaultIdentifier("break_statement"), BreakStatement.class);
+        if (parser.getCurrent().getType().equals(TokenTypes.BASE())) return parser.parse(MeazyMain.getDefaultIdentifier("base_call_statement"), BaseCallStatement.class);
 
         if (parser.currentLineHasToken(TokenTypes.ASSIGN()) || parser.currentLineHasToken(TokenTypeSets.OPERATOR_ASSIGN())) {
             return parser.parse(MeazyMain.getDefaultIdentifier("assignment_statement"), AssignmentStatement.class);

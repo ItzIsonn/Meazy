@@ -5,9 +5,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import org.jspecify.annotations.NullMarked;
@@ -28,8 +26,13 @@ public class BaseCallStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) { //TODO add support for automatic base calling before return
+        if (!EnvironmentUtils.hasParentOrSelf(environment, ConstructorEnvironment.class)) {
+            throw new IllegalArgumentException("Parent environment for BASE statement must be ConstructorEnvironment TODO");
+        }
+
         ResolvedConstructor resolvedConstructor = resolveConstructor(environment);
+        instructionsSet.loadThisReference();
 
         instructionsSet.invokeSuperClass(
                 resolvedConstructor.getClassDesc(),

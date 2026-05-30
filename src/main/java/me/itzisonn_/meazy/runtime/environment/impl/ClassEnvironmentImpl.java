@@ -22,6 +22,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDescs;
 import java.util.*;
 
 @NullMarked
@@ -89,6 +90,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
             }
         }
 
+        if (baseClass == null) baseClass = ConstantDescs.CD_Object;
         unresolvedBaseClasses.clear();
     }
 
@@ -167,7 +169,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
 
     @Override
-    public void declareConstructor(List<ParameterExpression> parameters, ConstructorEnvironment constructorEnvironment) {
+    public ConstructorValue declareConstructor(List<ParameterExpression> parameters, ConstructorEnvironment constructorEnvironment) {
         main:
         for (ConstructorValue constructorValue : constructors) {
             List<ParameterExpression> otherParameters = constructorValue.getParameters();
@@ -182,6 +184,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
         ConstructorValue value = new ConstructorValueImpl(parameters, List.of(), constructorEnvironment, Set.of());
         constructors.add(value);
+        return value;
     }
 
     @Override

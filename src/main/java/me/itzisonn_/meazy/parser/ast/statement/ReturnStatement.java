@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
+import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -14,6 +15,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
+import java.util.Optional;
 
 @Getter
 @NullMarked
@@ -27,6 +29,13 @@ public class ReturnStatement implements LocalStatement {
 
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+        Optional<ConstructorEnvironment> optionalConstructorEnvironment = EnvironmentUtils.getParentOrSelf(environment, ConstructorEnvironment.class);
+        if (optionalConstructorEnvironment.isPresent()) {
+            if (value != null) throw new RuntimeException("Constructor can't return value TODO");
+            instructionsSet.returnVoid();
+            return;
+        }
+
         FunctionEnvironment functionEnvironment = EnvironmentUtils.getParentOrSelf(environment, FunctionEnvironment.class).orElseThrow(
                 () -> new IllegalArgumentException("Parent environment for RETURN statement must be FunctionEnvironment TODO")
         );
