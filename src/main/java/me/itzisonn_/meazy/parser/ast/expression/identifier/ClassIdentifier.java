@@ -21,6 +21,6 @@ public class ClassIdentifier extends Identifier {
 
     @Override
     public DataType getType(Environment environment, Statement parent) {
-        return DataType.ofNonNull(EnvironmentUtils.resolveClassDesc(environment, id));
+        return DataType.ofNonNull(EnvironmentUtils.resolveClassDesc(environment, id, false));
     }
 }

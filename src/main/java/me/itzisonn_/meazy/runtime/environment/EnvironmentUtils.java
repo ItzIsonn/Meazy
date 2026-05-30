@@ -171,7 +171,7 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
     /**
      * TODO
      */
-    public static ClassDesc resolveClassDesc(Environment environment, ClassDesc classDesc) {
+    public static ClassDesc resolveClassDesc(Environment environment, ClassDesc classDesc, boolean allowPrimitives) {
         if (classDesc.isPrimitive() || classDesc.isArray()) return classDesc;
         if (!classDesc.packageName().isEmpty()) return classDesc;
 
@@ -192,6 +192,14 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         }
         else fullId = classDesc.displayName();
 
+        if (allowPrimitives) {
+            if (classDesc.displayName().equals("Int")) return ConstantDescs.CD_int;
+            if (classDesc.displayName().equals("Long")) return ConstantDescs.CD_long;
+            if (classDesc.displayName().equals("Float")) return ConstantDescs.CD_float;
+            if (classDesc.displayName().equals("Double")) return ConstantDescs.CD_double;
+            if (classDesc.displayName().equals("Boolean")) return ConstantDescs.CD_boolean;
+        }
+
         classValue = getClassValue(environment, fullId).orElse(null);
         if (classValue != null) return classValue.asClassDesc();
 
@@ -203,8 +211,8 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
     /**
      * TODO
      */
-    public static ClassDesc resolveClassDesc(Environment environment, String classDesc) {
-        return resolveClassDesc(environment, ClassDesc.of(classDesc));
+    public static ClassDesc resolveClassDesc(Environment environment, String classDesc, boolean allowPrimitives) {
+        return resolveClassDesc(environment, ClassDesc.of(classDesc), allowPrimitives);
     }
 
 

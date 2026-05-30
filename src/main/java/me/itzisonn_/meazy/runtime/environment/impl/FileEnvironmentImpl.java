@@ -16,7 +16,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
 import java.util.*;
 
 @NullMarked
@@ -43,12 +42,11 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         addImport("java.lang.String");
         addImport("java.lang.System");
         addImport("java.lang.IO");
-
-        imports.put("Int", ConstantDescs.CD_int);
-        imports.put("Long", ConstantDescs.CD_long);
-        imports.put("Float", ConstantDescs.CD_float);
-        imports.put("Double", ConstantDescs.CD_double);
-        imports.put("Boolean", ConstantDescs.CD_boolean);
+        addImport("java.lang.Integer", "Int");
+        addImport("java.lang.Long");
+        addImport("java.lang.Float");
+        addImport("java.lang.Double");
+        addImport("java.lang.Boolean");
     }
 
 
@@ -61,8 +59,13 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
 
 
     @Override
-    public void addImport(String name) {
-        ClassDesc classDesc = ClassDesc.of(name);
+    public void addImport(String fullName, String name) {
+        imports.put(name, ClassDesc.of(fullName));
+    }
+
+    @Override
+    public void addImport(String fullName) {
+        ClassDesc classDesc = ClassDesc.of(fullName);
         imports.put(classDesc.displayName(), classDesc);
     }
 
