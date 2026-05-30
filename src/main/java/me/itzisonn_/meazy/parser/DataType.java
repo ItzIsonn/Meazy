@@ -36,7 +36,7 @@ public final class DataType {
     }
 
     public void resolve(Environment environment) {
-        classDesc = EnvironmentUtils.resolveClassDesc(environment, classDesc);
+        classDesc = EnvironmentUtils.resolveClassDesc(environment, classDesc, !isNullable);
     }
 
 

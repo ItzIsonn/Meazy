@@ -206,7 +206,7 @@ public class CallExpression implements Expression, LocalStatement {
         String id = caller.getId();
         List<ClassDesc> parameters = args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
 
-        ClassValue classValue = EnvironmentUtils.getClassValue(environment, EnvironmentUtils.resolveClassDesc(environment, id)).orElse(null);
+        ClassValue classValue = EnvironmentUtils.getClassValue(environment, EnvironmentUtils.resolveClassDesc(environment, id, false)).orElse(null);
         if (classValue == null) return null;
 
         return classValue.getEnvironment().getConstructor(parameters).orElse(null);

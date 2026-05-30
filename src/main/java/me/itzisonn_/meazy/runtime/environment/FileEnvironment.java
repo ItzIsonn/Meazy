@@ -35,7 +35,12 @@ public interface FileEnvironment extends VariableDeclarationEnvironment, Functio
     /**
      * Adds to this file environment given import
      */
-    void addImport(String name);
+    void addImport(String fullName, String name);
+
+    /**
+     * Adds to this file environment given import
+     */
+    void addImport(String fullName);
 
     /**
      * @return All imports

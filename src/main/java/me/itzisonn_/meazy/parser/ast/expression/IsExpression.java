@@ -30,7 +30,7 @@ public class IsExpression implements Expression {
 
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
-        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType);
+        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType, false);
 
         if (isLike) {
             value.emit(instructionsSet, environment, this);
