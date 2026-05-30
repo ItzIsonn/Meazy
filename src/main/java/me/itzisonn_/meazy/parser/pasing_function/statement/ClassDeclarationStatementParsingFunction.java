@@ -145,7 +145,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             ));
         }
 
-        List<Statement> constructorBody = new ArrayList<>();
+        List<LocalStatement> constructorBody = new ArrayList<>();
         for (ParameterExpression callArgExpression : dataVariables) {
             constructorBody.add(new AssignmentStatement(new MemberExpression(new ThisLiteral(), new VariableIdentifier(callArgExpression.getId()), false), new VariableIdentifier(callArgExpression.getId())));
         }

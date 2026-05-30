@@ -1,14 +1,11 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
-import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ast.statement.BaseCallStatement;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
@@ -40,18 +37,9 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         }
 
         parser.next(TokenTypes.LEFT_BRACE(), Text.translatable("meazy:parser.expected.start", "left_brace", "constructor_body"));
-        parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy:parser.expected", "new_line"));
-        parser.moveOverOptionalNewLines();
-
-        List<Statement> body = new ArrayList<>();
-        while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-            if (parser.getCurrent().getType().equals(TokenTypes.BASE())) body.add(parser.parse(MeazyMain.getDefaultIdentifier("base_call_statement"), BaseCallStatement.class));
-            else body.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
-            parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy:parser.expected", "new_line"));
-            parser.moveOverOptionalNewLines();
-        }
-
+        List<LocalStatement> body = ParsingHelper.parseBody(context);
         parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "constructor_body"));
+
         return new ConstructorDeclarationStatement(modifiers, parameters, body);
     }
 }

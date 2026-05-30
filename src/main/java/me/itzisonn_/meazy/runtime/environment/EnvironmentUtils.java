@@ -348,9 +348,6 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         FileEnvironment fileEnvironment = globalEnvironment.getFileEnvironment(classDesc.packageName()).orElse(null);
         if (fileEnvironment == null) return Optional.empty();
 
-        ClassValue classValue = fileEnvironment.getClass(classDesc.displayName())
-                .orElseGet(() -> globalEnvironment.resolveJavaClass(classDesc).orElse(null));
-        if (classValue != null) return Optional.of(classValue);
-        return Optional.empty();
+        return fileEnvironment.getClass(classDesc.displayName()).or(() -> globalEnvironment.resolveJavaClass(classDesc));
     }
 }

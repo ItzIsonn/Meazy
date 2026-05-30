@@ -8,8 +8,10 @@ import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
@@ -20,35 +22,68 @@ import java.util.UUID;
 
 @Getter
 @NullMarked
-public class ConstructorDeclarationStatement extends ModifierStatement implements Statement {
+public class ConstructorDeclarationStatement extends ModifierStatement implements DeclarationStatement {
     private final List<ParameterExpression> parameters;
-    private final List<Statement> body;
+    private final List<LocalStatement> body;
+    @Nullable
+    private ConstructorValue constructorValue;
 
-    public ConstructorDeclarationStatement(Set<Modifier> modifiers, List<ParameterExpression> parameters, List<Statement> body) {
+    public ConstructorDeclarationStatement(Set<Modifier> modifiers, List<ParameterExpression> parameters, List<LocalStatement> body) {
         super(modifiers);
         this.parameters = parameters;
         this.body = body;
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void declare(Environment environment) {
         if (!(environment instanceof ConstructorDeclarationEnvironment constructorDeclarationEnvironment)) {
-            throw new RuntimeException("CANT DECLARE FUNCTION HERE TODO");
+            throw new RuntimeException("CANT DECLARE CONSTRUCTOR HERE TODO");
+        }
+
+        ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                constructorDeclarationEnvironment, null, null
+        );
+
+        constructorValue = constructorDeclarationEnvironment.declareConstructor(
+                parameters,
+                constructorEnvironment
+        );
+
+        boolean alwaysReturns = false;
+        boolean hasBaseCall = false;
+
+        for (LocalStatement localStatement : body) {
+            if (localStatement.alwaysReturns()) alwaysReturns = true;
+            if (localStatement instanceof BaseCallStatement) hasBaseCall = true;
+        }
+
+        if (!hasBaseCall) body.addFirst(new BaseCallStatement(List.of()));
+        if (!alwaysReturns) body.add(new ReturnStatement(null));
+    }
+
+    @Override
+    public void resolve(Environment environment) {
+        if (constructorValue == null) {
+            throw new RuntimeException("Constructor isn't declared TODO");
+        }
+
+        constructorValue.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));
+    }
+
+    @Override
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+        if (constructorValue == null) {
+            throw new RuntimeException("Declared function is unresolved TODO");
         }
 
         UUID startLabel = instructionsSet.createLabel();
         UUID endLabel = instructionsSet.createLabel();
 
-        ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(constructorDeclarationEnvironment, startLabel, endLabel);
-
-        constructorDeclarationEnvironment.declareConstructor(
-                parameters.stream().map(parameter -> new ParameterExpression(parameter.getId(), parameter.getDataType(), parameter.isConstant())).toList(),
-                constructorEnvironment
-        );
+        ConstructorEnvironment constructorEnvironment = constructorValue.getEnvironment();
 
         MethodTypeDesc methodTypeDesc = MethodTypeDesc.of(
                 ConstantDescs.CD_void,
-                parameters.stream().map(p -> p.getType(environment, this).getClassDesc()).toList()
+                constructorValue.getParameters().stream().map(p -> p.getType(environment, this).getClassDesc()).toList()
         );
 
         int accessFlags = 0;
@@ -63,8 +98,14 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
                     bodyInstructions.initLabel(startLabel);
                     bodyInstructions.initLabel(endLabel);
 
-                    for (ParameterExpression parameter : parameters) {
-                        VariableValue parameterValue = constructorEnvironment.declareVariable(parameter.getId(), parameter.getDataType(), parameter.isConstant(), null);
+                    for (ParameterExpression parameter : constructorValue.getParameters()) {
+                        VariableValue parameterValue = constructorEnvironment.declareVariable(
+                                parameter.getId(),
+                                parameter.getDataType(),
+                                parameter.isConstant(),
+                                null
+                        );
+
                         bodyInstructions.setLocalName(parameterValue.getSlot(), parameter.getId(), parameter.getDataType().getClassDesc(), startLabel, endLabel);
                     }
 

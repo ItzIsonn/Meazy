@@ -74,9 +74,8 @@ public class ProgramImpl implements Program {
         String id = FileUtils.getNameWithoutExtension(file);
         id = id.substring(0, 1).toUpperCase() + id.substring(1);
 
-        fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                globalEnvironment, path.get(path.size() - 2), id
-        );
+        fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(globalEnvironment, path.get(path.size() - 2), id);
+        globalEnvironment.addFileEnvironment(fileEnvironment);
 
         for (Statement statement : body) {
             if (statement instanceof ImportStatement importStatement) {

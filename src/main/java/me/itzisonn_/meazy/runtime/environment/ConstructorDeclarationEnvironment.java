@@ -18,7 +18,7 @@ public interface ConstructorDeclarationEnvironment extends Environment {
      * Declares given constructor in this environment
      * TODO
      */
-    void declareConstructor(List<ParameterExpression> parameters, ConstructorEnvironment constructorEnvironment);
+    ConstructorValue declareConstructor(List<ParameterExpression> parameters, ConstructorEnvironment constructorEnvironment);
 
     /**
      * @param parameters Constructor's args TODO
