@@ -140,9 +140,7 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             return Optional.of(classValue);
         }
         catch (ClassNotFoundException e) {
-            System.err.println("Class " + classDesc.descriptorString() + " not found");
+            throw new RuntimeException("Unknown class " + (classDesc.packageName().isEmpty() ? "" : classDesc.packageName() + ".") + classDesc.displayName());
         }
-
-        return Optional.empty();
     }
 }
