@@ -26,8 +26,8 @@ public class ConstructorValueImpl extends ModifierableValueImpl implements Const
     protected final List<Statement> body;
     protected final ConstructorEnvironment environment;
 
-    public ConstructorValueImpl(List<ParameterExpression> parameters, List<Statement> body, ConstructorEnvironment environment, Set<Modifier> modifiers) {
-        super(modifiers);
+    public ConstructorValueImpl(List<ParameterExpression> parameters, List<Statement> body, ConstructorEnvironment environment) {
+        super(environment.getModifiers());
 
         this.parameters = parameters;
         this.body = body;

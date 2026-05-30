@@ -6,7 +6,7 @@ import org.jspecify.annotations.NullMarked;
  * Represents environment for constructors
  */
 @NullMarked
-public interface ConstructorEnvironment extends LocalVariableDeclarationEnvironment {
+public interface ConstructorEnvironment extends LocalVariableDeclarationEnvironment, ModifieredEnvironment {
     @Override
     ConstructorDeclarationEnvironment getParent();
 }

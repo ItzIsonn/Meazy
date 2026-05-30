@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import org.jspecify.annotations.NullMarked;
@@ -16,7 +15,7 @@ import java.util.Set;
  * Represents environment for classes
  */
 @NullMarked
-public interface ClassEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
+public interface ClassEnvironment extends VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment, ModifieredEnvironment {
     @Override
     ClassDeclarationEnvironment getParent();
 
@@ -24,11 +23,6 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
      * @return This class environment's id
      */
     String getId();
-
-    /**
-     * @return This class environment's modifiers
-     */
-    Set<Modifier> getModifiers();
 
     boolean isInterface();
 

@@ -8,7 +8,7 @@ import org.jspecify.annotations.Nullable;
  * Represents environment for functions
  */
 @NullMarked
-public interface FunctionEnvironment extends LocalVariableDeclarationEnvironment {
+public interface FunctionEnvironment extends LocalVariableDeclarationEnvironment, ModifieredEnvironment {
     @Nullable
     DataType getReturnDataType();
     void setReturnDataType(@Nullable DataType returnDataType);

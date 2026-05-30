@@ -57,7 +57,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
     }
 
     @Override
-    public void declare(Environment environment) {
+    public void declare(Environment environment) { //TODO check whether abstract function isn't overridden
         if (!(environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment)) {
             throw new RuntimeException("CANT DECLARE FUNCTION HERE TODO");
         }
@@ -65,11 +65,10 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         boolean isShared = modifiers.contains(Modifiers.SHARED()) || environment instanceof FileEnvironment;
 
         FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                functionDeclarationEnvironment, null, null, returnDataType, isShared
+                functionDeclarationEnvironment, null, null, returnDataType, isShared, modifiers
         );
 
         functionValue = functionDeclarationEnvironment.declareFunction(
-                modifiers,
                 id,
                 parameters,
                 returnDataType,
@@ -159,13 +158,13 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         );
 
         List<AccessFlag> accessFlags = new ArrayList<>();
-        if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
-        else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
+        if (functionValue.getModifiers().contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
+        else if (functionValue.getModifiers().contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
         else accessFlags.add(AccessFlag.PUBLIC);
 
         if (isShared) accessFlags.add(AccessFlag.STATIC);
-        if (modifiers.contains(Modifiers.ABSTRACT())) accessFlags.add(AccessFlag.ABSTRACT);
-        else if (!modifiers.contains(Modifiers.OPEN()) && !(functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment && classEnvironment.isInterface())) {
+        if (functionValue.getModifiers().contains(Modifiers.ABSTRACT())) accessFlags.add(AccessFlag.ABSTRACT);
+        else if (!functionValue.getModifiers().contains(Modifiers.OPEN()) && !(functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment && classEnvironment.isInterface())) {
             accessFlags.add(AccessFlag.FINAL);
         }
 

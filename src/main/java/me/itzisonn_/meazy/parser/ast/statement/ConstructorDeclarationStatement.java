@@ -41,7 +41,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
         }
 
         ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                constructorDeclarationEnvironment, null, null
+                constructorDeclarationEnvironment, null, null, modifiers
         );
 
         constructorValue = constructorDeclarationEnvironment.declareConstructor(
@@ -87,8 +87,8 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
         );
 
         int accessFlags = 0;
-        if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
-        else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
+        if (constructorValue.getModifiers().contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
+        else if (constructorValue.getModifiers().contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
         else accessFlags |= AccessFlag.PUBLIC.mask();
 
         instructionsSet.withConstructor(
