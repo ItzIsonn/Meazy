@@ -92,10 +92,6 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier("is")).getValue();
     }
 
-    public static TokenType IS_LIKE() {
-        return Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier("is_like")).getValue();
-    }
-
 
 
     public static TokenType LEFT_PARENTHESIS() {

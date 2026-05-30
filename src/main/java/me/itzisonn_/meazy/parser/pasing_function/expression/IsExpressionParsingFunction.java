@@ -22,8 +22,8 @@ public class IsExpressionParsingFunction extends AbstractParsingFunction<Express
         Parser parser = context.getParser();
         Expression value = parser.parseAfter(MeazyMain.getDefaultIdentifier("is_expression"), Expression.class);
 
-        if (parser.getCurrent().getType().equals(TokenTypes.IS()) || parser.getCurrent().getType().equals(TokenTypes.IS_LIKE())) {
-            boolean isLike = parser.getCurrentAndNext().getType().equals(TokenTypes.IS_LIKE());
+        if (parser.getCurrent().getType().equals(TokenTypes.IS())) {
+            boolean isLike = parser.getCurrentAndNext().getValue().equals("islike");
             String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected.after_keyword", "id", "is")).getValue();
             return new IsExpression(value, id, isLike);
         }

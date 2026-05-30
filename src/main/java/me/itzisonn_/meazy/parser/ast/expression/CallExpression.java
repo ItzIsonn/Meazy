@@ -175,7 +175,7 @@ public class CallExpression implements Expression, LocalStatement {
             ClassValue classValue = EnvironmentUtils.getClassValue(environment, classDesc).orElse(null);
             if (classValue == null) return null;
 
-            return classValue.getEnvironment().getFunction(id, args).orElse(null);
+            return classValue.getEnvironment().getFunctionRecursively(id, args).orElse(null);
         }
 
         return EnvironmentUtils.getFunctionValue(environment, id, args).orElse(null);

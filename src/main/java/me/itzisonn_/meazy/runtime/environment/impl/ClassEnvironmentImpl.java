@@ -82,7 +82,9 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     @Override
     public void resolveBaseClasses() {
         for (String unresolvedBaseClass : unresolvedBaseClasses) {
-            ClassValue baseClassValue = EnvironmentUtils.getClassValue(parent, unresolvedBaseClass).orElseThrow();
+            ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(parent, unresolvedBaseClass, false);
+            ClassValue baseClassValue = EnvironmentUtils.getClassValue(parent, classDesc).orElseThrow();
+
             if (baseClassValue.isInterface()) interfaces.add(baseClassValue.asClassDesc());
             else {
                 if (baseClass != null) throw new RuntimeException("Class can't have more than one base class TODO");
@@ -90,7 +92,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
             }
         }
 
-        if (baseClass == null) baseClass = ConstantDescs.CD_Object;
+        if (baseClass == null && !isInterface) baseClass = ConstantDescs.CD_Object;
         unresolvedBaseClasses.clear();
     }
 

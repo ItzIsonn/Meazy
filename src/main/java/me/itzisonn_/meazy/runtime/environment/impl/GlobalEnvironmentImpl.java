@@ -101,7 +101,12 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                     returnDataType = DataType.of(returnTypeDesc, !method.getReturnType().isPrimitive());
                 }
 
-                classEnvironment.declareFunction(method.getName(), parameters, returnDataType,
+                Set<me.itzisonn_.meazy.parser.modifier.Modifier> functionModifiers = new HashSet<>();
+                if (!Modifier.isFinal(cls.getModifiers())) functionModifiers.add(Modifiers.OPEN());
+                if (Modifier.isPrivate(cls.getModifiers())) functionModifiers.add(Modifiers.PRIVATE());
+                if (Modifier.isAbstract(cls.getModifiers())) functionModifiers.add(Modifiers.ABSTRACT());
+
+                classEnvironment.declareFunction(functionModifiers, method.getName(), parameters, returnDataType,
                         Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                                 classEnvironment,
                                 null,

@@ -35,6 +35,10 @@ public final class Modifiers {
         return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("shared")).getValue();
     }
 
+    public static Modifier OVERRIDE() {
+        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("override")).getValue();
+    }
+
     public static Modifier ABSTRACT() {
         return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("abstract")).getValue();
     }
@@ -93,6 +97,7 @@ public final class Modifiers {
         register(new ProtectedModifier());
         register(new OpenModifier());
         register(new SharedModifier());
+        register(new OverrideModifier());
         register(new AbstractModifier());
         register(new GetModifier());
         register(new SetModifier());

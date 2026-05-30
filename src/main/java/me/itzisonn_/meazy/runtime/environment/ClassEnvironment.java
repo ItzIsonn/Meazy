@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -33,6 +34,29 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
     @Override
     String getFullClassName();
+
+
+
+    default Optional<FunctionValue> getFunctionRecursively(String id, List<ClassDesc> parameters) {
+        Optional<FunctionValue> functionValue = getFunction(id, parameters);
+        if (functionValue.isPresent()) return functionValue;
+
+        if (getBaseClass() != null) {
+            ClassDesc baseClass = EnvironmentUtils.resolveClassDesc(this, getBaseClass(), false);
+            ClassValue classValue = EnvironmentUtils.getClassValue(this, baseClass).orElseThrow();
+            functionValue = classValue.getEnvironment().getFunctionRecursively(id, parameters);
+            if (functionValue.isPresent()) return functionValue;
+        }
+
+        for (ClassDesc interfaceClassDesc : getInterfaces()) {
+            ClassDesc baseClass = EnvironmentUtils.resolveClassDesc(this, interfaceClassDesc, false);
+            ClassValue classValue = EnvironmentUtils.getClassValue(this, baseClass).orElseThrow();
+            functionValue = classValue.getEnvironment().getFunctionRecursively(id, parameters);
+            if (functionValue.isPresent()) return functionValue;
+        }
+
+        return Optional.empty();
+    }
 
 
 

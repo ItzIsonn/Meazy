@@ -1,7 +1,6 @@
 [
   { "id": "require", "regex": "require" },
   { "id": "import", "regex": "import" },
-  { "id": "using", "regex": "using" },
   { "id": "variable", "regex": "var|val" },
   { "id": "function", "regex": "fun" },
   { "id": "class", "regex": "class" },
@@ -16,6 +15,5 @@
   { "id": "return", "regex": "return" },
   { "id": "continue", "regex": "continue" },
   { "id": "break", "regex": "break" },
-  { "id": "is", "regex": "is" },
-  { "id": "is_like", "regex": "islike" }
+  { "id": "is", "regex": "islike|is" }
 ]
