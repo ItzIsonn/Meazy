@@ -36,7 +36,7 @@ public class AssignmentStatement implements LocalStatement {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
         if (resolvedVariable.isConstant()) throw new RuntimeException("Can't reassign constant variable " + resolvedVariable.getId() + " TODO");
 
-        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, resolvedVariable.getType());
+        ClassDesc classDesc = resolvedVariable.getType();
         ClassDesc valueType = value.getType(environment, this).getClassDesc();
 
         if (resolvedVariable.getClassDesc() != null && resolvedVariable.getTarget() != null) {
