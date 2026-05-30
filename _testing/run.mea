@@ -1,0 +1,143 @@
+import java.util.ArrayList
+import java.util.List
+import java.lang.Math
+import java.lang.Number
+import java.lang.System
+
+var testing = 52
+var test2 = testing + 1
+
+fun testPrimitives() {
+    val a = 67
+    System.out.println(a)
+
+    if (a > 67) {
+        val c = 52.52
+        val ok = 67.67
+        System.out.println(c + ok)
+
+        if (ok == c) {
+            val lol = ok
+            System.out.println(lol)
+        }
+    }
+    else {
+        val de = 69.69
+        System.out.println(de)
+
+        val bil = 100
+        System.out.println(bil)
+
+        if (de == bil) {
+            val haha = de + bil
+            System.out.println(haha)
+        }
+    }
+}
+
+fun println(val v: String) {
+    System.out.println(v)
+}
+
+fun get() = b()
+
+
+
+fun b(): List {
+    val l = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+    val m = {"hi" = "23", "lol" = List.of(), "ban" = ["32"]}
+    System.out.println(ArrayList(m.keySet()).get(0))
+
+    for (var s: String in l) {
+        s = s + " "
+        if (s.equals("pididi")) break
+        println(s)
+    }
+
+    return l
+}
+
+fun main() {
+    var a = 52
+    var b = a + 5
+    System.out.println(b)
+
+    var bool = !(-a <= b)
+    if (bool) {
+        println("True")
+    }
+    else if (b > 57) {
+        println("Greater")
+    }
+    else {
+        println("Less or equal" + 52 + "ok" + true)
+    }
+
+    var i = 10
+    while (i > 0) {
+        if (i == 5) {
+            i--
+            continue
+        }
+        println(String.valueOf(i))
+        i--
+    }
+
+    var tst = "Ok" ?: "Not ok"
+    println(tst)
+
+    println("HI")
+    var c = "Hello"
+    b()
+    a()
+    println(String.valueOf(2 ^ 5))
+    println(String.valueOf(b + Math.random() - c.length()))
+    testPrimitives()
+    //Test("Hi").ok()
+
+    val cls: Ok = Inheritor()
+    println(cls.test())
+    System.out.println(cls.pupok())
+}
+
+fun a() {
+    val abc = 2.5
+    val abcd = 2
+    val str = "Hi"
+
+    System.out.println(abc ?: null)
+
+    System.out.println("IS DOUBLE " + abc is Double)
+    System.out.println("IS LIKE DOUBLE " + abc islike Double)
+    System.out.println("IS NUMBER " + abc is Number)
+    System.out.println("IS LIKE NUMBER " + abc islike Number)
+}
+
+/*class Test {
+    private val a = 5
+
+    constructor(val arg: String) {
+        if (arg.equals("no")) {
+            System.out.println("Invalid arg!")
+            base()
+            return
+        }
+        System.out.println(arg + " ok")
+
+        base()
+    }
+
+    fun ok(): Int {
+        val b = 67
+        return a + b
+    }
+}*/
+
+interface Ok {
+    fun test(): String = "testing"
+    fun pupok(): Int
+}
+
+class Inheritor : Ok {
+    override fun pupok(): Int = 152
+}

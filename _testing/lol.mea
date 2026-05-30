@@ -1,0 +1,15 @@
+open function isGay(var name: String): Boolean {
+    Wow.a()
+    if (name == "Атаев") return true
+    return false
+}
+
+class Wow {
+    shared function a() {
+        println("Atamax gay")
+    }
+
+    constructor() {
+        println("YAY!!!")
+    }
+}
