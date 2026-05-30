@@ -42,6 +42,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         addImport("java.lang.String");
         addImport("java.lang.System");
         addImport("java.lang.IO");
+        addImport("java.lang.Object", "Any");
         addImport("java.lang.Integer", "Int");
         addImport("java.lang.Long");
         addImport("java.lang.Float");
