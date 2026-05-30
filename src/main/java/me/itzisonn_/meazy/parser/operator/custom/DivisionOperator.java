@@ -30,10 +30,11 @@ public class DivisionOperator extends Operator {
         NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't divide " + leftType + " and " + rightType); //TODO
+            throw new RuntimeException("Can't divide values " + leftType + " and " + rightType); //TODO
         }
 
-        NumberType commonNumberType = NumberType.getCommon(leftNumberType, rightNumberType);
+        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't divide nullable numbers");
+        NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
         left.emit(instructionsSet, environment, operatorExpression);
         instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
@@ -60,6 +61,7 @@ public class DivisionOperator extends Operator {
             throw new RuntimeException("Can't get type to divide " + leftType + " and " + rightType); //TODO
         }
 
-        return DataType.ofNonNull(NumberType.getCommon(leftNumberType, rightNumberType).getClassDesc());
+        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't divide nullable numbers");
+        return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).getClassDesc());
     }
 }

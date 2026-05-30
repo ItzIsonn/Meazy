@@ -122,10 +122,11 @@ public final class Operators {
         NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't compare " + leftType + " and " + rightType); //TODO
+            throw new RuntimeException("Can't compare values " + leftType + " and " + rightType); //TODO
         }
 
-        NumberType commonNumberType = NumberType.getCommon(leftNumberType, rightNumberType);
+        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't compare nullable numbers");
+        NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
         UUID trueLabel = instructionsSet.createAndInitLabel();
         UUID endLabel = instructionsSet.createAndInitLabel();

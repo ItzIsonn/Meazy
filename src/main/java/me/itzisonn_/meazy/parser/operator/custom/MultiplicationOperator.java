@@ -12,7 +12,6 @@ import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import org.jspecify.annotations.NullMarked;
 
-import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 
@@ -28,14 +27,15 @@ public class MultiplicationOperator extends Operator {
         Expression right = operatorExpression.getRight();
         if (right == null) throw new NullPointerException("Right side of operator expression is null");
 
-        ClassDesc leftType = left.getType(environment, operatorExpression).getClassDesc();
-        ClassDesc rightType = right.getType(environment, operatorExpression).getClassDesc();
+        DataType leftType = left.getType(environment, operatorExpression);
+        DataType rightType = right.getType(environment, operatorExpression);
 
-        NumberType leftNumberType = NumberType.valueOf(leftType);
-        NumberType rightNumberType = NumberType.valueOf(rightType);
+        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
+        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
 
         if (leftNumberType != null && rightNumberType != null) {
-            NumberType commonNumberType = NumberType.getCommon(leftNumberType, rightNumberType);
+            if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't multiply nullable numbers");
+            NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
             left.emit(instructionsSet, environment, operatorExpression);
             instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
@@ -49,19 +49,23 @@ public class MultiplicationOperator extends Operator {
 
         Expression string;
         Expression number;
+        NumberType numberType;
 
-        if (leftType.equals(ConstantDescs.CD_String) && rightType.equals(ConstantDescs.CD_int)) {
+        if (leftType.getClassDesc().equals(ConstantDescs.CD_String) && rightNumberType != null && rightNumberType.isInt() && !rightType.isNullable()) {
             string = left;
             number = right;
+            numberType = rightNumberType;
         }
-        else if (rightType.equals(ConstantDescs.CD_String) && leftType.equals(ConstantDescs.CD_int)) {
+        else if (rightType.getClassDesc().equals(ConstantDescs.CD_String) && leftNumberType != null && leftNumberType.isInt() && !leftType.isNullable()) {
             string = right;
             number = left;
+            numberType = leftNumberType;
         }
-        else throw new RuntimeException("Can't multiply " + leftType + " and " + rightType + " TODO"); //TODO
+        else throw new RuntimeException("Can't multiply " + leftType.getClassDesc() + " and " + rightType.getClassDesc() + " TODO"); //TODO
 
         string.emit(instructionsSet, environment, operatorExpression);
         number.emit(instructionsSet, environment, operatorExpression);
+        instructionsSet.convertToNumberType(numberType, numberType.unbox());
 
         instructionsSet.invokeMethod(
                 ConstantDescs.CD_String,
@@ -80,17 +84,17 @@ public class MultiplicationOperator extends Operator {
 
         DataType leftType = left.getType(environment, operatorExpression);
         DataType rightType = right.getType(environment, operatorExpression);
-        boolean isNullable = leftType.isNullable() || rightType.isNullable();
 
         if (leftType.getClassDesc().equals(ConstantDescs.CD_String) || rightType.getClassDesc().equals(ConstantDescs.CD_String)) {
-            return DataType.of(ConstantDescs.CD_String, isNullable);
+            return DataType.of(ConstantDescs.CD_String, leftType.isNullable() || rightType.isNullable());
         }
 
         NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
         NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
 
         if (leftNumberType != null && rightNumberType != null) {
-            return DataType.of(NumberType.getCommon(leftNumberType, rightNumberType).getClassDesc(), isNullable);
+            if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't multiply nullable numbers");
+            return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).getClassDesc());
         }
 
         if (leftType.equals(rightType)) return leftType;

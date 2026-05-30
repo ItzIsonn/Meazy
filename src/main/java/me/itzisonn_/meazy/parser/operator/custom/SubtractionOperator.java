@@ -11,8 +11,6 @@ import me.itzisonn_.meazy.parser.operator.OperatorType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import org.jspecify.annotations.NullMarked;
 
-import java.lang.constant.ClassDesc;
-
 @NullMarked
 public class SubtractionOperator extends Operator {
     public SubtractionOperator() {
@@ -25,17 +23,18 @@ public class SubtractionOperator extends Operator {
         Expression right = operatorExpression.getRight();
         if (right == null) throw new NullPointerException("Right side of operator expression is null");
 
-        ClassDesc leftType = left.getType(environment, operatorExpression).getClassDesc();
-        ClassDesc rightType = right.getType(environment, operatorExpression).getClassDesc();
+        DataType leftType = left.getType(environment, operatorExpression);
+        DataType rightType = right.getType(environment, operatorExpression);
 
-        NumberType leftNumberType = NumberType.valueOf(leftType);
-        NumberType rightNumberType = NumberType.valueOf(rightType);
+        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
+        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
 
         if (leftNumberType == null || rightNumberType == null) {
             throw new RuntimeException("Can't subtract " + leftType + " and " + rightType); //TODO
         }
 
-        NumberType commonNumberType = NumberType.getCommon(leftNumberType, rightNumberType);
+        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't subtract nullable numbers");
+        NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
         left.emit(instructionsSet, environment, operatorExpression);
         instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
@@ -62,6 +61,7 @@ public class SubtractionOperator extends Operator {
             throw new RuntimeException("Can't get type to subtract " + leftType + " and " + rightType); //TODO
         }
 
-        return DataType.ofNonNull(NumberType.getCommon(leftNumberType, rightNumberType).getClassDesc());
+        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't subtract nullable numbers");
+        return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).getClassDesc());
     }
 }

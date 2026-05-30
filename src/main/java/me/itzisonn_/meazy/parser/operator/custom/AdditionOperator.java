@@ -33,7 +33,8 @@ public class AdditionOperator extends Operator {
         NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
 
         if (leftNumberType != null && rightNumberType != null) {
-            NumberType commonNumberType = NumberType.getCommon(leftNumberType, rightNumberType);
+            if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't add nullable numbers");
+            NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
             left.emit(instructionsSet, environment, operatorExpression);
             instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
@@ -46,7 +47,7 @@ public class AdditionOperator extends Operator {
         }
 
         if (!leftType.getClassDesc().equals(ConstantDescs.CD_String) && !rightType.getClassDesc().equals(ConstantDescs.CD_String)) {
-            throw new RuntimeException("Can't add " + leftType + " and " + rightType + " TODO"); //TODO
+            throw new RuntimeException("Can't add values " + leftType + " and " + rightType); //TODO
         }
 
         left.emit(instructionsSet, environment, operatorExpression);
@@ -73,17 +74,17 @@ public class AdditionOperator extends Operator {
 
         DataType leftType = left.getType(environment, operatorExpression);
         DataType rightType = right.getType(environment, operatorExpression);
-        boolean isNullable = leftType.isNullable() || rightType.isNullable();
 
         if (leftType.getClassDesc().equals(ConstantDescs.CD_String) || rightType.getClassDesc().equals(ConstantDescs.CD_String)) {
-            return DataType.of(ConstantDescs.CD_String, isNullable);
+            return DataType.of(ConstantDescs.CD_String, leftType.isNullable() && rightType.isNullable());
         }
 
         NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
         NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
 
         if (leftNumberType != null && rightNumberType != null) {
-            return DataType.of(NumberType.getCommon(leftNumberType, rightNumberType).getClassDesc(), isNullable);
+            if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't add nullable numbers");
+            return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).getClassDesc());
         }
 
         if (leftType.equals(rightType)) return leftType;

@@ -82,7 +82,7 @@ public enum NumberType {
         return valueOf(classDesc) != null;
     }
 
-    public static NumberType getCommon(NumberType a, NumberType b) {
+    public static NumberType getCommonUnboxed(NumberType a, NumberType b) {
         if (a.isDouble() || b.isDouble()) return DOUBLE;
         if (a.isFloat() && b.isLong()) return DOUBLE;
         if (a.isLong() && b.isFloat()) return DOUBLE;
