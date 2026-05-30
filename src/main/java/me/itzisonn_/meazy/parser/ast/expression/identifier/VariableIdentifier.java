@@ -37,24 +37,33 @@ public class VariableIdentifier extends Identifier {
         }
         else {
             resolvedVariable.getTarget().emit(instructionsSet, environment, this);
+            UUID endLabel = null;
 
-            if (parent instanceof MemberExpression memberExpression && memberExpression.isNullSafe()) { //TODO test
-                UUID nonnullLabel = instructionsSet.createAndInitLabel();
-                UUID endLabel = instructionsSet.createAndInitLabel();
+            if (parent instanceof MemberExpression memberExpression) {
+                if (!memberExpression.isNullSafe()) {
+                    if (resolvedVariable.getTarget().getType(environment, this).isNullable()) {
+                        throw new RuntimeException("Unsafe member call of function " + id + " on object of type " + resolvedVariable.getClassDesc().descriptorString());
+                    }
+                }
+                else {
+                    UUID nonnullLabel = instructionsSet.createAndInitLabel();
+                    endLabel = instructionsSet.createAndInitLabel();
 
-                instructionsSet.duplicate();
-                instructionsSet.gotoLabelIfNonNull(nonnullLabel);
+                    instructionsSet.duplicate();
+                    instructionsSet.gotoLabelIfNonNull(nonnullLabel);
 
-                instructionsSet.pop();
-                instructionsSet.loadNull();
-                instructionsSet.gotoLabel(endLabel);
+                    instructionsSet.pop();
+                    instructionsSet.loadNull();
+                    instructionsSet.gotoLabel(endLabel);
 
-                instructionsSet.bindLabel(nonnullLabel);
-                instructionsSet.getField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
-                instructionsSet.bindLabel(endLabel);
+                    instructionsSet.bindLabel(nonnullLabel);
+                }
             }
-            else {
-                instructionsSet.getField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
+
+            instructionsSet.getField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
+
+            if (endLabel != null) {
+                instructionsSet.bindLabel(endLabel);
             }
         }
     }
