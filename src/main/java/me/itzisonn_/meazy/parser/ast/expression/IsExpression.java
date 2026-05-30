@@ -2,15 +2,14 @@ package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
+import me.itzisonn_.meazy.util.MiscUtils;
 import org.jspecify.annotations.NullMarked;
 
-import java.lang.classfile.constantpool.ConstantPoolBuilder;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
@@ -31,25 +30,14 @@ public class IsExpression implements Expression {
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType, false);
-
-        if (isLike) {
-            value.emit(instructionsSet, environment, this);
-            instructionsSet.instanceOf(classDesc);
-            return;
-        }
+        ClassDesc valueClassDesc = value.getType(environment, this).getClassDesc();
 
         value.emit(instructionsSet, environment, this);
-        ClassDesc valueType = value.getType(environment, this).getClassDesc();
+        if (valueClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructionsSet, valueClassDesc);
 
-        if (NumberType.isNumberType(valueType)) {
-            NumberType valueNumberType = NumberType.valueOf(classDesc);
-
-            if (valueNumberType != null && !valueNumberType.isBoxed()) {
-                instructionsSet.convertToNumberType(valueNumberType, valueNumberType.box());
-            }
-        }
-        else if (valueType.equals(ConstantDescs.CD_boolean)) {
-            instructionsSet.convertToBooleanType(false, true);
+        if (isLike) {
+            instructionsSet.instanceOf(classDesc);
+            return;
         }
 
         instructionsSet.invokeMethod(
@@ -64,7 +52,7 @@ public class IsExpression implements Expression {
                 ConstantDescs.CD_Object,
                 "equals",
                 MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object),
-                argsInstructions -> argsInstructions.loadConstant(ConstantPoolBuilder.of().classEntry(classDesc).constantValue()),
+                argsInstructions -> argsInstructions.loadConstant(classDesc),
                 InvokeType.VIRTUAL
         );
     }
