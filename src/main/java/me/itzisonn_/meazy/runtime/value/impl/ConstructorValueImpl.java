@@ -19,22 +19,24 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @NullMarked
-public class ConstructorValueImpl extends ModifierableValueImpl implements ConstructorValue {
+public class ConstructorValueImpl implements ConstructorValue {
     protected final List<ParameterExpression> parameters;
     protected final List<Statement> body;
     protected final ConstructorEnvironment environment;
 
     public ConstructorValueImpl(List<ParameterExpression> parameters, List<Statement> body, ConstructorEnvironment environment) {
-        super(environment.getModifiers());
-
         this.parameters = parameters;
         this.body = body;
         this.environment = environment;
     }
 
 
+    @Override
+    public Set<Modifier> getModifiers() {
+        return environment.getModifiers();
+    }
 
     @Override
     public boolean isAccessible(Environment environment) {

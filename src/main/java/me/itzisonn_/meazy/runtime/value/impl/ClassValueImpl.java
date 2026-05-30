@@ -20,15 +20,13 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @NullMarked
-public class ClassValueImpl extends ModifierableValueImpl implements ClassValue {
+public class ClassValueImpl implements ClassValue {
     protected final ClassEnvironment environment;
     protected final List<Statement> body;
 
     public ClassValueImpl(ClassEnvironment environment, List<Statement> body) {
-        super(environment.getModifiers());
-
         this.environment = environment;
         this.body = body;
     }

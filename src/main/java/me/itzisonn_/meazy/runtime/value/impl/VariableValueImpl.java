@@ -15,6 +15,7 @@ import me.itzisonn_.registry.RegistryEntry;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -23,7 +24,7 @@ import java.util.Set;
 @Getter
 @EqualsAndHashCode(callSuper = false, doNotUseGetters = true)
 @NullMarked
-public class VariableValueImpl extends ModifierableValueImpl implements VariableValue {
+public class VariableValueImpl implements VariableValue {
     @Nullable
     private final String id;
     private final DataType dataType;
@@ -32,6 +33,7 @@ public class VariableValueImpl extends ModifierableValueImpl implements Variable
     @Nullable
     private final Expression initializer;
     private final VariableDeclarationEnvironment parentEnvironment;
+    private final Set<Modifier> modifiers;
 
     /**
      * @param id Id
@@ -41,14 +43,13 @@ public class VariableValueImpl extends ModifierableValueImpl implements Variable
      * @param parentEnvironment Parent environment
      */
     public VariableValueImpl(@Nullable String id, DataType dataType, boolean isConstant, Set<Modifier> modifiers, int slot, @Nullable Expression initializer, VariableDeclarationEnvironment parentEnvironment) {
-        super(modifiers);
-
         this.id = id;
         this.dataType = dataType;
         this.isConstant = isConstant;
         this.slot = slot;
         this.initializer = initializer;
         this.parentEnvironment = parentEnvironment;
+        this.modifiers = modifiers;
     }
 
 
@@ -63,5 +64,10 @@ public class VariableValueImpl extends ModifierableValueImpl implements Variable
         }
 
         return true;
+    }
+
+    @Override
+    public Set<Modifier> getModifiers() {
+        return new HashSet<>(modifiers);
     }
 }

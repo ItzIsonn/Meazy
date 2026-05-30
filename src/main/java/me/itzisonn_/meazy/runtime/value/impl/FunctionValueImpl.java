@@ -18,11 +18,12 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @NullMarked
-public class FunctionValueImpl extends ModifierableValueImpl implements FunctionValue {
+public class FunctionValueImpl implements FunctionValue {
     protected final String id;
     protected final List<ParameterExpression> parameters;
     @Nullable
@@ -32,8 +33,6 @@ public class FunctionValueImpl extends ModifierableValueImpl implements Function
     protected boolean isOverridden = false;
 
     public FunctionValueImpl(String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment environment) {
-        super(environment.getModifiers());
-
         this.id = id;
         this.parameters = parameters;
         this.returnDataType = returnDataType;
@@ -70,6 +69,11 @@ public class FunctionValueImpl extends ModifierableValueImpl implements Function
     }
 
 
+
+    @Override
+    public Set<Modifier> getModifiers() {
+        return environment.getModifiers();
+    }
 
     @Override
     public boolean isAccessible(Environment environment) {
