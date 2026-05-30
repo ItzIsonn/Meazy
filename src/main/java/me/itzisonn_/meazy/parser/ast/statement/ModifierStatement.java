@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import org.jspecify.annotations.NullMarked;
 

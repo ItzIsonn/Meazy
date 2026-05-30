@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.ast.expression;
 import lombok.Getter;
 import lombok.Setter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -24,12 +24,12 @@ public class MemberExpression implements Expression, LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         member.emit(instructionsSet, environment, this);
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         return member.getType(environment, this);
     }
 

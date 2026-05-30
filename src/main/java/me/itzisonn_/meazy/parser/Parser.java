@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
@@ -21,7 +21,7 @@ import java.util.List;
  * @see Registries#PARSING_FUNCTIONS
  */
 @NullMarked
-public class Parser {
+public class Parser { //TODO change all Statement to ProgramUnit in javadoc
     private final ParsingContext context;
     private final List<Token> tokens;
 
@@ -194,8 +194,8 @@ public class Parser {
      *
      * @throws IllegalArgumentException When can't find ParsingFunction with given id
      */
-    public Statement parse(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
-        ParsingFunction<? extends Statement> parsingFunction = getParsingFunctionOrNull(id);
+    public ProgramUnit parse(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
+        ParsingFunction<? extends ProgramUnit> parsingFunction = getParsingFunctionOrNull(id);
         if (parsingFunction == null) throw new IllegalArgumentException("Can't find ParsingFunction with id " + id);
         return parsingFunction.parse(context, extra);
     }
@@ -213,14 +213,14 @@ public class Parser {
      *                                  or return type of ParsingFunction doesn't match requested
      */
     @SuppressWarnings("unchecked")
-    public <T extends Statement> T parse(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
-        Statement statement = parse(id, extra);
+    public <T extends ProgramUnit> T parse(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
+        ProgramUnit programUnit = parse(id, extra);
 
-        if (!cls.isInstance(statement)) {
+        if (!cls.isInstance(programUnit)) {
             throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
         }
 
-        return (T) statement;
+        return (T) programUnit;
     }
 
     /**
@@ -232,8 +232,8 @@ public class Parser {
      *
      * @throws IllegalArgumentException When can't find ParsingFunction with given id
      */
-    public Statement parseAfter(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
-        ParsingFunction<? extends Statement> parsingFunction = getParsingFunctionAfterOrNull(id);
+    public ProgramUnit parseAfter(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
+        ParsingFunction<? extends ProgramUnit> parsingFunction = getParsingFunctionAfterOrNull(id);
         if (parsingFunction == null) throw new IllegalArgumentException("Can't find ParsingFunction with id " + id);
 
         return parsingFunction.parse(context, extra);
@@ -252,14 +252,14 @@ public class Parser {
      *                                  or return type of ParsingFunction doesn't match requested
      */
     @SuppressWarnings("unchecked")
-    public <T extends Statement> T parseAfter(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
-        Statement statement = parseAfter(id, extra);
+    public <T extends ProgramUnit> T parseAfter(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
+        ProgramUnit programUnit = parseAfter(id, extra);
 
-        if (!cls.isInstance(statement)) {
+        if (!cls.isInstance(programUnit)) {
             throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
         }
 
-        return (T) statement;
+        return (T) programUnit;
     }
 
 
@@ -271,8 +271,8 @@ public class Parser {
      * @return ParsingFunction with given id or null
      */
     @Nullable
-    private ParsingFunction<? extends Statement> getParsingFunctionOrNull(RegistryIdentifier id) {
-        RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTIONS.getEntry(id);
+    private ParsingFunction<? extends ProgramUnit> getParsingFunctionOrNull(RegistryIdentifier id) {
+        RegistryEntry<ParsingFunction<? extends ProgramUnit>> entry = Registries.PARSING_FUNCTIONS.getEntry(id);
         if (entry == null) return null;
         return entry.getValue();
     }
@@ -284,8 +284,8 @@ public class Parser {
      * @return ParsingFunction after ParsingFunction with given id or null
      */
     @Nullable
-    private ParsingFunction<? extends Statement> getParsingFunctionAfterOrNull(RegistryIdentifier id) {
-        RegistryEntry<ParsingFunction<? extends Statement>> entry = Registries.PARSING_FUNCTIONS.getEntryAfter(id);
+    private ParsingFunction<? extends ProgramUnit> getParsingFunctionAfterOrNull(RegistryIdentifier id) {
+        RegistryEntry<ParsingFunction<? extends ProgramUnit>> entry = Registries.PARSING_FUNCTIONS.getEntryAfter(id);
         if (entry == null) return null;
 
         return entry.getValue();

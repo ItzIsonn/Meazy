@@ -1,7 +1,8 @@
 package me.itzisonn_.meazy.parser.ast.program;
 
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.statement.DeclarationStatement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.version.Version;
@@ -47,9 +48,5 @@ public interface Program extends DeclarationStatement {
     List<Statement> getBody();
 
     @Override
-    void declare(Environment environment);
-    @Override
-    void resolve(Environment environment);
-    @Override
-    void emit(InstructionsSet instructionsSet, Environment environment, @Nullable Statement parent);
+    void emit(InstructionsSet instructionsSet, Environment environment, @Nullable ProgramUnit parent);
 }

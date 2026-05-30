@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.program;
 
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.version.Version;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

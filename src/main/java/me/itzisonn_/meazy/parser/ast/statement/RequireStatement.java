@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.version.Version;
 import org.jspecify.annotations.NullMarked;
@@ -21,5 +21,5 @@ public class RequireStatement implements Statement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {}
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {}
 }

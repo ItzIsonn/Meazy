@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.InvalidSyntaxException;
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;

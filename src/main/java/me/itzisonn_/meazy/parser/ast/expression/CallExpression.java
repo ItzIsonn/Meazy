@@ -5,8 +5,9 @@ import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -37,7 +38,7 @@ public class CallExpression implements Expression, LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         if (caller instanceof FunctionIdentifier) {
             ResolvedCallable resolvedFunction = resolveFunction(environment, parent);
             UUID endLabel = null;
@@ -117,7 +118,7 @@ public class CallExpression implements Expression, LocalStatement {
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         if (caller instanceof FunctionIdentifier) {
             ResolvedCallable function = resolveFunction(environment, parent);
             ClassDesc returnType = function.getMethodTypeDesc().returnType();
@@ -131,7 +132,7 @@ public class CallExpression implements Expression, LocalStatement {
         throw new RuntimeException("Unknown caller TODO" + caller.getClass().getName());
     }
 
-    private ResolvedCallable resolveFunction(Environment environment, Statement parent) {
+    private ResolvedCallable resolveFunction(Environment environment, ProgramUnit parent) {
         FunctionValue functionValue = resolveMeazyFunction(environment, parent);
         if (functionValue == null) throw new RuntimeException("Can't find function for " + caller.getId());
 
@@ -169,7 +170,7 @@ public class CallExpression implements Expression, LocalStatement {
     }
 
     @Nullable
-    private FunctionValue resolveMeazyFunction(Environment environment, Statement parent) {
+    private FunctionValue resolveMeazyFunction(Environment environment, ProgramUnit parent) {
         String id = caller.getId();
         List<ClassDesc> args = this.args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
 

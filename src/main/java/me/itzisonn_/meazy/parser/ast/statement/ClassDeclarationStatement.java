@@ -1,10 +1,10 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
@@ -90,7 +90,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         if (!(environment instanceof FileEnvironment fileEnvironment)) throw new IllegalArgumentException("Environment must be file TODO");
         if (classValue == null) throw new RuntimeException("Declared class is unresolved TODO");
         ClassEnvironment classEnvironment = classValue.getEnvironment();

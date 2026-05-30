@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
@@ -26,7 +26,7 @@ public class ReturnStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         FunctionEnvironment functionEnvironment = EnvironmentUtils.getParentOrSelf(environment, FunctionEnvironment.class).orElseThrow(
                 () -> new IllegalArgumentException("Parent environment for RETURN statement must be FunctionEnvironment TODO")
         );

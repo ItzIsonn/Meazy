@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.operator.Operator;
@@ -44,12 +44,12 @@ public class OperatorExpression implements Expression, LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         operator.emit(instructionsSet, environment, this);
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         return operator.getType(environment, this);
     }
 

@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.program.Program;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy.parser.ast.statement.RequireStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
@@ -47,7 +47,7 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
 
         while (true) {
             try {
-                headerStatement = parser.parse(MeazyMain.getDefaultIdentifier("header_statement"));
+                headerStatement = parser.parse(MeazyMain.getDefaultIdentifier("header_statement"), Statement.class);
             }
             catch (UnexpectedTokenException e) {
                 break;
@@ -67,7 +67,7 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
         parser.moveOverOptionalNewLines();
 
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-            body.add(parser.parse(MeazyMain.getDefaultIdentifier("global_statement")));
+            body.add(parser.parse(MeazyMain.getDefaultIdentifier("global_statement"), Statement.class));
 
             if (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
                 parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy:parser.expected", "new_line"));

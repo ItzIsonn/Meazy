@@ -1,10 +1,10 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
@@ -26,7 +26,7 @@ public class WhileStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         if (!condition.getType(environment, this).equals(DataType.ofNonNull(ConstantDescs.CD_boolean))) {
             throw new RuntimeException("While statement must always use boolean TODO");
         }

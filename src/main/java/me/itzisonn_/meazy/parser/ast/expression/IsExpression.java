@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
@@ -29,7 +29,7 @@ public class IsExpression implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType, false);
 
         if (isLike) {
@@ -70,7 +70,7 @@ public class IsExpression implements Expression {
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         return DataType.ofNonNull(ConstantDescs.CD_boolean);
     }
 }

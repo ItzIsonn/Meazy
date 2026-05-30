@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.modifier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;
-import me.itzisonn_.meazy.parser.ast.expression.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import org.jspecify.annotations.NullMarked;
 

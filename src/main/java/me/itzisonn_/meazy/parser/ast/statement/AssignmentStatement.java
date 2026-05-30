@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
@@ -32,7 +32,7 @@ public class AssignmentStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
         if (resolvedVariable.isConstant()) throw new RuntimeException("Can't reassign constant variable " + resolvedVariable.getId() + " TODO");
 
@@ -73,7 +73,7 @@ public class AssignmentStatement implements LocalStatement {
 
 
 
-    private ResolvedVariable resolveVariable(Environment environment, Statement parent) {
+    private ResolvedVariable resolveVariable(Environment environment, ProgramUnit parent) {
         VariableValue variableValue = resolveMeazyVariable(environment);
         if (variableValue == null) throw new RuntimeException("Can't find variable");
 
