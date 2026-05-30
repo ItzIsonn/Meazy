@@ -31,6 +31,7 @@ import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @NullMarked
@@ -123,6 +124,8 @@ public class ProgramImpl implements Program {
 
         instructionsSet.withClass(
                 classDesc,
+                ConstantDescs.CD_Object,
+                Set.of(),
                 List.of(AccessFlag.PUBLIC, AccessFlag.FINAL),
                 attributes,
                 classInstructions -> {

@@ -102,6 +102,8 @@ public class InterfaceDeclarationStatement extends ModifierStatement implements 
 
         instructionsSet.withClass(
                 classDesc,
+                null,
+                classEnvironment.getInterfaces(),
                 flags,
                 attributes,
                 classInstructions -> {

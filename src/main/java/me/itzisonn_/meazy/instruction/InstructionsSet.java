@@ -226,12 +226,12 @@ public class InstructionsSet {
         returnValue(null);
     }
 
-    public void withClass(ClassDesc classDesc, int flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
-        with(new WithClassInstruction(classDesc, flags, attributes, classInstructions));
+    public void withClass(ClassDesc classDesc, @Nullable ClassDesc superClass, Set<ClassDesc> interfaceClasses, int flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
+        with(new WithClassInstruction(classDesc, superClass, interfaceClasses, flags, attributes, classInstructions));
     }
 
-    public void withClass(ClassDesc classDesc, List<AccessFlag> flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
-        with(new WithClassInstruction(classDesc, toIntFlags(flags), attributes, classInstructions));
+    public void withClass(ClassDesc classDesc, @Nullable ClassDesc superClass, Set<ClassDesc> interfaceClasses, List<AccessFlag> flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
+        with(new WithClassInstruction(classDesc, superClass, interfaceClasses, toIntFlags(flags), attributes, classInstructions));
     }
 
 

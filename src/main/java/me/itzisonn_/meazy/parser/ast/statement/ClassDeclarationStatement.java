@@ -72,6 +72,10 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
                 declarationStatement.declare(classEnvironment);
             }
         }
+
+        if (!classEnvironment.hasConstructor()) {
+            classEnvironment.declareConstructor(List.of(), Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(classEnvironment, null, null));
+        }
     }
 
     @Override
@@ -113,6 +117,8 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
 
         instructionsSet.withClass(
                 classDesc,
+                classEnvironment.getBaseClass(),
+                classEnvironment.getInterfaces(),
                 flags,
                 attributes,
                 classInstructions -> {

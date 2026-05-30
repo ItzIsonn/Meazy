@@ -15,6 +15,7 @@ import me.itzisonn_.meazy.runtime.value.VariableValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.lang.reflect.AccessFlag;
@@ -68,6 +69,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         );
 
         functionValue = functionDeclarationEnvironment.declareFunction(
+                modifiers,
                 id,
                 parameters,
                 returnDataType,
@@ -123,6 +125,30 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         FunctionEnvironment functionEnvironment = functionValue.getEnvironment();
         functionEnvironment.setStartLabel(startLabel);
         functionEnvironment.setEndLabel(endLabel);
+
+        if (functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment) {
+            if (classEnvironment.getBaseClass() != null) {
+                EnvironmentUtils.getClassValue(classEnvironment, classEnvironment.getBaseClass()).orElseThrow()
+                        .getEnvironment().getFunctionRecursively(functionValue.getId(), functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
+                        .ifPresent(f -> {
+                            if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
+                                throw new RuntimeException("Can't override non-open function " + id);
+                            }
+                            if (!functionValue.getModifiers().contains(Modifiers.OVERRIDE())) throw new RuntimeException("Must specify override keyword on function " + id);
+                        });
+            }
+
+            for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
+                EnvironmentUtils.getClassValue(classEnvironment, interfaceClassDesc).orElseThrow()
+                        .getEnvironment().getFunctionRecursively(functionValue.getId(), functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
+                        .ifPresent(f -> {
+                            if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
+                                throw new RuntimeException("Can't override non-open function " + id);
+                            }
+                            if (!functionValue.getModifiers().contains(Modifiers.OVERRIDE())) throw new RuntimeException("Must specify override keyword on function " + id);
+                        });
+            }
+        }
 
         boolean isShared = functionEnvironment.isShared();
         DataType returnDataType = functionValue.getReturnDataType();

@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -20,7 +21,7 @@ public interface FunctionDeclarationEnvironment extends Environment {
      * Declares given function in this environment
      * TODO
      */
-    FunctionValue declareFunction(String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment functionEnvironment);
+    FunctionValue declareFunction(Set<Modifier> modifiers, String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment functionEnvironment);
 
     /**
      * @param id Id

@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
@@ -30,7 +31,7 @@ public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl
     }
 
     @Override
-    public FunctionValue declareFunction(String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment functionEnvironment) {
+    public FunctionValue declareFunction(Set<Modifier> modifiers, String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment functionEnvironment) {
         main:
         for (FunctionValue functionValue : functions) {
             if (functionValue.getId().equals(id)) {
@@ -45,7 +46,7 @@ public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl
             }
         }
 
-        FunctionValue functionValue = new FunctionValueImpl(id, parameters, returnDataType, functionEnvironment, Set.of());
+        FunctionValue functionValue = new FunctionValueImpl(id, parameters, returnDataType, functionEnvironment, modifiers);
         functions.add(functionValue);
         return functionValue;
     }
