@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import me.itzisonn_.meazy.parser.ast.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;

@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
 import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
@@ -87,17 +86,11 @@ public class ForeachStatement implements LocalStatement {
                 InvokeType.INTERFACE
         );
 
-        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType.getClassDesc());
-        instructionsSet.checkCast(classDesc);
+        dataType.resolve(environment);
+        instructionsSet.checkCast(dataType.getClassDesc());
 
-        VariableValue variableValue = localVariableDeclarationEnvironment.declareVariable(
-                id,
-                DataType.of(classDesc, dataType.isNullable()),
-                isConstant,
-                null
-        );
-
-        instructionsSet.storeLocal(classDesc, variableValue.getSlot());
+        VariableValue variableValue = localVariableDeclarationEnvironment.declareVariable(id, dataType, isConstant, null);
+        instructionsSet.storeLocal(variableValue.getDataType().getClassDesc(), variableValue.getSlot());
         instructionsSet.setLocalName(variableValue.getSlot(), variableValue.getId(), variableValue.getDataType().getClassDesc(), conditionLabel, endLabel);
 
         for (Statement statement : body) {

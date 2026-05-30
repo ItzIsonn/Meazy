@@ -175,7 +175,6 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         if (classDesc.isPrimitive() || classDesc.isArray()) return classDesc;
         if (!classDesc.packageName().isEmpty()) return classDesc;
 
-        String fullId;
         FileEnvironment fileEnvironment = getParentOrSelf(environment, FileEnvironment.class).orElse(null);
         if (fileEnvironment == null) return classDesc;
 
@@ -185,6 +184,7 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         classValue = getClassValue(environment, classDesc).orElse(null);
         if (classValue != null) return classValue.asClassDesc();
 
+        String fullId;
         ClassDesc fullClassDesc = fileEnvironment.getImports().get(classDesc.displayName());
         if (fullClassDesc != null) {
             if (fullClassDesc.isPrimitive() || classDesc.isArray()) return fullClassDesc;
