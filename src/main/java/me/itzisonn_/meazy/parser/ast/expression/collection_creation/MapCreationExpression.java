@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.ast.expression.collection_creation;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -25,7 +25,7 @@ public class MapCreationExpression implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         instructionsSet.invokeConstructor(
                 ClassDesc.of("java.util.HashMap"),
                 MethodTypeDesc.of(ConstantDescs.CD_void, List.of(ClassDesc.of("java.util.Map"))),
@@ -34,7 +34,7 @@ public class MapCreationExpression implements Expression {
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         return DataType.ofNonNull(ClassDesc.of("java.util.HashMap"));
     }
 

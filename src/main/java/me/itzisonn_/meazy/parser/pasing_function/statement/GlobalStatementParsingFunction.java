@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.statement.ClassDeclarationStatement;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;

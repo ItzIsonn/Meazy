@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
@@ -109,7 +109,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
 
         List<Statement> body = new ArrayList<>(generatedBody);
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-            Statement statement = parser.parse(MeazyMain.getDefaultIdentifier("class_body_statement"));
+            Statement statement = parser.parse(MeazyMain.getDefaultIdentifier("class_body_statement"), Statement.class);
             body.add(statement);
 
             if (statement instanceof VariableDeclarationStatement variableDeclarationStatement) {

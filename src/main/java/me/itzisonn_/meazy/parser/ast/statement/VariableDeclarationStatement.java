@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -64,7 +64,7 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         if (variableValue == null) {
             if (!(environment instanceof FileEnvironment) && !(environment instanceof ClassEnvironment)) {
                 declare(environment);

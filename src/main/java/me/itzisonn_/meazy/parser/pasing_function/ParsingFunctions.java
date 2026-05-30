@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.pasing_function.expression.*;
 import me.itzisonn_.meazy.parser.pasing_function.statement.*;
 import me.itzisonn_.meazy.registry.Registries;
@@ -71,7 +71,7 @@ public final class ParsingFunctions {
         register(new PrimaryExpressionParsingFunction());
     }
 
-    private static void register(AbstractParsingFunction<? extends @NonNull Statement> parsingFunction) {
+    private static void register(AbstractParsingFunction<? extends @NonNull ProgramUnit> parsingFunction) {
         Registries.PARSING_FUNCTIONS.register(MeazyMain.getDefaultIdentifier(parsingFunction.getId()), parsingFunction);
     }
 }

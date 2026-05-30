@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.expression.literal;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -20,7 +20,7 @@ public class NumberLiteral implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         try {
             int number = Integer.parseInt(value);
             instructionsSet.loadConstant(number);
@@ -32,7 +32,7 @@ public class NumberLiteral implements Expression {
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         try {
             Integer.parseInt(value);
             return DataType.ofNonNull(ConstantDescs.CD_int);

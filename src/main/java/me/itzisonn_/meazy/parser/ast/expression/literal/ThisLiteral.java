@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.expression.literal;
 
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
@@ -14,12 +14,12 @@ import java.lang.constant.ClassDesc;
 @NullMarked
 public class ThisLiteral implements Expression {
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         instructionsSet.loadThisReference();
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         ClassEnvironment classEnvironment = EnvironmentUtils.getParentOrSelf(environment, ClassEnvironment.class).orElseThrow(
                 () -> new IllegalArgumentException("Parent environment for THIS expression must be ClassEnvironment")
         );

@@ -1,6 +1,7 @@
-package me.itzisonn_.meazy.parser.ast.expression;
+package me.itzisonn_.meazy.parser.ast.expression.identifier;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import org.jspecify.annotations.NullMarked;
 
 @Getter

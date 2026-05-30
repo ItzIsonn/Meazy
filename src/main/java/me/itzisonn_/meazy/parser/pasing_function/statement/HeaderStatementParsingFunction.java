@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy.parser.ast.statement.RequireStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;

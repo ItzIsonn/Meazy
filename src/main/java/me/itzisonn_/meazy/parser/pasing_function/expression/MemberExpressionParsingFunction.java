@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;

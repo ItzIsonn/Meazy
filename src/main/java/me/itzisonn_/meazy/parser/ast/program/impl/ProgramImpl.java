@@ -1,13 +1,14 @@
 package me.itzisonn_.meazy.parser.ast.program.impl;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.statement.DeclarationStatement;
 import me.itzisonn_.meazy.parser.ast.statement.ImportStatement;
 import me.itzisonn_.meazy.util.FileUtils;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.program.Program;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
@@ -102,7 +103,7 @@ public class ProgramImpl implements Program {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, @Nullable Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, @Nullable ProgramUnit parent) {
         if (fileEnvironment == null) throw new IllegalArgumentException("Program must be resolved TODO");
         if (file == null) throw new IllegalArgumentException("File can't be null"); //TODO make file actually nonnull
 

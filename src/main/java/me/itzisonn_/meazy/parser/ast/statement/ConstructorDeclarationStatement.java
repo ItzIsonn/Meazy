@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
@@ -31,7 +31,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         if (!(environment instanceof ConstructorDeclarationEnvironment constructorDeclarationEnvironment)) {
             throw new RuntimeException("CANT DECLARE FUNCTION HERE TODO");
         }

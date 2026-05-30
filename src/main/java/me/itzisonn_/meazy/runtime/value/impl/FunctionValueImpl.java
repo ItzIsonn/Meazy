@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.ast.expression.Identifier;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;

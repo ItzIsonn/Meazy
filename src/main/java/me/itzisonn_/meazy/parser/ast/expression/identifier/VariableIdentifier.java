@@ -3,9 +3,8 @@ package me.itzisonn_.meazy.parser.ast.expression.identifier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.Identifier;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
@@ -26,7 +25,7 @@ public class VariableIdentifier extends Identifier {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
 
         if (resolvedVariable.getClassDesc() == null) {
@@ -69,12 +68,12 @@ public class VariableIdentifier extends Identifier {
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
         return DataType.of(resolvedVariable.getType(), resolvedVariable.isNullable());
     }
 
-    private ResolvedVariable resolveVariable(Environment environment, Statement parent) {
+    private ResolvedVariable resolveVariable(Environment environment, ProgramUnit parent) {
         VariableValue variableValue = resolveMeazyVariable(environment, parent);
         if (variableValue == null) throw new RuntimeException("Can't find variable " + id);
 
@@ -102,7 +101,7 @@ public class VariableIdentifier extends Identifier {
     }
 
     @Nullable
-    private VariableValue resolveMeazyVariable(Environment environment, Statement parent) {
+    private VariableValue resolveMeazyVariable(Environment environment, ProgramUnit parent) {
         String id = getId();
 
         if (parent instanceof MemberExpression memberExpression) {

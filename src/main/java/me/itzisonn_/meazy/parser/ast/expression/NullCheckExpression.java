@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.expression;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.Statement;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.util.MiscUtils;
@@ -23,7 +23,7 @@ public class NullCheckExpression implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, Statement parent) {
+    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         DataType checkExpressionType = checkExpression.getType(environment, this);
         if (!checkExpressionType.isNullable()) {
             checkExpression.emit(instructionsSet, environment, this);
@@ -46,7 +46,7 @@ public class NullCheckExpression implements Expression {
     }
 
     @Override
-    public DataType getType(Environment environment, Statement parent) {
+    public DataType getType(Environment environment, ProgramUnit parent) {
         DataType checkExpressionType = checkExpression.getType(environment, this);
         if (!checkExpressionType.isNullable()) return checkExpressionType;
 
