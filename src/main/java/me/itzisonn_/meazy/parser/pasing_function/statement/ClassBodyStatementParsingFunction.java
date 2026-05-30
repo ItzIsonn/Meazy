@@ -30,7 +30,7 @@ public class ClassBodyStatementParsingFunction extends AbstractParsingFunction<S
         Set<Modifier> modifiers = ParsingHelper.parseModifiers(context);
 
         if (parser.getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers);
+            return parser.parse(MeazyMain.getDefaultIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers, false);
         }
         if (parser.getCurrent().getType().equals(TokenTypes.VARIABLE())) {
             return parser.parse(MeazyMain.getDefaultIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);

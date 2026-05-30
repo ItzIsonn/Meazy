@@ -31,8 +31,11 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
     @Override
     public FunctionDeclarationStatement parse(ParsingContext context, @Nullable Object... extra) {
         Parser parser = context.getParser();
-
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
+
+        if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
+        if (!(extra[1] instanceof Boolean canBeAbstractWithoutModifier)) throw new IllegalArgumentException("Expected boolean as extra argument");
+
         parser.next(TokenTypes.FUNCTION(), Text.translatable("meazy:parser.expected.keyword", "function"));
 
         String classId = null;
@@ -46,7 +49,8 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
         List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
         DataType dataType = ParsingHelper.parseDataType(context);
 
-        if (modifiers.contains(Modifiers.ABSTRACT())) {
+        if (modifiers.contains(Modifiers.ABSTRACT()) || (canBeAbstractWithoutModifier && parser.getCurrent().getType().equals(TokenTypes.NEW_LINE()))) {
+            modifiers.add(Modifiers.ABSTRACT());
             return new FunctionDeclarationStatement(modifiers, id, parameters, new ArrayList<>(), dataType);
         }
 

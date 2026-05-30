@@ -18,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.lang.reflect.AccessFlag;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -72,6 +73,8 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                 returnDataType,
                 functionEnvironment
         );
+
+        if (modifiers.contains(Modifiers.ABSTRACT())) return;
 
         for (LocalStatement localStatement : body) {
             if (localStatement.alwaysReturns()) return;
@@ -129,13 +132,16 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                 functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList()
         );
 
-        int accessFlags = 0;
-        if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
-        else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
-        else accessFlags |= AccessFlag.PUBLIC.mask();
+        List<AccessFlag> accessFlags = new ArrayList<>();
+        if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
+        else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
+        else accessFlags.add(AccessFlag.PUBLIC);
 
-        if (isShared) accessFlags |= AccessFlag.STATIC.mask();
-        if (!modifiers.contains(Modifiers.OPEN())) accessFlags |= AccessFlag.FINAL.mask();
+        if (isShared) accessFlags.add(AccessFlag.STATIC);
+        if (modifiers.contains(Modifiers.ABSTRACT())) accessFlags.add(AccessFlag.ABSTRACT);
+        else if (!modifiers.contains(Modifiers.OPEN()) && !(functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment && classEnvironment.isInterface())) {
+            accessFlags.add(AccessFlag.FINAL);
+        }
 
         instructionsSet.withMethod(
                 functionValue.getId(),

@@ -8,6 +8,7 @@ import org.jspecify.annotations.NullMarked;
 
 import java.lang.classfile.ClassBuilder;
 import java.lang.constant.MethodTypeDesc;
+import java.lang.reflect.AccessFlag;
 import java.util.function.Consumer;
 
 @NullMarked
@@ -22,6 +23,11 @@ public final class WithMethodInstruction implements Instruction {
     public void emit(BytecodeBuilders bytecodeBuilders) {
         ClassBuilder classBuilder = bytecodeBuilders.getClassBuilder();
         if (classBuilder == null) throw new RuntimeException("Class builder is null");
+
+        if ((AccessFlag.ABSTRACT.mask() & flags) != 0) {
+            classBuilder.withMethod(id, methodTypeDesc, flags, _ -> {});
+            return;
+        }
 
         classBuilder.withMethodBody(
                 id,
