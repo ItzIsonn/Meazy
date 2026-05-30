@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.value;
 
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
@@ -31,7 +30,5 @@ public interface ClassValue extends ModifierableValue {
     ClassEnvironment getEnvironment();
 
     //TODO
-    default ClassDesc asClassDesc() {
-        return ClassDesc.of(EnvironmentUtils.getPackageName(getEnvironment()).orElseThrow() + "." + getId());
-    }
+    ClassDesc asClassDesc();
 }

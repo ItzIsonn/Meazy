@@ -200,7 +200,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     @Override
     public String getFullClassName() {
         String classSpecifier;
-        if (modifiers.contains(Modifiers.PRIVATE())) classSpecifier = EnvironmentUtils.getFileEnvironment(this).orElseThrow().getClassName() + "$";
+        if (modifiers.contains(Modifiers.PRIVATE())) classSpecifier = EnvironmentUtils.getClassName(this).orElseThrow() + "$";
         else classSpecifier = "";
 
         return EnvironmentUtils.getPackageName(this).orElseThrow() + "." + classSpecifier + id;

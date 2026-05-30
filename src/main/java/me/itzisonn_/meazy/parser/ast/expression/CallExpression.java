@@ -136,13 +136,8 @@ public class CallExpression implements Expression, LocalStatement {
         FunctionValue functionValue = resolveMeazyFunction(environment, parent);
         if (functionValue == null) throw new RuntimeException("Can't find function for " + caller.getId());
 
-        String className;
-        if (functionValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment) {
-            className = EnvironmentUtils.getPackageName(classEnvironment).orElseThrow() + "." + classEnvironment.getId();
-        }
-        else {
-            className = EnvironmentUtils.getPackageName(functionValue.getEnvironment()).orElseThrow() + "." + EnvironmentUtils.getClassName(functionValue.getEnvironment()).orElseThrow();
-        }
+        String className = functionValue.getEnvironment().getParent().getFullClassName();
+        if (className == null) throw new RuntimeException("Invalid function's parent");
 
         Expression target;
         if (parent instanceof MemberExpression memberExpression) {
@@ -192,11 +187,8 @@ public class CallExpression implements Expression, LocalStatement {
         ConstructorValue constructorValue = resolveMeazyConstructor(environment);
         if (constructorValue == null) throw new RuntimeException("Can't find constructor for " + caller.getId());
 
-        String className;
-        if (constructorValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment) {
-            className = EnvironmentUtils.getPackageName(classEnvironment).orElseThrow() + "." + classEnvironment.getId();
-        }
-        else throw new RuntimeException("Invalid constructor");
+        String className = constructorValue.getEnvironment().getParent().getFullClassName();
+        if (className == null) throw new RuntimeException("Invalid constructor");
 
         List<ClassDesc> parameters = constructorValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
 

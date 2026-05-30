@@ -53,23 +53,17 @@ public class BaseCallStatement implements LocalStatement {
 
 
     private ResolvedConstructor resolveConstructor(Environment environment) {
-        if (!EnvironmentUtils.hasParent(environment, ClassEnvironment.class)) {
-            throw new RuntimeException("Can't call super class not inside class"); // TODO
-        }
-
         ConstructorValue constructorValue = resolveMeazyConstructor(environment);
         if (constructorValue == null) throw new RuntimeException();
 
-        String className;
-        if (constructorValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment) {
-            className = EnvironmentUtils.getPackageName(classEnvironment).orElseThrow() + "." + classEnvironment.getId();
+        if (!(constructorValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment)) {
+            throw new RuntimeException("Can't call super class not inside class");
         }
-        else throw new RuntimeException("Invalid constructor");
 
         List<ClassDesc> parameters = constructorValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
 
         return new ResolvedConstructor(
-                ClassDesc.of(className),
+                ClassDesc.of(classEnvironment.getFullClassName()),
                 MethodTypeDesc.of(ConstantDescs.CD_void, parameters)
         );
     }

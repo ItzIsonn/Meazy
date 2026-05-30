@@ -9,6 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
+import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.registry.RegistryEntry;
 import org.jspecify.annotations.NullMarked;
@@ -40,8 +41,8 @@ public class ClassValueImpl extends ModifierableValueImpl implements ClassValue 
     }
 
     @Override
-    public Set<Modifier> getModifiers() {
-        return environment.getModifiers();
+    public boolean isInterface() {
+        return environment.isInterface();
     }
 
     @Override
@@ -52,8 +53,13 @@ public class ClassValueImpl extends ModifierableValueImpl implements ClassValue 
     }
 
     @Override
-    public boolean isInterface() {
-        return environment.isInterface();
+    public ClassDesc asClassDesc() {
+        return ClassDesc.of(EnvironmentUtils.getPackageName(getEnvironment()).orElseThrow() + "." + getId());
+    }
+
+    @Override
+    public Set<Modifier> getModifiers() {
+        return environment.getModifiers();
     }
 
 
