@@ -44,6 +44,10 @@ public final class TokenTypes {
         return Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier("class")).getValue();
     }
 
+    public static TokenType INTERFACE() {
+        return Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier("interface")).getValue();
+    }
+
     public static TokenType CONSTRUCTOR() {
         return Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier("constructor")).getValue();
     }

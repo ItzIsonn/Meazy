@@ -5,6 +5,7 @@
   { "id": "variable", "regex": "var|val" },
   { "id": "function", "regex": "fun" },
   { "id": "class", "regex": "class" },
+  { "id": "interface", "regex": "interface" },
   { "id": "constructor", "regex": "constructor" },
   { "id": "base", "regex": "base" },
   { "id": "if", "regex": "if" },
