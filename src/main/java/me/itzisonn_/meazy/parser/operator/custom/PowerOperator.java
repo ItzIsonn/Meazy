@@ -27,18 +27,20 @@ public class PowerOperator extends Operator {
         Expression right = operatorExpression.getRight();
         if (right == null) throw new NullPointerException("Right side of operator expression is null");
 
-        ClassDesc leftType = left.getType(environment, operatorExpression).getClassDesc();
-        ClassDesc rightType = right.getType(environment, operatorExpression).getClassDesc();
+        DataType leftType = left.getType(environment, operatorExpression);
+        DataType rightType = right.getType(environment, operatorExpression);
 
-        if (!NumberType.isNumberType(leftType) || !NumberType.isNumberType(rightType)) {
-            throw new RuntimeException("Can't raise to the power types " + leftType + " and " + rightType); //TODO
-        }
+        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
+        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+
+        if (leftNumberType == null || rightNumberType == null) throw new RuntimeException("Can't raise to a power types " + leftType + " and " + rightType); //TODO
+        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't rais to a power nullable numbers");
 
         left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(leftType, NumberType.DOUBLE);
+        instructionsSet.convertToNumberType(leftNumberType, NumberType.DOUBLE);
 
         right.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(rightType, NumberType.DOUBLE);
+        instructionsSet.convertToNumberType(rightNumberType, NumberType.DOUBLE);
 
         instructionsSet.invokeMethod(
                 ClassDesc.of("java.lang.Math"),
