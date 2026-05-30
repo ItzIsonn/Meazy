@@ -74,8 +74,8 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
 
 
-    /** TODO javadoc
-     * @return All base classes of this class environment
+    /**
+     * @return ClassDesc of this class environment's base class
      */
     @Nullable
     ClassDesc getBaseClass();
