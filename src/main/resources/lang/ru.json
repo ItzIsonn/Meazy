@@ -88,6 +88,7 @@
   "parser.exception.enums.base_classes": "Класс-перечисление не должен иметь базовых классов",
   "parser.exception.enums.duplicated_entries": "Класс-перечисление не должен иметь повторяющиеся элементы",
   "parser.exception.foreach_variable_without_datatype": "Нельзя определить переменную без типа данных в инструкции 'foreach'",
+  "parser.exception.parameter_without_datatype": "Нельзя определить параметр без типа данных",
   "parser.exception.global_statement": "Ожидались инструкции 'variable_declaration', 'function_declaration' или 'class_declaration'",
   "parser.exception.statement": "Ожидались выражения 'call', 'postfix' или 'member'",
   "parser.exception.constant_without_value": "Нельзя определить константную переменную без значения",

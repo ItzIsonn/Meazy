@@ -35,7 +35,6 @@ public class ForeachStatementParsingFunction extends AbstractParsingFunction<Sta
         String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected", "id")).getValue();
 
         int lineNumber = parser.getCurrent().getLine();
-
         DataType dataType = ParsingHelper.parseDataType(context);
         if (dataType == null) throw new InvalidSyntaxException(lineNumber, Text.translatable("meazy:parser.exception.foreach_variable_without_datatype"));
 

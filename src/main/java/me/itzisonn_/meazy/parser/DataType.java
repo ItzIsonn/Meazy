@@ -17,7 +17,7 @@ import java.lang.constant.ConstantDescs;
 @NullMarked
 public final class DataType {
     /**
-     * TODO
+     * ClassDesc of this data type
      */
     private ClassDesc classDesc;
     /**
@@ -69,18 +69,6 @@ public final class DataType {
 
     public static DataType ofNonNull(ClassDesc classDesc) {
         return of(classDesc, false);
-    }
-
-    public static DataType any(boolean isNullable) {
-        return of(ConstantDescs.CD_Object, isNullable);
-    }
-
-    public static DataType anyNullable() {
-        return any(true);
-    }
-
-    public static DataType anyNonNull() {
-        return any(false);
     }
 
 

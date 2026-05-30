@@ -37,7 +37,7 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
         DataType dataType = ParsingHelper.parseDataType(context);
 
         if (!parser.getCurrent().getType().equals(TokenTypes.ASSIGN())) {
-            if (dataType == null) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("parser.exception.variable_without_datatype_and_value"));
+            if (dataType == null) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.variable_without_datatype_and_value"));
 
             if (canBeConstantWithoutValue) return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, null);
             if (isConstant) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.constant_without_value"));

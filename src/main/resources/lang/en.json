@@ -88,6 +88,7 @@
   "parser.exception.enums.base_classes": "Enum class can't have base classes",
   "parser.exception.enums.duplicated_entries": "Enum class can't have duplicated entries",
   "parser.exception.foreach_variable_without_datatype": "Can't declare variable without data type in 'foreach' statement",
+  "parser.exception.parameter_without_datatype": "Can't declare parameter without data type",
   "parser.exception.global_statement": "Expected 'variable_declaration', 'function_declaration' or 'class_declaration' statement",
   "parser.exception.statement": "Expected 'call', 'postfix' or 'member' expression",
   "parser.exception.constant_without_value": "Can't declare a constant variable without a value",

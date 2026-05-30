@@ -1,12 +1,9 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
+import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
 import org.jspecify.annotations.NullMarked;
@@ -29,7 +26,10 @@ public class ParameterExpressionParsingFunction extends AbstractParsingFunction<
         boolean isConstant = parser.getCurrentAndNext().getValue().equals("val");
         String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected.after_keyword", "id", "variable")).getValue();
 
+        int lineNumber = parser.getCurrent().getLine();
         DataType dataType = ParsingHelper.parseDataType(context);
-        return new ParameterExpression(id, dataType == null ? DataType.anyNullable() : dataType, isConstant);
+        if (dataType == null) throw new InvalidSyntaxException(lineNumber, Text.translatable("meazy:parser.exception.parameter_without_datatype"));
+
+        return new ParameterExpression(id, dataType, isConstant);
     }
 }
