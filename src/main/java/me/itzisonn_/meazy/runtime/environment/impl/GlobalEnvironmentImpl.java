@@ -106,18 +106,22 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                 if (Modifier.isPrivate(cls.getModifiers())) functionModifiers.add(Modifiers.PRIVATE());
                 if (Modifier.isAbstract(cls.getModifiers())) functionModifiers.add(Modifiers.ABSTRACT());
 
-                classEnvironment.declareFunction(functionModifiers, method.getName(), parameters, returnDataType,
+                classEnvironment.declareFunction(method.getName(), parameters, returnDataType,
                         Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                                 classEnvironment,
                                 null,
                                 null,
                                 returnDataType,
-                                Modifier.isStatic(method.getModifiers())
+                                Modifier.isStatic(method.getModifiers()),
+                                functionModifiers
                         )
                 );
             }
 
             for (Constructor<?> constructor : cls.getDeclaredConstructors()) {
+                Set<me.itzisonn_.meazy.parser.modifier.Modifier> constructorModifiers = new HashSet<>();
+                if (Modifier.isPrivate(cls.getModifiers())) constructorModifiers.add(Modifiers.PRIVATE());
+
                 classEnvironment.declareConstructor(
                         Arrays.stream(constructor.getParameters()).map(p -> new ParameterExpression(
                                 p.getName(),
@@ -128,7 +132,8 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                         Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                                 classEnvironment,
                                 null,
-                                null
+                                null,
+                                constructorModifiers
                         )
                 );
             }

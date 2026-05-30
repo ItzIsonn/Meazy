@@ -18,7 +18,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -32,8 +31,8 @@ public class FunctionValueImpl extends ModifierableValueImpl implements Function
     protected final FunctionEnvironment environment;
     protected boolean isOverridden = false;
 
-    public FunctionValueImpl(String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment environment, Set<Modifier> modifiers) {
-        super(modifiers);
+    public FunctionValueImpl(String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment environment) {
+        super(environment.getModifiers());
 
         this.id = id;
         this.parameters = parameters;

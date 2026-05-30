@@ -184,7 +184,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
             throw new EvaluationException(Text.translatable("meazy:runtime.constructor.already_exists"));
         }
 
-        ConstructorValue value = new ConstructorValueImpl(parameters, List.of(), constructorEnvironment, Set.of());
+        ConstructorValue value = new ConstructorValueImpl(parameters, List.of(), constructorEnvironment);
         constructors.add(value);
         return value;
     }
