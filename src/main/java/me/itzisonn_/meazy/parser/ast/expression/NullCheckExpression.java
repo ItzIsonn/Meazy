@@ -54,6 +54,6 @@ public class NullCheckExpression implements Expression {
         ClassDesc nullExpressionClassDesc = nullExpressionType.getClassDesc();
         if (nullExpressionClassDesc.isPrimitive()) nullExpressionClassDesc = MiscUtils.getBoxedType(nullExpressionClassDesc);
 
-        return DataType.commonOf(environment, checkExpressionType.with(false), nullExpressionType.with(nullExpressionClassDesc));
+        return DataType.commonOf(environment, checkExpressionType.asNonNull(), nullExpressionType.with(nullExpressionClassDesc));
     }
 }

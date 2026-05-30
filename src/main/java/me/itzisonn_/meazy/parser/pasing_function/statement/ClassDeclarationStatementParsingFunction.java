@@ -211,7 +211,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         body.add(new FunctionDeclarationStatement(
                 Set.of(Modifiers.OPERATOR()),
                 "equals",
-                List.of(new ParameterExpression("value", DataType.anyNullable(), true)),
+                List.of(new ParameterExpression("value", DataType.ofNullable(ConstantDescs.CD_Object), true)),
                 List.of(
                         new IfStatement(
                                 new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "==", OperatorType.INFIX),
