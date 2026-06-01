@@ -345,9 +345,11 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         GlobalEnvironment globalEnvironment = getParentOrSelf(environment, GlobalEnvironment.class).orElse(null);
         if (globalEnvironment == null) return Optional.empty();
 
-        FileEnvironment fileEnvironment = globalEnvironment.getFileEnvironment(classDesc.packageName()).orElse(null);
-        if (fileEnvironment == null) return Optional.empty();
+        for (FileEnvironment fileEnvironment : globalEnvironment.getFileEnvironments(classDesc.packageName())) {
+            Optional<ClassValue> classValue = fileEnvironment.getClass(classDesc.displayName());
+            if (classValue.isPresent()) return classValue;
+        }
 
-        return fileEnvironment.getClass(classDesc.displayName()).or(() -> globalEnvironment.resolveJavaClass(classDesc));
+        return globalEnvironment.resolveJavaClass(classDesc);
     }
 }
