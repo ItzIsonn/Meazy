@@ -90,7 +90,7 @@ public class InterfaceDeclarationStatement extends ModifierStatement implements 
         else classDesc = ClassDesc.of(fileEnvironment.getPackageName(), id);
 
         List<InnerClassesAttribute> attributes = new ArrayList<>();
-        List<AccessFlag> flags = new ArrayList<>();
+        Set<AccessFlag> flags = new HashSet<>();
         flags.add(AccessFlag.INTERFACE);
         flags.add(AccessFlag.ABSTRACT);
 

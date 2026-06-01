@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.lang.reflect.AccessFlag;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -86,10 +87,10 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
                 constructorValue.getParameters().stream().map(p -> p.getType(environment, this).getClassDesc()).toList()
         );
 
-        int accessFlags = 0;
-        if (constructorValue.getModifiers().contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
-        else if (constructorValue.getModifiers().contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
-        else accessFlags |= AccessFlag.PUBLIC.mask();
+        Set<AccessFlag> accessFlags = new HashSet<>();
+        if (constructorValue.getModifiers().contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
+        else if (constructorValue.getModifiers().contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
+        else accessFlags.add(AccessFlag.PUBLIC);
 
         instructionsSet.withConstructor(
                 methodTypeDesc,

@@ -106,13 +106,15 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
         else classDesc = ClassDesc.of(fileEnvironment.getPackageName(), id);
 
         List<InnerClassesAttribute> attributes = new ArrayList<>();
-        int flags = 0;
+        Set<AccessFlag> flags = new HashSet<>();
 
         if (isInner) attributes.add(getInnerClassesAttribute(fileEnvironment));
         else {
-            if (modifiers.contains(Modifiers.PRIVATE())) flags |= AccessFlag.PRIVATE.mask();
-            else flags |= AccessFlag.PUBLIC.mask();
-            if (!modifiers.contains(Modifiers.OPEN())) flags |= AccessFlag.FINAL.mask();
+            if (modifiers.contains(Modifiers.PRIVATE())) flags.add(AccessFlag.PRIVATE);
+            else flags.add(AccessFlag.PUBLIC);
+
+            if (modifiers.contains(Modifiers.ABSTRACT())) flags.add(AccessFlag.ABSTRACT);
+            else if (!modifiers.contains(Modifiers.OPEN())) flags.add(AccessFlag.FINAL);
         }
 
         instructionsSet.withClass(
@@ -130,7 +132,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
 
                     if (!hasConstructor) classInstructions.withConstructor(
                             MethodTypeDesc.of(ConstantDescs.CD_void),
-                            AccessFlag.PUBLIC.mask(),
+                            Set.of(AccessFlag.PUBLIC),
                             bodyInstructions -> {
                                 bodyInstructions.loadThisReference();
 
