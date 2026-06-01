@@ -32,6 +32,13 @@ public class NegationOperator extends Operator {
 
     @Override
     public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        return operatorExpression.getLeft().getType(environment, operatorExpression);
+        Expression left = operatorExpression.getLeft();
+        DataType leftType = left.getType(environment, operatorExpression);
+
+        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
+        if (leftNumberType == null) throw new RuntimeException("Can't negate non-number value");
+        if (leftType.isNullable()) throw new RuntimeException("Can't negate nullable number");
+
+        return DataType.ofNonNull(leftNumberType.unbox().getClassDesc());
     }
 }
