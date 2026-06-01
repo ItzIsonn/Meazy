@@ -158,24 +158,8 @@ public class InstructionsSet {
         with(new NegateNumberInstruction(type));
     }
 
-    public void negateNumber(ClassDesc classDesc) {
-        negateNumber(getNullSafeNumberType(classDesc));
-    }
-
     public void convertToNumberType(NumberType from, NumberType to) {
         with(new ConvertToNumberTypeInstruction(from, to));
-    }
-
-    public void convertToNumberType(ClassDesc from, ClassDesc to) {
-        convertToNumberType(getNullSafeNumberType(from), getNullSafeNumberType(to));
-    }
-
-    public void convertToNumberType(NumberType from, ClassDesc to) {
-        convertToNumberType(from, getNullSafeNumberType(to));
-    }
-
-    public void convertToNumberType(ClassDesc from, NumberType to) {
-        convertToNumberType(getNullSafeNumberType(from), to);
     }
 
     public void convertToBooleanType(boolean isFromBoxed, boolean isToBoxed) {
@@ -184,10 +168,6 @@ public class InstructionsSet {
 
     public void arithmeticOperation(NumberType type, ArithmeticOperation operation) {
         with(new ArithmeticOperationInstruction(type, operation));
-    }
-
-    public void arithmeticOperation(ClassDesc type, ArithmeticOperation operation) {
-        arithmeticOperation(getNullSafeNumberType(type), operation);
     }
 
     public void logicalOperation(LogicalOperation operation) {
@@ -262,23 +242,9 @@ public class InstructionsSet {
         with(new GotoLabelIfComparisonTrueInstruction(type, operation, uuid));
     }
 
-    public void gotoLabelIfComparisonTrue(ClassDesc type, ComparisonOperation operation, UUID uuid) {
-        gotoLabelIfComparisonTrue(getNullSafeNumberType(type), operation, uuid);
-    }
 
-
-
-    private NumberType getNullSafeNumberType(ClassDesc type) {
-        NumberType numberType = NumberType.valueOf(type);
-        if (numberType == null) throw new IllegalArgumentException("There's no NumberType corresponding to ClassDesc " +  type);
-        return numberType;
-    }
 
     private static int toIntFlags(Collection<AccessFlag> accessFlags) {
         return accessFlags.stream().map(AccessFlag::mask).reduce((i1, i2) -> i1 | i2).orElse(0);
-    }
-
-    private static int toIntFlags(AccessFlag... accessFlags) {
-        return toIntFlags(Arrays.asList(accessFlags));
     }
 }

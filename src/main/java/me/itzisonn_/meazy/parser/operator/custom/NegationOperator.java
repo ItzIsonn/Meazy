@@ -27,7 +27,7 @@ public class NegationOperator extends Operator {
 
         left.emit(instructionsSet, environment, operatorExpression);
         instructionsSet.convertToNumberType(leftNumberType, leftNumberType.unbox());
-        instructionsSet.negateNumber(leftType.getClassDesc());
+        instructionsSet.negateNumber(leftNumberType);
     }
 
     @Override

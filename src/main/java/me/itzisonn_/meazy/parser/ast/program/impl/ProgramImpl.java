@@ -162,8 +162,11 @@ public class ProgramImpl implements Program {
                                     ClassDesc variableType = variableValue.getDataType().getClassDesc();
 
                                     if (!valueType.equals(variableType)) {
-                                        if (NumberType.isNumberType(variableType) && NumberType.isNumberType(valueType)) {
-                                            bodyInstructions.convertToNumberType(valueType, variableType);
+                                        NumberType variableNumberType = NumberType.valueOf(variableType);
+                                        NumberType valueNumberType = NumberType.valueOf(valueType);
+
+                                        if (variableNumberType != null && valueNumberType != null) {
+                                            bodyInstructions.convertToNumberType(valueNumberType, variableNumberType);
                                         }
 
                                         else if (MiscUtils.isBoolean(variableType) && MiscUtils.isBoolean(valueType)) {
