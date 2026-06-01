@@ -56,19 +56,22 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             Class<?> cls = Class.forName(classDesc.packageName() + "." + classDesc.displayName());
             String packageName = cls.getPackageName();
 
-            FileEnvironment javaFileEnvironment = getFileEnvironment(packageName).orElse(null);
-            if (javaFileEnvironment != null) {
-                Optional<ClassValue> classValue = javaFileEnvironment.getClass(classDesc.displayName());
+            for (FileEnvironment fileEnvironment : getFileEnvironments(packageName)) {
+                Optional<ClassValue> classValue = fileEnvironment.getClass(classDesc.displayName());
                 if (classValue.isPresent()) return classValue;
             }
-            else javaFileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(this, packageName);
+
+            FileEnvironment fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                    this, packageName, cls.getSimpleName()
+            );
 
             Set<me.itzisonn_.meazy.parser.modifier.Modifier> classEnvironmentModifiers = new HashSet<>();
             if (!Modifier.isFinal(cls.getModifiers())) classEnvironmentModifiers.add(Modifiers.OPEN());
             if (Modifier.isPrivate(cls.getModifiers())) classEnvironmentModifiers.add(Modifiers.PRIVATE());
+            if (Modifier.isAbstract(cls.getModifiers())) classEnvironmentModifiers.add(Modifiers.ABSTRACT());
 
             ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                    javaFileEnvironment,
+                    fileEnvironment,
                     false,
                     cls.isInterface(),
                     classDesc.displayName(),
@@ -77,8 +80,8 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                     classEnvironmentModifiers
             );
 
-            ClassValue classValue = javaFileEnvironment.declareClass(classEnvironment);
-            addFileEnvironment(javaFileEnvironment);
+            ClassValue classValue = fileEnvironment.declareClass(classEnvironment);
+            addFileEnvironment(fileEnvironment);
 
             if (classEnvironment.getBaseClass() != null) resolveJavaClass(classEnvironment.getBaseClass());
             for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
@@ -87,11 +90,6 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
 
             for (Method method : cls.getDeclaredMethods()) {
                 if (method.isSynthetic()) continue;
-                List<ParameterExpression> parameters = Arrays.stream(method.getParameters()).map(p -> new ParameterExpression(
-                        p.getName(),
-                        DataType.of(p.getType().describeConstable().orElseThrow(), !p.getType().isPrimitive()),
-                        Modifier.isFinal(p.getModifiers())
-                )).toList();
 
                 DataType returnDataType;
                 if (method.getReturnType() == void.class) returnDataType = null;
@@ -104,9 +102,18 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                 Set<me.itzisonn_.meazy.parser.modifier.Modifier> functionModifiers = new HashSet<>();
                 if (!Modifier.isFinal(cls.getModifiers())) functionModifiers.add(Modifiers.OPEN());
                 if (Modifier.isPrivate(cls.getModifiers())) functionModifiers.add(Modifiers.PRIVATE());
+                if (Modifier.isProtected(cls.getModifiers())) functionModifiers.add(Modifiers.PROTECTED());
+                if (Modifier.isStatic(cls.getModifiers())) functionModifiers.add(Modifiers.SHARED());
                 if (Modifier.isAbstract(cls.getModifiers())) functionModifiers.add(Modifiers.ABSTRACT());
 
-                classEnvironment.declareFunction(method.getName(), parameters, returnDataType,
+                classEnvironment.declareFunction(
+                        method.getName(),
+                        Arrays.stream(method.getParameters()).map(p -> new ParameterExpression(
+                                p.getName(),
+                                DataType.of(p.getType().describeConstable().orElseThrow(), !p.getType().isPrimitive()),
+                                Modifier.isFinal(p.getModifiers())
+                        )).toList(),
+                        returnDataType,
                         Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                                 classEnvironment,
                                 null,
@@ -121,6 +128,7 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             for (Constructor<?> constructor : cls.getDeclaredConstructors()) {
                 Set<me.itzisonn_.meazy.parser.modifier.Modifier> constructorModifiers = new HashSet<>();
                 if (Modifier.isPrivate(cls.getModifiers())) constructorModifiers.add(Modifiers.PRIVATE());
+                if (Modifier.isProtected(cls.getModifiers())) constructorModifiers.add(Modifiers.PROTECTED());
 
                 classEnvironment.declareConstructor(
                         Arrays.stream(constructor.getParameters()).map(p -> new ParameterExpression(
@@ -158,7 +166,7 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             return Optional.of(classValue);
         }
         catch (ClassNotFoundException e) {
-            throw new RuntimeException("Unknown class " + (classDesc.packageName().isEmpty() ? "" : classDesc.packageName() + ".") + classDesc.displayName());
+            return Optional.empty();
         }
         catch (IllegalAccessException e) {
             throw new RuntimeException(e);

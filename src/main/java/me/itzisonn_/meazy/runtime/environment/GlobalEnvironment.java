@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.value.ClassValue;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,12 +19,14 @@ public interface GlobalEnvironment extends Environment {
      */
     void addFileEnvironment(FileEnvironment fileEnvironment);
 
-    default Optional<FileEnvironment> getFileEnvironment(String packageName) {
+    default Set<FileEnvironment> getFileEnvironments(String packageName) {
+        Set<FileEnvironment> fileEnvironments = new HashSet<>();
+
         for (FileEnvironment fileEnvironment : getFileEnvironments()) {
-            if (packageName.equals(fileEnvironment.getPackageName())) return Optional.of(fileEnvironment);
+            if (packageName.equals(fileEnvironment.getPackageName())) fileEnvironments.add(fileEnvironment);
         }
 
-        return Optional.empty();
+        return fileEnvironments;
     }
 
     /**

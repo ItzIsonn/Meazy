@@ -9,7 +9,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.UUID;
 
 /**
- * Represents environment for loops TODO
+ * Adds to Environment ability to declare local variables
  */
 @NullMarked
 public interface LocalVariableDeclarationEnvironment extends VariableDeclarationEnvironment {

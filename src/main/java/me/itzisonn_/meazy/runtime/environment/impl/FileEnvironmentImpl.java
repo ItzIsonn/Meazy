@@ -16,6 +16,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDescs;
 import java.util.*;
 
 @NullMarked
@@ -23,13 +24,12 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
     @Getter
     private final String packageName;
     @Getter
-    @Nullable
     private final String className;
     private final Map<String, ClassDesc> imports;
     private final List<VariableValue> variables;
     private final Set<ClassValue> classes;
 
-    public FileEnvironmentImpl(GlobalEnvironment parent, String packageName, @Nullable String className) {
+    public FileEnvironmentImpl(GlobalEnvironment parent, String packageName, String className) {
         super(parent, true);
 
         this.packageName = packageName;
@@ -42,8 +42,8 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
         addImport("java.lang.String");
         addImport("java.lang.System");
         addImport("java.lang.IO");
-        addImport("java.lang.Object", "Any");
-        addImport("java.lang.Integer", "Int");
+        addImport(ConstantDescs.CD_Object, "Any");
+        addImport(ConstantDescs.CD_Integer, "Int");
         addImport("java.lang.Long");
         addImport("java.lang.Float");
         addImport("java.lang.Double");
@@ -60,8 +60,8 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
 
 
     @Override
-    public void addImport(String fullName, String name) {
-        imports.put(name, ClassDesc.of(fullName));
+    public void addImport(ClassDesc classDesc, String name) {
+        imports.put(name, classDesc);
     }
 
     @Override
@@ -108,10 +108,5 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
     @Override
     public Set<ClassValue> getClasses() {
         return new HashSet<>(classes);
-    }
-
-    @Override
-    public String getFullClassName() {
-        return packageName + "." + className;
     }
 }
