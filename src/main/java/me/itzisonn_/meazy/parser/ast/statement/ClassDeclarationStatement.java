@@ -132,8 +132,11 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
                             bodyInstructions -> {
                                 bodyInstructions.loadThisReference();
 
+                                ClassDesc baseClass = classEnvironment.getBaseClass();
+                                if (baseClass == null) throw new RuntimeException("Class " + classEnvironment.getId() + " has no base class");
+
                                 bodyInstructions.invokeSuperClass(
-                                        ConstantDescs.CD_Object,
+                                        baseClass,
                                         MethodTypeDesc.of(ConstantDescs.CD_void),
                                         _ -> {}
                                 );
