@@ -60,8 +60,11 @@ public class ReturnStatement implements LocalStatement {
         ClassDesc returnTypeClassDesc = returnDataType.getClassDesc();
 
         if (!EnvironmentUtils.isInstanceOf(functionEnvironment, valueClassDesc, returnTypeClassDesc)) {
-            if (NumberType.isNumberType(returnTypeClassDesc) && NumberType.isNumberType(valueClassDesc)) {
-                instructionsSet.convertToNumberType(valueClassDesc, returnTypeClassDesc);
+            NumberType returnNumberType = NumberType.valueOf(returnTypeClassDesc);
+            NumberType valueNumberType = NumberType.valueOf(valueClassDesc);
+
+            if (returnNumberType != null && valueNumberType != null) {
+                instructionsSet.convertToNumberType(valueNumberType, returnNumberType);
             }
             else if (MiscUtils.isBoolean(returnTypeClassDesc) && MiscUtils.isBoolean(valueClassDesc)) {
                 instructionsSet.convertToBooleanType(valueClassDesc.isClassOrInterface(), returnTypeClassDesc.isClassOrInterface());

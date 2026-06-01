@@ -36,7 +36,7 @@ public class AssignmentStatement implements LocalStatement {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
         if (resolvedVariable.isConstant()) throw new RuntimeException("Can't reassign constant variable " + resolvedVariable.getId() + " TODO");
 
-        ClassDesc classDesc = resolvedVariable.getType();
+        ClassDesc variableType = resolvedVariable.getType();
         ClassDesc valueType = value.getType(environment, this).getClassDesc();
 
         if (resolvedVariable.getClassDesc() != null && resolvedVariable.getTarget() != null) {
@@ -45,13 +45,15 @@ public class AssignmentStatement implements LocalStatement {
 
         value.emit(instructionsSet, environment, this);
 
-        if (!valueType.equals(classDesc)) {
-            if (NumberType.isNumberType(classDesc) && NumberType.isNumberType(valueType)) {
-                instructionsSet.convertToNumberType(valueType, classDesc);
-            }
+        if (!valueType.equals(variableType)) {
+            NumberType variableNumberType = NumberType.valueOf(variableType);
+            NumberType valueNumberType = NumberType.valueOf(valueType);
 
-            else if (MiscUtils.isBoolean(classDesc) && MiscUtils.isBoolean(valueType)) {
-                instructionsSet.convertToBooleanType(valueType.isClassOrInterface(), classDesc.isClassOrInterface());
+            if (variableNumberType != null && valueNumberType != null) {
+                instructionsSet.convertToNumberType(valueNumberType, variableNumberType);
+            }
+            else if (MiscUtils.isBoolean(variableType) && MiscUtils.isBoolean(valueType)) {
+                instructionsSet.convertToBooleanType(valueType.isClassOrInterface(), variableType.isClassOrInterface());
             }
         }
 

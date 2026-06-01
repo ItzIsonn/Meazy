@@ -108,8 +108,11 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             ClassDesc valueType = value.getType(environment, this).getClassDesc();
 
             if (!valueType.equals(classDesc)) {
-                if (NumberType.isNumberType(classDesc) && NumberType.isNumberType(valueType)) {
-                    instructionsSet.convertToNumberType(valueType, classDesc);
+                NumberType variableNumberType = NumberType.valueOf(classDesc);
+                NumberType valueNumberType = NumberType.valueOf(valueType);
+
+                if (variableNumberType != null && valueNumberType != null) {
+                    instructionsSet.convertToNumberType(valueNumberType, variableNumberType);
                 }
 
                 else if (MiscUtils.isBoolean(classDesc) && MiscUtils.isBoolean(valueType)) {
