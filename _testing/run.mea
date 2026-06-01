@@ -93,7 +93,7 @@ fun main() {
     println(String.valueOf(2 ^ 5))
     println(String.valueOf(b + Math.random() - c.length()))
     testPrimitives()
-    //Test("Hi").ok()
+    Test("Hi").ok()
 
     val cls: Ok = Inheritor()
     println(cls.test())
@@ -113,7 +113,7 @@ fun a() {
     System.out.println("IS LIKE NUMBER " + abc islike Number)
 }
 
-/*class Test {
+class Test {
     private val a = 5
 
     constructor(val arg: String) {
@@ -131,7 +131,7 @@ fun a() {
         val b = 67
         return a + b
     }
-}*/
+}
 
 interface Ok {
     fun test(): String = "testing"
@@ -144,4 +144,8 @@ class Inheritor : Ok {
 
 abstract class AbstractClass : Ok {
     abstract fun hello()
+}
+
+class Lol : AbstractClass {
+
 }

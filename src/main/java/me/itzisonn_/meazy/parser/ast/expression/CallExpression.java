@@ -185,13 +185,18 @@ public class CallExpression implements Expression, LocalStatement {
         ConstructorValue constructorValue = resolveMeazyConstructor(environment);
         if (constructorValue == null) throw new RuntimeException("Can't find constructor for " + caller.getId());
 
-        String className = constructorValue.getEnvironment().getParent().getFullClassName();
-        if (className == null) throw new RuntimeException("Invalid constructor");
+        if (!(constructorValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment)) {
+            throw new RuntimeException("Invalid constructor");
+        }
+
+        if (classEnvironment.hasModifier(Modifiers.ABSTRACT())) {
+            throw new RuntimeException("Can't create instance of abstract class " + classEnvironment.getId());
+        }
 
         List<ClassDesc> parameters = constructorValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
 
         return new ResolvedCallable(
-                ClassDesc.of(className),
+                ClassDesc.of(classEnvironment.getFullClassName()),
                 MethodTypeDesc.of(ConstantDescs.CD_void, parameters),
                 false,
                 null,
