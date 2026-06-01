@@ -58,55 +58,41 @@ public class InstructionsSet {
 
 
 
-    public void withField(String id, ClassDesc type, int flags) {
-        with(new WithFieldInstruction(id, type, flags));
-    }
-
-    public void withField(String id, ClassDesc type, AccessFlag... flags) {
-        withField(id, type, toIntFlags(flags));
-    }
-
-    public void getField(ClassDesc owner, String id, ClassDesc type, boolean isStatic) {
-        with(new GetFieldInstruction(owner, id, type, isStatic));
+    public void withField(String id, ClassDesc type, Set<AccessFlag> flags) {
+        with(new WithFieldInstruction(id, type, toIntFlags(flags)));
     }
 
     public void getField(ClassDesc owner, String id, ClassDesc type) {
-        getField(owner, id, type, false);
+        with(new GetFieldInstruction(owner, id, type, false));
     }
 
     public void getStaticField(ClassDesc owner, String id, ClassDesc type) {
-        getField(owner, id, type, true);
-    }
-
-    public void storeField(ClassDesc owner, String id, ClassDesc type, boolean isStatic) {
-        with(new StoreFieldInstruction(owner, id, type, isStatic));
+        with(new GetFieldInstruction(owner, id, type, true));
     }
 
     public void storeField(ClassDesc owner, String id, ClassDesc type) {
-        storeField(owner, id, type, false);
+        with(new StoreFieldInstruction(owner, id, type, false));
     }
 
     public void storeStaticField(ClassDesc owner, String id, ClassDesc type) {
-        storeField(owner, id, type, true);
+        with(new StoreFieldInstruction(owner, id, type, true));
     }
 
 
 
-    public void withMethod(String id, MethodTypeDesc methodTypeDesc, int flags, Consumer<InstructionsSet> bodyInstructions) {
-        with(new WithMethodInstruction(id, methodTypeDesc, flags, bodyInstructions));
+    public void withMethod(String id, MethodTypeDesc methodTypeDesc, Set<AccessFlag> flags, Consumer<InstructionsSet> bodyInstructions) {
+        with(new WithMethodInstruction(id, methodTypeDesc, toIntFlags(flags), bodyInstructions));
     }
 
-    public void withMethod(String id, MethodTypeDesc methodTypeDesc, List<AccessFlag> flags, Consumer<InstructionsSet> bodyInstructions) {
-        withMethod(id, methodTypeDesc, toIntFlags(flags), bodyInstructions);
+    public void withConstructor(MethodTypeDesc methodTypeDesc, Set<AccessFlag> flags, Consumer<InstructionsSet> bodyInstructions) {
+        with(new WithConstructorInstruction(methodTypeDesc, toIntFlags(flags), bodyInstructions));
     }
 
-    public void withConstructor(MethodTypeDesc methodTypeDesc, int flags, Consumer<InstructionsSet> bodyInstructions) {
-        with(new WithConstructorInstruction(methodTypeDesc, flags, bodyInstructions));
+    public void withClass(ClassDesc classDesc, @Nullable ClassDesc superClass, Set<ClassDesc> interfaceClasses, Set<AccessFlag> flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
+        with(new WithClassInstruction(classDesc, superClass, interfaceClasses, toIntFlags(flags), attributes, classInstructions));
     }
 
-    public void withConstructor(MethodTypeDesc methodTypeDesc, List<AccessFlag> flags, Consumer<InstructionsSet> bodyInstructions) {
-        withConstructor(methodTypeDesc, toIntFlags(flags), bodyInstructions);
-    }
+
 
     public void invokeMethod(ClassDesc owner, String id, MethodTypeDesc methodTypeDesc, Consumer<InstructionsSet> argsInstructions, InvokeType invokeType) {
         with(new InvokeMethodInstruction(owner, id, methodTypeDesc, argsInstructions, invokeType));
@@ -130,12 +116,12 @@ public class InstructionsSet {
         with(new LoadConstantInstruction(constant));
     }
 
-    public void loadConstant(Boolean constant) {
+    public void loadConstant(boolean constant) {
         loadConstant(constant ? 1 : 0);
     }
 
     public void loadNull() {
-        loadConstant((ConstantDesc) null);
+        loadConstant(null);
     }
 
     public void loadThisReference() {
@@ -226,14 +212,6 @@ public class InstructionsSet {
         returnValue(null);
     }
 
-    public void withClass(ClassDesc classDesc, @Nullable ClassDesc superClass, Set<ClassDesc> interfaceClasses, int flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
-        with(new WithClassInstruction(classDesc, superClass, interfaceClasses, flags, attributes, classInstructions));
-    }
-
-    public void withClass(ClassDesc classDesc, @Nullable ClassDesc superClass, Set<ClassDesc> interfaceClasses, List<AccessFlag> flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
-        with(new WithClassInstruction(classDesc, superClass, interfaceClasses, toIntFlags(flags), attributes, classInstructions));
-    }
-
 
 
     public void duplicate() {
@@ -296,7 +274,7 @@ public class InstructionsSet {
         return numberType;
     }
 
-    private static int toIntFlags(List<AccessFlag> accessFlags) {
+    private static int toIntFlags(Collection<AccessFlag> accessFlags) {
         return accessFlags.stream().map(AccessFlag::mask).reduce((i1, i2) -> i1 | i2).orElse(0);
     }
 

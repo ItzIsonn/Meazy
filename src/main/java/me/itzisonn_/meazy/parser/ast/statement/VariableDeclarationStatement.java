@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.lang.reflect.AccessFlag;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -77,24 +78,24 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
         ClassDesc classDesc = dataType.getClassDesc();
 
         if (environment instanceof FileEnvironment) {
-            int accessFlags = AccessFlag.STATIC.mask();
-            if (isConstant) accessFlags |= AccessFlag.FINAL.mask();
+            Set<AccessFlag> accessFlags = new HashSet<>(Set.of(AccessFlag.STATIC));
+            if (isConstant) accessFlags.add(AccessFlag.FINAL);
 
-            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
-            else accessFlags |= AccessFlag.PUBLIC.mask();
+            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
+            else accessFlags.add(AccessFlag.PUBLIC);
 
             instructionsSet.withField(id, classDesc, accessFlags);
             return;
         }
 
         if (environment instanceof ClassEnvironment) {
-            int accessFlags = 0;
-            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags |= AccessFlag.PRIVATE.mask();
-            else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags |= AccessFlag.PROTECTED.mask();
-            else accessFlags |= AccessFlag.PUBLIC.mask();
+            Set<AccessFlag> accessFlags = new HashSet<>();
+            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
+            else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
+            else accessFlags.add(AccessFlag.PUBLIC);
 
-            if (modifiers.contains(Modifiers.SHARED())) accessFlags |= AccessFlag.STATIC.mask();
-            if (isConstant) accessFlags |= AccessFlag.FINAL.mask();
+            if (modifiers.contains(Modifiers.SHARED())) accessFlags.add(AccessFlag.STATIC);
+            if (isConstant) accessFlags.add(AccessFlag.FINAL);
 
             instructionsSet.withField(id, classDesc, accessFlags);
             return;

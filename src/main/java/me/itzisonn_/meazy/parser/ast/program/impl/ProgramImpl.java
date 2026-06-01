@@ -126,7 +126,7 @@ public class ProgramImpl implements Program {
                 classDesc,
                 ConstantDescs.CD_Object,
                 Set.of(),
-                List.of(AccessFlag.PUBLIC, AccessFlag.FINAL),
+                Set.of(AccessFlag.PUBLIC, AccessFlag.FINAL),
                 attributes,
                 classInstructions -> {
                     for (Statement statement : body) {
@@ -135,7 +135,7 @@ public class ProgramImpl implements Program {
 
                     classInstructions.withConstructor(
                             MethodTypeDesc.of(ConstantDescs.CD_void),
-                            AccessFlag.PRIVATE.mask(),
+                            Set.of(AccessFlag.PRIVATE),
                             bodyInstructions -> {
                                 bodyInstructions.loadThisReference();
 
@@ -151,7 +151,7 @@ public class ProgramImpl implements Program {
 
                     classInstructions.withConstructor(
                             MethodTypeDesc.of(ConstantDescs.CD_void),
-                            AccessFlag.STATIC.mask(),
+                            Set.of(AccessFlag.STATIC),
                             bodyInstructions -> {
                                 for (VariableValue variableValue : fileEnvironment.getVariables()) {
                                     Expression value = variableValue.getInitializer();

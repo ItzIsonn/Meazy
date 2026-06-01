@@ -19,10 +19,7 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.lang.reflect.AccessFlag;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @NullMarked
@@ -157,7 +154,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                 functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList()
         );
 
-        List<AccessFlag> accessFlags = new ArrayList<>();
+        Set<AccessFlag> accessFlags = new HashSet<>();
         if (functionValue.getModifiers().contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
         else if (functionValue.getModifiers().contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
         else accessFlags.add(AccessFlag.PUBLIC);

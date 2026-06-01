@@ -141,3 +141,7 @@ interface Ok {
 class Inheritor : Ok {
     override fun pupok(): Int = 152
 }
+
+abstract class AbstractClass : Ok {
+    abstract fun hello()
+}
