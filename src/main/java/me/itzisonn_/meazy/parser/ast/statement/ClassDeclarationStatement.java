@@ -4,14 +4,10 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.util.MiscUtils;
@@ -152,15 +148,9 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
                                     ClassDesc valueType = value.getType(classEnvironment, this).getClassDesc();
                                     ClassDesc variableType = variableValue.getDataType().getClassDesc();
 
-                                    if (!valueType.equals(variableType)) {
-                                        NumberType variableNumberType = NumberType.valueOf(variableType);
-                                        NumberType valueNumberType = NumberType.valueOf(valueType);
-
-                                        if (variableNumberType != null && valueNumberType != null) {
-                                            bodyInstructions.convertToNumberType(valueNumberType, variableNumberType);
-                                        }
-                                        else if (MiscUtils.isBoolean(variableType) && MiscUtils.isBoolean(valueType)) {
-                                            bodyInstructions.convertToBooleanType(valueType.isClassOrInterface(), variableType.isClassOrInterface());
+                                    if (!EnvironmentUtils.isInstanceOf(classEnvironment, valueType, variableType)) {
+                                        if (!MiscUtils.convertPrimitiveOrBoxed(bodyInstructions, valueType, variableType)) {
+                                            throw new RuntimeException("Can't assign value of type " + valueType + " to variable with type " + variableType);
                                         }
                                     }
 

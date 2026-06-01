@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.util;
 
 import me.itzisonn_.meazy.instruction.InstructionsSet;
+import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import org.jspecify.annotations.NullMarked;
 
@@ -55,5 +56,21 @@ public final class MiscUtils {
                 _ -> {},
                 InvokeType.STATIC
         );
+    }
+
+    public static boolean convertPrimitiveOrBoxed(InstructionsSet instructionsSet, ClassDesc from, ClassDesc to) {
+        NumberType fromNumberType = NumberType.valueOf(from);
+        NumberType toNumberType = NumberType.valueOf(to);
+
+        if (fromNumberType != null && toNumberType != null) {
+            instructionsSet.convertToNumberType(fromNumberType, toNumberType);
+            return true;
+        }
+        else if (isBoolean(from) && isBoolean(to)) {
+            instructionsSet.convertToBooleanType(from.isClassOrInterface(), to.isClassOrInterface());
+            return true;
+        }
+
+        return false;
     }
 }

@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -60,16 +59,9 @@ public class ReturnStatement implements LocalStatement {
         ClassDesc returnTypeClassDesc = returnDataType.getClassDesc();
 
         if (!EnvironmentUtils.isInstanceOf(functionEnvironment, valueClassDesc, returnTypeClassDesc)) {
-            NumberType returnNumberType = NumberType.valueOf(returnTypeClassDesc);
-            NumberType valueNumberType = NumberType.valueOf(valueClassDesc);
-
-            if (returnNumberType != null && valueNumberType != null) {
-                instructionsSet.convertToNumberType(valueNumberType, returnNumberType);
+            if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, valueClassDesc, returnTypeClassDesc)) {
+                throw new RuntimeException("Function's return value not matches its return data type TODO");
             }
-            else if (MiscUtils.isBoolean(returnTypeClassDesc) && MiscUtils.isBoolean(valueClassDesc)) {
-                instructionsSet.convertToBooleanType(valueClassDesc.isClassOrInterface(), returnTypeClassDesc.isClassOrInterface());
-            }
-            else throw new RuntimeException("Function's return value not matches its return data type TODO");
         }
 
         instructionsSet.returnValue(returnTypeClassDesc);

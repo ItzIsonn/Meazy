@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
@@ -74,8 +73,7 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             else throw new RuntimeException("Declared variable is unresolved TODO");
         }
 
-        DataType dataType = variableValue.getDataType();
-        ClassDesc classDesc = dataType.getClassDesc();
+        ClassDesc variableType = variableValue.getDataType().getClassDesc();
 
         if (environment instanceof FileEnvironment) {
             Set<AccessFlag> accessFlags = new HashSet<>(Set.of(AccessFlag.STATIC));
@@ -84,7 +82,7 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
             else accessFlags.add(AccessFlag.PUBLIC);
 
-            instructionsSet.withField(id, classDesc, accessFlags);
+            instructionsSet.withField(id, variableType, accessFlags);
             return;
         }
 
@@ -97,7 +95,7 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             if (modifiers.contains(Modifiers.SHARED())) accessFlags.add(AccessFlag.STATIC);
             if (isConstant) accessFlags.add(AccessFlag.FINAL);
 
-            instructionsSet.withField(id, classDesc, accessFlags);
+            instructionsSet.withField(id, variableType, accessFlags);
             return;
         }
 
@@ -107,27 +105,20 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             value.emit(instructionsSet, environment, this);
             ClassDesc valueType = value.getType(environment, this).getClassDesc();
 
-            if (!valueType.equals(classDesc)) {
-                NumberType variableNumberType = NumberType.valueOf(classDesc);
-                NumberType valueNumberType = NumberType.valueOf(valueType);
-
-                if (variableNumberType != null && valueNumberType != null) {
-                    instructionsSet.convertToNumberType(valueNumberType, variableNumberType);
-                }
-
-                else if (MiscUtils.isBoolean(classDesc) && MiscUtils.isBoolean(valueType)) {
-                    instructionsSet.convertToBooleanType(valueType.isClassOrInterface(), classDesc.isClassOrInterface());
+            if (!EnvironmentUtils.isInstanceOf(environment, valueType, variableType)) {
+                if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, valueType, variableType)) {
+                    throw new RuntimeException("Can't assign value of type " + valueType + " to variable with type " + variableType);
                 }
             }
         }
 
-        instructionsSet.storeLocal(classDesc, variableValue.getSlot());
+        instructionsSet.storeLocal(variableType, variableValue.getSlot());
 
         if (environment instanceof LocalVariableDeclarationEnvironment localDeclarationEnvironment) {
             if (localDeclarationEnvironment.getStartLabel() == null || localDeclarationEnvironment.getEndLabel() == null) return;
 
             instructionsSet.setLocalName(
-                    variableValue.getSlot(), id, classDesc,
+                    variableValue.getSlot(), id, variableType,
                     localDeclarationEnvironment.getStartLabel(), localDeclarationEnvironment.getEndLabel()
             );
         }

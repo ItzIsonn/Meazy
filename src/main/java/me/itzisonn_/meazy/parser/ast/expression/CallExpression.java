@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.parser.ast.expression;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
@@ -17,6 +16,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
+import me.itzisonn_.meazy.util.MiscUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -79,15 +79,13 @@ public class CallExpression implements Expression, LocalStatement {
                             Expression arg = args.get(i);
                             ClassDesc argType = arg.getType(environment, this).getClassDesc();
 
-                            if (!argType.equals(parameterType)) {
-                                NumberType argNumberType = NumberType.valueOf(argType);
+                            arg.emit(argsInstructions, environment, this);
 
-                                if (argNumberType != null && !argNumberType.isBoxed() && parameterType.isClassOrInterface()) {
-                                    argsInstructions.convertToNumberType(argNumberType, argNumberType.box());
+                            if (!EnvironmentUtils.isInstanceOf(environment, argType, parameterType)) {
+                                if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, argType, parameterType)) {
+                                    throw new RuntimeException("Can't pass argument of type " + argType + " to parameter of type " + parameterType);
                                 }
                             }
-
-                            arg.emit(argsInstructions, environment, this);
                         }
                     },
                     resolvedFunction.getTarget() == null ?

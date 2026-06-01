@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.parser.ast.statement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.*;
@@ -45,15 +44,9 @@ public class AssignmentStatement implements LocalStatement {
 
         value.emit(instructionsSet, environment, this);
 
-        if (!valueType.equals(variableType)) {
-            NumberType variableNumberType = NumberType.valueOf(variableType);
-            NumberType valueNumberType = NumberType.valueOf(valueType);
-
-            if (variableNumberType != null && valueNumberType != null) {
-                instructionsSet.convertToNumberType(valueNumberType, variableNumberType);
-            }
-            else if (MiscUtils.isBoolean(variableType) && MiscUtils.isBoolean(valueType)) {
-                instructionsSet.convertToBooleanType(valueType.isClassOrInterface(), variableType.isClassOrInterface());
+        if (!EnvironmentUtils.isInstanceOf(environment, valueType, variableType)) {
+            if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, valueType, variableType)) {
+                throw new RuntimeException("Can't assign value of type " + valueType + " to variable with type " + variableType);
             }
         }
 
