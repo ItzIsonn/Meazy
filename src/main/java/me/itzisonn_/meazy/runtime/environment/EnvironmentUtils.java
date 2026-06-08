@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -294,7 +293,7 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @return Environment that has requested function or null
      */
     public static Optional<FunctionDeclarationEnvironment> getFunctionDeclarationEnvironment(Environment environment, String id, List<ClassDesc> parameters) {
-        return getFunctionValue(environment, id, parameters).map(FunctionValue::getEnvironment).map(FunctionEnvironment::getParent);
+        return getFunctionEnvironment(environment, id, parameters).map(FunctionEnvironment::getParent);
     }
 
     /**
@@ -304,16 +303,16 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param parameters Function's parameters
      * @return Environment that has requested function or null
      */
-    public static Optional<FunctionValue> getFunctionValue(Environment environment, String id, List<ClassDesc> parameters) {
+    public static Optional<FunctionEnvironment> getFunctionEnvironment(Environment environment, String id, List<ClassDesc> parameters) {
         if (environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment) {
-            Optional<FunctionValue> functionValue = functionDeclarationEnvironment.getFunction(id, parameters);
-            if (functionValue.isPresent()) return functionValue;
+            Optional<FunctionEnvironment> functionEnvironment = functionDeclarationEnvironment.getFunction(id, parameters);
+            if (functionEnvironment.isPresent()) return functionEnvironment;
         }
 
         if (environment instanceof GlobalEnvironment globalEnvironment) {
             for (FileEnvironment fileEnvironment : globalEnvironment.getFileEnvironments()) {
-                Optional<FunctionValue> functionValue = fileEnvironment.getFunction(id, parameters);
-                if (functionValue.isPresent()) return functionValue;
+                Optional<FunctionEnvironment> functionEnvironment = fileEnvironment.getFunction(id, parameters);
+                if (functionEnvironment.isPresent()) return functionEnvironment;
             }
 
             return Optional.empty();
@@ -321,7 +320,7 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
 
         Environment parent = environment.getParent();
         if (parent == null) return Optional.empty();
-        return getFunctionValue(parent, id, parameters);
+        return getFunctionEnvironment(parent, id, parameters);
     }
 
 

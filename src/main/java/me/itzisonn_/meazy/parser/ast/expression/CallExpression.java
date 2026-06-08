@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral;
@@ -129,39 +128,39 @@ public class CallExpression implements Expression, LocalStatement {
     }
 
     private ResolvedCallable resolveFunction(Environment environment, ProgramUnit parent) {
-        FunctionValue functionValue = resolveMeazyFunction(environment, parent);
-        if (functionValue == null) throw new RuntimeException("Can't find function for " + caller.getId());
+        FunctionEnvironment functionEnvironment = resolveMeazyFunction(environment, parent);
+        if (functionEnvironment == null) throw new RuntimeException("Can't find function for " + caller.getId());
 
-        String className = functionValue.getEnvironment().getParent().getFullClassName();
+        String className = functionEnvironment.getParent().getFullClassName();
         if (className == null) throw new RuntimeException("Invalid function's parent");
 
         Expression target;
         if (parent instanceof MemberExpression memberExpression) {
              target = memberExpression.getObject() instanceof ClassIdentifier ? null : memberExpression.getObject();
         }
-        else if (functionValue.getModifiers().contains(Modifiers.SHARED()) || functionValue.getEnvironment().getParent() instanceof FileEnvironment) {
+        else if (functionEnvironment.getModifiers().contains(Modifiers.SHARED()) || functionEnvironment.getParent() instanceof FileEnvironment) {
             target = null;
         }
         else {
             target = new ThisLiteral();
         }
 
-        DataType returnDataType = functionValue.getReturnDataType();
+        DataType returnDataType = functionEnvironment.getReturnDataType();
 
         return new ResolvedCallable(
                 ClassDesc.of(className),
                 MethodTypeDesc.of(
                         returnDataType == null ? ConstantDescs.CD_void : returnDataType.getClassDesc(),
-                        functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList()
+                        functionEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList()
                 ),
                 returnDataType != null && returnDataType.isNullable(),
                 target,
-                functionValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment && classEnvironment.isInterface()
+                functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment && classEnvironment.isInterface()
         );
     }
 
     @Nullable
-    private FunctionValue resolveMeazyFunction(Environment environment, ProgramUnit parent) {
+    private FunctionEnvironment resolveMeazyFunction(Environment environment, ProgramUnit parent) {
         String id = caller.getId();
         List<ClassDesc> args = this.args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
 
@@ -174,7 +173,7 @@ public class CallExpression implements Expression, LocalStatement {
             return classEnvironment.getFunctionRecursively(id, args).orElse(null);
         }
 
-        return EnvironmentUtils.getFunctionValue(environment, id, args).orElse(null);
+        return EnvironmentUtils.getFunctionEnvironment(environment, id, args).orElse(null);
     }
 
 

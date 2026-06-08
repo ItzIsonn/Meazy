@@ -1,10 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ClassDesc;
 import java.util.List;
@@ -20,19 +17,19 @@ public interface FunctionDeclarationEnvironment extends Environment {
      * Declares given function in this environment
      * TODO
      */
-    FunctionValue declareFunction(String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, FunctionEnvironment functionEnvironment);
+    void declareFunction(FunctionEnvironment functionEnvironment);
 
     /**
      * @param id Id
      * @param parameters Parameters
      * @return Declared function with given id and args or null
      */
-    default Optional<FunctionValue> getFunction(String id, List<ClassDesc> parameters) {
+    default Optional<FunctionEnvironment> getFunction(String id, List<ClassDesc> parameters) {
         main:
-        for (FunctionValue functionValue : getFunctions()) {
-            if (!functionValue.getId().equals(id)) continue;
+        for (FunctionEnvironment functionEnvironment : getFunctions()) {
+            if (!functionEnvironment.getId().equals(id)) continue;
 
-            List<ParameterExpression> functionParameters = functionValue.getParameters();
+            List<ParameterExpression> functionParameters = functionEnvironment.getParameters();
             if (functionParameters.size() != parameters.size()) continue;
 
             for (int i = 0; i < parameters.size(); i++) {
@@ -41,7 +38,7 @@ public interface FunctionDeclarationEnvironment extends Environment {
                 if (!EnvironmentUtils.isInstanceOf(this, parameterClassDesc, functionParameterClassDesc)) continue main;
             }
 
-            return Optional.of(functionValue);
+            return Optional.of(functionEnvironment);
         }
 
         return Optional.empty();
@@ -50,5 +47,5 @@ public interface FunctionDeclarationEnvironment extends Environment {
     /**
      * @return All declared functions
      */
-    Set<FunctionValue> getFunctions();
+    Set<FunctionEnvironment> getFunctions();
 }

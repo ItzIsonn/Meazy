@@ -7,12 +7,8 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.EvaluationException;
 import me.itzisonn_.meazy.runtime.value.impl.VariableValueImpl;
 import org.jspecify.annotations.NullMarked;
@@ -36,7 +32,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     protected final Set<ClassDesc> interfaces;
     protected final Set<String> unresolvedBaseClasses;
     protected final Set<Modifier> modifiers;
-    protected final Set<FunctionValue> operatorFunctions;
+    protected final Set<FunctionEnvironment> operatorFunctions;
 
     public ClassEnvironmentImpl(ClassDeclarationEnvironment parent, boolean isShared, boolean isInterface, String id, @Nullable ClassDesc baseClass, Set<ClassDesc> interfaces, Set<Modifier> modifiers) {
         super(parent, isShared);
@@ -126,37 +122,37 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
 
     @Override
-    public void declareOperatorFunction(FunctionValue value) {
-        List<ParameterExpression> parameters = value.getParameters();
+    public void declareOperatorFunction(FunctionEnvironment functionEnvironment) {
+        List<ParameterExpression> parameters = functionEnvironment.getParameters();
 
         main:
-        for (FunctionValue functionValue : operatorFunctions) {
-            if (functionValue.getId().equals(value.getId())) {
-                List<ParameterExpression> otherParameters = functionValue.getParameters();
+        for (FunctionEnvironment otherFunctionEnvironment : operatorFunctions) {
+            if (otherFunctionEnvironment.getId().equals(functionEnvironment.getId())) {
+                List<ParameterExpression> otherParameters = otherFunctionEnvironment.getParameters();
                 if (parameters.size() != otherParameters.size()) continue;
 
                 for (int i = 0; i < parameters.size(); i++) {
                     if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
                 }
 
-                throw new EvaluationException(Text.translatable("meazy:runtime.function.operator.already_exists", value.getId()));
+                throw new EvaluationException(Text.translatable("meazy:runtime.function.operator.already_exists", functionEnvironment.getId()));
             }
         }
 
-        operatorFunctions.add(value);
+        operatorFunctions.add(functionEnvironment);
     }
 
     @Override
-    public Set<FunctionValue> getOperatorFunctions() {
+    public Set<FunctionEnvironment> getOperatorFunctions() {
         return new HashSet<>(operatorFunctions);
     }
 
 
 
     @Override
-    public Optional<FunctionValue> getFunction(String id, List<ClassDesc> args) {
-        Optional<FunctionValue> functionValue = super.getFunction(id, args);
-        if (functionValue.isPresent()) return functionValue;
+    public Optional<FunctionEnvironment> getFunction(String id, List<ClassDesc> args) {
+        Optional<FunctionEnvironment> functionEnvironment = super.getFunction(id, args);
+        if (functionEnvironment.isPresent()) return functionEnvironment;
 
         if (baseClass == null) return Optional.empty();
         ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElse(null);
