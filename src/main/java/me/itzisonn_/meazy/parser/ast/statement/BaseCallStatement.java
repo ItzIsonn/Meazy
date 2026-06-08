@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.statement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.*;
@@ -75,12 +76,12 @@ public class BaseCallStatement implements LocalStatement {
         ClassDesc baseClassDesc = classEnvironment.getBaseClass();
         if (baseClassDesc == null) return null;
 
-        List<ClassDesc> parameters = args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
+        List<DataType> args = this.args.stream().map(arg -> arg.getType(environment, this)).toList();
 
         ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, baseClassDesc).orElse(null);
         if (baseClassEnvironment == null) return null;
 
-        return baseClassEnvironment.getConstructor(parameters).orElse(null);
+        return baseClassEnvironment.getConstructor(args).orElse(null);
     }
 
 

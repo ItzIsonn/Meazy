@@ -81,4 +81,9 @@ public final class DataType {
                 dataType1.isNullable() || dataType2.isNullable()
         );
     }
+
+    public static boolean matches(Environment environment, DataType dataType, DataType target) {
+        return EnvironmentUtils.isInstanceOf(environment, dataType.getClassDesc(), target.getClassDesc())
+                && (!dataType.isNullable() || target.isNullable());
+    }
 }

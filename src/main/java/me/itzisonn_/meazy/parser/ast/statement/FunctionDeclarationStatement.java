@@ -115,7 +115,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         if (functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment) {
             if (classEnvironment.getBaseClass() != null) {
                 EnvironmentUtils.getClassEnvironment(classEnvironment, classEnvironment.getBaseClass()).orElseThrow()
-                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
+                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(ParameterExpression::getDataType).toList())
                         .ifPresent(f -> {
                             if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
                                 throw new RuntimeException("Can't override non-open function " + id);
@@ -126,7 +126,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
 
             for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
                 EnvironmentUtils.getClassEnvironment(classEnvironment, interfaceClassDesc).orElseThrow()
-                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
+                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(ParameterExpression::getDataType).toList())
                         .ifPresent(f -> {
                             if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
                                 throw new RuntimeException("Can't override non-open function " + id);

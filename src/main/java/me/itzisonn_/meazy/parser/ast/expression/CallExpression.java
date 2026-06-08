@@ -129,7 +129,9 @@ public class CallExpression implements Expression, LocalStatement {
 
     private ResolvedCallable resolveFunction(Environment environment, ProgramUnit parent) {
         FunctionEnvironment functionEnvironment = resolveMeazyFunction(environment, parent);
-        if (functionEnvironment == null) throw new RuntimeException("Can't find function for " + caller.getId());
+        if (functionEnvironment == null) {
+            throw new RuntimeException("Can't find function for " + caller.getId() + " and args " + args);
+        }
 
         String className = functionEnvironment.getParent().getFullClassName();
         if (className == null) throw new RuntimeException("Invalid function's parent");
@@ -162,7 +164,7 @@ public class CallExpression implements Expression, LocalStatement {
     @Nullable
     private FunctionEnvironment resolveMeazyFunction(Environment environment, ProgramUnit parent) {
         String id = caller.getId();
-        List<ClassDesc> args = this.args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
+        List<DataType> args = this.args.stream().map(arg -> arg.getType(environment, this)).toList();
 
         if (parent instanceof MemberExpression memberExpression) {
             ClassDesc classDesc = memberExpression.getObject().getType(environment, this).getClassDesc();
@@ -204,12 +206,12 @@ public class CallExpression implements Expression, LocalStatement {
     @Nullable
     private ConstructorEnvironment resolveMeazyConstructor(Environment environment) {
         String id = caller.getId();
-        List<ClassDesc> parameters = args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
+        List<DataType> args = this.args.stream().map(arg -> arg.getType(environment, this)).toList();
 
         ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, EnvironmentUtils.resolveClassDesc(environment, id, false)).orElse(null);
         if (classEnvironment == null) return null;
 
-        return classEnvironment.getConstructor(parameters).orElse(null);
+        return classEnvironment.getConstructor(args).orElse(null);
     }
 
     @Override

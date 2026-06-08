@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import org.jspecify.annotations.NullMarked;
 
-import java.lang.constant.ClassDesc;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,19 +20,19 @@ public interface ConstructorDeclarationEnvironment extends Environment {
     void declareConstructor(ConstructorEnvironment constructorEnvironment);
 
     /**
-     * @param parameters Constructor's args TODO
+     * @param args Constructor's args TODO
      * @return Declared constructor with given args or null
      */
-    default Optional<ConstructorEnvironment> getConstructor(List<ClassDesc> parameters) {
+    default Optional<ConstructorEnvironment> getConstructor(List<DataType> args) {
         main:
         for (ConstructorEnvironment constructorEnvironment : getConstructors()) {
-            List<ParameterExpression> constructorParameters = constructorEnvironment.getParameters();
-            if (parameters.size() != constructorParameters.size()) continue;
+            List<ParameterExpression> parameters = constructorEnvironment.getParameters();
+            if (args.size() != parameters.size()) continue;
 
-            for (int i = 0; i < parameters.size(); i++) {
-                ClassDesc constructorParameterClassDesc = constructorParameters.get(i).getDataType().getClassDesc();
-                ClassDesc parameterClassDesc = parameters.get(i);
-                if (!EnvironmentUtils.isInstanceOf(this, parameterClassDesc, constructorParameterClassDesc)) continue main;
+            for (int i = 0; i < args.size(); i++) {
+                DataType parameter = parameters.get(i).getDataType();
+                DataType arg = args.get(i);
+                if (!DataType.matches(this, arg, parameter)) continue main;
             }
 
             return Optional.of(constructorEnvironment);
