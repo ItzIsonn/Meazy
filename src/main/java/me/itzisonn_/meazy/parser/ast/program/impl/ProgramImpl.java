@@ -30,7 +30,6 @@ import java.lang.constant.MethodTypeDesc;
 import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -39,12 +38,11 @@ public class ProgramImpl implements Program {
     @Nullable
     private File file;
     private final Version version;
-    private final Map<String, @Nullable Version> requiredAddons;
     private final List<Statement> body;
     @Nullable
     private FileEnvironment fileEnvironment;
 
-    ProgramImpl(@Nullable File file, Version version, Map<String, @Nullable Version> requiredAddons, List<Statement> body) throws IllegalArgumentException {
+    ProgramImpl(@Nullable File file, Version version, List<Statement> body) throws IllegalArgumentException {
         if (file != null) {
             if (!file.exists()) throw new IllegalArgumentException("File doesn't exist");
             if (file.isDirectory()) throw new IllegalArgumentException("File can't be directory");
@@ -52,7 +50,6 @@ public class ProgramImpl implements Program {
 
         this.file = file;
         this.version = version;
-        this.requiredAddons = requiredAddons;
         this.body = body;
     }
 

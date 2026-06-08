@@ -2,8 +2,6 @@ package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.addon.Addon;
-import me.itzisonn_.meazy.addon.AddonInfo;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.lexer.TokenTypes;
@@ -11,17 +9,13 @@ import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.program.Program;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.version.Version;
-import me.itzisonn_.meazy.parser.ast.statement.RequireStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @NullMarked
 public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
@@ -40,7 +34,6 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
         Parser parser = context.getParser();
         parser.moveOverOptionalNewLines();
 
-        Map<String, @Nullable Version> requiredAddons = new HashMap<>();
         List<Statement> body = new ArrayList<>();
 
         Statement headerStatement;
@@ -56,12 +49,7 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
 
-            if (headerStatement instanceof RequireStatement requireStatement) {
-                requiredAddons.put(requireStatement.getId(), requireStatement.getVersion());
-            }
-            else {
-                body.add(headerStatement);
-            }
+            body.add(headerStatement);
         }
 
         parser.moveOverOptionalNewLines();
@@ -75,13 +63,6 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             }
         }
 
-        if (requiredAddons.isEmpty()) {
-            for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
-                AddonInfo addonInfo = addon.getAddonInfo();
-                requiredAddons.put(addonInfo.getId(), addonInfo.getVersion());
-            }
-        }
-
-        return Registries.PROGRAM_FACTORY.getEntry().getValue().create(file, MeazyMain.VERSION, requiredAddons, body);
+        return Registries.PROGRAM_FACTORY.getEntry().getValue().create(file, MeazyMain.VERSION, body);
     }
 }

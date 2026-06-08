@@ -1,11 +1,8 @@
 package me.itzisonn_.meazy.registry;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.addon.Addon;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
-import me.itzisonn_.meazy.lang.TextException;
-import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.instruction.Instruction;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.lang.Language;
@@ -22,7 +19,6 @@ import me.itzisonn_.meazy.runtime.ClassLoaderWrapper;
 import me.itzisonn_.meazy.runtime.RunProgramFunction;
 import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.runtime.environment.factory.impl.*;
-import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.meazy.parser.ast.program.Program;
 import me.itzisonn_.registry.multiple_entry.OrderedRegistry;
@@ -234,16 +230,6 @@ public final class Registries {
         });
 
         COMPILE_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("compile_program"), program -> {
-            for (String addonId : program.getRequiredAddons().keySet()) {
-                Addon addon = MeazyMain.ADDON_MANAGER.getAddon(addonId);
-                if (addon == null) throw new TextException(Text.translatable("meazy:addons.cant_find", addonId)){};
-
-                Version addonVersion = program.getRequiredAddons().get(addonId);
-                if (addonVersion != null && !addon.getAddonInfo().getVersion().equals(addonVersion)) {
-                    throw new TextException(Text.translatable("meazy:addons.cant_find_version", addonId, addonVersion, addon.getAddonInfo().getVersion())){};
-                }
-            }
-
             GlobalEnvironment globalEnvironment = GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create();
 
             BytecodeBuilders bytecodeBuilders = BytecodeBuilders.of(null, null);

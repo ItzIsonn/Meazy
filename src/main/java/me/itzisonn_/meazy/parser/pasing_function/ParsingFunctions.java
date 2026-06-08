@@ -34,7 +34,6 @@ public final class ParsingFunctions {
 
         register(new HeaderStatementParsingFunction());
         register(new ImportStatementParsingFunction());
-        register(new RequireStatementParsingFunction());
 
         register(new GlobalStatementParsingFunction());
         register(new ClassDeclarationStatementParsingFunction());

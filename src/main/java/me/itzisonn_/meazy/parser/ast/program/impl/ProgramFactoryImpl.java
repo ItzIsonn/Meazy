@@ -8,17 +8,16 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 @NullMarked
 public class ProgramFactoryImpl implements ProgramFactory {
     @Override
-    public ProgramImpl create(@Nullable File file, Version version, Map<String, @Nullable Version> requiredAddons, List<Statement> body) {
-        return new ProgramImpl(file, version, requiredAddons, body);
+    public ProgramImpl create(@Nullable File file, Version version, List<Statement> body) {
+        return new ProgramImpl(file, version, body);
     }
 
     @Override
-    public ProgramImpl create(Version version, Map<String, @Nullable Version> requiredAddons, List<Statement> body) {
-        return new ProgramImpl(null, version, requiredAddons, body);
+    public ProgramImpl create(Version version, List<Statement> body) {
+        return new ProgramImpl(null, version, body);
     }
 }

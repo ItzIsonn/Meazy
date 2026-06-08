@@ -1,7 +1,6 @@
 {
   "id": "keywords",
   "token_types": [
-    "require",
     "import",
     "variable",
     "function",

@@ -1,11 +1,10 @@
 package me.itzisonn_.meazy;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.addon.AddonManager;
 import me.itzisonn_.meazy.datagen.DatagenDeserializers;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
-import me.itzisonn_.meazy.datagen.manager.MeazyDatagenManager;
+import me.itzisonn_.meazy.datagen.DatagenManager;
 import me.itzisonn_.meazy.lang.Language;
 import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
 import me.itzisonn_.meazy.lang.bundle.BundleManager;
@@ -31,7 +30,6 @@ public final class MeazyMain {
     public static final BundleManager BUNDLE_MANAGER = new BundleManager(MEAZY_LANGUAGE_FILE_PROVIDER);
 
     public static final SettingsManager SETTINGS_MANAGER = new SettingsManager();
-    public static final AddonManager ADDON_MANAGER = new AddonManager();
 
     /**
      * Regex used by all identifiers
@@ -96,7 +94,7 @@ public final class MeazyMain {
         if (languagesEntry == null) LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:settings.unknown_language", stringLanguage));
         else BUNDLE_MANAGER.setLanguage(languagesEntry.getValue());
 
-        MeazyDatagenManager meazyDatagenManager = new MeazyDatagenManager();
+        DatagenManager meazyDatagenManager = new DatagenManager();
 
         for (TokenType tokenType : meazyDatagenManager.getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.INSTANCE.getTokenTypeDeserializer())) {
             Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.getId()), tokenType);
@@ -105,8 +103,6 @@ public final class MeazyMain {
         for (TokenTypeSet tokenTypeSet : meazyDatagenManager.getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer("meazy"))) {
             Registries.TOKEN_TYPE_SETS.register(getDefaultIdentifier(tokenTypeSet.getId()), tokenTypeSet);
         }
-
-        ADDON_MANAGER.enableAddons();
     }
 
     /**

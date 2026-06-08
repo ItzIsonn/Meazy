@@ -1,5 +1,4 @@
 [
-  { "id": "require", "regex": "require" },
   { "id": "import", "regex": "import" },
   { "id": "variable", "regex": "var|val" },
   { "id": "function", "regex": "fun" },

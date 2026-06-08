@@ -11,7 +11,6 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents compiled Meazy program
@@ -37,10 +36,6 @@ public interface Program extends DeclarationStatement {
      * Version
      */
     Version getVersion();
-    /**
-     * Required addons
-     */
-    Map<String, @Nullable Version> getRequiredAddons();
 
     /**
      * Body
