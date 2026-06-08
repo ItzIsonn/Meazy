@@ -1,159 +1,153 @@
-package me.itzisonn_.meazy.version;
+package me.itzisonn_.meazy.version
 
-import lombok.Getter;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Objects
+import java.util.regex.Pattern
+import kotlin.math.max
 
 /**
  * Represents version
+ *
+ * @param parts   Parts
+ * @param type    Type
+ * @param ordinal Ordinal
+ *
+ * @throws IllegalArgumentException If given parts is empty
  */
-@Getter
-@NullMarked
-public class Version {
-    private final List<Integer> parts;
-    private final VersionType type;
-    private final int ordinal;
-
-    /**
-     * @param parts Parts
-     * @param type Type
-     * @param ordinal Ordinal
-     * @throws IllegalArgumentException If given parts is empty
-     */
-    public Version(List<Integer> parts, VersionType type, int ordinal) {
-        if (parts.isEmpty()) throw new IllegalArgumentException("Parts can't be empty");
-
-        this.parts = List.copyOf(parts);
-        this.type = type;
-        this.ordinal = ordinal;
-    }
+class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
+    val parts: List<Int>
+    val type: VersionType
+    val ordinal: Int
 
     /**
      * Checks if given version is before this version
-     *
+     * 
      * @param version Version to check
      * @return Whether given version is before this version
      */
-    public boolean isBefore(Version version) {
-        List<Integer> parts1 = parts;
-        List<Integer> parts2 = version.getParts();
+    fun isBefore(version: Version): Boolean {
+        val parts1 = parts
+        val parts2 = version.parts
 
-        for (int i = 0; i < Math.max(parts1.size(), parts2.size()); i++) {
-            int part1 = i < parts1.size() ? parts1.get(i) : 0;
-            int part2 = i < parts2.size() ? parts2.get(i) : 0;
+        for (i in 0..<max(parts1.size, parts2.size)) {
+            val part1 = if (i < parts1.size) parts1.get(i) else 0
+            val part2 = if (i < parts2.size) parts2.get(i) else 0
 
-            if (part1 < part2) return true;
-            if (part1 > part2) return false;
+            if (part1 < part2) return true
+            if (part1 > part2) return false
         }
 
-        return type.ordinal() < version.getType().ordinal() || (type.ordinal() == version.getType().ordinal() && ordinal < version.getOrdinal());
-
+        return type.ordinal < version.type.ordinal || (type.ordinal == version.type.ordinal && ordinal < version.ordinal)
     }
 
     /**
      * Checks if given version is after this version
-     *
+     * 
      * @param version Version to check
      * @return Whether given version is after this version
      */
-    public boolean isAfter(Version version) {
-        return !equals(version) && !isBefore(version);
+    fun isAfter(version: Version): Boolean {
+        return !equals(version) && !isBefore(version)
     }
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Version version)) return false;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Version) return false
 
-        List<Integer> parts1 = parts;
-        List<Integer> parts2 = version.getParts();
+        val parts1 = parts
+        val parts2 = other.parts
 
-        for (int i = 0; i < Math.max(parts1.size(), parts2.size()); i++) {
-            int part1 = i < parts1.size() ? parts1.get(i) : 0;
-            int part2 = i < parts2.size() ? parts2.get(i) : 0;
+        for (i in 0..<max(parts1.size, parts2.size)) {
+            val part1 = if (i < parts1.size) parts1[i] else 0
+            val part2 = if (i < parts2.size) parts2[i] else 0
 
-            if (part1 != part2) return false;
+            if (part1 != part2) return false
         }
 
-        return type.ordinal() == version.getType().ordinal() && ordinal == version.getOrdinal();
+        return type.ordinal == other.type.ordinal && ordinal == other.ordinal
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(parts, type, ordinal);
+    override fun hashCode(): Int {
+        return Objects.hash(parts, type, ordinal)
     }
 
-    @Override
-    public String toString() {
-        String partsString = String.join(".", parts.stream().map(String::valueOf).toList());
+    override fun toString(): String {
+        val partsString = parts.joinToString(".")
 
-        String typeString;
-        String ordinalString;
+        val typeString: String
+        val ordinalString: String
         if (type == VersionType.RELEASE && ordinal == 0) {
-            typeString = "";
-            ordinalString = "";
+            typeString = ""
+            ordinalString = ""
         }
         else {
-            typeString = "-" + type;
-            ordinalString = String.valueOf(ordinal);
+            typeString = "-$type"
+            ordinalString = ordinal.toString()
         }
 
-        return partsString + typeString + ordinalString;
+        return partsString + typeString + ordinalString
     }
 
 
-    private static final Pattern versionPattern;
+    init {
+        require(!parts.isEmpty()) { "Parts can't be empty" }
 
-    static {
-        String possibleTypes = String.join("|", VersionType.VERSION_TYPES.keySet().stream().sorted().toList().reversed());
-        versionPattern = Pattern.compile("(\\d+(\\.\\d+)*)(-(" + possibleTypes + ")(\\d*))?", Pattern.CASE_INSENSITIVE);
+        this.parts = parts.toList()
+        this.type = type
+        this.ordinal = ordinal
     }
 
-    /**
-     * Parses given string into {@link Version}
-     *
-     * @param version String to parse
-     * @return Parsed version
-     * @throws IllegalArgumentException If given version is in invalid format
-     */
-    public static Version of(String version) throws IllegalArgumentException {
-        Matcher matcher = versionPattern.matcher(version);
-        if (!matcher.matches()) throw new IllegalArgumentException("Invalid version '" + version + "'");
+    companion object {
+        private val versionPattern: Pattern
 
-        List<Integer> parts;
-        try {
-            parts = Arrays.stream(matcher.group(1).split("\\.")).map(Integer::parseInt).toList();
-        }
-        catch (NumberFormatException ignore) {
-            throw new IllegalArgumentException("Invalid version '" + version + "'");
+        init {
+            val possibleTypes = VersionType.VERSION_TYPES.keys.stream().sorted().toList().reversed().joinToString("|")
+            versionPattern = Pattern.compile("(\\d+(\\.\\d+)*)(-($possibleTypes)(\\d*))?", Pattern.CASE_INSENSITIVE)
         }
 
-        VersionType versionType;
-        String versionTypeGroup = matcher.group(4);
-        if (versionTypeGroup == null) versionType = VersionType.RELEASE;
-        else {
-            versionType = VersionType.of(versionTypeGroup);
-            if (versionType == null) throw new IllegalArgumentException("Invalid version '" + version + "'");
-        }
+        /**
+         * Parses given string into [Version]
+         * 
+         * @param version String to parse
+         * @return Parsed version
+         * @throws IllegalArgumentException If given version is in invalid format
+         */
+        @JvmStatic
+        @Throws(IllegalArgumentException::class)
+        fun of(version: String): Version {
+            val matcher = versionPattern.matcher(version)
+            require(matcher.matches()) { "Invalid version '$version'" }
 
-        int ordinal;
-        String ordinalGroup = matcher.group(5);
-        if (ordinalGroup == null || ordinalGroup.isBlank()) ordinal = 0;
-        else {
+            val parts: List<Int>
             try {
-                ordinal = Integer.parseInt(matcher.group(5));
+                parts = matcher.group(1).split("\\.".toRegex())
+                    .dropLastWhile { it.isEmpty() }
+                    .map { s -> s.toInt() }
+                    .toList()
             }
-            catch (NumberFormatException ignore) {
-                throw new IllegalArgumentException("Invalid version '" + version + "'");
+            catch (_: NumberFormatException) {
+                throw IllegalArgumentException("Invalid version '$version'")
             }
-        }
 
-        return new Version(parts, versionType, ordinal);
+            val versionType: VersionType?
+            val versionTypeGroup = matcher.group(4)
+            if (versionTypeGroup == null) versionType = VersionType.RELEASE
+            else {
+                versionType = VersionType.of(versionTypeGroup)
+                requireNotNull(versionType) { "Invalid version '$version'" }
+            }
+
+            val ordinalGroup = matcher.group(5)
+            val ordinal = if (ordinalGroup == null || ordinalGroup.isBlank()) 0
+            else {
+                try {
+                    matcher.group(5).toInt()
+                }
+                catch (_: NumberFormatException) {
+                    throw IllegalArgumentException("Invalid version '$version'")
+                }
+            }
+
+            return Version(parts, versionType, ordinal)
+        }
     }
 }
