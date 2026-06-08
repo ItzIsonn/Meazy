@@ -18,7 +18,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.parser.operator.Operators;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions;
-import me.itzisonn_.meazy.runtime.ClassLoaderHelper;
+import me.itzisonn_.meazy.runtime.ClassLoaderWrapper;
 import me.itzisonn_.meazy.runtime.RunProgramFunction;
 import me.itzisonn_.meazy.runtime.environment.factory.*;
 import me.itzisonn_.meazy.runtime.environment.factory.impl.*;
@@ -260,10 +260,12 @@ public final class Registries {
         });
 
         RUN_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("run_program"), classes -> {
+            ClassLoaderWrapper classLoader = new ClassLoaderWrapper();
+
             for (ClassDesc classDesc : classes.keySet()) {
                 byte[] classFile = classes.get(classDesc);
 
-                Class<?> loadedClass = ClassLoaderHelper.defineClass(classFile);
+                Class<?> loadedClass = classLoader.defineClass(classFile);
                 try {
                     Method method = loadedClass.getDeclaredMethod("main");
                     if (method.getReturnType() != void.class) {

@@ -3,12 +3,10 @@ package me.itzisonn_.meazy.runtime;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class ClassLoaderHelper {
-    private static final DynamicClassLoader CLASS_LOADER = new DynamicClassLoader();
+public final class ClassLoaderWrapper {
+    private final DynamicClassLoader CLASS_LOADER = new DynamicClassLoader();
 
-    private ClassLoaderHelper() {}
-
-    public static Class<?> defineClass(byte[] bytecode) {
+    public Class<?> defineClass(byte[] bytecode) {
         return CLASS_LOADER.define(bytecode);
     }
 
