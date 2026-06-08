@@ -1,56 +1,40 @@
-package me.itzisonn_.meazy.datagen.manager;
+package me.itzisonn_.meazy.datagen.manager
 
-import me.itzisonn_.meazy.util.FileUtils;
-import org.jspecify.annotations.NullMarked;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
+import me.itzisonn_.meazy.util.FileUtils.getLines
+import org.jspecify.annotations.NullMarked
+import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
+import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
 /**
- * Provides methods for working with datagen
+ * Provides methods for working with datagen TODO
+ * @param file Addon's file
  */
 @NullMarked
-public class AddonDatagenManager extends DatagenManager {
-    /**
-     * Addon's file
-     */
-    private final File file;
+class AddonDatagenManager(private val file: File) : DatagenManager() {
+    override fun getDatagenFilesLines(folderPath: String): MutableSet<String> {
+        val result: MutableSet<String> = HashSet()
 
-    /**
-     * @param file Addon's file
-     */
-    public AddonDatagenManager(File file) {
-        this.file = file;
-    }
+        try {
+            ZipFile(file).use { zipFile ->
+                val inputStream = ZipInputStream(FileInputStream(file))
+                var zipEntry = inputStream.getNextEntry()
+                while (zipEntry != null) {
+                    if (!zipEntry.getName().startsWith("data/$folderPath/") || zipEntry.isDirectory) {
+                        zipEntry = inputStream.getNextEntry()
+                        continue
+                    }
 
-    @Override
-    public Set<String> getDatagenFilesLines(String folderPath) {
-        Set<String> result = new HashSet<>();
-
-        try (ZipFile zipFile = new ZipFile(file)) {
-            ZipInputStream inputStream = new ZipInputStream(new FileInputStream(file));
-
-            ZipEntry zipEntry = inputStream.getNextEntry();
-            while (zipEntry != null) {
-                if (!zipEntry.getName().startsWith("data/" + folderPath + "/") || zipEntry.isDirectory()) {
-                    zipEntry = inputStream.getNextEntry();
-                    continue;
+                    result.add(getLines(zipFile.getInputStream(zipEntry)))
+                    zipEntry = inputStream.getNextEntry()
                 }
-
-                result.add(FileUtils.getLines(zipFile.getInputStream(zipEntry)));
-                zipEntry = inputStream.getNextEntry();
+                return result
             }
-
-            return result;
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        catch (e: IOException) {
+            throw RuntimeException(e)
         }
     }
 }

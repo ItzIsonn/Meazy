@@ -1,16 +1,7 @@
-package me.itzisonn_.meazy.datagen;
-
-import org.jspecify.annotations.NullMarked;
+package me.itzisonn_.meazy.datagen
 
 /**
- * Is thrown when one of {@link DatagenDeserializers} meets invalid JSON object
+ * Is thrown when one of [DatagenDeserializers] meets invalid JSON object
+ * @param message Message
  */
-@NullMarked
-public class InvalidDatagenJsonException extends RuntimeException {
-    /**
-     * @param message Message
-     */
-    public InvalidDatagenJsonException(String message) {
-        super(message);
-    }
-}
+class InvalidDatagenJsonException(message: String) : RuntimeException(message)

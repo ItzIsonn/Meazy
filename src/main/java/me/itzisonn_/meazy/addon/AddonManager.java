@@ -219,7 +219,7 @@ public final class AddonManager {
             if (addon.getLanguageFileProvider() != null) MeazyMain.BUNDLE_MANAGER.addLanguageFileProvider(addon.getLanguageFileProvider());
             enableAddon(addon);
 
-            for (TokenType tokenType : addon.getDatagenManager().getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.getTokenTypeDeserializer())) {
+            for (TokenType tokenType : addon.getDatagenManager().getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.INSTANCE.getTokenTypeDeserializer())) {
                 Registries.TOKEN_TYPES.register(RegistryIdentifier.of(addon.getAddonInfo().getId(), tokenType.getId()), tokenType);
             }
 
