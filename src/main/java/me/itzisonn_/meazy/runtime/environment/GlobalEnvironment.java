@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
@@ -36,5 +35,5 @@ public interface GlobalEnvironment extends Environment {
 
 
 
-    Optional<ClassValue> resolveJavaClass(ClassDesc classDesc);
+    Optional<ClassEnvironment> resolveJavaClass(ClassDesc classDesc);
 }

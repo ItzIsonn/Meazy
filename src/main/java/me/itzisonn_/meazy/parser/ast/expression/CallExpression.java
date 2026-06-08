@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
@@ -170,10 +169,10 @@ public class CallExpression implements Expression, LocalStatement {
         if (parent instanceof MemberExpression memberExpression) {
             ClassDesc classDesc = memberExpression.getObject().getType(environment, this).getClassDesc();
 
-            ClassValue classValue = EnvironmentUtils.getClassValue(environment, classDesc).orElse(null);
-            if (classValue == null) return null;
+            ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, classDesc).orElse(null);
+            if (classEnvironment == null) return null;
 
-            return classValue.getEnvironment().getFunctionRecursively(id, args).orElse(null);
+            return classEnvironment.getFunctionRecursively(id, args).orElse(null);
         }
 
         return EnvironmentUtils.getFunctionValue(environment, id, args).orElse(null);
@@ -209,10 +208,10 @@ public class CallExpression implements Expression, LocalStatement {
         String id = caller.getId();
         List<ClassDesc> parameters = args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
 
-        ClassValue classValue = EnvironmentUtils.getClassValue(environment, EnvironmentUtils.resolveClassDesc(environment, id, false)).orElse(null);
-        if (classValue == null) return null;
+        ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, EnvironmentUtils.resolveClassDesc(environment, id, false)).orElse(null);
+        if (classEnvironment == null) return null;
 
-        return classValue.getEnvironment().getConstructor(parameters).orElse(null);
+        return classEnvironment.getConstructor(parameters).orElse(null);
     }
 
     @Override

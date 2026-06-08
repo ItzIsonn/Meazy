@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral;
@@ -108,11 +107,10 @@ public class VariableIdentifier extends Identifier {
             DataType dataType = memberExpression.getObject().getType(environment, this);
             ClassDesc classDesc = dataType.getClassDesc();
 
-            ClassValue classValue = EnvironmentUtils.getClassValue(environment, classDesc).orElse(null);
-            if (classValue == null) return null;
+            ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, classDesc).orElse(null);
+            if (classEnvironment == null) return null;
 
-
-            return classValue.getEnvironment().getVariable(id).orElse(null);
+            return classEnvironment.getVariable(id).orElse(null);
         }
 
         return EnvironmentUtils.getVariableValue(environment, id).orElse(null);

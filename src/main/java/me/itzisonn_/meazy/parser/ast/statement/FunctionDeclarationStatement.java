@@ -124,8 +124,8 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
 
         if (functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment) {
             if (classEnvironment.getBaseClass() != null) {
-                EnvironmentUtils.getClassValue(classEnvironment, classEnvironment.getBaseClass()).orElseThrow()
-                        .getEnvironment().getFunctionRecursively(functionValue.getId(), functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
+                EnvironmentUtils.getClassEnvironment(classEnvironment, classEnvironment.getBaseClass()).orElseThrow()
+                        .getFunctionRecursively(functionValue.getId(), functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
                         .ifPresent(f -> {
                             if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
                                 throw new RuntimeException("Can't override non-open function " + id);
@@ -135,8 +135,8 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
             }
 
             for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
-                EnvironmentUtils.getClassValue(classEnvironment, interfaceClassDesc).orElseThrow()
-                        .getEnvironment().getFunctionRecursively(functionValue.getId(), functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
+                EnvironmentUtils.getClassEnvironment(classEnvironment, interfaceClassDesc).orElseThrow()
+                        .getFunctionRecursively(functionValue.getId(), functionValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList())
                         .ifPresent(f -> {
                             if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
                                 throw new RuntimeException("Can't override non-open function " + id);
