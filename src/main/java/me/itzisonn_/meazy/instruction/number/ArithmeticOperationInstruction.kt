@@ -1,68 +1,64 @@
-package me.itzisonn_.meazy.instruction.number;
+package me.itzisonn_.meazy.instruction.number
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
-
-import java.lang.classfile.CodeBuilder;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import me.itzisonn_.meazy.instruction.NumberType
+import org.jspecify.annotations.NullMarked
 
 @NullMarked
-@AllArgsConstructor
-public final class ArithmeticOperationInstruction implements Instruction {
-    private final NumberType type;
-    private final ArithmeticOperation operation;
+class ArithmeticOperationInstruction(
+    private val type: NumberType,
+    private val operation: ArithmeticOperation
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
 
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.codeBuilder;
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-
-        switch (type) {
-            case INT -> {
-                switch (operation) {
-                    case ADDITION -> codeBuilder.iadd();
-                    case SUBTRACTION -> codeBuilder.isub();
-                    case MULTIPLICATION -> codeBuilder.imul();
-                    case DIVISION -> codeBuilder.idiv();
-                    case REMAINDER -> codeBuilder.irem();
+        when (type) {
+            NumberType.INT -> {
+                when (operation) {
+                    ArithmeticOperation.ADDITION -> codeBuilder.iadd()
+                    ArithmeticOperation.SUBTRACTION -> codeBuilder.isub()
+                    ArithmeticOperation.MULTIPLICATION -> codeBuilder.imul()
+                    ArithmeticOperation.DIVISION -> codeBuilder.idiv()
+                    ArithmeticOperation.REMAINDER -> codeBuilder.irem()
                 }
             }
 
-            case LONG -> {
-                switch (operation) {
-                    case ADDITION -> codeBuilder.ladd();
-                    case SUBTRACTION -> codeBuilder.lsub();
-                    case MULTIPLICATION -> codeBuilder.lmul();
-                    case DIVISION -> codeBuilder.ldiv();
-                    case REMAINDER -> codeBuilder.lrem();
+            NumberType.LONG -> {
+                when (operation) {
+                    ArithmeticOperation.ADDITION -> codeBuilder.ladd()
+                    ArithmeticOperation.SUBTRACTION -> codeBuilder.lsub()
+                    ArithmeticOperation.MULTIPLICATION -> codeBuilder.lmul()
+                    ArithmeticOperation.DIVISION -> codeBuilder.ldiv()
+                    ArithmeticOperation.REMAINDER -> codeBuilder.lrem()
                 }
             }
 
-            case FLOAT -> {
-                switch (operation) {
-                    case ADDITION -> codeBuilder.fadd();
-                    case SUBTRACTION -> codeBuilder.fsub();
-                    case MULTIPLICATION -> codeBuilder.fmul();
-                    case DIVISION -> codeBuilder.fdiv();
-                    case REMAINDER -> codeBuilder.frem();
+            NumberType.FLOAT -> {
+                when (operation) {
+                    ArithmeticOperation.ADDITION -> codeBuilder.fadd()
+                    ArithmeticOperation.SUBTRACTION -> codeBuilder.fsub()
+                    ArithmeticOperation.MULTIPLICATION -> codeBuilder.fmul()
+                    ArithmeticOperation.DIVISION -> codeBuilder.fdiv()
+                    ArithmeticOperation.REMAINDER -> codeBuilder.frem()
                 }
             }
 
-            case DOUBLE -> {
-                switch (operation) {
-                    case ADDITION -> codeBuilder.dadd();
-                    case SUBTRACTION -> codeBuilder.dsub();
-                    case MULTIPLICATION -> codeBuilder.dmul();
-                    case DIVISION -> codeBuilder.ddiv();
-                    case REMAINDER -> codeBuilder.drem();
+            NumberType.DOUBLE -> {
+                when (operation) {
+                    ArithmeticOperation.ADDITION -> codeBuilder.dadd()
+                    ArithmeticOperation.SUBTRACTION -> codeBuilder.dsub()
+                    ArithmeticOperation.MULTIPLICATION -> codeBuilder.dmul()
+                    ArithmeticOperation.DIVISION -> codeBuilder.ddiv()
+                    ArithmeticOperation.REMAINDER -> codeBuilder.drem()
                 }
             }
+
+            else -> error("Can't apply arithmetic operation to boxed number $type")
         }
     }
 
-    public enum ArithmeticOperation {
+    enum class ArithmeticOperation {
         ADDITION,
         SUBTRACTION,
         MULTIPLICATION,

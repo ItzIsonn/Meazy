@@ -62,6 +62,6 @@ public class RemainderOperator extends Operator {
             throw new RuntimeException("Can't get type to get remainder of " + leftType + " and " + rightType); //TODO
         }
 
-        return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).getClassDesc());
+        return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
     }
 }

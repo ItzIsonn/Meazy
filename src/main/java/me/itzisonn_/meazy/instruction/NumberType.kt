@@ -1,14 +1,9 @@
-package me.itzisonn_.meazy.instruction;
+package me.itzisonn_.meazy.instruction
 
-import lombok.Getter;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDescs
 
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
-
-@NullMarked
-public enum NumberType {
+enum class NumberType(@JvmField val classDesc: ClassDesc, val isBoxed: Boolean) {
     INT(ConstantDescs.CD_int, false),
     LONG(ConstantDescs.CD_long, false),
     FLOAT(ConstantDescs.CD_float, false),
@@ -19,76 +14,55 @@ public enum NumberType {
     BOXED_FLOAT(ConstantDescs.CD_Float, true),
     BOXED_DOUBLE(ConstantDescs.CD_Double, true);
 
-    @Getter
-    private final ClassDesc classDesc;
-    @Getter
-    private final boolean boxed;
+    val isInt get() = this == INT || this == BOXED_INT
+    val isLong get() = this == LONG || this == BOXED_LONG
+    val isFloat get() = this == FLOAT || this == BOXED_FLOAT
+    val isDouble get() = this == DOUBLE || this == BOXED_DOUBLE
 
-    NumberType(ClassDesc classDesc, boolean boxed) {
-        this.classDesc = classDesc;
-        this.boxed = boxed;
+    fun box(): NumberType {
+        return when (this) {
+            INT -> BOXED_INT
+            LONG -> BOXED_LONG
+            FLOAT -> BOXED_FLOAT
+            DOUBLE -> BOXED_DOUBLE
+            else -> this
+        }
     }
 
-    public boolean isInt() {
-        return this == INT || this == BOXED_INT;
-    }
-
-    public boolean isLong() {
-        return this == LONG || this == BOXED_LONG;
-    }
-
-    public boolean isFloat() {
-        return this == FLOAT || this == BOXED_FLOAT;
-    }
-
-    public boolean isDouble() {
-        return this == DOUBLE || this == BOXED_DOUBLE;
-    }
-
-
-
-    public NumberType box() {
-        return switch (this) {
-            case INT -> BOXED_INT;
-            case LONG -> BOXED_LONG;
-            case FLOAT -> BOXED_FLOAT;
-            case DOUBLE -> BOXED_DOUBLE;
-            default -> this;
-        };
-    }
-
-    public NumberType unbox() {
-        return switch (this) {
-            case BOXED_INT -> INT;
-            case BOXED_LONG -> LONG;
-            case BOXED_FLOAT -> FLOAT;
-            case BOXED_DOUBLE -> DOUBLE;
-            default -> this;
-        };
+    fun unbox(): NumberType {
+        return when (this) {
+            BOXED_INT -> INT
+            BOXED_LONG -> LONG
+            BOXED_FLOAT -> FLOAT
+            BOXED_DOUBLE -> DOUBLE
+            else -> this
+        }
     }
 
 
+    companion object {
+        @JvmStatic
+        fun valueOf(classDesc: ClassDesc): NumberType? {
+            for (numberType in entries) {
+                if (numberType.classDesc == classDesc) return numberType
+            }
 
-    @Nullable
-    public static NumberType valueOf(ClassDesc classDesc) {
-        for (NumberType numberType : values()) {
-            if (numberType.getClassDesc().equals(classDesc)) return numberType;
+            return null
         }
 
-        return null;
-    }
+        fun isNumberType(classDesc: ClassDesc): Boolean {
+            return valueOf(classDesc) != null
+        }
 
-    public static boolean isNumberType(ClassDesc classDesc) {
-        return valueOf(classDesc) != null;
-    }
+        @JvmStatic
+        fun getCommonUnboxed(a: NumberType, b: NumberType): NumberType {
+            if (a.isDouble || b.isDouble) return DOUBLE
+            if (a.isFloat && b.isLong) return DOUBLE
+            if (a.isLong && b.isFloat) return DOUBLE
 
-    public static NumberType getCommonUnboxed(NumberType a, NumberType b) {
-        if (a.isDouble() || b.isDouble()) return DOUBLE;
-        if (a.isFloat() && b.isLong()) return DOUBLE;
-        if (a.isLong() && b.isFloat()) return DOUBLE;
-
-        if (a.isFloat() || b.isFloat()) return FLOAT;
-        if (a.isInt() && b.isInt()) return INT;
-        return LONG;
+            if (a.isFloat || b.isFloat) return FLOAT
+            if (a.isInt && b.isInt) return INT
+            return LONG
+        }
     }
 }

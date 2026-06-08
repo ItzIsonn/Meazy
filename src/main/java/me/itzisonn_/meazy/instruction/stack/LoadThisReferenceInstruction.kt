@@ -1,19 +1,13 @@
-package me.itzisonn_.meazy.instruction.stack;
+package me.itzisonn_.meazy.instruction.stack
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
-
-import java.lang.classfile.CodeBuilder;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import org.jspecify.annotations.NullMarked
 
 @NullMarked
-@AllArgsConstructor
-public final class LoadThisReferenceInstruction implements Instruction {
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.codeBuilder;
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-        codeBuilder.aload(0);
+class LoadThisReferenceInstruction : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
+        codeBuilder.aload(0)
     }
 }
