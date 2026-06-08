@@ -98,7 +98,7 @@ public final class MeazyMain {
 
         MeazyDatagenManager meazyDatagenManager = new MeazyDatagenManager();
 
-        for (TokenType tokenType : meazyDatagenManager.getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.getTokenTypeDeserializer())) {
+        for (TokenType tokenType : meazyDatagenManager.getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.INSTANCE.getTokenTypeDeserializer())) {
             Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.getId()), tokenType);
         }
 
