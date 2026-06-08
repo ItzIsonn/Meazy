@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -27,7 +26,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
     private final List<ParameterExpression> parameters;
     private final List<LocalStatement> body;
     @Nullable
-    private ConstructorValue constructorValue;
+    private ConstructorEnvironment constructorEnvironment;
 
     public ConstructorDeclarationStatement(Set<Modifier> modifiers, List<ParameterExpression> parameters, List<LocalStatement> body) {
         super(modifiers);
@@ -42,13 +41,11 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
         }
 
         ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(
-                constructorDeclarationEnvironment, null, null, modifiers
+                constructorDeclarationEnvironment, null, null, modifiers, parameters
         );
 
-        constructorValue = constructorDeclarationEnvironment.declareConstructor(
-                parameters,
-                constructorEnvironment
-        );
+        constructorDeclarationEnvironment.declareConstructor(constructorEnvironment);
+        this.constructorEnvironment = constructorEnvironment;
 
         boolean alwaysReturns = false;
         boolean hasBaseCall = false;
@@ -64,32 +61,32 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
 
     @Override
     public void resolve(Environment environment) {
-        if (constructorValue == null) {
+        if (constructorEnvironment == null) {
             throw new RuntimeException("Constructor isn't declared TODO");
         }
 
-        constructorValue.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));
+        constructorEnvironment.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));
     }
 
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        if (constructorValue == null) {
+        if (constructorEnvironment == null) {
             throw new RuntimeException("Declared function is unresolved TODO");
         }
 
         UUID startLabel = instructionsSet.createLabel();
         UUID endLabel = instructionsSet.createLabel();
-
-        ConstructorEnvironment constructorEnvironment = constructorValue.getEnvironment();
+        constructorEnvironment.setStartLabel(startLabel);
+        constructorEnvironment.setEndLabel(endLabel);
 
         MethodTypeDesc methodTypeDesc = MethodTypeDesc.of(
                 ConstantDescs.CD_void,
-                constructorValue.getParameters().stream().map(p -> p.getType(environment, this).getClassDesc()).toList()
+                this.constructorEnvironment.getParameters().stream().map(p -> p.getType(environment, this).getClassDesc()).toList()
         );
 
         Set<AccessFlag> accessFlags = new HashSet<>();
-        if (constructorValue.getModifiers().contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
-        else if (constructorValue.getModifiers().contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
+        if (this.constructorEnvironment.getModifiers().contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
+        else if (this.constructorEnvironment.getModifiers().contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
         else accessFlags.add(AccessFlag.PUBLIC);
 
         instructionsSet.withConstructor(
@@ -99,7 +96,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
                     bodyInstructions.initLabel(startLabel);
                     bodyInstructions.initLabel(endLabel);
 
-                    for (ParameterExpression parameter : constructorValue.getParameters()) {
+                    for (ParameterExpression parameter : this.constructorEnvironment.getParameters()) {
                         VariableValue parameterValue = constructorEnvironment.declareVariable(
                                 parameter.getId(),
                                 parameter.getDataType(),

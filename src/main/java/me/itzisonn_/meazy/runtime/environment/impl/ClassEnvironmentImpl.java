@@ -12,10 +12,8 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.EvaluationException;
-import me.itzisonn_.meazy.runtime.value.impl.ConstructorValueImpl;
 import me.itzisonn_.meazy.runtime.value.impl.VariableValueImpl;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -31,7 +29,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     @Getter
     protected final boolean isInterface;
     protected final List<VariableValue> variables;
-    protected final Set<ConstructorValue> constructors;
+    protected final Set<ConstructorEnvironment> constructors;
     @Getter
     @Nullable
     protected ClassDesc baseClass;
@@ -170,10 +168,12 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
 
     @Override
-    public ConstructorValue declareConstructor(List<ParameterExpression> parameters, ConstructorEnvironment constructorEnvironment) {
+    public void declareConstructor(ConstructorEnvironment constructorEnvironment) {
+        List<ParameterExpression> parameters = constructorEnvironment.getParameters();
+
         main:
-        for (ConstructorValue constructorValue : constructors) {
-            List<ParameterExpression> otherParameters = constructorValue.getParameters();
+        for (ConstructorEnvironment otherConstructorEnvironment : constructors) {
+            List<ParameterExpression> otherParameters = otherConstructorEnvironment.getParameters();
             if (parameters.size() != otherParameters.size()) continue;
 
             for (int i = 0; i < parameters.size(); i++) {
@@ -183,13 +183,11 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
             throw new EvaluationException(Text.translatable("meazy:runtime.constructor.already_exists"));
         }
 
-        ConstructorValue value = new ConstructorValueImpl(parameters, List.of(), constructorEnvironment);
-        constructors.add(value);
-        return value;
+        constructors.add(constructorEnvironment);
     }
 
     @Override
-    public Set<ConstructorValue> getConstructors() {
+    public Set<ConstructorEnvironment> getConstructors() {
         return new HashSet<>(constructors);
     }
 
