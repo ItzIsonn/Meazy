@@ -55,7 +55,7 @@ public final class MeazyMain {
             return;
         }
 
-        AbstractCommand command = Commands.getByName(args[0]);
+        AbstractCommand command = Commands.INSTANCE.getByName(args[0]);
         if (command == null) {
             LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:commands.unknown", args[0]));
             showAvailableCommandsList();

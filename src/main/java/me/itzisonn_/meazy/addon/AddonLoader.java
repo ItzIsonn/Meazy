@@ -63,7 +63,7 @@ public class AddonLoader {
             if (entry == null) throw new InvalidAddonInfoException("Addon jar doesn't contain addon.json");
 
             try (InputStream inputStream = jar.getInputStream(entry)) {
-                return new AddonInfo(inputStream);
+                return AddonInfoKt.AddonInfo(inputStream);
             }
         }
         catch (IOException e) {
