@@ -1,52 +1,40 @@
-package me.itzisonn_.meazy.command.custom;
+package me.itzisonn_.meazy.command.custom
 
-import me.itzisonn_.meazy.util.FileUtils;
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.command.AbstractCommand;
-import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.util.logger.LogLevel;
-import me.itzisonn_.meazy.parser.ast.program.Program;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.io.File;
-import java.lang.constant.ClassDesc;
-import java.util.List;
-import java.util.Map;
+import me.itzisonn_.meazy.MeazyMain
+import me.itzisonn_.meazy.command.AbstractCommand
+import me.itzisonn_.meazy.lang.text.Text
+import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.util.FileUtils.getExtension
+import me.itzisonn_.meazy.util.FileUtils.getLines
+import me.itzisonn_.meazy.util.logger.LogLevel
+import org.jspecify.annotations.NullMarked
+import java.io.File
 
 @NullMarked
-public class RunCommand extends AbstractCommand {
-    public RunCommand() {
-        super("run", List.of("<target_file>"));
-    }
-
-    @Override
-    @Nullable
-    public Text execute(String[] args) {
-        File file = new File(args[0]);
+class RunCommand : AbstractCommand("run", mutableListOf<String>("<target_file>")) {
+    override fun execute(vararg args: String): Text? {
+        val file = File(args[0])
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()));
-            return null;
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()))
+            return null
         }
 
-        String extension = FileUtils.getExtension(file);
-        if (!extension.equals("mea")) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", extension));
-            return null;
+        val extension = getExtension(file)
+        if (extension != "mea") {
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", extension))
+            return null
         }
 
-        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.getAbsolutePath()));
-        long startMillis = System.currentTimeMillis();
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.getAbsolutePath()))
+        val startMillis = System.currentTimeMillis()
 
-        List<Token> tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(FileUtils.getLines(file));
-        Program program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(file, tokens);
+        val tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(getLines(file))
+        val program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(file, tokens)
 
-        Map<ClassDesc, byte[]> classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue().compile(program);
-        Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue().run(classes);
+        val classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue().compile(program)
+        Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue().run(classes)
 
-        long endMillis = System.currentTimeMillis();
-        return Text.translatable("meazy:commands.run.info", (double) (endMillis - startMillis) / 1000);
+        val endMillis = System.currentTimeMillis()
+        return Text.translatable("meazy:commands.run.info", (endMillis - startMillis).toDouble() / 1000)
     }
 }

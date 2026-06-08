@@ -182,7 +182,7 @@ public final class Registries {
         LANGUAGES.register(MeazyMain.getDefaultIdentifier("english"), new Language("en", "English"));
         LANGUAGES.register(MeazyMain.getDefaultIdentifier("russian"), new Language("ru", "Русский"));
 
-        Commands.REGISTER();
+        Commands.INSTANCE.register();
         Modifiers.REGISTER();
         Operators.REGISTER();
         ParsingFunctions.REGISTER();

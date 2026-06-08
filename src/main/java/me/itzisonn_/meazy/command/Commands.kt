@@ -1,63 +1,53 @@
-package me.itzisonn_.meazy.command;
+package me.itzisonn_.meazy.command
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.command.custom.*;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.registry.RegistryEntry;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain
+import me.itzisonn_.meazy.command.custom.*
+import me.itzisonn_.meazy.registry.Registries
 
 /**
  * Commands registrar
- *
- * @see Registries#COMMANDS
+ * 
+ * @see Registries.COMMANDS
  */
-public final class Commands {
-    private static boolean hasRegistered = false;
-
-    private Commands() {}
-
-
+object Commands {
+    private var hasRegistered = false
 
     /**
      * Finds registered AbstractCommand with given name
-     *
+     * 
      * @param name AbstractCommand's name
      * @return AbstractCommand with given name or null
      */
-    @Nullable
-    public static AbstractCommand getByName(@NonNull String name) {
-        for (RegistryEntry<AbstractCommand> entry : Registries.COMMANDS.getEntries()) {
-            if (entry.getValue().getName().equals(name)) return entry.getValue();
+    fun getByName(name: String): AbstractCommand? {
+        for (entry in Registries.COMMANDS.getEntries()) {
+            if (entry.getValue().name == name) return entry.getValue()
         }
 
-        return null;
+        return null
     }
-
 
 
     /**
-     * Initializes {@link Registries#COMMANDS} registry
-     * <p>
-     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
-     *
-     * @throws IllegalStateException If {@link Registries#COMMANDS} registry has already been initialized
+     * Initializes [Registries.COMMANDS] registry
+     * 
+     * 
+     * *Don't use this method because it's called once at [Registries] initialization*
+     * 
+     * @throws IllegalStateException If [Registries.COMMANDS] registry has already been initialized
      */
-    public static void REGISTER() {
-        if (hasRegistered) throw new IllegalStateException("Commands have already been initialized");
-        hasRegistered = true;
+    fun register() {
+        check(!hasRegistered) { "Commands have already been initialized" }
+        hasRegistered = true
 
-        register(new VersionCommand());
-        register(new AddonsCommand());
-        register(new RunCommand());
-        register(new CompileCommand());
-        register(new CompileAndRunCommand());
+        register(VersionCommand())
+        register(AddonsCommand())
+        register(RunCommand())
+        register(CompileCommand())
+        register(CompileAndRunCommand())
     }
 
 
-
-
-    private static void register(AbstractCommand command) {
-        Registries.COMMANDS.register(MeazyMain.getDefaultIdentifier(command.getName()), command);
+    private fun register(command: AbstractCommand) {
+        Registries.COMMANDS.register(MeazyMain.getDefaultIdentifier(command.name), command)
     }
 }

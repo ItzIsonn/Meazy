@@ -1,57 +1,53 @@
-package me.itzisonn_.meazy.command;
+package me.itzisonn_.meazy.command
 
-import lombok.Getter;
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.lang.text.Text;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.util.List;
+import me.itzisonn_.meazy.MeazyMain
+import me.itzisonn_.meazy.lang.text.Text
+import me.itzisonn_.meazy.registry.Registries
 
 /**
  * Represents command
- * @see Registries#COMMANDS
+ * 
+ * @see Registries.COMMANDS
+ *
+ * @param name Name
+ * @param args List of args names
+ * @throws IllegalArgumentException If either name or any of args doesn't match [MeazyMain.IDENTIFIER_REGEX]
  */
-@NullMarked
-public abstract class AbstractCommand {
+abstract class AbstractCommand(name: String, args: List<String>) {
     /**
      * Name
      */
-    @Getter
-    private final String name;
+    val name: String
+
     /**
      * List of args names
      */
-    private final List<String> args;
+    private val args: List<String>
 
-    /**
-     * @param name Name
-     * @param args List of args names
-     * @throws IllegalArgumentException If either name or any of args doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
-     */
-    public AbstractCommand(String name, List<String> args) throws IllegalArgumentException {
-        if (!name.matches(MeazyMain.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid command's name");
-        if (!args.isEmpty() && args.stream().allMatch(arg -> arg.matches(MeazyMain.IDENTIFIER_REGEX))) throw new IllegalArgumentException("Invalid arg's name");
+    init {
+        require(name.matches(MeazyMain.IDENTIFIER_REGEX.toRegex())) { "Invalid command's name" }
+        require(
+            !(!args.isEmpty() && args.stream()
+                .allMatch { arg: String? -> arg!!.matches(MeazyMain.IDENTIFIER_REGEX.toRegex()) })
+        ) { "Invalid arg's name" }
 
-        this.name = name;
-        this.args = args;
+        this.name = name
+        this.args = args
     }
 
     /**
      * Executes this command with given args.
-     * Args' amount matches {@link AbstractCommand#args}' size
-     *
+     * Args' amount matches [AbstractCommand.args]' size
+     * 
      * @param args Args
      * @return Success message that will be logged or null
      */
-    @Nullable
-    public abstract Text execute(String... args);
+    abstract fun execute(vararg args: String): Text?
 
     /**
      * @return Copy of args names
      */
-    public List<String> getArgs() {
-        return List.copyOf(args);
+    fun getArgs(): List<String> {
+        return args.toList()
     }
 }

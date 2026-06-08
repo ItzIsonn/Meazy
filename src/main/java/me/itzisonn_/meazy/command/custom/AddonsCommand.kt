@@ -1,49 +1,32 @@
-package me.itzisonn_.meazy.command.custom;
+package me.itzisonn_.meazy.command.custom
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.addon.Addon;
-import me.itzisonn_.meazy.addon.AddonInfo;
-import me.itzisonn_.meazy.command.AbstractCommand;
-import me.itzisonn_.meazy.lang.text.Text;
-import me.itzisonn_.meazy.util.logger.LogLevel;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain
+import me.itzisonn_.meazy.command.AbstractCommand
+import me.itzisonn_.meazy.lang.text.Text
+import me.itzisonn_.meazy.util.logger.LogLevel
 
-import java.util.List;
-
-@NullMarked
-public class AddonsCommand extends AbstractCommand {
-    public AddonsCommand() {
-        super("addons", List.of());
-    }
-
-    @Override
-    @Nullable
-    public Text execute(String[] args) {
+class AddonsCommand : AbstractCommand("addons", mutableListOf()) {
+    override fun execute(vararg args: String): Text? {
         if (MeazyMain.ADDON_MANAGER.getAddons().isEmpty()) {
-            MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.addons.empty"));
-            return null;
+            MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.addons.empty"))
+            return null
         }
 
-        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.addons.loaded"));
-        for (Addon addon : MeazyMain.ADDON_MANAGER.getAddons()) {
-            AddonInfo addonInfo = addon.getAddonInfo();
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.addons.loaded"))
+        for (addon in MeazyMain.ADDON_MANAGER.getAddons()) {
+            val addonInfo = addon.getAddonInfo()
+            val authors = if (!addonInfo.authors.isEmpty())
+                " " + Text.translatable("meazy:commands.addons.by") + " " + addonInfo.authors.joinToString(", ")
+            else ""
 
-            String authors;
-            if (!addonInfo.getAuthors().isEmpty()) {
-                authors = " " + Text.translatable("meazy:commands.addons.by") + " " + String.join(", ", addonInfo.getAuthors());
+            val description = if (!addonInfo.description.isBlank()) {
+                " - " + addonInfo.description
             }
-            else authors = "";
+            else ""
 
-            String description;
-            if (!addonInfo.getDescription().isBlank()) {
-                description = " - " + addonInfo.getDescription();
-            }
-            else description = "";
-
-            MeazyMain.LOGGER.log(LogLevel.INFO, Text.literal("    " + addonInfo.getFullName() + authors + description));
+            MeazyMain.LOGGER.log(LogLevel.INFO, Text.literal("    " + addonInfo.fullName + authors + description))
         }
 
-        return null;
+        return null
     }
 }
