@@ -130,17 +130,16 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                 if (Modifier.isProtected(cls.getModifiers())) constructorModifiers.add(Modifiers.PROTECTED());
 
                 classEnvironment.declareConstructor(
-                        Arrays.stream(constructor.getParameters()).map(p -> new ParameterExpression(
-                                p.getName(),
-                                DataType.of(p.getType().describeConstable().orElseThrow(), !p.getType().isPrimitive()),
-                                Modifier.isFinal(p.getModifiers())
-                        )).toList(),
-
                         Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                                 classEnvironment,
                                 null,
                                 null,
-                                constructorModifiers
+                                constructorModifiers,
+                                Arrays.stream(constructor.getParameters()).map(p -> new ParameterExpression(
+                                        p.getName(),
+                                        DataType.of(p.getType().describeConstable().orElseThrow(), !p.getType().isPrimitive()),
+                                        Modifier.isFinal(p.getModifiers())
+                                )).toList()
                         )
                 );
             }

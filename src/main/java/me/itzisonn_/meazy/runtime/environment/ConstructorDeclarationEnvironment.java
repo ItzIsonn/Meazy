@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
@@ -18,16 +17,16 @@ public interface ConstructorDeclarationEnvironment extends Environment {
      * Declares given constructor in this environment
      * TODO
      */
-    ConstructorValue declareConstructor(List<ParameterExpression> parameters, ConstructorEnvironment constructorEnvironment);
+    void declareConstructor(ConstructorEnvironment constructorEnvironment);
 
     /**
      * @param parameters Constructor's args TODO
      * @return Declared constructor with given args or null
      */
-    default Optional<ConstructorValue> getConstructor(List<ClassDesc> parameters) {
+    default Optional<ConstructorEnvironment> getConstructor(List<ClassDesc> parameters) {
         main:
-        for (ConstructorValue constructorValue : getConstructors()) {
-            List<ParameterExpression> constructorParameters = constructorValue.getParameters();
+        for (ConstructorEnvironment constructorEnvironment : getConstructors()) {
+            List<ParameterExpression> constructorParameters = constructorEnvironment.getParameters();
             if (parameters.size() != constructorParameters.size()) continue;
 
             for (int i = 0; i < parameters.size(); i++) {
@@ -36,7 +35,7 @@ public interface ConstructorDeclarationEnvironment extends Environment {
                 if (!EnvironmentUtils.isInstanceOf(this, parameterClassDesc, constructorParameterClassDesc)) continue main;
             }
 
-            return Optional.of(constructorValue);
+            return Optional.of(constructorEnvironment);
         }
 
         return Optional.empty();
@@ -52,5 +51,5 @@ public interface ConstructorDeclarationEnvironment extends Environment {
     /**
      * @return All declared constructors
      */
-    Set<ConstructorValue> getConstructors();
+    Set<ConstructorEnvironment> getConstructors();
 }

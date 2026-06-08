@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -52,14 +51,14 @@ public class BaseCallStatement implements LocalStatement {
 
 
     private ResolvedConstructor resolveConstructor(Environment environment) {
-        ConstructorValue constructorValue = resolveMeazyConstructor(environment);
-        if (constructorValue == null) throw new RuntimeException();
+        ConstructorEnvironment constructorEnvironment = resolveMeazyConstructor(environment);
+        if (constructorEnvironment == null) throw new RuntimeException();
 
-        if (!(constructorValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment)) {
+        if (!(constructorEnvironment.getParent() instanceof ClassEnvironment classEnvironment)) {
             throw new RuntimeException("Can't call super class not inside class");
         }
 
-        List<ClassDesc> parameters = constructorValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
+        List<ClassDesc> parameters = constructorEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
 
         return new ResolvedConstructor(
                 ClassDesc.of(classEnvironment.getFullClassName()),
@@ -68,7 +67,7 @@ public class BaseCallStatement implements LocalStatement {
     }
 
     @Nullable
-    private ConstructorValue resolveMeazyConstructor(Environment environment) {
+    private ConstructorEnvironment resolveMeazyConstructor(Environment environment) {
         ClassEnvironment classEnvironment = EnvironmentUtils.getParent(environment, ClassEnvironment.class).orElseThrow(
                 () -> new RuntimeException("Can't call super class not inside class")
         );

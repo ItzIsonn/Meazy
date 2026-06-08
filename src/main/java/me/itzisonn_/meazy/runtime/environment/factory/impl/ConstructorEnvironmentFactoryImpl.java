@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.factory.impl;
 
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
@@ -8,13 +9,14 @@ import me.itzisonn_.meazy.runtime.environment.factory.ConstructorEnvironmentFact
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @NullMarked
 public class ConstructorEnvironmentFactoryImpl implements ConstructorEnvironmentFactory {
     @Override
-    public ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, Set<Modifier> modifiers) {
-        return new ConstructorEnvironmentImpl(parent, startLabel, endLabel, modifiers);
+    public ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, Set<Modifier> modifiers, List<ParameterExpression> parameters) {
+        return new ConstructorEnvironmentImpl(parent, startLabel, endLabel, modifiers, parameters);
     }
 }

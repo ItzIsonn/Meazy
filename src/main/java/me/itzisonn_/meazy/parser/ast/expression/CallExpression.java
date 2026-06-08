@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
@@ -181,10 +180,10 @@ public class CallExpression implements Expression, LocalStatement {
 
 
     private ResolvedCallable resolveConstructor(Environment environment) {
-        ConstructorValue constructorValue = resolveMeazyConstructor(environment);
-        if (constructorValue == null) throw new RuntimeException("Can't find constructor for " + caller.getId());
+        ConstructorEnvironment constructorEnvironment = resolveMeazyConstructor(environment);
+        if (constructorEnvironment == null) throw new RuntimeException("Can't find constructor for " + caller.getId());
 
-        if (!(constructorValue.getEnvironment().getParent() instanceof ClassEnvironment classEnvironment)) {
+        if (!(constructorEnvironment.getParent() instanceof ClassEnvironment classEnvironment)) {
             throw new RuntimeException("Invalid constructor");
         }
 
@@ -192,7 +191,7 @@ public class CallExpression implements Expression, LocalStatement {
             throw new RuntimeException("Can't create instance of abstract class " + classEnvironment.getId());
         }
 
-        List<ClassDesc> parameters = constructorValue.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
+        List<ClassDesc> parameters = constructorEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
 
         return new ResolvedCallable(
                 ClassDesc.of(classEnvironment.getFullClassName()),
@@ -204,7 +203,7 @@ public class CallExpression implements Expression, LocalStatement {
     }
 
     @Nullable
-    private ConstructorValue resolveMeazyConstructor(Environment environment) {
+    private ConstructorEnvironment resolveMeazyConstructor(Environment environment) {
         String id = caller.getId();
         List<ClassDesc> parameters = args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
 
