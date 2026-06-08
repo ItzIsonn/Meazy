@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
-import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;

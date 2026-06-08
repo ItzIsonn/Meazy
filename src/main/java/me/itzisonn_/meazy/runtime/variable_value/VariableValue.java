@@ -1,16 +1,47 @@
-package me.itzisonn_.meazy.runtime.value;
+package me.itzisonn_.meazy.runtime.variable_value;
 
+import me.itzisonn_.meazy.parser.ast.expression.Expression;
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 /**
- * Represents value in runtime that can have modifiers
+ * Represents runtime variable value
  */
 @NullMarked
-public interface ModifierableValue {
+public interface VariableValue {
+    /**
+     * @return Id
+     */
+    String getId();
+
+    /**
+     * @return DataType
+     */
+    DataType getDataType();
+
+    /**
+     * @return Whether value is constant
+     */
+    boolean isConstant();
+
+    //TODO
+    int getSlot();
+
+    @Nullable
+    Expression getInitializer();
+
+    /**
+     * @return Parent environment
+     */
+    VariableDeclarationEnvironment getParentEnvironment();
+
+
+
     /**
      * @param target Target modifier
      * @return Whether this runtime value has given modifier
@@ -39,10 +70,4 @@ public interface ModifierableValue {
      * @return Modifiers
      */
     Set<Modifier> getModifiers();
-
-    /**
-     * @param environment From which environment access is checked
-     * @return Whether this value is accessible from given environment
-     */
-    boolean isAccessible(Environment environment);
 }

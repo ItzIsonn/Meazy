@@ -7,9 +7,9 @@ import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
-import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
 import me.itzisonn_.meazy.runtime.EvaluationException;
-import me.itzisonn_.meazy.runtime.value.impl.VariableValueImpl;
+import me.itzisonn_.meazy.runtime.variable_value.VariableValueImpl;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
