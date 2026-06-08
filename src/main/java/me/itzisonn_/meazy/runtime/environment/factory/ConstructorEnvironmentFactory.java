@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.factory;
 
+import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
@@ -22,5 +23,5 @@ public interface ConstructorEnvironmentFactory { //TODO javadoc
      * @param parent Parent
      * @return New constructor environment
      */
-    ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, Set<Modifier> modifiers, List<ParameterExpression> parameters);
+    ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, @Nullable Uuid startLabel, @Nullable Uuid endLabel, Set<Modifier> modifiers, List<ParameterExpression> parameters);
 }

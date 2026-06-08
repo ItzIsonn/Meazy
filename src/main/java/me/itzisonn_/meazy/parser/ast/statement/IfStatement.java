@@ -32,8 +32,8 @@ public class IfStatement implements LocalStatement {
 
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        UUID startLabel = instructionsSet.createAndInitLabel();
-        UUID elseLabel = instructionsSet.createAndInitLabel();
+        var startLabel = instructionsSet.createAndInitLabel();
+        var elseLabel = instructionsSet.createAndInitLabel();
         LocalVariableDeclarationEnvironment ifEnvironment = Registries.LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                 environment, startLabel, elseLabel
         );
@@ -55,7 +55,7 @@ public class IfStatement implements LocalStatement {
             throw new RuntimeException("If statement must always use boolean TODO but uses " + condition.getType(environment, this));
         }
 
-        UUID endLabel = instructionsSet.createAndInitLabel();
+        var endLabel = instructionsSet.createAndInitLabel();
         condition.emit(instructionsSet, environment, this);
         instructionsSet.convertToBooleanType(conditionType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
         instructionsSet.gotoLabelIfEqualsZero(elseLabel);

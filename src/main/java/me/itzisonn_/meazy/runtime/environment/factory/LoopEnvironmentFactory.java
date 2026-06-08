@@ -1,10 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment.factory;
 
+import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
 import org.jspecify.annotations.NullMarked;
-
-import java.util.UUID;
 
 /**
  * Represents factory for creating {@link LoopEnvironment}s
@@ -17,5 +16,5 @@ public interface LoopEnvironmentFactory {//TODO
      * @param parent Parent
      * @return New loop environment
      */
-    LoopEnvironment create(Environment parent, UUID startLabel, UUID endLabel);
+    LoopEnvironment create(Environment parent, Uuid startLabel, Uuid endLabel);
 }

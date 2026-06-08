@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.factory.impl;
 
+import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @NullMarked
 public class ConstructorEnvironmentFactoryImpl implements ConstructorEnvironmentFactory {
     @Override
-    public ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, Set<Modifier> modifiers, List<ParameterExpression> parameters) {
+    public ConstructorEnvironment create(ConstructorDeclarationEnvironment parent, @Nullable Uuid startLabel, @Nullable Uuid endLabel, Set<Modifier> modifiers, List<ParameterExpression> parameters) {
         return new ConstructorEnvironmentImpl(parent, startLabel, endLabel, modifiers, parameters);
     }
 }

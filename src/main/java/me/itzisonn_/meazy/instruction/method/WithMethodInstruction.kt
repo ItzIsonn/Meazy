@@ -1,47 +1,40 @@
-package me.itzisonn_.meazy.instruction.method;
+package me.itzisonn_.meazy.instruction.method
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import java.lang.classfile.CodeBuilder
+import java.lang.classfile.MethodBuilder
+import java.lang.constant.MethodTypeDesc
+import java.lang.reflect.AccessFlag
+import java.util.function.Consumer
 
-import java.lang.classfile.ClassBuilder;
-import java.lang.constant.MethodTypeDesc;
-import java.lang.reflect.AccessFlag;
-import java.util.function.Consumer;
+class WithMethodInstruction(
+    private val id: String,
+    private val methodTypeDesc: MethodTypeDesc,
+    private val flags: Int,
+    private val bodyInstructions: Consumer<InstructionsSet>
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val classBuilder = bytecodeBuilders.classBuilder ?: error("Class builder is null")
 
-@NullMarked
-@AllArgsConstructor
-public final class WithMethodInstruction implements Instruction {
-    private final String id;
-    private final MethodTypeDesc methodTypeDesc;
-    private final int flags;
-    private final Consumer<InstructionsSet> bodyInstructions;
-
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        ClassBuilder classBuilder = bytecodeBuilders.getClassBuilder();
-        if (classBuilder == null) throw new RuntimeException("Class builder is null");
-
-        if ((AccessFlag.ABSTRACT.mask() & flags) != 0) {
-            classBuilder.withMethod(id, methodTypeDesc, flags, _ -> {});
-            return;
+        if ((AccessFlag.ABSTRACT.mask() and flags) != 0) {
+            classBuilder.withMethod(id, methodTypeDesc, flags, Consumer { `_`: MethodBuilder? -> })
+            return
         }
 
         classBuilder.withMethodBody(
-                id,
-                methodTypeDesc,
-                flags,
-                codeBuilder -> {
-                    BytecodeBuilders methodBytecodeBuilders = bytecodeBuilders.copy(codeBuilder);
-                    InstructionsSet instructionsSet = new InstructionsSet(methodBytecodeBuilders);
-                    bodyInstructions.accept(instructionsSet);
+            id,
+            methodTypeDesc,
+            flags
+        ) { codeBuilder: CodeBuilder? ->
+            val methodBytecodeBuilders = bytecodeBuilders.copy(codeBuilder)
+            val instructionsSet = InstructionsSet(methodBytecodeBuilders)
 
-                    for (Instruction instruction : instructionsSet.getInstructions()) {
-                        instruction.emit(methodBytecodeBuilders);
-                    }
-                }
-        );
+            bodyInstructions.accept(instructionsSet)
+            for (instruction in instructionsSet.instructions) {
+                instruction.emit(methodBytecodeBuilders)
+            }
+        }
     }
 }

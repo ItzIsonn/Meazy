@@ -26,8 +26,8 @@ public class InversionOperator extends Operator {
         DataType leftType = left.getType(environment, operatorExpression);
         if (!MiscUtils.isBoolean(leftType.getClassDesc())) throw new RuntimeException("Can only invert booleans TODO");
 
-        UUID trueLabel = instructionsSet.createAndInitLabel();
-        UUID endLabel = instructionsSet.createAndInitLabel();
+        var trueLabel = instructionsSet.createAndInitLabel();
+        var endLabel = instructionsSet.createAndInitLabel();
 
         left.emit(instructionsSet, environment, operatorExpression);
         instructionsSet.convertToBooleanType(leftType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);

@@ -1,19 +1,11 @@
-package me.itzisonn_.meazy.instruction.array;
+package me.itzisonn_.meazy.instruction.array
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
 
-import java.lang.classfile.CodeBuilder;
-
-@NullMarked
-@AllArgsConstructor
-public final class StoreReferenceIntoArrayInstruction implements Instruction {
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-        codeBuilder.aastore();
+class StoreReferenceIntoArrayInstruction : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
+        codeBuilder.aastore()
     }
 }

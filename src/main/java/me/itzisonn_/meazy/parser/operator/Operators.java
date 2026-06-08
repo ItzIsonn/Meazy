@@ -128,8 +128,8 @@ public final class Operators {
         if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't compare nullable numbers");
         NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
-        UUID trueLabel = instructionsSet.createAndInitLabel();
-        UUID endLabel = instructionsSet.createAndInitLabel();
+        var trueLabel = instructionsSet.createAndInitLabel();
+        var endLabel = instructionsSet.createAndInitLabel();
 
         left.emit(instructionsSet, environment, operatorExpression);
         instructionsSet.convertToNumberType(leftNumberType, commonNumberType);

@@ -1,41 +1,33 @@
-package me.itzisonn_.meazy.instruction.method;
+package me.itzisonn_.meazy.instruction.method
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import java.lang.constant.ClassDesc
+import java.lang.constant.MethodTypeDesc
+import java.util.function.Consumer
 
-import java.lang.classfile.CodeBuilder;
-import java.lang.constant.ClassDesc;
-import java.lang.constant.MethodTypeDesc;
-import java.util.function.Consumer;
-
-@NullMarked
-@AllArgsConstructor
-public final class InvokeConstructorInstruction implements Instruction {
-    private final ClassDesc owner;
-    private final MethodTypeDesc constructorTypeDesc;
-    private final Consumer<InstructionsSet> argsInstructions;
-    private final boolean isSuper;
-
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
+class InvokeConstructorInstruction(
+    private val owner: ClassDesc,
+    private val constructorTypeDesc: MethodTypeDesc,
+    private val argsInstructions: Consumer<InstructionsSet>,
+    private val isSuper: Boolean
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
 
         if (!isSuper) {
-            codeBuilder.new_(owner);
-            codeBuilder.dup();
+            codeBuilder.new_(owner)
+            codeBuilder.dup()
         }
 
-        InstructionsSet instructionsSet = new InstructionsSet(bytecodeBuilders);
-        argsInstructions.accept(instructionsSet);
+        val instructionsSet = InstructionsSet(bytecodeBuilders)
+        argsInstructions.accept(instructionsSet)
 
-        for (Instruction instruction : instructionsSet.getInstructions()) {
-            instruction.emit(bytecodeBuilders);
+        for (instruction in instructionsSet.instructions) {
+            instruction.emit(bytecodeBuilders)
         }
 
-        codeBuilder.invokespecial(owner, "<init>", constructorTypeDesc);
+        codeBuilder.invokespecial(owner, "<init>", constructorTypeDesc)
     }
 }

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.factory;
 
+import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
 import org.jspecify.annotations.NullMarked;
@@ -18,5 +19,5 @@ public interface LocalVariableDeclarationEnvironmentFactory {//TODO
      * @param parent Parent
      * @return New loop environment
      */
-    LocalVariableDeclarationEnvironment create(Environment parent, @Nullable UUID startLabel, @Nullable UUID endLabel);
+    LocalVariableDeclarationEnvironment create(Environment parent, @Nullable Uuid startLabel, @Nullable Uuid endLabel);
 }

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.expression;
 
+import kotlin.uuid.Uuid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
@@ -38,7 +39,7 @@ public class CallExpression implements Expression, LocalStatement {
     public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         if (caller instanceof FunctionIdentifier) {
             ResolvedCallable resolvedFunction = resolveFunction(environment, parent);
-            UUID endLabel = null;
+            Uuid endLabel = null;
 
             if (resolvedFunction.getTarget() != null) {
                 resolvedFunction.getTarget().emit(instructionsSet, environment, this);
@@ -50,7 +51,7 @@ public class CallExpression implements Expression, LocalStatement {
                         }
                     }
                     else {
-                        UUID nonnullLabel = instructionsSet.createAndInitLabel();
+                        var nonnullLabel = instructionsSet.createAndInitLabel();
                         endLabel = instructionsSet.createAndInitLabel();
 
                         instructionsSet.duplicate();

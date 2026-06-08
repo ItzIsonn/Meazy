@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
+import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
@@ -14,7 +15,7 @@ public class ConstructorEnvironmentImpl extends LocalVariableDeclarationEnvironm
     protected final Set<Modifier> modifiers;
     protected final List<ParameterExpression> parameters;
 
-    public ConstructorEnvironmentImpl(ConstructorDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, Set<Modifier> modifiers, List<ParameterExpression> parameters) {
+    public ConstructorEnvironmentImpl(ConstructorDeclarationEnvironment parent, @Nullable Uuid startLabel, @Nullable Uuid endLabel, Set<Modifier> modifiers, List<ParameterExpression> parameters) {
         super(parent, startLabel, endLabel);
         this.modifiers = modifiers;
         this.parameters = parameters;

@@ -1,29 +1,28 @@
-package me.itzisonn_.meazy.instruction.method;
+package me.itzisonn_.meazy.instruction.method
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import me.itzisonn_.meazy.instruction.Instruction;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import java.lang.constant.ConstantDesc
+import java.lang.constant.DirectMethodHandleDesc
+import java.lang.constant.DynamicCallSiteDesc
+import java.lang.constant.MethodTypeDesc
 
-import java.lang.classfile.CodeBuilder;
-import java.lang.constant.ConstantDesc;
-import java.lang.constant.DirectMethodHandleDesc;
-import java.lang.constant.DynamicCallSiteDesc;
-import java.lang.constant.MethodTypeDesc;
-import java.util.List;
+class InvokeDynamicMethodInstruction(
+    private val bootstrapMethod: DirectMethodHandleDesc,
+    private val id: String,
+    private val methodTypeDesc: MethodTypeDesc,
+    private val args: MutableList<ConstantDesc>
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
 
-@NullMarked
-@AllArgsConstructor
-public final class InvokeDynamicMethodInstruction implements Instruction {
-    private final DirectMethodHandleDesc bootstrapMethod;
-    private final String id;
-    private final MethodTypeDesc methodTypeDesc;
-    private final List<ConstantDesc> args;
-
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-        codeBuilder.invokedynamic(DynamicCallSiteDesc.of(bootstrapMethod, id, methodTypeDesc, args.toArray(new ConstantDesc[0])));
+        codeBuilder.invokedynamic(
+            DynamicCallSiteDesc.of(
+                bootstrapMethod,
+                id,
+                methodTypeDesc,
+                *args.toTypedArray<ConstantDesc>()
+            )
+        )
     }
 }

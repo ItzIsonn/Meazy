@@ -1,24 +1,18 @@
 package me.itzisonn_.meazy.instruction;
 
-import lombok.Getter;
+import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.instruction.array.NewReferenceArrayInstruction;
 import me.itzisonn_.meazy.instruction.array.StoreReferenceIntoArrayInstruction;
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction;
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation;
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfEqualsZeroInstruction;
 import me.itzisonn_.meazy.instruction.field.GetFieldInstruction;
 import me.itzisonn_.meazy.instruction.field.StoreFieldInstruction;
 import me.itzisonn_.meazy.instruction.field.WithFieldInstruction;
-import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction;
-import me.itzisonn_.meazy.instruction.method.*;
-import me.itzisonn_.meazy.instruction.label.BindLabelInstruction;
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfNonNullInstruction;
-import me.itzisonn_.meazy.instruction.label.GotoLabelInstruction;
-import me.itzisonn_.meazy.instruction.label.InitLabelInstruction;
-import me.itzisonn_.meazy.instruction.stack.LoadConstantInstruction;
+import me.itzisonn_.meazy.instruction.label.*;
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation;
 import me.itzisonn_.meazy.instruction.local.GetLocalInstruction;
-import me.itzisonn_.meazy.instruction.stack.LoadThisReferenceInstruction;
+import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction;
 import me.itzisonn_.meazy.instruction.local.StoreLocalInstruction;
+import me.itzisonn_.meazy.instruction.method.*;
+import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import me.itzisonn_.meazy.instruction.misc.CheckCastInstruction;
 import me.itzisonn_.meazy.instruction.misc.InstanceOfInstruction;
 import me.itzisonn_.meazy.instruction.misc.ReturnInstruction;
@@ -27,21 +21,27 @@ import me.itzisonn_.meazy.instruction.number.*;
 import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation;
 import me.itzisonn_.meazy.instruction.number.LogicalOperationInstruction.LogicalOperation;
 import me.itzisonn_.meazy.instruction.stack.DuplicateInstruction;
+import me.itzisonn_.meazy.instruction.stack.LoadConstantInstruction;
+import me.itzisonn_.meazy.instruction.stack.LoadThisReferenceInstruction;
 import me.itzisonn_.meazy.instruction.stack.PopInstruction;
-import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.classfile.attribute.InnerClassesAttribute;
-import java.lang.constant.*;
+import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDesc;
+import java.lang.constant.DirectMethodHandleDesc;
+import java.lang.constant.MethodTypeDesc;
 import java.lang.reflect.AccessFlag;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 @NullMarked
 public class InstructionsSet {
     private final List<Instruction> instructions = new ArrayList<>();
-    @Getter
     private final BytecodeBuilders bytecodeBuilders;
 
     public InstructionsSet(BytecodeBuilders bytecodeBuilders) {
@@ -55,7 +55,6 @@ public class InstructionsSet {
     public void with(Instruction instruction) {
         instructions.add(instruction);
     }
-
 
 
     public void withField(String id, ClassDesc type, Set<AccessFlag> flags) {
@@ -79,7 +78,6 @@ public class InstructionsSet {
     }
 
 
-
     public void withMethod(String id, MethodTypeDesc methodTypeDesc, Set<AccessFlag> flags, Consumer<InstructionsSet> bodyInstructions) {
         with(new WithMethodInstruction(id, methodTypeDesc, toIntFlags(flags), bodyInstructions));
     }
@@ -91,7 +89,6 @@ public class InstructionsSet {
     public void withClass(ClassDesc classDesc, @Nullable ClassDesc superClass, Set<ClassDesc> interfaceClasses, Set<AccessFlag> flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
         with(new WithClassInstruction(classDesc, superClass, interfaceClasses, toIntFlags(flags), attributes, classInstructions));
     }
-
 
 
     public void invokeMethod(ClassDesc owner, String id, MethodTypeDesc methodTypeDesc, Consumer<InstructionsSet> argsInstructions, InvokeType invokeType) {
@@ -111,7 +108,6 @@ public class InstructionsSet {
     }
 
 
-
     public void loadConstant(@Nullable ConstantDesc constant) {
         with(new LoadConstantInstruction(constant));
     }
@@ -129,7 +125,6 @@ public class InstructionsSet {
     }
 
 
-
     public void getLocal(ClassDesc type, int slot) {
         with(new GetLocalInstruction(type, slot));
     }
@@ -138,10 +133,9 @@ public class InstructionsSet {
         with(new StoreLocalInstruction(type, slot));
     }
 
-    public void setLocalName(int slot, String id, ClassDesc type, UUID startLabelUuid, UUID endLabelUuid) {
+    public void setLocalName(int slot, String id, ClassDesc type, Uuid startLabelUuid, Uuid endLabelUuid) {
         with(new SetLocalNameInstruction(slot, id, type, startLabelUuid, endLabelUuid));
     }
-
 
 
     public void newReferenceArray(ClassDesc type) {
@@ -151,7 +145,6 @@ public class InstructionsSet {
     public void storeReferenceIntoArray() {
         with(new StoreReferenceIntoArrayInstruction());
     }
-
 
 
     public void negateNumber(NumberType type) {
@@ -175,7 +168,6 @@ public class InstructionsSet {
     }
 
 
-
     public void instanceOf(ClassDesc target) {
         with(new InstanceOfInstruction(target));
     }
@@ -193,7 +185,6 @@ public class InstructionsSet {
     }
 
 
-
     public void duplicate() {
         with(new DuplicateInstruction());
     }
@@ -203,48 +194,49 @@ public class InstructionsSet {
     }
 
 
-
-    public UUID createLabel() {
-        UUID uuid = UUID.randomUUID();
+    public Uuid createLabel() {
+        Uuid uuid = Uuid.Companion.random();
         bytecodeBuilders.addLabel(uuid);
         return uuid;
     }
 
-    public void initLabel(UUID uuid) {
+    public void initLabel(Uuid uuid) {
         with(new InitLabelInstruction(uuid));
     }
 
-    public UUID createAndInitLabel() {
-        UUID uuid = createLabel();
+    public Uuid createAndInitLabel() {
+        Uuid uuid = createLabel();
         initLabel(uuid);
         return uuid;
     }
 
-    public void bindLabel(UUID uuid) {
+    public void bindLabel(Uuid uuid) {
         with(new BindLabelInstruction(uuid));
     }
 
-    public void gotoLabel(UUID uuid) {
+    public void gotoLabel(Uuid uuid) {
         with(new GotoLabelInstruction(uuid));
     }
 
 
-
-    public void gotoLabelIfNonNull(UUID uuid) {
+    public void gotoLabelIfNonNull(Uuid uuid) {
         with(new GotoLabelIfNonNullInstruction(uuid));
     }
 
-    public void gotoLabelIfEqualsZero(UUID uuid) {
+    public void gotoLabelIfEqualsZero(Uuid uuid) {
         with(new GotoLabelIfEqualsZeroInstruction(uuid));
     }
 
-    public void gotoLabelIfComparisonTrue(NumberType type, ComparisonOperation operation, UUID uuid) {
+    public void gotoLabelIfComparisonTrue(NumberType type, ComparisonOperation operation, Uuid uuid) {
         with(new GotoLabelIfComparisonTrueInstruction(type, operation, uuid));
     }
 
 
-
     private static int toIntFlags(Collection<AccessFlag> accessFlags) {
         return accessFlags.stream().map(AccessFlag::mask).reduce((i1, i2) -> i1 | i2).orElse(0);
+    }
+
+    public BytecodeBuilders getBytecodeBuilders() {
+        return this.bytecodeBuilders;
     }
 }

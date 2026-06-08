@@ -1,44 +1,34 @@
-package me.itzisonn_.meazy.instruction.method;
+package me.itzisonn_.meazy.instruction.method
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import java.lang.classfile.CodeBuilder
+import java.lang.constant.MethodTypeDesc
+import java.lang.reflect.AccessFlag
+import java.util.function.Consumer
 
-import java.lang.classfile.ClassBuilder;
-import java.lang.constant.MethodTypeDesc;
-import java.lang.reflect.AccessFlag;
-import java.lang.reflect.AccessFlag.Location;
-import java.util.function.Consumer;
-
-@NullMarked
-@AllArgsConstructor
-public final class WithConstructorInstruction implements Instruction {
-    private final MethodTypeDesc methodTypeDesc;
-    private final int flags;
-    private final Consumer<InstructionsSet> bodyInstructions;
-
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        ClassBuilder classBuilder = bytecodeBuilders.getClassBuilder();
-        if (classBuilder == null) throw new RuntimeException("Class builder is null");
-
-        boolean isStatic = AccessFlag.maskToAccessFlags(flags, Location.METHOD).contains(AccessFlag.STATIC);
+class WithConstructorInstruction(
+    private val methodTypeDesc: MethodTypeDesc,
+    private val flags: Int,
+    private val bodyInstructions: Consumer<InstructionsSet>
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val classBuilder = bytecodeBuilders.classBuilder ?: error("Class builder is null")
+        val isStatic = AccessFlag.maskToAccessFlags(flags, AccessFlag.Location.METHOD).contains(AccessFlag.STATIC)
 
         classBuilder.withMethodBody(
-                isStatic ? "<clinit>" : "<init>",
-                methodTypeDesc,
-                flags,
-                codeBuilder -> {
-                    BytecodeBuilders constructorBytecodeBuilders = bytecodeBuilders.copy(codeBuilder);
-                    InstructionsSet instructionsSet = new InstructionsSet(constructorBytecodeBuilders);
-                    bodyInstructions.accept(instructionsSet);
+            if (isStatic) "<clinit>" else "<init>",
+            methodTypeDesc,
+            flags
+        ) { codeBuilder: CodeBuilder? ->
+            val constructorBytecodeBuilders = bytecodeBuilders.copy(codeBuilder)
+            val instructionsSet = InstructionsSet(constructorBytecodeBuilders)
 
-                    for (Instruction instruction : instructionsSet.getInstructions()) {
-                        instruction.emit(constructorBytecodeBuilders);
-                    }
-                }
-        );
+            bodyInstructions.accept(instructionsSet)
+            for (instruction in instructionsSet.instructions) {
+                instruction.emit(constructorBytecodeBuilders)
+            }
+        }
     }
 }

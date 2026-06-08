@@ -17,7 +17,7 @@ public final class ConvertToBooleanTypeInstruction implements Instruction {
 
     @Override
     public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
+        CodeBuilder codeBuilder = bytecodeBuilders.codeBuilder;
         if (codeBuilder == null) throw new RuntimeException("Code builder is null");
 
         if (isFromBoxed == isToBoxed) return;

@@ -107,8 +107,8 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
             throw new RuntimeException("Declared function is unresolved TODO");
         }
 
-        UUID startLabel = instructionsSet.createLabel();
-        UUID endLabel = instructionsSet.createLabel();
+        var startLabel = instructionsSet.createLabel();
+        var endLabel = instructionsSet.createLabel();
         functionEnvironment.setStartLabel(startLabel);
         functionEnvironment.setEndLabel(endLabel);
 

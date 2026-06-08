@@ -1,27 +1,28 @@
-package me.itzisonn_.meazy.instruction.local;
+package me.itzisonn_.meazy.instruction.local
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
-
-import java.lang.classfile.CodeBuilder;
-import java.lang.constant.ClassDesc;
-import java.util.UUID;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import org.jspecify.annotations.NullMarked
+import java.lang.constant.ClassDesc
+import kotlin.uuid.Uuid
 
 @NullMarked
-@AllArgsConstructor
-public final class SetLocalNameInstruction implements Instruction {
-    private final int slot;
-    private final String id;
-    private final ClassDesc type;
-    private final UUID startUuid;
-    private final UUID endUuid;
+class SetLocalNameInstruction(
+    private val slot: Int,
+    private val id: String,
+    private val type: ClassDesc,
+    private val startUuid: Uuid,
+    private val endUuid: Uuid
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
 
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-        codeBuilder.localVariable(slot, id, type, bytecodeBuilders.getLabel(startUuid), bytecodeBuilders.getLabel(endUuid));
+        codeBuilder.localVariable(
+            slot,
+            id,
+            type,
+            bytecodeBuilders.getLabel(startUuid),
+            bytecodeBuilders.getLabel(endUuid)
+        )
     }
 }

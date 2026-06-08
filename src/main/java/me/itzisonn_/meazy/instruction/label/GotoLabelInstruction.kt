@@ -1,22 +1,12 @@
-package me.itzisonn_.meazy.instruction.label;
+package me.itzisonn_.meazy.instruction.label
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import kotlin.uuid.Uuid
 
-import java.lang.classfile.CodeBuilder;
-import java.util.UUID;
-
-@NullMarked
-@AllArgsConstructor
-public final class GotoLabelInstruction implements Instruction {
-    private final UUID uuid;
-
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-        codeBuilder.goto_(bytecodeBuilders.getLabel(uuid));
+class GotoLabelInstruction(private val uuid: Uuid) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: throw RuntimeException("Code builder is null")
+        codeBuilder.goto_(bytecodeBuilders.getLabel(uuid))
     }
 }

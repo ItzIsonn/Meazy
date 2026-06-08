@@ -1,8 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import kotlin.uuid.Uuid;
 import org.jspecify.annotations.NullMarked;
-
-import java.util.UUID;
 
 /**
  * Represents environment for loops
@@ -10,7 +9,7 @@ import java.util.UUID;
 @NullMarked
 public interface LoopEnvironment extends LocalVariableDeclarationEnvironment {
     @Override
-    UUID getStartLabel();
+    Uuid getStartLabel();
     @Override
-    UUID getEndLabel();
+    Uuid getEndLabel();
 }
