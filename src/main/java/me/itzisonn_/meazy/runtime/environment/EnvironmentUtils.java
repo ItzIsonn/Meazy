@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.value.VariableValue;
+import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 

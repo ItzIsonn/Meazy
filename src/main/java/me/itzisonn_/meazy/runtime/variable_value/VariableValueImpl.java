@@ -1,17 +1,11 @@
-package me.itzisonn_.meazy.runtime.value.impl;
+package me.itzisonn_.meazy.runtime.variable_value;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
-import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.registry.RegistryEntry;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -50,20 +44,6 @@ public class VariableValueImpl implements VariableValue {
         this.initializer = initializer;
         this.parentEnvironment = parentEnvironment;
         this.modifiers = modifiers;
-    }
-
-
-    @Override
-    public boolean isAccessible(Environment environment) {
-        if (id == null) return false;
-        Identifier identifier = new VariableIdentifier(id);
-
-        for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
-            Modifier modifier = entry.getValue();
-            if (!modifier.canAccess(environment, getParentEnvironment(), identifier, getModifiers().contains(modifier))) return false;
-        }
-
-        return true;
     }
 
     @Override
