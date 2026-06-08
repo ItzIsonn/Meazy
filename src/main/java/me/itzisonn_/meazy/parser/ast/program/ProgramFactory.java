@@ -17,19 +17,17 @@ public interface ProgramFactory {
      *
      * @param file File that contains this program or null
      * @param version Version
-     * @param requiredAddons Required addons
      * @param body Body
      *
      * @throws IllegalArgumentException If file doesn't exist or is a directory
      */
-    Program create(@Nullable File file, Version version, Map<String, @Nullable Version> requiredAddons, List<Statement> body) throws IllegalArgumentException;
+    Program create(@Nullable File file, Version version, List<Statement> body) throws IllegalArgumentException;
 
     /**
      * Constructor with file set to null TODO
      *
      * @param version Version
-     * @param requiredAddons Required addons
      * @param body Body
      */
-    Program create(Version version, Map<String, @Nullable Version> requiredAddons, List<Statement> body);
+    Program create(Version version, List<Statement> body);
 }

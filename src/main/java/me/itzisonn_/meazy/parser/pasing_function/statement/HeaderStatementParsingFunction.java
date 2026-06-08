@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.statement.ImportStatement;
-import me.itzisonn_.meazy.parser.ast.statement.RequireStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -25,9 +24,6 @@ public class HeaderStatementParsingFunction extends AbstractParsingFunction<Stat
 
         if (parser.getCurrent().getType().equals(TokenTypes.IMPORT())) {
             return parser.parse(MeazyMain.getDefaultIdentifier("import_statement"), ImportStatement.class);
-        }
-        if (parser.getCurrent().getType().equals(TokenTypes.REQUIRE())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("require_statement"), RequireStatement.class);
         }
 
         throw new UnexpectedTokenException(parser.getCurrent().getLine(), Text.literal("Expected header statement")); //TODO;

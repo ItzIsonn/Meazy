@@ -75,9 +75,8 @@ object DatagenDeserializers {
                     cls = Class.forName(className)
                 }
                 catch (e: ClassNotFoundException) {
-                    cls = MeazyMain.ADDON_MANAGER.getClassByName(className)
-                    if (cls == null) throw RuntimeException(
-                        "Can't find specified class " + className + " for canMatch method in TokenType with id " + id,
+                    throw RuntimeException(
+                        "Can't find specified class $className for canMatch method in TokenType with id $id",
                         e
                     )
                 }

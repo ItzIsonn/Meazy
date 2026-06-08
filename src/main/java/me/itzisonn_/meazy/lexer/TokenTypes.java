@@ -24,10 +24,6 @@ public final class TokenTypes {
 
 
 
-    public static TokenType REQUIRE() {
-        return Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier("require")).getValue();
-    }
-
     public static TokenType IMPORT() {
         return Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier("import")).getValue();
     }

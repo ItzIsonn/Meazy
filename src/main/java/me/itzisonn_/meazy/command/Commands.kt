@@ -40,7 +40,6 @@ object Commands {
         hasRegistered = true
 
         register(VersionCommand())
-        register(AddonsCommand())
         register(RunCommand())
         register(CompileCommand())
         register(CompileAndRunCommand())

@@ -5,21 +5,6 @@
   "settings.invalid_file": "Invalid settings file. Creating default",
   "settings.unknown_language": "Unknown language {0}. Using default",
 
-  "addons.single_loaded": "1 addon loaded",
-  "addons.multiple_loaded": "{0} addons loaded",
-  "addons.cant_load_folder": "Can't load addons folder",
-  "addons.enabling": "Enabling addon {0}",
-  "addons.failed_enable": "Failed to enable addon {0}. {1}",
-  "addons.duplicate_id": "Duplicate addon id '{0}' for files '{1}' and '{2}'",
-  "addons.cant_load.general": "Can't load '{0}'. {1}",
-  "addons.cant_load.unsupported_version": "Can't load '{0}' because it has unsupported version {1}",
-  "addons.cant_load.circular_dependency": "Can't load '{0}' because of circular dependency",
-  "addons.resource.save_failed": "Failed to save resource {0}. {1}",
-  "addons.resource.save_failed_already_exists": "Failed to save resource {0} because it already exists",
-  "addons.resource.save_failed_config": "Failed to save config {0}. {1}",
-  "addons.cant_find": "Can't find required addon with id '{0}'",
-  "addons.cant_find_version": "Can't find required addon with id '{0}' of version {1} (found version {2})",
-
   "file.doesnt_exist": "File '{0}' doesn't exist",
   "file.already_exists": "File '{0}' already exists",
   "file.failed_read": "Failed to read file '{0}'",
@@ -38,10 +23,6 @@
 
   "commands.version": "Meazy version {0}",
 
-  "commands.addons.empty": "No addons present",
-  "commands.addons.loaded": "Loaded addons:",
-  "commands.addons.by": "by",
-
   "commands.run.running": "Running file '{0}'",
   "commands.run.incompatible_version": "Can't run file that has been compiled by a more recent version of the Meazy ({0}) in an older version ({1})",
   "commands.run.unsafe": "It's unsafe to run file that has been compiled by an older version of the Meazy ({0}) in a more recent version ({1})",
@@ -49,11 +30,6 @@
 
   "commands.compile.compiling": "Compiling file '{0}'",
   "commands.compile.info": "Compiled in {0}s",
-
-  "commands.decompile.decompiling": "Decompiling file '{0}'",
-  "commands.decompile.incompatible_version": "Can't decompile file that has been compiled by a more recent version of the Meazy ({0}) in an older version ({1})",
-  "commands.decompile.unsafe": "It's unsafe to decompile file that has been compiled by an older version of the Meazy ({0}) in a more recent version ({1})",
-  "commands.decompile.info": "Decompiled in {0}s",
 
 
 
