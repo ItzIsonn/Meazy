@@ -1,16 +1,7 @@
-package me.itzisonn_.meazy.settings;
-
-import org.jspecify.annotations.NullMarked;
+package me.itzisonn_.meazy.settings
 
 /**
- * Is thrown when {@link SettingsDeserializer} meets invalid settings file
+ * Is thrown when [SettingsDeserializer] meets invalid settings file
+ * @param message Message
  */
-@NullMarked
-public class InvalidSettingsException extends RuntimeException {
-    /**
-     * @param message Message
-     */
-    public InvalidSettingsException(String message) {
-        super(message);
-    }
-}
+class InvalidSettingsException(message: String) : RuntimeException(message)
