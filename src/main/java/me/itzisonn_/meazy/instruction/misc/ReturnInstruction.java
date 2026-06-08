@@ -18,7 +18,7 @@ public final class ReturnInstruction implements Instruction {
 
     @Override
     public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
+        CodeBuilder codeBuilder = bytecodeBuilders.codeBuilder;
         if (codeBuilder == null) throw new RuntimeException("Code builder is null");
 
         if (type != null) codeBuilder.return_(TypeKind.from(type));

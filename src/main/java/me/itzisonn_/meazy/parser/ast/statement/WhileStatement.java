@@ -31,8 +31,8 @@ public class WhileStatement implements LocalStatement {
             throw new RuntimeException("While statement must always use boolean TODO");
         }
 
-        UUID conditionLabel = instructionsSet.createAndInitLabel();
-        UUID endLabel = instructionsSet.createAndInitLabel();
+        var conditionLabel = instructionsSet.createAndInitLabel();
+        var endLabel = instructionsSet.createAndInitLabel();
         LoopEnvironment loopEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment, conditionLabel, endLabel);
 
         instructionsSet.bindLabel(conditionLabel);

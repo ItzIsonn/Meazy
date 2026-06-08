@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
+import kotlin.uuid.Uuid;
 import lombok.Getter;
 import lombok.Setter;
 import me.itzisonn_.meazy.parser.DataType;
@@ -13,7 +14,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @NullMarked
@@ -26,7 +26,7 @@ public class FunctionEnvironmentImpl extends LocalVariableDeclarationEnvironment
     private final boolean isShared;
     protected final Set<Modifier> modifiers;
 
-    public FunctionEnvironmentImpl(FunctionDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, boolean isShared, Set<Modifier> modifiers) {
+    public FunctionEnvironmentImpl(FunctionDeclarationEnvironment parent, @Nullable Uuid startLabel, @Nullable Uuid endLabel, String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, boolean isShared, Set<Modifier> modifiers) {
         super(parent, startLabel, endLabel);
         this.id = id;
         this.parameters = parameters;

@@ -1,79 +1,67 @@
-package me.itzisonn_.meazy.instruction;
+package me.itzisonn_.meazy.instruction
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import java.lang.classfile.ClassBuilder
+import java.lang.classfile.ClassFile
+import java.lang.classfile.CodeBuilder
+import java.lang.classfile.Label
+import java.lang.constant.ClassDesc
+import java.util.Optional
+import java.util.function.Consumer
+import kotlin.uuid.Uuid
 
-import java.lang.classfile.ClassBuilder;
-import java.lang.classfile.ClassFile;
-import java.lang.classfile.CodeBuilder;
-import java.lang.classfile.Label;
-import java.lang.constant.ClassDesc;
-import java.util.*;
-import java.util.function.Consumer;
-
-@Getter
-@NullMarked
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BytecodeBuilders {
-    @Nullable
-    private final ClassBuilder classBuilder;
-    @Nullable
-    private final CodeBuilder codeBuilder;
-    private final LinkedHashMap<ClassDesc, byte[]> classes;
-    private final Map<UUID, Optional<Label>> labels;
-
-    public static BytecodeBuilders of(@Nullable ClassBuilder classBuilder, @Nullable CodeBuilder codeBuilder) {
-        return new BytecodeBuilders(classBuilder, codeBuilder, new LinkedHashMap<>(), new HashMap<>());
+class BytecodeBuilders private constructor(
+    @JvmField val classBuilder: ClassBuilder?,
+    @JvmField val codeBuilder: CodeBuilder?,
+    private val classes: LinkedHashMap<ClassDesc, ByteArray>,
+    private val labels: MutableMap<Uuid, Optional<Label>>
+) {
+    fun withClass(classDesc: ClassDesc, classBuilder: Consumer<ClassBuilder>) {
+        val classFile = ClassFile.of().build(classDesc, classBuilder)
+        classes[classDesc] = classFile
     }
 
-    public void withClass(ClassDesc classDesc, Consumer<ClassBuilder> classBuilder) {
-        byte[] classFile = ClassFile.of().build(
-                classDesc,
-                classBuilder
-        );
-
-        classes.put(classDesc, classFile);
+    fun getClasses(): MutableMap<ClassDesc, ByteArray> {
+        return LinkedHashMap(classes)
     }
 
-    public Map<ClassDesc, byte[]> getClasses() {
-        return new LinkedHashMap<>(classes);
+    fun getLabel(uuid: Uuid): Label {
+        return labels.getOrDefault(uuid, Optional.empty<Label>()).orElseThrow()
     }
 
-    public Label getLabel(UUID uuid) {
-        return labels.getOrDefault(uuid, Optional.empty()).orElseThrow();
+    fun hasLabel(uuid: Uuid): Boolean {
+        return labels.containsKey(uuid)
     }
 
-    public boolean hasLabel(UUID uuid) {
-        return labels.containsKey(uuid);
+    fun hasInitializedLabel(uuid: Uuid): Boolean {
+        return labels.getOrDefault(uuid, Optional.empty<Label>()).isPresent
     }
 
-    public boolean hasInitializedLabel(UUID uuid) {
-        return labels.getOrDefault(uuid, Optional.empty()).isPresent();
+    fun setLabel(uuid: Uuid, label: Label) {
+        require(labels.containsKey(uuid)) { "Label with Uuid $uuid does not exist" }
+        labels[uuid] = Optional.of<Label>(label)
     }
 
-    public void setLabel(UUID uuid, Label label) {
-        if (!labels.containsKey(uuid)) throw new IllegalArgumentException("Label with UUID " + uuid + " does not exist");
-        labels.put(uuid, Optional.of(label));
-    }
-
-    public void addLabel(UUID uuid) {
-        labels.put(uuid, Optional.empty());
+    fun addLabel(uuid: Uuid) {
+        labels[uuid] = Optional.empty<Label>()
     }
 
 
-
-    public BytecodeBuilders copy(@Nullable ClassBuilder classBuilder, @Nullable CodeBuilder codeBuilder) {
-        return new BytecodeBuilders(classBuilder, codeBuilder, classes, labels);
+    @JvmOverloads
+    fun copy(classBuilder: ClassBuilder?, codeBuilder: CodeBuilder? = null): BytecodeBuilders {
+        return BytecodeBuilders(classBuilder, codeBuilder, classes, labels)
     }
 
-    public BytecodeBuilders copy(@Nullable ClassBuilder classBuilder) {
-        return copy(classBuilder, null);
+    fun copy(codeBuilder: CodeBuilder?): BytecodeBuilders {
+        return copy(classBuilder, codeBuilder)
     }
 
-    public BytecodeBuilders copy(@Nullable CodeBuilder codeBuilder) {
-        return copy(classBuilder, codeBuilder);
+    companion object {
+        @JvmStatic
+        fun of(classBuilder: ClassBuilder?, codeBuilder: CodeBuilder?): BytecodeBuilders {
+            return BytecodeBuilders(
+                classBuilder, codeBuilder,
+                LinkedHashMap(), HashMap()
+            )
+        }
     }
 }

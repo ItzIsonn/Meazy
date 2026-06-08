@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
+import kotlin.uuid.Uuid;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
@@ -74,8 +75,8 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
             throw new RuntimeException("Declared function is unresolved TODO");
         }
 
-        UUID startLabel = instructionsSet.createLabel();
-        UUID endLabel = instructionsSet.createLabel();
+        var startLabel = instructionsSet.createLabel();
+        var endLabel = instructionsSet.createLabel();
         constructorEnvironment.setStartLabel(startLabel);
         constructorEnvironment.setEndLabel(endLabel);
 

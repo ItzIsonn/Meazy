@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.expression.identifier;
 
+import kotlin.uuid.Uuid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
@@ -35,7 +36,7 @@ public class VariableIdentifier extends Identifier {
         }
         else {
             resolvedVariable.getTarget().emit(instructionsSet, environment, this);
-            UUID endLabel = null;
+            Uuid endLabel = null;
 
             if (parent instanceof MemberExpression memberExpression) {
                 if (!memberExpression.isNullSafe()) {
@@ -44,7 +45,7 @@ public class VariableIdentifier extends Identifier {
                     }
                 }
                 else {
-                    UUID nonnullLabel = instructionsSet.createAndInitLabel();
+                    var nonnullLabel = instructionsSet.createAndInitLabel();
                     endLabel = instructionsSet.createAndInitLabel();
 
                     instructionsSet.duplicate();

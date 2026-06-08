@@ -61,8 +61,8 @@ public class ForeachStatement implements LocalStatement {
 
         instructionsSet.storeLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
 
-        UUID conditionLabel = instructionsSet.createAndInitLabel();
-        UUID endLabel = instructionsSet.createAndInitLabel();
+        var conditionLabel = instructionsSet.createAndInitLabel();
+        var endLabel = instructionsSet.createAndInitLabel();
         LoopEnvironment loopEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment, conditionLabel, endLabel);
 
         instructionsSet.bindLabel(conditionLabel);

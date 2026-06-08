@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
+import kotlin.uuid.Uuid;
 import lombok.Getter;
 import lombok.Setter;
 import me.itzisonn_.meazy.lang.text.Text;
@@ -16,18 +17,17 @@ import org.jspecify.annotations.Nullable;
 import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Setter
 @NullMarked
 public class LocalVariableDeclarationEnvironmentImpl extends VariableDeclarationEnvironmentImpl implements LocalVariableDeclarationEnvironment {
     @Nullable
-    private UUID startLabel;
+    private Uuid startLabel;
     @Nullable
-    private UUID endLabel;
+    private Uuid endLabel;
 
-    public LocalVariableDeclarationEnvironmentImpl(Environment parent, @Nullable UUID startLabel, @Nullable UUID endLabel) {
+    public LocalVariableDeclarationEnvironmentImpl(Environment parent, @Nullable Uuid startLabel, @Nullable Uuid endLabel) {
         super(parent);
         this.startLabel = startLabel;
         this.endLabel = endLabel;

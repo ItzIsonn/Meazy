@@ -30,7 +30,7 @@ public class NullCheckExpression implements Expression {
             return;
         }
 
-        UUID endLabel = instructionsSet.createAndInitLabel();
+        var endLabel = instructionsSet.createAndInitLabel();
 
         checkExpression.emit(instructionsSet, environment, this);
         instructionsSet.duplicate();

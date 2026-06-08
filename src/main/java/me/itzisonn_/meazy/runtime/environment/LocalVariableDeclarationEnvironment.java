@@ -1,12 +1,11 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-
-import java.util.UUID;
 
 /**
  * Adds to Environment ability to declare local variables
@@ -17,11 +16,11 @@ public interface LocalVariableDeclarationEnvironment extends VariableDeclaration
     VariableValue declareVariable(@Nullable String id, DataType type, boolean isConstant, @Nullable Expression value);
 
     //TODO
-    void setStartLabel(UUID startLabel);
-    void setEndLabel(UUID endLabel);
+    void setStartLabel(Uuid startLabel);
+    void setEndLabel(Uuid endLabel);
     @Nullable
-    UUID getStartLabel();
+    Uuid getStartLabel();
     @Nullable
-    UUID getEndLabel();
+    Uuid getEndLabel();
     int getUsedSlotsCount();
 }

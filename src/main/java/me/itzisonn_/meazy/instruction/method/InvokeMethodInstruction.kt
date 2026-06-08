@@ -1,47 +1,39 @@
-package me.itzisonn_.meazy.instruction.method;
+package me.itzisonn_.meazy.instruction.method
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import java.lang.constant.ClassDesc
+import java.lang.constant.MethodTypeDesc
+import java.util.function.Consumer
 
-import java.lang.classfile.CodeBuilder;
-import java.lang.constant.ClassDesc;
-import java.lang.constant.MethodTypeDesc;
-import java.util.function.Consumer;
+class InvokeMethodInstruction(
+    private val owner: ClassDesc,
+    private val id: String,
+    private val methodTypeDesc: MethodTypeDesc,
+    private val argsInstructions: Consumer<InstructionsSet>,
+    private val invokeType: InvokeType
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
 
-@NullMarked
-@AllArgsConstructor
-public final class InvokeMethodInstruction implements Instruction {
-    private final ClassDesc owner;
-    private final String id;
-    private final MethodTypeDesc methodTypeDesc;
-    private final Consumer<InstructionsSet> argsInstructions;
-    private final InvokeType invokeType;
+        val instructionsSet = InstructionsSet(bytecodeBuilders)
+        argsInstructions.accept(instructionsSet)
 
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-
-        InstructionsSet instructionsSet = new InstructionsSet(bytecodeBuilders);
-        argsInstructions.accept(instructionsSet);
-
-        for (Instruction instruction : instructionsSet.getInstructions()) {
-            instruction.emit(bytecodeBuilders);
+        for (instruction in instructionsSet.instructions) {
+            instruction.emit(bytecodeBuilders)
         }
 
-        switch (invokeType) {
-            case STATIC -> codeBuilder.invokestatic(owner, id, methodTypeDesc, false);
-            case STATIC_INTERFACE -> codeBuilder.invokestatic(owner, id, methodTypeDesc, true);
-            case INTERFACE -> codeBuilder.invokeinterface(owner, id, methodTypeDesc);
-            case VIRTUAL -> codeBuilder.invokevirtual(owner, id, methodTypeDesc);
-            case SPECIAL -> codeBuilder.invokespecial(owner, id, methodTypeDesc);
+        when (invokeType) {
+            InvokeType.STATIC -> codeBuilder.invokestatic(owner, id, methodTypeDesc, false)
+            InvokeType.STATIC_INTERFACE -> codeBuilder.invokestatic(owner, id, methodTypeDesc, true)
+            InvokeType.INTERFACE -> codeBuilder.invokeinterface(owner, id, methodTypeDesc)
+            InvokeType.VIRTUAL -> codeBuilder.invokevirtual(owner, id, methodTypeDesc)
+            InvokeType.SPECIAL -> codeBuilder.invokespecial(owner, id, methodTypeDesc)
         }
     }
 
-    public enum InvokeType {
+    enum class InvokeType {
         STATIC,
         STATIC_INTERFACE,
         INTERFACE,

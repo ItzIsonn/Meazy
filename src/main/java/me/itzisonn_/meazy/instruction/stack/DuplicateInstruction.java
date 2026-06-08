@@ -12,7 +12,7 @@ import java.lang.classfile.CodeBuilder;
 public final class DuplicateInstruction implements Instruction {
     @Override
     public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
+        CodeBuilder codeBuilder = bytecodeBuilders.codeBuilder;
         if (codeBuilder == null) throw new RuntimeException("Code builder is null");
         codeBuilder.dup();
     }

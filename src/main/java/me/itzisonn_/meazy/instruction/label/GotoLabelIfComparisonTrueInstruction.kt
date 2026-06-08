@@ -1,59 +1,52 @@
-package me.itzisonn_.meazy.instruction.label;
+package me.itzisonn_.meazy.instruction.label
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
-
-import java.lang.classfile.CodeBuilder;
-import java.lang.classfile.Label;
-import java.util.UUID;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import me.itzisonn_.meazy.instruction.NumberType
+import org.jspecify.annotations.NullMarked
+import kotlin.uuid.Uuid
 
 @NullMarked
-@AllArgsConstructor
-public final class GotoLabelIfComparisonTrueInstruction implements Instruction {
-    private final NumberType type;
-    private final ComparisonOperation operation;
-    private final UUID uuid;
-
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.getCodeBuilder();
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-
-        Label label = bytecodeBuilders.getLabel(uuid);
+class GotoLabelIfComparisonTrueInstruction(
+    private val type: NumberType,
+    private val operation: ComparisonOperation,
+    private val uuid: Uuid
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
+        val label = bytecodeBuilders.getLabel(uuid)
 
         if (type == NumberType.INT) {
-            switch (operation) {
-                case EQUALS -> codeBuilder.if_icmpeq(label);
-                case NOT_EQUALS -> codeBuilder.if_icmpne(label);
-                case GREATER -> codeBuilder.if_icmpgt(label);
-                case GREATER_OR_EQUALS -> codeBuilder.if_icmpge(label);
-                case LESS -> codeBuilder.if_icmplt(label);
-                case LESS_OR_EQUALS -> codeBuilder.if_icmple(label);
+            when (operation) {
+                ComparisonOperation.EQUALS -> codeBuilder.if_icmpeq(label)
+                ComparisonOperation.NOT_EQUALS -> codeBuilder.if_icmpne(label)
+                ComparisonOperation.GREATER -> codeBuilder.if_icmpgt(label)
+                ComparisonOperation.GREATER_OR_EQUALS -> codeBuilder.if_icmpge(label)
+                ComparisonOperation.LESS -> codeBuilder.if_icmplt(label)
+                ComparisonOperation.LESS_OR_EQUALS -> codeBuilder.if_icmple(label)
             }
 
-            return;
+            return
         }
 
-        switch (type) {
-            case LONG -> codeBuilder.lcmp();
-            case FLOAT -> codeBuilder.fcmpl();
-            case DOUBLE -> codeBuilder.dcmpl();
+        when (type) {
+            NumberType.LONG -> codeBuilder.lcmp()
+            NumberType.FLOAT -> codeBuilder.fcmpl()
+            NumberType.DOUBLE -> codeBuilder.dcmpl()
+            else -> error("Can't compare boxed number $type")
         }
 
-        switch (operation) {
-            case EQUALS -> codeBuilder.ifeq(label);
-            case NOT_EQUALS -> codeBuilder.ifne(label);
-            case GREATER -> codeBuilder.ifgt(label);
-            case GREATER_OR_EQUALS -> codeBuilder.ifge(label);
-            case LESS -> codeBuilder.iflt(label);
-            case LESS_OR_EQUALS -> codeBuilder.ifle(label);
+        when (operation) {
+            ComparisonOperation.EQUALS -> codeBuilder.ifeq(label)
+            ComparisonOperation.NOT_EQUALS -> codeBuilder.ifne(label)
+            ComparisonOperation.GREATER -> codeBuilder.ifgt(label)
+            ComparisonOperation.GREATER_OR_EQUALS -> codeBuilder.ifge(label)
+            ComparisonOperation.LESS -> codeBuilder.iflt(label)
+            ComparisonOperation.LESS_OR_EQUALS -> codeBuilder.ifle(label)
         }
     }
 
-    public enum ComparisonOperation {
+    enum class ComparisonOperation {
         EQUALS,
         NOT_EQUALS,
         GREATER,

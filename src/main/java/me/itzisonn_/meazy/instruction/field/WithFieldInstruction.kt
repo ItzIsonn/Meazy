@@ -1,24 +1,16 @@
-package me.itzisonn_.meazy.instruction.field;
+package me.itzisonn_.meazy.instruction.field
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import java.lang.constant.ClassDesc
 
-import java.lang.classfile.ClassBuilder;
-import java.lang.constant.ClassDesc;
-
-@NullMarked
-@AllArgsConstructor
-public final class WithFieldInstruction implements Instruction {
-    private final String id;
-    private final ClassDesc type;
-    private final int flags;
-
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        ClassBuilder classBuilder = bytecodeBuilders.getClassBuilder();
-        if (classBuilder == null) throw new RuntimeException("Class builder is null");
-        classBuilder.withField(id, type, flags);
+class WithFieldInstruction(
+    private val id: String,
+    private val type: ClassDesc,
+    private val flags: Int
+) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val classBuilder = bytecodeBuilders.classBuilder ?: error("Class builder is null")
+        classBuilder.withField(id, type, flags)
     }
 }
