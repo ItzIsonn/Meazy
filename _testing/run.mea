@@ -35,7 +35,7 @@ fun testPrimitives() {
     }
 }
 
-fun println(val v: String) {
+fun println(val v: String?) {
     System.out.println(v)
 }
 

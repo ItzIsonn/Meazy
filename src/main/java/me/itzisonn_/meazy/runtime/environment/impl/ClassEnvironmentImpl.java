@@ -150,7 +150,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
 
     @Override
-    public Optional<FunctionEnvironment> getFunction(String id, List<ClassDesc> args) {
+    public Optional<FunctionEnvironment> getFunction(String id, List<DataType> args) {
         Optional<FunctionEnvironment> functionEnvironment = super.getFunction(id, args);
         if (functionEnvironment.isPresent()) return functionEnvironment;
 

@@ -268,7 +268,7 @@ public final class Registries {
                 Class<?> loadedClass = classLoader.defineClass(classFile);
                 try {
                     Method method = loadedClass.getDeclaredMethod("main");
-                    if (method.getReturnType() != void.class) {
+                    if (method.getReturnType() != void.class || method.getParameters().length != 0) {
                         System.err.println("Main method has invalid signature in class" + classDesc); //TODO
                         continue;
                     }

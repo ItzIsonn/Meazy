@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
+import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -31,21 +32,21 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
 
 
-    default Optional<FunctionEnvironment> getFunctionRecursively(String id, List<ClassDesc> parameters) {
-        Optional<FunctionEnvironment> functionEnvironment = getFunction(id, parameters);
+    default Optional<FunctionEnvironment> getFunctionRecursively(String id, List<DataType> args) {
+        Optional<FunctionEnvironment> functionEnvironment = getFunction(id, args);
         if (functionEnvironment.isPresent()) return functionEnvironment;
 
         if (getBaseClass() != null) {
             ClassDesc baseClass = EnvironmentUtils.resolveClassDesc(this, getBaseClass(), false);
             ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElseThrow();
-            functionEnvironment = classEnvironment.getFunctionRecursively(id, parameters);
+            functionEnvironment = classEnvironment.getFunctionRecursively(id, args);
             if (functionEnvironment.isPresent()) return functionEnvironment;
         }
 
         for (ClassDesc interfaceClassDesc : getInterfaces()) {
             ClassDesc baseClass = EnvironmentUtils.resolveClassDesc(this, interfaceClassDesc, false);
             ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElseThrow();
-            functionEnvironment = classEnvironment.getFunctionRecursively(id, parameters);
+            functionEnvironment = classEnvironment.getFunctionRecursively(id, args);
             if (functionEnvironment.isPresent()) return functionEnvironment;
         }
 
