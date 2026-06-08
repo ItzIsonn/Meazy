@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.environment;
 
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import org.jspecify.annotations.NullMarked;
@@ -127,12 +126,12 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
     public static boolean isInstanceOf(Environment environment, ClassDesc classDesc, ClassDesc target) {
         if (classDesc.equals(target)) return true;
 
-        ClassValue classValue = getClassValue(environment, classDesc).orElse(null);
-        if (classValue == null) return false;
+        ClassEnvironment classEnvironment = getClassEnvironment(environment, classDesc).orElse(null);
+        if (classEnvironment == null) return false;
 
-        if (classValue.getEnvironment().getBaseClass() != null && isInstanceOf(environment, classValue.getEnvironment().getBaseClass(), target)) return true;
+        if (classEnvironment.getBaseClass() != null && isInstanceOf(environment, classEnvironment.getBaseClass(), target)) return true;
 
-        for (ClassDesc interfaceClassDesc : classValue.getEnvironment().getInterfaces()) {
+        for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
             if (isInstanceOf(environment, interfaceClassDesc, target)) return true;
         }
 
@@ -148,18 +147,18 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         if (isInstanceOf(environment, classDesc1, classDesc2)) return classDesc2;
         if (isInstanceOf(environment, classDesc2, classDesc1)) return classDesc1;
 
-        ClassValue classValue = getClassValue(environment, classDesc1).orElse(null);
-        if (classValue == null) return null;
+        ClassEnvironment classEnvironment = getClassEnvironment(environment, classDesc1).orElse(null);
+        if (classEnvironment == null) return null;
 
         boolean gotObjectAsCommon = false;
 
-        if (classValue.getEnvironment().getBaseClass() != null) {
-            ClassDesc commonClassDesc = getCommonOf(environment, classValue.getEnvironment().getBaseClass(), classDesc2);
+        if (classEnvironment.getBaseClass() != null) {
+            ClassDesc commonClassDesc = getCommonOf(environment, classEnvironment.getBaseClass(), classDesc2);
             if (ConstantDescs.CD_Object.equals(commonClassDesc)) gotObjectAsCommon = true;
             else if (commonClassDesc != null) return commonClassDesc;
         }
 
-        for (ClassDesc interfaceClassDesc : classValue.getEnvironment().getInterfaces()) {
+        for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
             ClassDesc commonClassDesc = getCommonOf(environment, interfaceClassDesc, classDesc2);
             if (commonClassDesc != null) return commonClassDesc;
         }
@@ -178,11 +177,11 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
         FileEnvironment fileEnvironment = getParentOrSelf(environment, FileEnvironment.class).orElse(null);
         if (fileEnvironment == null) return classDesc;
 
-        ClassValue classValue = fileEnvironment.getClass(classDesc.displayName()).orElse(null);
-        if (classValue != null) return classValue.asClassDesc();
+        ClassEnvironment classEnvironment = fileEnvironment.getClass(classDesc.displayName()).orElse(null);
+        if (classEnvironment != null) return classEnvironment.getClassDesc();
 
-        classValue = getClassValue(environment, classDesc).orElse(null);
-        if (classValue != null) return classValue.asClassDesc();
+        classEnvironment = getClassEnvironment(environment, classDesc).orElse(null);
+        if (classEnvironment != null) return classEnvironment.getClassDesc();
 
         String fullId;
         ClassDesc fullClassDesc = fileEnvironment.getImports().get(classDesc.displayName());
@@ -200,8 +199,8 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
             if (classDesc.displayName().equals("Boolean")) return ConstantDescs.CD_boolean;
         }
 
-        classValue = getClassValue(environment, fullId).orElse(null);
-        if (classValue != null) return classValue.asClassDesc();
+        classEnvironment = getClassEnvironment(environment, fullId).orElse(null);
+        if (classEnvironment != null) return classEnvironment.getClassDesc();
 
         ClassDesc resolvedClassDesc = ClassDesc.of(fullId);
         fileEnvironment.getParent().resolveJavaClass(resolvedClassDesc);
@@ -228,7 +227,7 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
     public static Optional<String> getClassName(Environment environment) {
         FileEnvironment parent = getFileEnvironment(environment).orElse(null);
         if (parent == null) return Optional.empty();
-        return Optional.ofNullable(parent.getClassName());
+        return Optional.of(parent.getClassName());
     }
 
     /**
@@ -332,22 +331,22 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
     }
 
     public static Optional<ClassDeclarationEnvironment> getClassDeclarationEnvironment(Environment environment, ClassDesc classDesc) {
-        return getClassValue(environment, classDesc).map(ClassValue::getEnvironment).map(ClassEnvironment::getParent);
+        return getClassEnvironment(environment, classDesc).map(ClassEnvironment::getParent);
     }
 
-    public static Optional<ClassValue> getClassValue(Environment environment, String id) {
-        return getClassValue(environment, ClassDesc.of(id));
+    public static Optional<ClassEnvironment> getClassEnvironment(Environment environment, String id) {
+        return getClassEnvironment(environment, ClassDesc.of(id));
     }
 
-    public static Optional<ClassValue> getClassValue(Environment environment, ClassDesc classDesc) {
+    public static Optional<ClassEnvironment> getClassEnvironment(Environment environment, ClassDesc classDesc) {
         if (classDesc.isPrimitive() || classDesc.isArray()) return Optional.empty();
 
         GlobalEnvironment globalEnvironment = getParentOrSelf(environment, GlobalEnvironment.class).orElse(null);
         if (globalEnvironment == null) return Optional.empty();
 
         for (FileEnvironment fileEnvironment : globalEnvironment.getFileEnvironments(classDesc.packageName())) {
-            Optional<ClassValue> classValue = fileEnvironment.getClass(classDesc.displayName());
-            if (classValue.isPresent()) return classValue;
+            Optional<ClassEnvironment> classEnvironment = fileEnvironment.getClass(classDesc.displayName());
+            if (classEnvironment.isPresent()) return classEnvironment;
         }
 
         return globalEnvironment.resolveJavaClass(classDesc);

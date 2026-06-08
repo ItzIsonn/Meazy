@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -79,10 +78,10 @@ public class BaseCallStatement implements LocalStatement {
 
         List<ClassDesc> parameters = args.stream().map(arg -> arg.getType(environment, this).getClassDesc()).toList();
 
-        ClassValue classValue = EnvironmentUtils.getClassValue(environment, baseClassDesc).orElse(null);
-        if (classValue == null) return null;
+        ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, baseClassDesc).orElse(null);
+        if (baseClassEnvironment == null) return null;
 
-        return classValue.getEnvironment().getConstructor(parameters).orElse(null);
+        return baseClassEnvironment.getConstructor(parameters).orElse(null);
     }
 
 

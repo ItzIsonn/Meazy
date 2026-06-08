@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.util.MiscUtils;
 import org.jspecify.annotations.NullMarked;
@@ -30,7 +29,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
     private final List<Statement> body;
     private final Map<String, List<Expression>> enumIds;
     @Nullable
-    private ClassValue classValue;
+    private ClassEnvironment classEnvironment;
 
     public ClassDeclarationStatement(Set<Modifier> modifiers, String id, Set<String> baseClasses, List<Statement> body, Map<String, List<Expression>> enumIds) {
         super(modifiers);
@@ -61,7 +60,8 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
                 modifiers
         );
 
-        classValue = classDeclarationEnvironment.declareClass(classEnvironment);
+        classDeclarationEnvironment.declareClass(classEnvironment);
+        this.classEnvironment = classEnvironment;
 
         for (Statement statement : body) {
             if (statement instanceof DeclarationStatement declarationStatement) {
@@ -76,15 +76,15 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
 
     @Override
     public void resolve(Environment environment) {
-        if (classValue == null) {
+        if (classEnvironment == null) {
             throw new RuntimeException("Class isn't declared TODO");
         }
 
-        classValue.getEnvironment().resolveBaseClasses();
+        classEnvironment.resolveBaseClasses();
 
         for (Statement statement : body) {
             if (statement instanceof DeclarationStatement declarationStatement) {
-                declarationStatement.resolve(classValue.getEnvironment());
+                declarationStatement.resolve(classEnvironment);
             }
         }
     }
@@ -92,8 +92,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
     @Override
     public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         if (!(environment instanceof FileEnvironment fileEnvironment)) throw new IllegalArgumentException("Environment must be file TODO");
-        if (classValue == null) throw new RuntimeException("Declared class is unresolved TODO");
-        ClassEnvironment classEnvironment = classValue.getEnvironment();
+        if (classEnvironment == null) throw new RuntimeException("Declared class is unresolved TODO");
 
         boolean isInner = getModifiers().contains(Modifiers.PRIVATE());
 

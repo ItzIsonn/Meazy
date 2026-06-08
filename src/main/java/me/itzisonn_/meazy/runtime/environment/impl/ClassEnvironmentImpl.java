@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
 import me.itzisonn_.meazy.runtime.value.ConstructorValue;
 import me.itzisonn_.meazy.runtime.value.FunctionValue;
@@ -83,12 +82,12 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     public void resolveBaseClasses() {
         for (String unresolvedBaseClass : unresolvedBaseClasses) {
             ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(parent, unresolvedBaseClass, false);
-            ClassValue baseClassValue = EnvironmentUtils.getClassValue(parent, classDesc).orElseThrow();
+            ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(parent, classDesc).orElseThrow();
 
-            if (baseClassValue.isInterface()) interfaces.add(baseClassValue.asClassDesc());
+            if (baseClassEnvironment.isInterface()) interfaces.add(baseClassEnvironment.getClassDesc());
             else {
                 if (baseClass != null) throw new RuntimeException("Class can't have more than one base class TODO");
-                baseClass = baseClassValue.asClassDesc();
+                baseClass = baseClassEnvironment.getClassDesc();
             }
         }
 
@@ -115,9 +114,9 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         if (variableValue.isPresent()) return variableValue;
 
         if (baseClass == null) return Optional.empty();
-        ClassValue baseClassValue = EnvironmentUtils.getClassValue(this, baseClass.displayName()).orElse(null);
+        ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass.displayName()).orElse(null);
 
-        if (baseClassValue != null) return baseClassValue.getEnvironment().getVariable(id);
+        if (baseClassEnvironment != null) return baseClassEnvironment.getVariable(id);
         return Optional.empty();
     }
 
@@ -162,9 +161,9 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         if (functionValue.isPresent()) return functionValue;
 
         if (baseClass == null) return Optional.empty();
-        ClassValue baseClassValue = EnvironmentUtils.getClassValue(this, baseClass).orElse(null);
+        ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElse(null);
 
-        if (baseClassValue != null) return baseClassValue.getEnvironment().getFunction(id, args);
+        if (baseClassEnvironment != null) return baseClassEnvironment.getFunction(id, args);
         return Optional.empty();
     }
 
@@ -206,5 +205,10 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
         else classSpecifier = "";
 
         return EnvironmentUtils.getPackageName(this).orElseThrow() + "." + classSpecifier + id;
+    }
+
+    @Override
+    public ClassDesc getClassDesc() {
+        return ClassDesc.of(getFullClassName());
     }
 }

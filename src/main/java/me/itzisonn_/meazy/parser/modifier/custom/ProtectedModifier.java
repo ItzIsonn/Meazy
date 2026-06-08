@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.runtime.InvalidIdentifierException;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ConstructorClassIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
@@ -48,11 +47,11 @@ public class ProtectedModifier extends Modifier {
                                     if (declarationEnvironment == null) return false;
                                     if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                                    ClassValue parentClassValue = EnvironmentUtils.getClassValue(environment, classEnvironment.getId()).orElse(null);
-                                    if (parentClassValue == null) {
+                                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, classEnvironment.getId()).orElse(null);
+                                    if (parentClassEnvironment == null) {
                                         throw new InvalidIdentifierException(Text.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                                     }
-                                    return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
+                                    return parentClassEnvironment.getInterfaces().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
                                 }
 
                                 return false;
@@ -69,11 +68,11 @@ public class ProtectedModifier extends Modifier {
                                     if (declarationEnvironment == null) return false;
                                     if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                                    ClassValue parentClassValue = EnvironmentUtils.getClassValue(environment, classEnvironment.getId()).orElse(null);
-                                    if (parentClassValue == null) {
+                                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, classEnvironment.getId()).orElse(null);
+                                    if (parentClassEnvironment == null) {
                                         throw new InvalidIdentifierException(Text.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                                     }
-                                    return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
+                                    return parentClassEnvironment.getInterfaces().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
                                 }
 
                                 return false;
@@ -83,11 +82,11 @@ public class ProtectedModifier extends Modifier {
                 if (env instanceof ClassEnvironment classEnvironment) {
                     if (classEnvironment.getId().equals(identifier.getId())) return true;
 
-                    ClassValue parentClassValue = EnvironmentUtils.getClassValue(requestEnvironment, classEnvironment.getId()).orElse(null);
-                    if (parentClassValue == null) {
+                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(requestEnvironment, classEnvironment.getId()).orElse(null);
+                    if (parentClassEnvironment == null) {
                         throw new InvalidIdentifierException(Text.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                     }
-                    return parentClassValue.getBaseClasses().stream().anyMatch(cls -> cls.equals(identifier.getId()));
+                    return parentClassEnvironment.getInterfaces().stream().anyMatch(cls -> cls.equals(identifier.getId()));
                 }
 
                 return false;

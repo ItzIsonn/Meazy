@@ -7,7 +7,6 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -49,7 +48,7 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
 
 
     @Override
-    public Optional<ClassValue> resolveJavaClass(ClassDesc classDesc) {
+    public Optional<ClassEnvironment> resolveJavaClass(ClassDesc classDesc) {
         if (classDesc.isPrimitive() || classDesc.isArray()) return Optional.empty();
 
         try {
@@ -57,8 +56,8 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
             String packageName = cls.getPackageName();
 
             for (FileEnvironment fileEnvironment : getFileEnvironments(packageName)) {
-                Optional<ClassValue> classValue = fileEnvironment.getClass(classDesc.displayName());
-                if (classValue.isPresent()) return classValue;
+                Optional<ClassEnvironment> classEnvironment = fileEnvironment.getClass(classDesc.displayName());
+                if (classEnvironment.isPresent()) return classEnvironment;
             }
 
             FileEnvironment fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(
@@ -80,7 +79,7 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                     classEnvironmentModifiers
             );
 
-            ClassValue classValue = fileEnvironment.declareClass(classEnvironment);
+            fileEnvironment.declareClass(classEnvironment);
             addFileEnvironment(fileEnvironment);
 
             if (classEnvironment.getBaseClass() != null) resolveJavaClass(classEnvironment.getBaseClass());
@@ -163,7 +162,7 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                 );
             }
 
-            return Optional.of(classValue);
+            return Optional.of(classEnvironment);
         }
         catch (ClassNotFoundException e) {
             return Optional.empty();

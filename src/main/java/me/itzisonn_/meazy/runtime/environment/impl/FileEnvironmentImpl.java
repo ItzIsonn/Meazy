@@ -8,9 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.value.VariableValue;
-import me.itzisonn_.meazy.runtime.value.ClassValue;
 import me.itzisonn_.meazy.runtime.EvaluationException;
-import me.itzisonn_.meazy.runtime.value.impl.ClassValueImpl;
 import me.itzisonn_.meazy.runtime.value.impl.VariableValueImpl;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -27,7 +25,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
     private final String className;
     private final Map<String, ClassDesc> imports;
     private final List<VariableValue> variables;
-    private final Set<ClassValue> classes;
+    private final Set<ClassEnvironment> classes;
 
     public FileEnvironmentImpl(GlobalEnvironment parent, String packageName, String className) {
         super(parent, true);
@@ -92,21 +90,18 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
 
 
     @Override
-    public ClassValue declareClass(ClassEnvironment classEnvironment) {
-        ClassValue value = new ClassValueImpl(classEnvironment, List.of());
-
-        for (ClassValue classValue : getClasses()) {
-            if (classValue.getId().equals(value.getId())) {
-                throw new EvaluationException(Text.translatable("meazy:runtime.class.already_exists", value.getId()));
+    public void declareClass(ClassEnvironment classEnvironment) {
+        for (ClassEnvironment otherEnvironment : getClasses()) {
+            if (otherEnvironment.getId().equals(classEnvironment.getId())) {
+                throw new EvaluationException(Text.translatable("meazy:runtime.class.already_exists", classEnvironment.getId()));
             }
         }
 
-        classes.add(value);
-        return value;
+        classes.add(classEnvironment);
     }
 
     @Override
-    public Set<ClassValue> getClasses() {
+    public Set<ClassEnvironment> getClasses() {
         return new HashSet<>(classes);
     }
 }
