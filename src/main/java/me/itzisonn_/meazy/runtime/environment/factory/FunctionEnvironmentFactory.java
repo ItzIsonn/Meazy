@@ -1,12 +1,14 @@
 package me.itzisonn_.meazy.runtime.environment.factory;
 
 import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,5 +24,5 @@ public interface FunctionEnvironmentFactory { //TODO javadoc
      * @param isShared Whether function environment is shared
      * @return New function environment
      */
-    FunctionEnvironment create(FunctionDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, @Nullable DataType returnDataType, boolean isShared, Set<Modifier> modifiers);
+    FunctionEnvironment create(FunctionDeclarationEnvironment parent, @Nullable UUID startLabel, @Nullable UUID endLabel, String id, List<ParameterExpression> parameters, @Nullable DataType returnDataType, boolean isShared, Set<Modifier> modifiers);
 }

@@ -106,17 +106,16 @@ public class GlobalEnvironmentImpl implements GlobalEnvironment {
                 if (Modifier.isAbstract(cls.getModifiers())) functionModifiers.add(Modifiers.ABSTRACT());
 
                 classEnvironment.declareFunction(
-                        method.getName(),
-                        Arrays.stream(method.getParameters()).map(p -> new ParameterExpression(
-                                p.getName(),
-                                DataType.of(p.getType().describeConstable().orElseThrow(), !p.getType().isPrimitive()),
-                                Modifier.isFinal(p.getModifiers())
-                        )).toList(),
-                        returnDataType,
                         Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
                                 classEnvironment,
                                 null,
                                 null,
+                                method.getName(),
+                                Arrays.stream(method.getParameters()).map(p -> new ParameterExpression(
+                                        p.getName(),
+                                        DataType.of(p.getType().describeConstable().orElseThrow(), !p.getType().isPrimitive()),
+                                        Modifier.isFinal(p.getModifiers())
+                                )).toList(),
                                 returnDataType,
                                 Modifier.isStatic(method.getModifiers()),
                                 functionModifiers

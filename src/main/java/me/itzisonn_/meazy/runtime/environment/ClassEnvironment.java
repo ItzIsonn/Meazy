@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment;
 
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import me.itzisonn_.meazy.runtime.value.FunctionValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -32,22 +31,22 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
 
 
-    default Optional<FunctionValue> getFunctionRecursively(String id, List<ClassDesc> parameters) {
-        Optional<FunctionValue> functionValue = getFunction(id, parameters);
-        if (functionValue.isPresent()) return functionValue;
+    default Optional<FunctionEnvironment> getFunctionRecursively(String id, List<ClassDesc> parameters) {
+        Optional<FunctionEnvironment> functionEnvironment = getFunction(id, parameters);
+        if (functionEnvironment.isPresent()) return functionEnvironment;
 
         if (getBaseClass() != null) {
             ClassDesc baseClass = EnvironmentUtils.resolveClassDesc(this, getBaseClass(), false);
             ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElseThrow();
-            functionValue = classEnvironment.getFunctionRecursively(id, parameters);
-            if (functionValue.isPresent()) return functionValue;
+            functionEnvironment = classEnvironment.getFunctionRecursively(id, parameters);
+            if (functionEnvironment.isPresent()) return functionEnvironment;
         }
 
         for (ClassDesc interfaceClassDesc : getInterfaces()) {
             ClassDesc baseClass = EnvironmentUtils.resolveClassDesc(this, interfaceClassDesc, false);
             ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElseThrow();
-            functionValue = classEnvironment.getFunctionRecursively(id, parameters);
-            if (functionValue.isPresent()) return functionValue;
+            functionEnvironment = classEnvironment.getFunctionRecursively(id, parameters);
+            if (functionEnvironment.isPresent()) return functionEnvironment;
         }
 
         return Optional.empty();
@@ -57,20 +56,20 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
 
     /**
      * Declares given operator function in this environment
-     * @param value FunctionValue
+     * @param functionEnvironment Function environment
      */
-    void declareOperatorFunction(FunctionValue value);
+    void declareOperatorFunction(FunctionEnvironment functionEnvironment);
 
     /**
      * @param id Id
      * @param parameters Parameters
      * @return Declared operator function with given id and args or null
      */
-    default Optional<FunctionValue> getOperatorFunction(String id, List<ClassDesc> parameters) {
+    default Optional<FunctionEnvironment> getOperatorFunction(String id, List<ClassDesc> parameters) {
         main:
-        for (FunctionValue functionValue : getOperatorFunctions()) {
-            if (functionValue.getId().equals(id)) {
-                List<ParameterExpression> functionParameters = functionValue.getParameters();
+        for (FunctionEnvironment functionEnvironment : getOperatorFunctions()) {
+            if (functionEnvironment.getId().equals(id)) {
+                List<ParameterExpression> functionParameters = functionEnvironment.getParameters();
                 if (parameters.size() != functionParameters.size()) continue;
 
                 for (int i = 0; i < parameters.size(); i++) {
@@ -79,7 +78,7 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
                     if (!EnvironmentUtils.isInstanceOf(this, parameterClassDesc, functionParameterClassDesc)) continue main;
                 }
 
-                return Optional.of(functionValue);
+                return Optional.of(functionEnvironment);
             }
         }
 
@@ -89,7 +88,7 @@ public interface ClassEnvironment extends VariableDeclarationEnvironment, Functi
     /**
      * @return All declared operator functions
      */
-    Set<FunctionValue> getOperatorFunctions();
+    Set<FunctionEnvironment> getOperatorFunctions();
 
 
 
