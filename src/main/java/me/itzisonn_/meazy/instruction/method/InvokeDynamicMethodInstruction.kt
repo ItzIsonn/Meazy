@@ -11,7 +11,7 @@ class InvokeDynamicMethodInstruction(
     private val bootstrapMethod: DirectMethodHandleDesc,
     private val id: String,
     private val methodTypeDesc: MethodTypeDesc,
-    private val args: MutableList<ConstantDesc>
+    private val args: List<ConstantDesc>
 ) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
         val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")

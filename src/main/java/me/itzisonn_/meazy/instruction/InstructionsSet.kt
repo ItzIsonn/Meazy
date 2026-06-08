@@ -1,242 +1,271 @@
-package me.itzisonn_.meazy.instruction;
+package me.itzisonn_.meazy.instruction
 
-import kotlin.uuid.Uuid;
-import me.itzisonn_.meazy.instruction.array.NewReferenceArrayInstruction;
-import me.itzisonn_.meazy.instruction.array.StoreReferenceIntoArrayInstruction;
-import me.itzisonn_.meazy.instruction.field.GetFieldInstruction;
-import me.itzisonn_.meazy.instruction.field.StoreFieldInstruction;
-import me.itzisonn_.meazy.instruction.field.WithFieldInstruction;
-import me.itzisonn_.meazy.instruction.label.*;
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation;
-import me.itzisonn_.meazy.instruction.local.GetLocalInstruction;
-import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction;
-import me.itzisonn_.meazy.instruction.local.StoreLocalInstruction;
-import me.itzisonn_.meazy.instruction.method.*;
-import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.instruction.misc.CheckCastInstruction;
-import me.itzisonn_.meazy.instruction.misc.InstanceOfInstruction;
-import me.itzisonn_.meazy.instruction.misc.ReturnInstruction;
-import me.itzisonn_.meazy.instruction.misc.WithClassInstruction;
-import me.itzisonn_.meazy.instruction.number.*;
-import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation;
-import me.itzisonn_.meazy.instruction.number.LogicalOperationInstruction.LogicalOperation;
-import me.itzisonn_.meazy.instruction.stack.DuplicateInstruction;
-import me.itzisonn_.meazy.instruction.stack.LoadConstantInstruction;
-import me.itzisonn_.meazy.instruction.stack.LoadThisReferenceInstruction;
-import me.itzisonn_.meazy.instruction.stack.PopInstruction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.instruction.array.NewReferenceArrayInstruction
+import me.itzisonn_.meazy.instruction.array.StoreReferenceIntoArrayInstruction
+import me.itzisonn_.meazy.instruction.field.GetFieldInstruction
+import me.itzisonn_.meazy.instruction.field.StoreFieldInstruction
+import me.itzisonn_.meazy.instruction.field.WithFieldInstruction
+import me.itzisonn_.meazy.instruction.label.*
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
+import me.itzisonn_.meazy.instruction.local.GetLocalInstruction
+import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction
+import me.itzisonn_.meazy.instruction.local.StoreLocalInstruction
+import me.itzisonn_.meazy.instruction.method.*
+import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.instruction.misc.CheckCastInstruction
+import me.itzisonn_.meazy.instruction.misc.InstanceOfInstruction
+import me.itzisonn_.meazy.instruction.misc.ReturnInstruction
+import me.itzisonn_.meazy.instruction.misc.WithClassInstruction
+import me.itzisonn_.meazy.instruction.number.*
+import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
+import me.itzisonn_.meazy.instruction.number.LogicalOperationInstruction.LogicalOperation
+import me.itzisonn_.meazy.instruction.stack.DuplicateInstruction
+import me.itzisonn_.meazy.instruction.stack.LoadConstantInstruction
+import me.itzisonn_.meazy.instruction.stack.LoadThisReferenceInstruction
+import me.itzisonn_.meazy.instruction.stack.PopInstruction
+import java.lang.classfile.attribute.InnerClassesAttribute
+import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDesc
+import java.lang.constant.DirectMethodHandleDesc
+import java.lang.constant.MethodTypeDesc
+import java.lang.reflect.AccessFlag
+import java.util.function.Consumer
+import kotlin.uuid.Uuid
+import kotlin.uuid.Uuid.Companion.random
 
-import java.lang.classfile.attribute.InnerClassesAttribute;
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDesc;
-import java.lang.constant.DirectMethodHandleDesc;
-import java.lang.constant.MethodTypeDesc;
-import java.lang.reflect.AccessFlag;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
+class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
+    private val _instructions: MutableList<Instruction> = mutableListOf()
+    val instructions get() = _instructions.toList()
 
-@NullMarked
-public class InstructionsSet {
-    private final List<Instruction> instructions = new ArrayList<>();
-    private final BytecodeBuilders bytecodeBuilders;
-
-    public InstructionsSet(BytecodeBuilders bytecodeBuilders) {
-        this.bytecodeBuilders = bytecodeBuilders;
-    }
-
-    public List<Instruction> getInstructions() {
-        return new ArrayList<>(instructions);
-    }
-
-    public void with(Instruction instruction) {
-        instructions.add(instruction);
+    fun with(instruction: Instruction) {
+        _instructions.add(instruction)
     }
 
 
-    public void withField(String id, ClassDesc type, Set<AccessFlag> flags) {
-        with(new WithFieldInstruction(id, type, toIntFlags(flags)));
+    fun withField(id: String, type: ClassDesc, flags: MutableSet<AccessFlag>) {
+        with(WithFieldInstruction(id, type, toIntFlags(flags)))
     }
 
-    public void getField(ClassDesc owner, String id, ClassDesc type) {
-        with(new GetFieldInstruction(owner, id, type, false));
+    fun getField(owner: ClassDesc, id: String, type: ClassDesc) {
+        with(GetFieldInstruction(owner, id, type, false))
     }
 
-    public void getStaticField(ClassDesc owner, String id, ClassDesc type) {
-        with(new GetFieldInstruction(owner, id, type, true));
+    fun getStaticField(owner: ClassDesc, id: String, type: ClassDesc) {
+        with(GetFieldInstruction(owner, id, type, true))
     }
 
-    public void storeField(ClassDesc owner, String id, ClassDesc type) {
-        with(new StoreFieldInstruction(owner, id, type, false));
+    fun storeField(owner: ClassDesc, id: String, type: ClassDesc) {
+        with(StoreFieldInstruction(owner, id, type, false))
     }
 
-    public void storeStaticField(ClassDesc owner, String id, ClassDesc type) {
-        with(new StoreFieldInstruction(owner, id, type, true));
-    }
-
-
-    public void withMethod(String id, MethodTypeDesc methodTypeDesc, Set<AccessFlag> flags, Consumer<InstructionsSet> bodyInstructions) {
-        with(new WithMethodInstruction(id, methodTypeDesc, toIntFlags(flags), bodyInstructions));
-    }
-
-    public void withConstructor(MethodTypeDesc methodTypeDesc, Set<AccessFlag> flags, Consumer<InstructionsSet> bodyInstructions) {
-        with(new WithConstructorInstruction(methodTypeDesc, toIntFlags(flags), bodyInstructions));
-    }
-
-    public void withClass(ClassDesc classDesc, @Nullable ClassDesc superClass, Set<ClassDesc> interfaceClasses, Set<AccessFlag> flags, List<InnerClassesAttribute> attributes, Consumer<InstructionsSet> classInstructions) {
-        with(new WithClassInstruction(classDesc, superClass, interfaceClasses, toIntFlags(flags), attributes, classInstructions));
+    fun storeStaticField(owner: ClassDesc, id: String, type: ClassDesc) {
+        with(StoreFieldInstruction(owner, id, type, true))
     }
 
 
-    public void invokeMethod(ClassDesc owner, String id, MethodTypeDesc methodTypeDesc, Consumer<InstructionsSet> argsInstructions, InvokeType invokeType) {
-        with(new InvokeMethodInstruction(owner, id, methodTypeDesc, argsInstructions, invokeType));
+    fun withMethod(
+        id: String,
+        methodTypeDesc: MethodTypeDesc,
+        flags: MutableSet<AccessFlag>,
+        bodyInstructions: Consumer<InstructionsSet>
+    ) {
+        with(WithMethodInstruction(id, methodTypeDesc, toIntFlags(flags), bodyInstructions))
     }
 
-    public void invokeDynamicMethod(DirectMethodHandleDesc bootstrapMethod, String id, MethodTypeDesc methodTypeDesc, ConstantDesc... args) {
-        with(new InvokeDynamicMethodInstruction(bootstrapMethod, id, methodTypeDesc, List.of(args)));
+    fun withConstructor(
+        methodTypeDesc: MethodTypeDesc,
+        flags: MutableSet<AccessFlag>,
+        bodyInstructions: Consumer<InstructionsSet>
+    ) {
+        with(WithConstructorInstruction(methodTypeDesc, toIntFlags(flags), bodyInstructions))
     }
 
-    public void invokeConstructor(ClassDesc owner, MethodTypeDesc constructorTypeDesc, Consumer<InstructionsSet> argsInstructions) {
-        with(new InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, false));
-    }
-
-    public void invokeSuperClass(ClassDesc owner, MethodTypeDesc constructorTypeDesc, Consumer<InstructionsSet> argsInstructions) {
-        with(new InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, true));
-    }
-
-
-    public void loadConstant(@Nullable ConstantDesc constant) {
-        with(new LoadConstantInstruction(constant));
-    }
-
-    public void loadConstant(boolean constant) {
-        loadConstant(constant ? 1 : 0);
-    }
-
-    public void loadNull() {
-        loadConstant(null);
-    }
-
-    public void loadThisReference() {
-        with(new LoadThisReferenceInstruction());
-    }
-
-
-    public void getLocal(ClassDesc type, int slot) {
-        with(new GetLocalInstruction(type, slot));
-    }
-
-    public void storeLocal(ClassDesc type, int slot) {
-        with(new StoreLocalInstruction(type, slot));
-    }
-
-    public void setLocalName(int slot, String id, ClassDesc type, Uuid startLabelUuid, Uuid endLabelUuid) {
-        with(new SetLocalNameInstruction(slot, id, type, startLabelUuid, endLabelUuid));
+    fun withClass(
+        classDesc: ClassDesc,
+        superClass: ClassDesc?,
+        interfaceClasses: MutableSet<ClassDesc>,
+        flags: MutableSet<AccessFlag>,
+        attributes: MutableList<InnerClassesAttribute>,
+        classInstructions: Consumer<InstructionsSet>
+    ) {
+        with(
+            WithClassInstruction(
+                classDesc,
+                superClass,
+                interfaceClasses,
+                toIntFlags(flags),
+                attributes,
+                classInstructions
+            )
+        )
     }
 
 
-    public void newReferenceArray(ClassDesc type) {
-        with(new NewReferenceArrayInstruction(type));
+    fun invokeMethod(
+        owner: ClassDesc,
+        id: String,
+        methodTypeDesc: MethodTypeDesc,
+        argsInstructions: Consumer<InstructionsSet>,
+        invokeType: InvokeType
+    ) {
+        with(InvokeMethodInstruction(owner, id, methodTypeDesc, argsInstructions, invokeType))
     }
 
-    public void storeReferenceIntoArray() {
-        with(new StoreReferenceIntoArrayInstruction());
+    fun invokeDynamicMethod(
+        bootstrapMethod: DirectMethodHandleDesc,
+        id: String,
+        methodTypeDesc: MethodTypeDesc,
+        vararg args: ConstantDesc
+    ) {
+        with(InvokeDynamicMethodInstruction(bootstrapMethod, id, methodTypeDesc, listOf(*args)))
     }
 
-
-    public void negateNumber(NumberType type) {
-        with(new NegateNumberInstruction(type));
+    fun invokeConstructor(
+        owner: ClassDesc,
+        constructorTypeDesc: MethodTypeDesc,
+        argsInstructions: Consumer<InstructionsSet>
+    ) {
+        with(InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, false))
     }
 
-    public void convertToNumberType(NumberType from, NumberType to) {
-        with(new ConvertToNumberTypeInstruction(from, to));
-    }
-
-    public void convertToBooleanType(boolean isFromBoxed, boolean isToBoxed) {
-        with(new ConvertToBooleanTypeInstruction(isFromBoxed, isToBoxed));
-    }
-
-    public void arithmeticOperation(NumberType type, ArithmeticOperation operation) {
-        with(new ArithmeticOperationInstruction(type, operation));
-    }
-
-    public void logicalOperation(LogicalOperation operation) {
-        with(new LogicalOperationInstruction(operation));
-    }
-
-
-    public void instanceOf(ClassDesc target) {
-        with(new InstanceOfInstruction(target));
-    }
-
-    public void checkCast(ClassDesc type) {
-        with(new CheckCastInstruction(type));
-    }
-
-    public void returnValue(@Nullable ClassDesc classDesc) {
-        with(new ReturnInstruction(classDesc));
-    }
-
-    public void returnVoid() {
-        returnValue(null);
+    fun invokeSuperClass(
+        owner: ClassDesc,
+        constructorTypeDesc: MethodTypeDesc,
+        argsInstructions: Consumer<InstructionsSet>
+    ) {
+        with(InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, true))
     }
 
 
-    public void duplicate() {
-        with(new DuplicateInstruction());
+    fun loadConstant(constant: ConstantDesc?) {
+        with(LoadConstantInstruction(constant))
     }
 
-    public void pop() {
-        with(new PopInstruction());
+    fun loadConstant(constant: Boolean) {
+        loadConstant(Integer.valueOf(if (constant) 1 else 0) as Integer)
     }
 
-
-    public Uuid createLabel() {
-        Uuid uuid = Uuid.Companion.random();
-        bytecodeBuilders.addLabel(uuid);
-        return uuid;
+    fun loadNull() {
+        loadConstant(null)
     }
 
-    public void initLabel(Uuid uuid) {
-        with(new InitLabelInstruction(uuid));
-    }
-
-    public Uuid createAndInitLabel() {
-        Uuid uuid = createLabel();
-        initLabel(uuid);
-        return uuid;
-    }
-
-    public void bindLabel(Uuid uuid) {
-        with(new BindLabelInstruction(uuid));
-    }
-
-    public void gotoLabel(Uuid uuid) {
-        with(new GotoLabelInstruction(uuid));
+    fun loadThisReference() {
+        with(LoadThisReferenceInstruction())
     }
 
 
-    public void gotoLabelIfNonNull(Uuid uuid) {
-        with(new GotoLabelIfNonNullInstruction(uuid));
+    fun getLocal(type: ClassDesc, slot: Int) {
+        with(GetLocalInstruction(type, slot))
     }
 
-    public void gotoLabelIfEqualsZero(Uuid uuid) {
-        with(new GotoLabelIfEqualsZeroInstruction(uuid));
+    fun storeLocal(type: ClassDesc, slot: Int) {
+        with(StoreLocalInstruction(type, slot))
     }
 
-    public void gotoLabelIfComparisonTrue(NumberType type, ComparisonOperation operation, Uuid uuid) {
-        with(new GotoLabelIfComparisonTrueInstruction(type, operation, uuid));
+    fun setLocalName(slot: Int, id: String, type: ClassDesc, startLabelUuid: Uuid, endLabelUuid: Uuid) {
+        with(SetLocalNameInstruction(slot, id, type, startLabelUuid, endLabelUuid))
     }
 
 
-    private static int toIntFlags(Collection<AccessFlag> accessFlags) {
-        return accessFlags.stream().map(AccessFlag::mask).reduce((i1, i2) -> i1 | i2).orElse(0);
+    fun newReferenceArray(type: ClassDesc) {
+        with(NewReferenceArrayInstruction(type))
     }
 
-    public BytecodeBuilders getBytecodeBuilders() {
-        return this.bytecodeBuilders;
+    fun storeReferenceIntoArray() {
+        with(StoreReferenceIntoArrayInstruction())
+    }
+
+
+    fun negateNumber(type: NumberType) {
+        with(NegateNumberInstruction(type))
+    }
+
+    fun convertToNumberType(from: NumberType, to: NumberType) {
+        with(ConvertToNumberTypeInstruction(from, to))
+    }
+
+    fun convertToBooleanType(isFromBoxed: Boolean, isToBoxed: Boolean) {
+        with(ConvertToBooleanTypeInstruction(isFromBoxed, isToBoxed))
+    }
+
+    fun arithmeticOperation(type: NumberType, operation: ArithmeticOperation) {
+        with(ArithmeticOperationInstruction(type, operation))
+    }
+
+    fun logicalOperation(operation: LogicalOperation) {
+        with(LogicalOperationInstruction(operation))
+    }
+
+
+    fun instanceOf(target: ClassDesc) {
+        with(InstanceOfInstruction(target))
+    }
+
+    fun checkCast(type: ClassDesc) {
+        with(CheckCastInstruction(type))
+    }
+
+    fun returnValue(classDesc: ClassDesc?) {
+        with(ReturnInstruction(classDesc))
+    }
+
+    fun returnVoid() {
+        returnValue(null)
+    }
+
+
+    fun duplicate() {
+        with(DuplicateInstruction())
+    }
+
+    fun pop() {
+        with(PopInstruction())
+    }
+
+
+    fun createLabel(): Uuid {
+        val uuid = random()
+        bytecodeBuilders.addLabel(uuid)
+        return uuid
+    }
+
+    fun initLabel(uuid: Uuid) {
+        with(InitLabelInstruction(uuid))
+    }
+
+    fun createAndInitLabel(): Uuid {
+        val uuid = createLabel()
+        initLabel(uuid)
+        return uuid
+    }
+
+    fun bindLabel(uuid: Uuid) {
+        with(BindLabelInstruction(uuid))
+    }
+
+    fun gotoLabel(uuid: Uuid) {
+        with(GotoLabelInstruction(uuid))
+    }
+
+
+    fun gotoLabelIfNonNull(uuid: Uuid) {
+        with(GotoLabelIfNonNullInstruction(uuid))
+    }
+
+    fun gotoLabelIfEqualsZero(uuid: Uuid) {
+        with(GotoLabelIfEqualsZeroInstruction(uuid))
+    }
+
+    fun gotoLabelIfComparisonTrue(type: NumberType, operation: ComparisonOperation, uuid: Uuid) {
+        with(GotoLabelIfComparisonTrueInstruction(type, operation, uuid))
+    }
+
+
+    companion object {
+        private fun toIntFlags(accessFlags: Collection<AccessFlag>): Int {
+            return accessFlags
+                .map { obj: AccessFlag -> obj.mask() }
+                .reduceOrNull { i1: Int, i2: Int -> i1 or i2 } ?: 0
+        }
     }
 }

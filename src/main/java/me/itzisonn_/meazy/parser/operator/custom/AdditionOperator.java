@@ -84,7 +84,7 @@ public class AdditionOperator extends Operator {
 
         if (leftNumberType != null && rightNumberType != null) {
             if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't add nullable numbers");
-            return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).getClassDesc());
+            return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
         }
 
         if (leftType.equals(rightType)) return leftType;

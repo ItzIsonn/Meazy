@@ -1,90 +1,92 @@
-package me.itzisonn_.meazy.instruction.number;
+package me.itzisonn_.meazy.instruction.number
 
-import lombok.AllArgsConstructor;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import org.jspecify.annotations.NullMarked;
-
-import java.lang.classfile.CodeBuilder;
-import java.lang.constant.MethodTypeDesc;
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.Instruction
+import me.itzisonn_.meazy.instruction.NumberType
+import org.jspecify.annotations.NullMarked
+import java.lang.classfile.CodeBuilder
+import java.lang.constant.MethodTypeDesc
 
 @NullMarked
-@AllArgsConstructor
-public final class ConvertToNumberTypeInstruction implements Instruction {
-    private final NumberType from;
-    private final NumberType to;
+class ConvertToNumberTypeInstruction(private val from: NumberType, private val to: NumberType) : Instruction {
+    override fun emit(bytecodeBuilders: BytecodeBuilders) {
+        val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
 
-    @Override
-    public void emit(BytecodeBuilders bytecodeBuilders) {
-        CodeBuilder codeBuilder = bytecodeBuilders.codeBuilder;
-        if (codeBuilder == null) throw new RuntimeException("Code builder is null");
-
-        if (!from.isBoxed() && !to.isBoxed()) emitUnboxed(codeBuilder, from, to);
-        else if (from.isBoxed() && !to.isBoxed()) emitBoxedToUnboxed(codeBuilder, from, to);
-        else if (!from.isBoxed()) emitUnboxedToBoxed(codeBuilder, from, to);
-        else emitBoxed(codeBuilder, from, to);
+        if (!from.isBoxed && !to.isBoxed) emitUnboxed(codeBuilder, from, to)
+        else if (from.isBoxed && !to.isBoxed) emitBoxedToUnboxed(codeBuilder, from, to)
+        else if (!from.isBoxed) emitUnboxedToBoxed(codeBuilder, from, to)
+        else emitBoxed(codeBuilder, from, to)
     }
 
-    private void emitUnboxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
-        switch (from) {
-            case INT -> {
-                switch (to) {
-                    case INT -> {}
-                    case LONG -> codeBuilder.i2l();
-                    case FLOAT -> codeBuilder.i2f();
-                    case DOUBLE -> codeBuilder.i2d();
+    private fun emitUnboxed(codeBuilder: CodeBuilder, from: NumberType, to: NumberType) {
+        when (from) {
+            NumberType.INT -> {
+                when (to) {
+                    NumberType.INT -> {}
+                    NumberType.LONG -> codeBuilder.i2l()
+                    NumberType.FLOAT -> codeBuilder.i2f()
+                    NumberType.DOUBLE -> codeBuilder.i2d()
+                    else -> error("Invalid call")
                 }
             }
 
-            case LONG -> {
-                switch (to) {
-                    case INT -> codeBuilder.l2i();
-                    case LONG -> {}
-                    case FLOAT -> codeBuilder.l2f();
-                    case DOUBLE -> codeBuilder.l2d();
+            NumberType.LONG -> {
+                when (to) {
+                    NumberType.INT -> codeBuilder.l2i()
+                    NumberType.LONG -> {}
+                    NumberType.FLOAT -> codeBuilder.l2f()
+                    NumberType.DOUBLE -> codeBuilder.l2d()
+                    else -> error("Invalid call")
                 }
             }
 
-            case FLOAT -> {
-                switch (to) {
-                    case INT -> codeBuilder.f2i();
-                    case LONG -> codeBuilder.f2l();
-                    case FLOAT -> {}
-                    case DOUBLE -> codeBuilder.f2d();
+            NumberType.FLOAT -> {
+                when (to) {
+                    NumberType.INT -> codeBuilder.f2i()
+                    NumberType.LONG -> codeBuilder.f2l()
+                    NumberType.FLOAT -> {}
+                    NumberType.DOUBLE -> codeBuilder.f2d()
+                    else -> error("Invalid call")
                 }
             }
 
-            case DOUBLE -> {
-                switch (to) {
-                    case INT -> codeBuilder.d2i();
-                    case LONG -> codeBuilder.d2l();
-                    case FLOAT -> codeBuilder.d2f();
-                    case DOUBLE -> {}
+            NumberType.DOUBLE -> {
+                when (to) {
+                    NumberType.INT -> codeBuilder.d2i()
+                    NumberType.LONG -> codeBuilder.d2l()
+                    NumberType.FLOAT -> codeBuilder.d2f()
+                    NumberType.DOUBLE -> {}
+                    else -> error("Invalid call")
                 }
             }
+
+            else -> error("Invalid call")
         }
     }
 
-    private void emitBoxedToUnboxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
-        String methodName = switch (to) {
-            case INT -> "intValue";
-            case LONG -> "longValue";
-            case FLOAT -> "floatValue";
-            case DOUBLE -> "doubleValue";
-            default -> null;
-        };
+    private fun emitBoxedToUnboxed(codeBuilder: CodeBuilder, from: NumberType, to: NumberType) {
+        val methodName = when (to) {
+            NumberType.INT -> "intValue"
+            NumberType.LONG -> "longValue"
+            NumberType.FLOAT -> "floatValue"
+            NumberType.DOUBLE -> "doubleValue"
+            else -> error("Invalid call")
+        }
 
-        codeBuilder.invokevirtual(from.getClassDesc(), methodName, MethodTypeDesc.of(to.getClassDesc()));
+        codeBuilder.invokevirtual(from.classDesc, methodName, MethodTypeDesc.of(to.classDesc))
     }
 
-    private void emitUnboxedToBoxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
-        emitUnboxed(codeBuilder, from, to.unbox());
-        codeBuilder.invokestatic(to.getClassDesc(), "valueOf", MethodTypeDesc.of(to.getClassDesc(), to.unbox().getClassDesc()));
+    private fun emitUnboxedToBoxed(codeBuilder: CodeBuilder, from: NumberType, to: NumberType) {
+        emitUnboxed(codeBuilder, from, to.unbox())
+        codeBuilder.invokestatic(
+            to.classDesc,
+            "valueOf",
+            MethodTypeDesc.of(to.classDesc, to.unbox().classDesc)
+        )
     }
 
-    private void emitBoxed(CodeBuilder codeBuilder, NumberType from, NumberType to) {
-        emitBoxedToUnboxed(codeBuilder, from, from.unbox());
-        emitUnboxedToBoxed(codeBuilder, from.unbox(), to);
+    private fun emitBoxed(codeBuilder: CodeBuilder, from: NumberType, to: NumberType) {
+        emitBoxedToUnboxed(codeBuilder, from, from.unbox())
+        emitUnboxedToBoxed(codeBuilder, from.unbox(), to)
     }
 }

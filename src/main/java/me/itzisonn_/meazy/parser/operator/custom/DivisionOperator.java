@@ -62,6 +62,6 @@ public class DivisionOperator extends Operator {
         }
 
         if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't divide nullable numbers");
-        return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).getClassDesc());
+        return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
     }
 }
