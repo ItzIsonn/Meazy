@@ -1,11 +1,11 @@
 plugins {
     java
+    kotlin("jvm") version "2.4.0"
 }
 
 group = "me.itzisonn_.meazy"
 version = "3.0"
 description = "Meazy"
-java.sourceCompatibility = JavaVersion.VERSION_25
 
 val lombokVersion = "1.18.46"
 val junitVersion = "6.1.0"
@@ -42,6 +42,10 @@ tasks.withType<Javadoc> {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(25)
 }
 
 

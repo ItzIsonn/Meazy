@@ -1,18 +1,15 @@
-package me.itzisonn_.meazy.runtime;
+package me.itzisonn_.meazy.runtime
 
-import org.jspecify.annotations.NullMarked;
+class ClassLoaderWrapper {
+    private val classLoader = DynamicClassLoader()
 
-@NullMarked
-public final class ClassLoaderWrapper {
-    private final DynamicClassLoader CLASS_LOADER = new DynamicClassLoader();
-
-    public Class<?> defineClass(byte[] bytecode) {
-        return CLASS_LOADER.define(bytecode);
+    fun defineClass(bytecode: ByteArray): Class<*> {
+        return classLoader.define(bytecode)
     }
 
-    private static class DynamicClassLoader extends ClassLoader {
-        public Class<?> define(byte[] bytecode) {
-            return defineClass(null, bytecode, 0, bytecode.length);
+    private class DynamicClassLoader : ClassLoader() {
+        fun define(bytecode: ByteArray): Class<*> {
+            return defineClass(null, bytecode, 0, bytecode.size)
         }
     }
 }
