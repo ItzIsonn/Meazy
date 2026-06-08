@@ -24,7 +24,7 @@ public class TranslatableText implements Text {
     public String toString() {
         String translation;
 
-        if (MeazyMain.SETTINGS_MANAGER.getSettings().isExceptionAbsentKey()) {
+        if (MeazyMain.SETTINGS_MANAGER.getSettings().getExceptionAbsentKey()) {
             translation = bundle.getTranslation(key);
             if (translation == null) throw new TranslationNotFoundException("Can't find translation with key " + key);
         }
