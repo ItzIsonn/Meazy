@@ -1,21 +1,10 @@
-package me.itzisonn_.meazy.util.logger;
-
-import lombok.Getter;
-import org.jspecify.annotations.NullMarked;
+package me.itzisonn_.meazy.util.logger
 
 /**
  * Level of logging. Shows how important a message is
  */
-@NullMarked
-public enum LogLevel {
+enum class LogLevel(val id: String) {
     INFO("info"),
     WARNING("warning"),
-    ERROR("error");
-
-    @Getter
-    private final String id;
-
-    LogLevel(String id) {
-        this.id = id;
-    }
+    ERROR("error")
 }

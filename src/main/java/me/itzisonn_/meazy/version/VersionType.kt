@@ -1,53 +1,53 @@
-package me.itzisonn_.meazy.version;
+package me.itzisonn_.meazy.version
 
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.util.Map;
+import java.util.*
 
 /**
  * Represents different types of version
  */
-@NullMarked
-public enum VersionType {
+enum class VersionType {
     /**
      * Alpha version type
      */
     ALPHA,
+
     /**
      * Beta version type
      */
     BETA,
+
     /**
      * Release candidate version type
      */
     RELEASE_CANDIDATE,
+
     /**
      * Release version type
      */
     RELEASE;
 
-    /**
-     * @param string String representation of {@link VersionType}
-     * @return Version type that matches given string or null
-     */
-    @Nullable
-    public static VersionType of(String string) {
-        return VERSION_TYPES.get(string.toUpperCase());
-    }
+    companion object {
+        /**
+         * @param string String representation of [VersionType]
+         * @return Version type that matches given string or null
+         */
+        fun of(string: String): VersionType? {
+            return VERSION_TYPES[string.uppercase(Locale.getDefault())]
+        }
 
-    /**
-     * Map of different spellings of version types
-     */
-    public static final Map<String, VersionType> VERSION_TYPES = Map.of(
-            "ALPHA", ALPHA,
-            "A", ALPHA,
-            "BETA", BETA,
-            "B", BETA,
-            "RELEASE_CANDIDATE", RELEASE_CANDIDATE,
-            "RELEASE-CANDIDATE", RELEASE_CANDIDATE,
-            "RC", RELEASE_CANDIDATE,
-            "RELEASE", RELEASE,
-            "R", RELEASE
-    );
+        /**
+         * Map of different spellings of version types
+         */
+        val VERSION_TYPES = mapOf(
+            "ALPHA" to ALPHA,
+            "A" to ALPHA,
+            "BETA" to BETA,
+            "B" to BETA,
+            "RELEASE_CANDIDATE" to RELEASE_CANDIDATE,
+            "RELEASE-CANDIDATE" to RELEASE_CANDIDATE,
+            "RC" to RELEASE_CANDIDATE,
+            "RELEASE" to RELEASE,
+            "R" to RELEASE
+        )
+    }
 }
