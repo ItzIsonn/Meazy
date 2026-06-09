@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.command.custom
 
-import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.command.AbstractCommand
 import me.itzisonn_.meazy.text.Text
 import me.itzisonn_.meazy.text.translatable
@@ -8,6 +7,7 @@ import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.util.FileUtils.getExtension
 import me.itzisonn_.meazy.util.FileUtils.getLines
 import me.itzisonn_.meazy.util.logger.LogLevel
+import me.itzisonn_.meazy.util.logger.Logger
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -19,17 +19,17 @@ class CompileCommand : AbstractCommand(
     override fun execute(vararg args: String): Text? {
         val file = File(args[0])
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, translatable("meazy:file.doesnt_exist", file.absolutePath))
+            Logger.log(LogLevel.ERROR, translatable("meazy:file.doesnt_exist", file.absolutePath))
             return null
         }
 
         val extension = getExtension(file)
         if (extension != "mea") {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, translatable("meazy:file.unsupported_extension", extension))
+            Logger.log(LogLevel.ERROR, translatable("meazy:file.unsupported_extension", extension))
             return null
         }
 
-        MeazyMain.LOGGER.log(
+        Logger.log(
             LogLevel.INFO,
             translatable("meazy:commands.compile.compiling", file.absolutePath)
         )

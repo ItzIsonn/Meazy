@@ -5,10 +5,11 @@ import me.itzisonn_.meazy.command.AbstractCommand
 import me.itzisonn_.meazy.text.Text
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.util.logger.LogLevel
+import me.itzisonn_.meazy.util.logger.Logger
 
 class VersionCommand : AbstractCommand("version", listOf()) {
     override fun execute(vararg args: String): Text? {
-        MeazyMain.LOGGER.log(LogLevel.INFO, translatable("meazy:commands.version", MeazyMain.VERSION))
+        Logger.log(LogLevel.INFO, translatable("meazy:commands.version", MeazyMain.VERSION))
         return null
     }
 }
