@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.lexer.TokenType
 import me.itzisonn_.meazy.lexer.TokenTypeSet
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.registry.RegistryIdentifier
-import org.jspecify.annotations.NullMarked
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -17,56 +16,49 @@ import java.lang.reflect.Type
 /**
  * All basic datagen deserializers
  */
-@NullMarked
 object DatagenDeserializers {
     /**
      * @return Deserializer for [TokenType]
      */
-    @JvmStatic
-    fun getTokenTypeSetDeserializer(namespace: String): JsonDeserializer<TokenTypeSet> {
-        return JsonDeserializer { jsonElement: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
-            val `object` = jsonElement!!.getAsJsonObject()
-            if (`object`.get("id") == null) throw InvalidDatagenJsonException("TokenTypeSet doesn't have field id")
-            val id = `object`.get("id").getAsString()
+    val tokenTypeSetDeserializer =
+        JsonDeserializer { jsonElement: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
+            val jsonObject = jsonElement!!.getAsJsonObject()
+            if (jsonObject.get("id") == null) throw InvalidDatagenJsonException("TokenTypeSet doesn't have field id")
+            val id = jsonObject.get("id").asString
 
-            if (`object`.get("token_types") == null) throw InvalidDatagenJsonException("TokenTypeSet doesn't have field token_types")
+            if (jsonObject.get("token_types") == null) throw InvalidDatagenJsonException("TokenTypeSet doesn't have field token_types")
             val tokenTypes: MutableSet<TokenType> = HashSet()
 
-            for (element in `object`.get("token_types").getAsJsonArray()) {
-                val tokenTypeId = element.getAsString()
+            for (element in jsonObject.get("token_types").getAsJsonArray()) {
+                val tokenTypeId = element.asString
                 val tokenTypeEntry = try {
                     Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.of(tokenTypeId))
                 }
                 catch (_: IllegalArgumentException) {
-                    Registries.TOKEN_TYPES.getEntry(RegistryIdentifier.of(namespace, tokenTypeId))
+                    Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier(tokenTypeId))
                 }
 
-                if (tokenTypeEntry == null) throw InvalidDatagenJsonException("TokenType with id '" + tokenTypeId + "' doesn't exist")
+                if (tokenTypeEntry == null) throw InvalidDatagenJsonException("TokenType with id '$tokenTypeId' doesn't exist")
                 tokenTypes.add(tokenTypeEntry.getValue())
             }
             TokenTypeSet(id, tokenTypes)
         }
-    }
 
 
     /**
      * @return Deserializer for [TokenType]
      */
-    val tokenTypeDeserializer: JsonDeserializer<TokenType> =
+    val tokenTypeDeserializer =
         JsonDeserializer { jsonElement: JsonElement?, _: Type?, _: JsonDeserializationContext? ->
-            val `object` = jsonElement!!.getAsJsonObject()
-            if (`object`.get("id") == null) throw InvalidDatagenJsonException("TokenType doesn't have field id")
-            val id = `object`.get("id").getAsString()
+            val jsonObject = jsonElement!!.getAsJsonObject()
+            if (jsonObject.get("id") == null) throw InvalidDatagenJsonException("TokenType doesn't have field id")
 
-            val regex: String?
-            if (`object`.get("regex") != null) regex = `object`.get("regex").getAsString()
-            else regex = null
+            val id = jsonObject.get("id").asString
+            val regex = if (jsonObject.get("regex") != null) jsonObject.get("regex").asString else null
+            val shouldSkip = jsonObject.get("should_skip") != null && jsonObject.get("should_skip").asBoolean
 
-            val shouldSkip = `object`.get("should_skip") != null && `object`.get("should_skip").getAsBoolean()
-
-            if (`object`.get("can_match") != null) {
-                val path = `object`.get("can_match").getAsString().split("#".toRegex()).dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
+            if (jsonObject.get("can_match") != null) {
+                val path = jsonObject.get("can_match").asString.split("#".toRegex()).dropLastWhile { it.isEmpty() }
                 val className = path[0]
                 val methodName = path[1]
 
@@ -87,19 +79,18 @@ object DatagenDeserializers {
                 }
                 catch (e: NoSuchMethodException) {
                     throw RuntimeException(
-                        "Can't find specified method " + methodName + " for canMatch method in TokenType with id " + id,
+                        "Can't find specified method $methodName for canMatch method in TokenType with id $id",
                         e
                     )
                 }
 
-                if (!method.isAnnotationPresent(NativeCanMatch::class.java)) throw RuntimeException("Specified non-native method for canMatch method in TokenType with id " + id)
-                if (!method.canAccess(null)) throw RuntimeException("Specified inaccessible method for canMatch method in TokenType with id " + id)
-                if (!Boolean::class.javaPrimitiveType!!.isAssignableFrom(method.getReturnType())) throw RuntimeException(
-                    "Specifier method with non-boolean return type for canMatch method in TokenType with id " + id
+                if (!method.isAnnotationPresent(NativeCanMatch::class.java)) throw RuntimeException("Specified non-native method for canMatch method in TokenType with id $id")
+                if (!method.canAccess(null)) throw RuntimeException("Specified inaccessible method for canMatch method in TokenType with id $id")
+                if (!Boolean::class.javaPrimitiveType!!.isAssignableFrom(method.returnType)) throw RuntimeException(
+                    "Specifier method with non-boolean return type for canMatch method in TokenType with id $id"
                 )
 
                 return@JsonDeserializer object : TokenType(id, regex, shouldSkip) {
-                    @NullMarked
                     override fun canMatch(string: String): Boolean {
                         try {
                             return method.invoke(null, string) as Boolean

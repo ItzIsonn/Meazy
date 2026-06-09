@@ -63,6 +63,6 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             }
         }
 
-        return Registries.PROGRAM_FACTORY.getEntry().getValue().create(file, MeazyMain.VERSION, body);
+        return Registries.PROGRAM_FACTORY.getEntry().getValue().create(file, MeazyMain.INSTANCE.getVERSION(), body);
     }
 }

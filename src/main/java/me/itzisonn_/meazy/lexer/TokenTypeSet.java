@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.lexer;
 
-import lombok.Getter;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashSet;
@@ -11,7 +10,6 @@ import java.util.Set;
  *
  * @see TokenType
  */
-@Getter
 @NullMarked
 public class TokenTypeSet {
     private final String id;
@@ -20,7 +18,7 @@ public class TokenTypeSet {
     /**
      * Main constructor
      *
-     * @param id Id
+     * @param id         Id
      * @param tokenTypes Set of TokenTypes
      */
     public TokenTypeSet(String id, Set<TokenType> tokenTypes) {
@@ -31,7 +29,7 @@ public class TokenTypeSet {
     /**
      * Constructor with array of tokenTypes
      *
-     * @param id Id
+     * @param id         Id
      * @param tokenTypes Array of TokenTypes
      * @throws IllegalArgumentException If given array contains duplicate elements
      */
@@ -62,5 +60,9 @@ public class TokenTypeSet {
      */
     public boolean contains(TokenType tokenType) {
         return tokenTypes.contains(tokenType);
+    }
+
+    public String getId() {
+        return this.id;
     }
 }

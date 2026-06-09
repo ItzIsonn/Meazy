@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.lexer;
 
-import lombok.Getter;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.registry.Registries;
 import org.jspecify.annotations.NullMarked;
@@ -10,9 +9,9 @@ import java.util.regex.Pattern;
 
 /**
  * Represents type of token
+ *
  * @see Registries#TOKEN_TYPES
  */
-@Getter
 @NullMarked
 public class TokenType {
     /**
@@ -32,10 +31,9 @@ public class TokenType {
     /**
      * Main constructor
      *
-     * @param id Id
-     * @param pattern Pattern that is used to match this token type
+     * @param id         Id
+     * @param pattern    Pattern that is used to match this token type
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
-     *
      * @throws IllegalArgumentException If given id doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
      */
     public TokenType(String id, @Nullable Pattern pattern, boolean shouldSkip) throws IllegalArgumentException {
@@ -53,10 +51,9 @@ public class TokenType {
     /**
      * Constructor with regex that is compiled into pattern
      *
-     * @param id Id
-     * @param regex Regex that is compiled into {@link Pattern}
+     * @param id         Id
+     * @param regex      Regex that is compiled into {@link Pattern}
      * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
-     *
      * @throws IllegalArgumentException If given id doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
      */
     public TokenType(String id, @Nullable String regex, boolean shouldSkip) throws IllegalArgumentException {
@@ -90,5 +87,17 @@ public class TokenType {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    public @Nullable Pattern getPattern() {
+        return this.pattern;
+    }
+
+    public boolean isShouldSkip() {
+        return this.shouldSkip;
     }
 }
