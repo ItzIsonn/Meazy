@@ -1,0 +1,14 @@
+package me.itzisonn_.meazy.text
+
+/**
+ * Represents language
+ *
+ * @param id   Id
+ * @param name Name
+ * @throws IllegalArgumentException If given id is invalid
+ */
+class Language(val id: String, val name: String) {
+    init {
+        require(id.matches("[a-zA-Z_]+".toRegex())) { "Invalid id" }
+    }
+}

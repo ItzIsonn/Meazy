@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.pasing_function.statement;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -32,19 +32,19 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
         if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
         if (!(extra[1] instanceof Boolean canBeConstantWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
 
-        boolean isConstant = parser.getCurrentAndNext(TokenTypes.VARIABLE(), Text.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected", "id")).getValue();
+        boolean isConstant = parser.getCurrentAndNext(TokenTypes.VARIABLE(), TextKt.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
+        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
         DataType dataType = ParsingHelper.parseDataType(context);
 
         if (!parser.getCurrent().getType().equals(TokenTypes.ASSIGN())) {
-            if (dataType == null) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.variable_without_datatype_and_value"));
+            if (dataType == null) throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.variable_without_datatype_and_value"));
 
             if (canBeConstantWithoutValue) return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, null);
-            if (isConstant) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.constant_without_value"));
+            if (isConstant) throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.constant_without_value"));
             return new VariableDeclarationStatement(modifiers, false, id, dataType, new NullLiteral());
         }
 
-        parser.next(TokenTypes.ASSIGN(), Text.translatable("meazy:parser.expected.after", "assign", "id"));
+        parser.next(TokenTypes.ASSIGN(), TextKt.translatable("meazy:parser.expected.after", "assign", "id"));
 
         return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class));
     }

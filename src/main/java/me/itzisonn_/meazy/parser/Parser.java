@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.Text;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;

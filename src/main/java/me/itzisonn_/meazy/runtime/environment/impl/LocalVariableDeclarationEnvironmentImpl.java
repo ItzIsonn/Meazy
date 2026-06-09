@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime.environment.impl;
 import kotlin.uuid.Uuid;
 import lombok.Getter;
 import lombok.Setter;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
@@ -36,7 +36,7 @@ public class LocalVariableDeclarationEnvironmentImpl extends VariableDeclaration
     @Override
     public VariableValue declareVariable(@Nullable String id, DataType dataType, boolean isConstant, @Nullable Expression value) {
         if (id != null && getVariable(id).isPresent()) {
-            throw new EvaluationException(Text.translatable("meazy:runtime.variable.already_exists", id));
+            throw new EvaluationException(TextKt.translatable("meazy:runtime.variable.already_exists", id));
         }
 
         int slot = getUsedSlotsCount();

@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.Parser;
@@ -31,6 +31,6 @@ public class InterfaceBodyStatementParsingFunction extends AbstractParsingFuncti
             return parser.parse(MeazyMain.getDefaultIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers, true);
         }
 
-        throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.expected.statement", "interface_body"));
+        throw new InvalidStatementException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.expected.statement", "interface_body"));
     }
 }

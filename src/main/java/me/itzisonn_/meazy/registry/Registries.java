@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.instruction.Instruction;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.lang.Language;
+import me.itzisonn_.meazy.text.Language;
 import me.itzisonn_.meazy.lexer.*;
 import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.instruction.BytecodeBuilders;

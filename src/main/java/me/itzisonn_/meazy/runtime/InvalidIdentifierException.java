@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime;
 
-import me.itzisonn_.meazy.lang.TextException;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextException;
+import me.itzisonn_.meazy.text.Text;
 import org.jspecify.annotations.NullMarked;
 
 /**

@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
@@ -94,7 +94,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     @Override
     public VariableValue declareVariable(String id, DataType dataType, boolean isConstant, @Nullable Expression value) {
         if (getVariable(id).isPresent()) {
-            throw new EvaluationException(Text.translatable("meazy:runtime.variable.already_exists", id));
+            throw new EvaluationException(TextKt.translatable("meazy:runtime.variable.already_exists", id));
         }
 
         VariableValue variableValue = new VariableValueImpl(id, dataType, isConstant, Set.of(), variables.size(), value, this);
@@ -135,7 +135,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
                     if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
                 }
 
-                throw new EvaluationException(Text.translatable("meazy:runtime.function.operator.already_exists", functionEnvironment.getId()));
+                throw new EvaluationException(TextKt.translatable("meazy:runtime.function.operator.already_exists", functionEnvironment.getId()));
             }
         }
 
@@ -176,7 +176,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
                 if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
             }
 
-            throw new EvaluationException(Text.translatable("meazy:runtime.constructor.already_exists"));
+            throw new EvaluationException(TextKt.translatable("meazy:runtime.constructor.already_exists"));
         }
 
         constructors.add(constructorEnvironment);

@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironment;
@@ -39,7 +39,7 @@ public abstract class FunctionDeclarationEnvironmentImpl extends EnvironmentImpl
                     if (!otherParameters.get(i).getDataType().equals(parameters.get(i).getDataType())) continue main;
                 }
 
-                throw new EvaluationException(Text.translatable("meazy:runtime.function.already_exists", functionEnvironment.getId()));
+                throw new EvaluationException(TextKt.translatable("meazy:runtime.function.already_exists", functionEnvironment.getId()));
             }
         }
 

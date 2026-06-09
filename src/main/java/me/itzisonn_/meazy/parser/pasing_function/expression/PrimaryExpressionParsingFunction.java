@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.pasing_function.expression;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.parser.Parser;
@@ -59,10 +59,10 @@ public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Ex
         if (tokenType.equals(TokenTypes.LEFT_PARENTHESIS())) {
             parser.getCurrentAndNext();
             Expression value = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-            parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy:parser.expected", "right_parenthesis"));
+            parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected", "right_parenthesis"));
             return value;
         }
 
-        throw new InvalidStatementException(token.getLine(), Text.translatable("meazy:parser.exception.cant_parse", tokenType.getId()));
+        throw new InvalidStatementException(token.getLine(), TextKt.translatable("meazy:parser.exception.cant_parse", tokenType.getId()));
     }
 }

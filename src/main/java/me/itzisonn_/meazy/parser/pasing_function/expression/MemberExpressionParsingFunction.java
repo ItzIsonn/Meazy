@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -31,7 +31,7 @@ public class MemberExpressionParsingFunction extends AbstractParsingFunction<Exp
             Expression member = parser.parseAfter(MeazyMain.getDefaultIdentifier("member_expression"), Expression.class);
 
             if (!(member instanceof Identifier) && !(member instanceof CallExpression)) {
-                throw new UnexpectedTokenException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.member_expression"));
+                throw new UnexpectedTokenException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.member_expression"));
             }
 
             object = new MemberExpression(object, member, isNullSafe);

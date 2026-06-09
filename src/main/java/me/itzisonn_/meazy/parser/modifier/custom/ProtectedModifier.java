@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.modifier.custom;
 
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
@@ -49,7 +49,7 @@ public class ProtectedModifier extends Modifier {
 
                                     ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, classEnvironment.getId()).orElse(null);
                                     if (parentClassEnvironment == null) {
-                                        throw new InvalidIdentifierException(Text.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
+                                        throw new InvalidIdentifierException(TextKt.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                                     }
                                     return parentClassEnvironment.getInterfaces().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
                                 }
@@ -70,7 +70,7 @@ public class ProtectedModifier extends Modifier {
 
                                     ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, classEnvironment.getId()).orElse(null);
                                     if (parentClassEnvironment == null) {
-                                        throw new InvalidIdentifierException(Text.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
+                                        throw new InvalidIdentifierException(TextKt.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                                     }
                                     return parentClassEnvironment.getInterfaces().stream().anyMatch(cls -> cls.equals(declarationEnvironment.getId()));
                                 }
@@ -84,7 +84,7 @@ public class ProtectedModifier extends Modifier {
 
                     ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(requestEnvironment, classEnvironment.getId()).orElse(null);
                     if (parentClassEnvironment == null) {
-                        throw new InvalidIdentifierException(Text.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
+                        throw new InvalidIdentifierException(TextKt.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                     }
                     return parentClassEnvironment.getInterfaces().stream().anyMatch(cls -> cls.equals(identifier.getId()));
                 }

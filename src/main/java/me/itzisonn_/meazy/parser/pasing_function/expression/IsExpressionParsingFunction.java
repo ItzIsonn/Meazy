@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.pasing_function.expression;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.IsExpression;
@@ -24,7 +24,7 @@ public class IsExpressionParsingFunction extends AbstractParsingFunction<Express
 
         if (parser.getCurrent().getType().equals(TokenTypes.IS())) {
             boolean isLike = parser.getCurrentAndNext().getValue().equals("islike");
-            String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected.after_keyword", "id", "is")).getValue();
+            String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "is")).getValue();
             return new IsExpression(value, id, isLike);
         }
 

@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.*;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
@@ -20,15 +20,15 @@ public class ParameterExpressionParsingFunction extends AbstractParsingFunction<
         Parser parser = context.getParser();
 
         if (!parser.getCurrent().getType().equals(TokenTypes.VARIABLE())) {
-            throw new UnexpectedTokenException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.expected.start_expression", "variable", "parameter"));
+            throw new UnexpectedTokenException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.expected.start_expression", "variable", "parameter"));
         }
 
         boolean isConstant = parser.getCurrentAndNext().getValue().equals("val");
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected.after_keyword", "id", "variable")).getValue();
+        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "variable")).getValue();
 
         int lineNumber = parser.getCurrent().getLine();
         DataType dataType = ParsingHelper.parseDataType(context);
-        if (dataType == null) throw new InvalidSyntaxException(lineNumber, Text.translatable("meazy:parser.exception.parameter_without_datatype"));
+        if (dataType == null) throw new InvalidSyntaxException(lineNumber, TextKt.translatable("meazy:parser.exception.parameter_without_datatype"));
 
         return new ParameterExpression(id, dataType, isConstant);
     }

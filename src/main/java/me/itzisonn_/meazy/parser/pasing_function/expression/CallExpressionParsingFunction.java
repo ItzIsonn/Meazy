@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression;
 
 import me.itzisonn_.meazy.MeazyMain;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
@@ -30,7 +30,7 @@ public class CallExpressionParsingFunction extends AbstractParsingFunction<Expre
 
         if (parser.getCurrent().getType().equals(TokenTypes.LEFT_PARENTHESIS())) {
             if (!(expression instanceof Identifier identifier)) {
-                throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.call_not_identifier"));
+                throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.call_not_identifier"));
             }
 
             List<Expression> args = ParsingHelper.parseArgs(context);

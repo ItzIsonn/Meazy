@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
@@ -44,6 +44,6 @@ public class AssignmentStatementParsingFunction extends AbstractParsingFunction<
             return new AssignmentStatement(left, value);
         }
 
-        throw new UnexpectedTokenException(parser.getCurrent().getLine(), Text.literal("Expected assign operators")); //TODO
+        throw new UnexpectedTokenException(parser.getCurrent().getLine(), TextKt.literal("Expected assign operators")); //TODO
     }
 }

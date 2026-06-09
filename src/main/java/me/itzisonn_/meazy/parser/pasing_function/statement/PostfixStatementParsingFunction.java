@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lexer.Token;
@@ -27,7 +27,7 @@ public class PostfixStatementParsingFunction extends AbstractParsingFunction<Sta
         Parser parser = context.getParser();
 
         Expression left = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-        Token token = parser.getCurrentAndNext(TokenTypeSets.OPERATOR_POSTFIX(), Text.translatable("meazy:parser.expected.end_statement", "operator_postfix", "postfix_statement"));
+        Token token = parser.getCurrentAndNext(TokenTypeSets.OPERATOR_POSTFIX(), TextKt.translatable("meazy:parser.expected.end_statement", "operator_postfix", "postfix_statement"));
 
         Expression value = new OperatorExpression(
                 left,
