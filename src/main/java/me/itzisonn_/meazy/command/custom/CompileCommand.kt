@@ -7,17 +7,18 @@ import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.util.FileUtils.getExtension
 import me.itzisonn_.meazy.util.FileUtils.getLines
 import me.itzisonn_.meazy.util.logger.LogLevel
-import org.jspecify.annotations.NullMarked
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-@NullMarked
-class CompileCommand : AbstractCommand("compile", mutableListOf<String>("<target_file>", "<output_directory_path>")) {
+class CompileCommand : AbstractCommand(
+    "compile",
+    listOf("target_file", "output_directory_path")
+) {
     override fun execute(vararg args: String): Text? {
         val file = File(args[0])
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()))
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.absolutePath))
             return null
         }
 
@@ -29,7 +30,7 @@ class CompileCommand : AbstractCommand("compile", mutableListOf<String>("<target
 
         MeazyMain.LOGGER.log(
             LogLevel.INFO,
-            Text.translatable("meazy:commands.compile.compiling", file.getAbsolutePath())
+            Text.translatable("meazy:commands.compile.compiling", file.absolutePath)
         )
         val startMillis = System.currentTimeMillis()
 
@@ -40,12 +41,12 @@ class CompileCommand : AbstractCommand("compile", mutableListOf<String>("<target
         val outputDirectory = File(args[1])
         if (!outputDirectory.exists()) {
             if (!outputDirectory.mkdirs()) {
-                throw RuntimeException("Failed to create output directory") //TODO
+                throw RuntimeException("Failed to create output directory") //TODO translation
             }
         }
 
         for (classDesc in classes.keys) {
-            val classFile: ByteArray = classes.get(classDesc)!!
+            val classFile: ByteArray = classes[classDesc]!!
             val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
 
             try {

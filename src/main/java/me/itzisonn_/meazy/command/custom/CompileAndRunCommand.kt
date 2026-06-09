@@ -7,19 +7,18 @@ import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.util.FileUtils.getExtension
 import me.itzisonn_.meazy.util.FileUtils.getLines
 import me.itzisonn_.meazy.util.logger.LogLevel
-import org.jspecify.annotations.NullMarked
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
-import java.util.*
 
-@NullMarked
-class CompileAndRunCommand :
-    AbstractCommand("compile_and_run", mutableListOf("<target_file>", "<output_directory_path>")) {
+class CompileAndRunCommand : AbstractCommand(
+    "compile_and_run",
+    listOf("target_file", "output_directory_path")
+) {
     override fun execute(vararg args: String): Text? {
         val file = File(args[0])
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()))
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.absolutePath))
             return null
         }
 
@@ -31,7 +30,7 @@ class CompileAndRunCommand :
 
         MeazyMain.LOGGER.log(
             LogLevel.INFO,
-            Text.translatable("meazy:commands.compile.compiling", file.getAbsolutePath())
+            Text.translatable("meazy:commands.compile.compiling", file.absolutePath)
         )
         val startCompileMillis = System.currentTimeMillis()
 
@@ -45,10 +44,10 @@ class CompileAndRunCommand :
                 throw RuntimeException("Failed to create output directory") //TODO
             }
         }
-        else Arrays.stream<File>(outputDirectory.listFiles()).forEach { obj: File? -> obj!!.delete() }
+        else outputDirectory.listFiles()?.forEach { obj: File? -> obj!!.delete() }
 
         for (classDesc in classes.keys) {
-            val classFile: ByteArray = classes.get(classDesc)!!
+            val classFile = classes[classDesc]!!
             val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
 
             try {
@@ -65,7 +64,7 @@ class CompileAndRunCommand :
             Text.translatable("meazy:commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
         )
 
-        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.getAbsolutePath()))
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.absolutePath))
         val startRunMillis = System.currentTimeMillis()
         Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue().run(classes)
 

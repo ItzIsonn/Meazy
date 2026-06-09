@@ -19,7 +19,7 @@ object Commands {
      * @return AbstractCommand with given name or null
      */
     fun getByName(name: String): AbstractCommand? {
-        for (entry in Registries.COMMANDS.getEntries()) {
+        for (entry in Registries.COMMANDS.entries) {
             if (entry.getValue().name == name) return entry.getValue()
         }
 
@@ -29,8 +29,7 @@ object Commands {
 
     /**
      * Initializes [Registries.COMMANDS] registry
-     * 
-     * 
+     *
      * *Don't use this method because it's called once at [Registries] initialization*
      * 
      * @throws IllegalStateException If [Registries.COMMANDS] registry has already been initialized
