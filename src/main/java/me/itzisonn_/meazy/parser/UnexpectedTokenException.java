@@ -1,7 +1,8 @@
 package me.itzisonn_.meazy.parser;
 
-import me.itzisonn_.meazy.lang.TextException;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextException;
+import me.itzisonn_.meazy.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -14,6 +15,6 @@ public class UnexpectedTokenException extends TextException {
      * @param text Text
      */
     public UnexpectedTokenException(int lineNumber, Text text) {
-        super(Text.translatable("meazy:parser.unexpected_token", lineNumber, text));
+        super(TextKt.translatable("meazy:parser.unexpected_token", lineNumber, text));
     }
 }

@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.pasing_function.statement;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
@@ -36,14 +36,14 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
         if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
         if (!(extra[1] instanceof Boolean canBeAbstractWithoutModifier)) throw new IllegalArgumentException("Expected boolean as extra argument");
 
-        parser.next(TokenTypes.FUNCTION(), Text.translatable("meazy:parser.expected.keyword", "function"));
+        parser.next(TokenTypes.FUNCTION(), TextKt.translatable("meazy:parser.expected.keyword", "function"));
 
         String classId = null;
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected.after_keyword", "id", "function")).getValue();
+        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "function")).getValue();
         if (parser.getCurrent().getType().equals(TokenTypes.DOT())) {
             parser.next();
             classId = id;
-            id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected", "id")).getValue();
+            id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
         }
 
         List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
@@ -64,9 +64,9 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
             returnDataTypeValue = expression;
         }
         else {
-            parser.next(TokenTypes.LEFT_BRACE(), Text.translatable("meazy:parser.expected.start", "left_brace", "function_body"));
+            parser.next(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "function_body"));
             body = ParsingHelper.parseBody(context);
-            parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "function_body"));
+            parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "function_body"));
             returnDataTypeValue = null;
         }
 

@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.registry;
 
-import me.itzisonn_.meazy.lang.Language;
+import me.itzisonn_.meazy.text.Language;
 import me.itzisonn_.registry.RegistryEntry;
 import me.itzisonn_.registry.RegistryIdentifier;
 import me.itzisonn_.registry.multiple_entry.SetRegistry;

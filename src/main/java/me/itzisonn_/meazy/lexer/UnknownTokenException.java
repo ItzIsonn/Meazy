@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.lexer;
 
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.lang.TextException;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextException;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -15,6 +15,6 @@ public class UnknownTokenException extends TextException {
      * @param errorString Error string
      */
     public UnknownTokenException(int lineNumber, String errorString) {
-        super(Text.translatable("meazy:lexer.unknown_token", lineNumber, errorString));
+        super(TextKt.translatable("meazy:lexer.unknown_token", lineNumber, errorString));
     }
 }

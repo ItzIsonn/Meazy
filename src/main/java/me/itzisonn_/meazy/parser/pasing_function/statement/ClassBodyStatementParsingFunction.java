@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.statement.Statement;
@@ -39,6 +39,6 @@ public class ClassBodyStatementParsingFunction extends AbstractParsingFunction<S
             return parser.parse(MeazyMain.getDefaultIdentifier("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
         }
 
-        throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.expected.statement", "class_body"));
+        throw new InvalidStatementException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.expected.statement", "class_body"));
     }
 }

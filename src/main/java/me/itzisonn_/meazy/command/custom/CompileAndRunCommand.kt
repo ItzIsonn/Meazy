@@ -2,7 +2,8 @@ package me.itzisonn_.meazy.command.custom
 
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.command.AbstractCommand
-import me.itzisonn_.meazy.lang.text.Text
+import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.util.FileUtils.getExtension
 import me.itzisonn_.meazy.util.FileUtils.getLines
@@ -18,19 +19,19 @@ class CompileAndRunCommand : AbstractCommand(
     override fun execute(vararg args: String): Text? {
         val file = File(args[0])
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.absolutePath))
+            MeazyMain.LOGGER.log(LogLevel.ERROR, translatable("meazy:file.doesnt_exist", file.absolutePath))
             return null
         }
 
         val extension = getExtension(file)
         if (extension != "mea") {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.unsupported_extension", extension))
+            MeazyMain.LOGGER.log(LogLevel.ERROR, translatable("meazy:file.unsupported_extension", extension))
             return null
         }
 
         MeazyMain.LOGGER.log(
             LogLevel.INFO,
-            Text.translatable("meazy:commands.compile.compiling", file.absolutePath)
+            translatable("meazy:commands.compile.compiling", file.absolutePath)
         )
         val startCompileMillis = System.currentTimeMillis()
 
@@ -61,14 +62,14 @@ class CompileAndRunCommand : AbstractCommand(
         val endCompileMillis = System.currentTimeMillis()
         MeazyMain.LOGGER.log(
             LogLevel.INFO,
-            Text.translatable("meazy:commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
+            translatable("meazy:commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
         )
 
-        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.absolutePath))
+        MeazyMain.LOGGER.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
         val startRunMillis = System.currentTimeMillis()
         Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue().run(classes)
 
         val endRunMillis = System.currentTimeMillis()
-        return Text.translatable("meazy:commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)
+        return translatable("meazy:commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)
     }
 }

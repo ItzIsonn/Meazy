@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.pasing_function;
 
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
@@ -33,7 +33,7 @@ public final class ParsingHelper {
 
             if (modifier == null) {
                 if (modifiers.isEmpty()) return modifiers;
-                throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.modifier.doesnt_exist", id));
+                throw new InvalidStatementException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.modifier.doesnt_exist", id));
             }
 
             parser.next();
@@ -59,7 +59,7 @@ public final class ParsingHelper {
     public static List<ParameterExpression> parseParameters(ParsingContext context) {
         Parser parser = context.getParser();
 
-        parser.getCurrentAndNext(TokenTypes.LEFT_PARENTHESIS(), Text.translatable("meazy:parser.expected.start_expression", "left_parenthesis", "parameters"));
+        parser.getCurrentAndNext(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start_expression", "left_parenthesis", "parameters"));
         List<ParameterExpression> parameters = new ArrayList<>();
 
         if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_PARENTHESIS())) {
@@ -71,13 +71,13 @@ public final class ParsingHelper {
             }
         }
 
-        parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy:parser.expected.end_expression", "right_parenthesis", "parameters"));
+        parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.end_expression", "right_parenthesis", "parameters"));
         return parameters;
     }
 
     public static List<Expression> parseArgs(ParsingContext context) {
         Parser parser = context.getParser();
-        parser.getCurrentAndNext(TokenTypes.LEFT_PARENTHESIS(), Text.translatable("meazy:parser.expected.start_expression", "left_parenthesis", "args"));
+        parser.getCurrentAndNext(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start_expression", "left_parenthesis", "args"));
         List<Expression> args = new ArrayList<>();
 
         if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_PARENTHESIS())) {
@@ -89,7 +89,7 @@ public final class ParsingHelper {
             }
         }
 
-        parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), Text.translatable("meazy:parser.expected.end_expression", "right_parenthesis", "args"));
+        parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.end_expression", "right_parenthesis", "args"));
         return args;
     }
 
@@ -99,7 +99,7 @@ public final class ParsingHelper {
 
         if (parser.getCurrent().getType().equals(TokenTypes.COLON())) {
             parser.getCurrentAndNext();
-            String dataTypeId = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected.after", "id", "colon")).getValue();
+            String dataTypeId = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after", "id", "colon")).getValue();
 
             if (parser.getCurrent().getType().equals(TokenTypes.QUESTION())) {
                 parser.getCurrentAndNext();
@@ -116,12 +116,12 @@ public final class ParsingHelper {
         Parser parser = context.getParser();
 
         List<LocalStatement> body = new ArrayList<>();
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy:parser.expected", "new_line"));
+        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
         parser.moveOverOptionalNewLines();
 
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             body.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
-            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy:parser.expected", "new_line"));
+            parser.getCurrentAndNext(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
         }
 
@@ -132,8 +132,8 @@ public final class ParsingHelper {
         Parser parser = context.getParser();
         Token token = parser.getCurrent();
 
-        String value = parser.getCurrentAndNext(TokenTypes.STRING(), Text.translatable("meazy:parser.expected", "string")).getValue();
-        if (!value.endsWith("\"")) throw new InvalidStatementException(token.getLine(), Text.translatable("meazy:parser.exception.string_quote_not_closed", value.substring(1)));
+        String value = parser.getCurrentAndNext(TokenTypes.STRING(), TextKt.translatable("meazy:parser.expected", "string")).getValue();
+        if (!value.endsWith("\"")) throw new InvalidStatementException(token.getLine(), TextKt.translatable("meazy:parser.exception.string_quote_not_closed", value.substring(1)));
         return value.substring(1, value.length() - 1);
     }
 }

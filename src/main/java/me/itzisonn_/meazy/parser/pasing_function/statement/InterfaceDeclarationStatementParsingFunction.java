@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ParsingContext;
@@ -25,8 +25,8 @@ public class InterfaceDeclarationStatementParsingFunction extends AbstractParsin
         Parser parser = context.getParser();
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
 
-        parser.getCurrentAndNext(TokenTypes.INTERFACE(), Text.translatable("meazy:parser.expected.keyword", "interface"));
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected.after_keyword", "id", "interface")).getValue();
+        parser.getCurrentAndNext(TokenTypes.INTERFACE(), TextKt.translatable("meazy:parser.expected.keyword", "interface"));
+        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "interface")).getValue();
 
         List<Statement> generatedBody = new ArrayList<>();
 
@@ -35,7 +35,7 @@ public class InterfaceDeclarationStatementParsingFunction extends AbstractParsin
         if (parser.getCurrent().getType().equals(TokenTypes.COLON())) {
             do {
                 parser.next();
-                baseClasses.add(parser.getCurrentAndNext(TokenTypes.ID(), Text.translatable("meazy:parser.expected", "id")).getValue());
+                baseClasses.add(parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue());
             }
             while (parser.getCurrent().getType().equals(TokenTypes.COMMA()));
         }
@@ -44,14 +44,14 @@ public class InterfaceDeclarationStatementParsingFunction extends AbstractParsin
             return new InterfaceDeclarationStatement(modifiers, id, baseClasses, generatedBody);
         }
 
-        parser.next(TokenTypes.LEFT_BRACE(), Text.translatable("meazy:parser.expected.start", "left_brace", "interface_body"));
+        parser.next(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "interface_body"));
 
         if (parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
             parser.next();
             return new InterfaceDeclarationStatement(modifiers, id, baseClasses, generatedBody);
         }
 
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), Text.translatable("meazy:parser.expected", "new_line"));
+        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
         parser.moveOverOptionalNewLines();
 
         List<Statement> body = new ArrayList<>(generatedBody);
@@ -61,7 +61,7 @@ public class InterfaceDeclarationStatementParsingFunction extends AbstractParsin
             parser.moveOverOptionalNewLines();
         }
 
-        parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "interface_body"));
+        parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "interface_body"));
         return new InterfaceDeclarationStatement(modifiers, id, baseClasses, body);
     }
 }

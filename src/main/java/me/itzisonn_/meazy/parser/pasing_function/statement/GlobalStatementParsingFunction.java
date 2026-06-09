@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.pasing_function.statement;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
@@ -39,6 +39,6 @@ public class GlobalStatementParsingFunction extends AbstractParsingFunction<Stat
             return parser.parse(MeazyMain.getDefaultIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
         }
 
-        throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.global_statement"));
+        throw new InvalidStatementException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.global_statement"));
     }
 }

@@ -5,11 +5,10 @@ import me.itzisonn_.meazy.datagen.DatagenDeserializers;
 import me.itzisonn_.meazy.command.AbstractCommand;
 import me.itzisonn_.meazy.command.Commands;
 import me.itzisonn_.meazy.datagen.DatagenManager;
-import me.itzisonn_.meazy.lang.Language;
-import me.itzisonn_.meazy.lang.file_provider.LanguageFileProvider;
-import me.itzisonn_.meazy.lang.bundle.BundleManager;
-import me.itzisonn_.meazy.lang.file_provider.LanguageFileProviderImpl;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.Language;
+import me.itzisonn_.meazy.text.TextKt;
+import me.itzisonn_.meazy.text.TranslationsBundle;
+import me.itzisonn_.meazy.text.Text;
 import me.itzisonn_.meazy.lexer.TokenType;
 import me.itzisonn_.meazy.lexer.TokenTypeSet;
 import me.itzisonn_.meazy.util.logger.LogLevel;
@@ -25,11 +24,6 @@ import java.util.Arrays;
 public final class MeazyMain {
     public static final Version VERSION = Version.of("3.0");
     public static final Logger LOGGER = new Logger("meazy");
-
-    public static final LanguageFileProvider MEAZY_LANGUAGE_FILE_PROVIDER = new LanguageFileProviderImpl("meazy", MeazyMain.class.getClassLoader()::getResourceAsStream);
-    public static final BundleManager BUNDLE_MANAGER = new BundleManager(MEAZY_LANGUAGE_FILE_PROVIDER);
-
-    public static final SettingsManager SETTINGS_MANAGER = new SettingsManager();
 
     /**
      * Regex used by all identifiers
@@ -55,29 +49,29 @@ public final class MeazyMain {
 
         AbstractCommand command = Commands.INSTANCE.getByName(args[0]);
         if (command == null) {
-            LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:commands.unknown", args[0]));
+            LOGGER.log(LogLevel.ERROR, TextKt.translatable("meazy:commands.unknown", args[0]));
             showAvailableCommandsList();
             return;
         }
 
         String[] commandArgs = Arrays.copyOfRange(args, 1, args.length);
         if (commandArgs.length != command.getArgs().size()) {
-            LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:commands.invalid_args", command.getArgs().size(), commandArgs.length));
+            LOGGER.log(LogLevel.ERROR, TextKt.translatable("meazy:commands.invalid_args", command.getArgs().size(), commandArgs.length));
             return;
         }
 
         Text log = command.execute(commandArgs);
         if (log != null) {
-            LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.loaded_info", ((double) endLoadMillis - (double) startLoadMillis) / 1000).append(Text.literal(". ")).append(log));
+            LOGGER.log(LogLevel.INFO, TextKt.translatable("meazy:commands.loaded_info", ((double) endLoadMillis - (double) startLoadMillis) / 1000).append(TextKt.literal(". ")).append(log));
         }
     }
 
     private static void showAvailableCommandsList() {
-        LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.available"));
+        LOGGER.log(LogLevel.INFO, TextKt.translatable("meazy:commands.available"));
 
         for (RegistryEntry<AbstractCommand> entry : Registries.COMMANDS.getEntries()) {
             AbstractCommand command = entry.getValue();
-            LOGGER.log(LogLevel.INFO, Text.literal("    " + command.getName() + " " + String.join(" ", command.getArgs().stream().map(arg -> "<" + arg + ">").toList())));
+            LOGGER.log(LogLevel.INFO, TextKt.literal("    " + command.getName() + " " + String.join(" ", command.getArgs().stream().map(arg -> "<" + arg + ">").toList())));
         }
     }
 
@@ -89,10 +83,10 @@ public final class MeazyMain {
 
         Registries.INIT();
 
-        String stringLanguage = SETTINGS_MANAGER.getSettings().getLanguage();
+        String stringLanguage = SettingsManager.INSTANCE.getSettings().getLanguage();
         RegistryEntry<Language> languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage);
-        if (languagesEntry == null) LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:settings.unknown_language", stringLanguage));
-        else BUNDLE_MANAGER.setLanguage(languagesEntry.getValue());
+        if (languagesEntry == null) LOGGER.log(LogLevel.ERROR, TextKt.translatable("meazy:settings.unknown_language", stringLanguage));
+        else TranslationsBundle.INSTANCE.setLanguage(languagesEntry.getValue());
 
         DatagenManager meazyDatagenManager = new DatagenManager();
 

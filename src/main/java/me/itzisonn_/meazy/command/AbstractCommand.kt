@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.command
 
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.lang.text.Text
+import me.itzisonn_.meazy.text.Text
 import me.itzisonn_.meazy.registry.Registries
 
 /**

@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.pasing_function.statement;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.UnexpectedTokenException;
@@ -46,7 +46,7 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
                 break;
             }
 
-            parser.next(TokenTypes.NEW_LINE(),  Text.translatable("meazy:parser.expected", "new_line"));
+            parser.next(TokenTypes.NEW_LINE(),  TextKt.translatable("meazy:parser.expected", "new_line"));
             parser.moveOverOptionalNewLines();
 
             body.add(headerStatement);
@@ -58,7 +58,7 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             body.add(parser.parse(MeazyMain.getDefaultIdentifier("global_statement"), Statement.class));
 
             if (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                parser.next(TokenTypes.NEW_LINE(), Text.translatable("meazy:parser.expected", "new_line"));
+                parser.next(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
                 parser.moveOverOptionalNewLines();
             }
         }

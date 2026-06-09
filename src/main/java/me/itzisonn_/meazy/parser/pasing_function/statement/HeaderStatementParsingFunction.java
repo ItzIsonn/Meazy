@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.parser.Parser;
@@ -26,6 +26,6 @@ public class HeaderStatementParsingFunction extends AbstractParsingFunction<Stat
             return parser.parse(MeazyMain.getDefaultIdentifier("import_statement"), ImportStatement.class);
         }
 
-        throw new UnexpectedTokenException(parser.getCurrent().getLine(), Text.literal("Expected header statement")); //TODO;
+        throw new UnexpectedTokenException(parser.getCurrent().getLine(), TextKt.literal("Expected header statement")); //TODO;
     }
 }

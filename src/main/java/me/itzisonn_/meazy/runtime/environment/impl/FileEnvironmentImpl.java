@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
@@ -93,7 +93,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
     public void declareClass(ClassEnvironment classEnvironment) {
         for (ClassEnvironment otherEnvironment : getClasses()) {
             if (otherEnvironment.getId().equals(classEnvironment.getId())) {
-                throw new EvaluationException(Text.translatable("meazy:runtime.class.already_exists", classEnvironment.getId()));
+                throw new EvaluationException(TextKt.translatable("meazy:runtime.class.already_exists", classEnvironment.getId()));
             }
         }
 

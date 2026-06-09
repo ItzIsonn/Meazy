@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypeSets;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.statement.*;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
@@ -37,7 +37,7 @@ public class LocalStatementParsingFunction extends AbstractParsingFunction<Local
         if (parser.getCurrent().getType().equals(TokenTypes.VARIABLE())) {
             return parser.parse(MeazyMain.getDefaultIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
         }
-        if (!modifiers.isEmpty()) throw new InvalidSyntaxException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.modifier.unexpected"));
+        if (!modifiers.isEmpty()) throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.modifier.unexpected"));
 
         if (parser.getCurrent().getType().equals(TokenTypes.IF())) return parser.parse(MeazyMain.getDefaultIdentifier("if_statement"), IfStatement.class);
         if (parser.getCurrent().getType().equals(TokenTypes.FOR())) return parser.parse(MeazyMain.getDefaultIdentifier("foreach_statement"), ForeachStatement.class);
@@ -60,7 +60,7 @@ public class LocalStatementParsingFunction extends AbstractParsingFunction<Local
             case CallExpression callExpression -> callExpression;
             case MemberExpression memberExpression -> memberExpression;
             case OperatorExpression operatorExpression when operatorExpression.getOperator().getOperatorType() != OperatorType.INFIX -> operatorExpression;
-            default -> throw new InvalidStatementException(parser.getCurrent().getLine(), Text.translatable("meazy:parser.exception.statement"));
+            default -> throw new InvalidStatementException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.statement"));
         };
     }
 }

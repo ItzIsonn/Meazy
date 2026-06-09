@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
@@ -28,7 +28,7 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         Parser parser = context.getParser();
 
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
-        parser.next(TokenTypes.CONSTRUCTOR(), Text.translatable("meazy:parser.expected.keyword", "constructor"));
+        parser.next(TokenTypes.CONSTRUCTOR(), TextKt.translatable("meazy:parser.expected.keyword", "constructor"));
 
         List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
 
@@ -36,9 +36,9 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
             return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());
         }
 
-        parser.next(TokenTypes.LEFT_BRACE(), Text.translatable("meazy:parser.expected.start", "left_brace", "constructor_body"));
+        parser.next(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "constructor_body"));
         List<LocalStatement> body = ParsingHelper.parseBody(context);
-        parser.next(TokenTypes.RIGHT_BRACE(), Text.translatable("meazy:parser.expected.end", "right_brace", "constructor_body"));
+        parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "constructor_body"));
 
         return new ConstructorDeclarationStatement(modifiers, parameters, body);
     }

@@ -52,6 +52,7 @@ class DatagenManager {
         val result = mutableSetOf<T>()
 
         val gson = GsonBuilder().registerTypeAdapter(cls, deserializer).create()
+        @Suppress("UNCHECKED_CAST")
         val typeToken = TypeToken.getParameterized(MutableSet::class.java, cls) as TypeToken<MutableSet<T>>
 
         for (lines in getDatagenFilesLines(folderPath)) {

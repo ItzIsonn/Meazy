@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.parser.pasing_function.expression;
 import me.itzisonn_.meazy.MeazyMain;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lang.text.Text;
+import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.Parser;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreationExpression;
@@ -32,11 +32,11 @@ public class ListCreationExpressionParsingFunction extends AbstractParsingFuncti
                 list.add(parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class));
 
                 if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) {
-                    parser.getCurrentAndNext(TokenTypes.COMMA(), Text.translatable("meazy:parser.expected.separator_expression", "comma", "list_creation"));
+                    parser.getCurrentAndNext(TokenTypes.COMMA(), TextKt.translatable("meazy:parser.expected.separator_expression", "comma", "list_creation"));
                 }
             }
 
-            parser.getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), Text.translatable("meazy:parser.expected.end_expression", "right_bracket", "list_creation"));
+            parser.getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), TextKt.translatable("meazy:parser.expected.end_expression", "right_bracket", "list_creation"));
 
             return new ListCreationExpression(list);
         }
