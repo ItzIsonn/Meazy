@@ -7,9 +7,10 @@ import java.util.*
 
 /**
  * Logger for [Text] messages
- * @param id Id
  */
-class Logger(private val id: String) {
+object Logger {
+    private val DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
+
     /**
      * Logs text with given level to console
      * 
@@ -19,10 +20,6 @@ class Logger(private val id: String) {
     fun log(level: LogLevel, text: Text) {
         val time = LocalDateTime.now().format(DATE_TIME_FORMATTER)
         val levelString = level.id.uppercase(Locale.getDefault())
-        println("$time [$levelString] $id: $text")
-    }
-
-    companion object {
-        private val DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
+        println("$time $levelString: $text")
     }
 }

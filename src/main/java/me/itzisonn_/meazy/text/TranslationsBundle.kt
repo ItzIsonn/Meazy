@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.util.FileUtils
 import me.itzisonn_.meazy.util.logger.LogLevel
+import me.itzisonn_.meazy.util.logger.Logger
 import java.io.IOException
 
 /**
@@ -64,7 +65,7 @@ object TranslationsBundle {
 
         translations.keys.removeIf { key ->
             val remove = !key.matches("[a-zA-Z_.]+".toRegex())
-            if (remove) MeazyMain.LOGGER.log(
+            if (remove) Logger.log(
                 LogLevel.WARNING,
                 literal(
                     "Key with id {0} was removed from translation bundle because of invalid format",
