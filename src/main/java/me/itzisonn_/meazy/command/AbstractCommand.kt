@@ -22,32 +22,23 @@ abstract class AbstractCommand(name: String, args: List<String>) {
     /**
      * List of args names
      */
-    private val args: List<String>
+    private val _args: List<String>
+    val args get() = _args.toList()
 
     init {
         require(name.matches(MeazyMain.IDENTIFIER_REGEX.toRegex())) { "Invalid command's name" }
-        require(
-            !(!args.isEmpty() && args.stream()
-                .allMatch { arg: String? -> arg!!.matches(MeazyMain.IDENTIFIER_REGEX.toRegex()) })
-        ) { "Invalid arg's name" }
+        require(args.all { it.matches(MeazyMain.IDENTIFIER_REGEX.toRegex()) }) { "Invalid arg's name" }
 
         this.name = name
-        this.args = args
+        this._args = args
     }
 
     /**
      * Executes this command with given args.
-     * Args' amount matches [AbstractCommand.args]' size
+     * Args' amount matches [AbstractCommand._args]' size
      * 
      * @param args Args
      * @return Success message that will be logged or null
      */
     abstract fun execute(vararg args: String): Text?
-
-    /**
-     * @return Copy of args names
-     */
-    fun getArgs(): List<String> {
-        return args.toList()
-    }
 }

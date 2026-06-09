@@ -7,15 +7,13 @@ import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.util.FileUtils.getExtension
 import me.itzisonn_.meazy.util.FileUtils.getLines
 import me.itzisonn_.meazy.util.logger.LogLevel
-import org.jspecify.annotations.NullMarked
 import java.io.File
 
-@NullMarked
-class RunCommand : AbstractCommand("run", mutableListOf<String>("<target_file>")) {
+class RunCommand : AbstractCommand("run", listOf("target_file")) {
     override fun execute(vararg args: String): Text? {
         val file = File(args[0])
         if (file.isDirectory() || !file.exists()) {
-            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.getAbsolutePath()))
+            MeazyMain.LOGGER.log(LogLevel.ERROR, Text.translatable("meazy:file.doesnt_exist", file.absolutePath))
             return null
         }
 
@@ -25,7 +23,7 @@ class RunCommand : AbstractCommand("run", mutableListOf<String>("<target_file>")
             return null
         }
 
-        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.getAbsolutePath()))
+        MeazyMain.LOGGER.log(LogLevel.INFO, Text.translatable("meazy:commands.run.running", file.absolutePath))
         val startMillis = System.currentTimeMillis()
 
         val tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(getLines(file))
