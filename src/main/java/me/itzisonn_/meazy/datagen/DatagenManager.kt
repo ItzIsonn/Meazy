@@ -11,11 +11,12 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.toPath
 import kotlin.io.path.walk
+import kotlin.reflect.KClass
 
 /**
  * Provides methods for working with datagen
  */
-class DatagenManager {
+object DatagenManager {
     /**
      * Gets all lines inside folder with given folderPath and deserializes them using given deserializer. Accepts only single value in JSON
      *
@@ -26,12 +27,12 @@ class DatagenManager {
      * @return Set of all values inside folder with given folderPath
      * @param T Type of deserialized values
      */
-    fun <T> getDeserializedSingle(folderPath: String, cls: Class<T>, deserializer: JsonDeserializer<T>): Set<T> {
+    fun <T : Any> getDeserializedSingle(folderPath: String, cls: KClass<T>, deserializer: JsonDeserializer<T>): Set<T> {
         val result = mutableSetOf<T>()
-        val gson = GsonBuilder().registerTypeAdapter(cls, deserializer).create()
+        val gson = GsonBuilder().registerTypeAdapter(cls.java, deserializer).create()
 
         for (lines in getDatagenFilesLines(folderPath)) {
-            val value = gson.fromJson(lines, cls)
+            val value = gson.fromJson(lines, cls.java)
             result.add(value)
         }
 
@@ -48,16 +49,16 @@ class DatagenManager {
      * @return Set of all values inside folder with given folderPath
      * @param T Type of deserialized values
      */
-    fun <T> getDeserializedMultiple(folderPath: String, cls: Class<T>, deserializer: JsonDeserializer<T>): Set<T> {
+    fun <T : Any> getDeserializedMultiple(folderPath: String, cls: KClass<T>, deserializer: JsonDeserializer<T>): Set<T> {
         val result = mutableSetOf<T>()
 
-        val gson = GsonBuilder().registerTypeAdapter(cls, deserializer).create()
+        val gson = GsonBuilder().registerTypeAdapter(cls.java, deserializer).create()
         @Suppress("UNCHECKED_CAST")
-        val typeToken = TypeToken.getParameterized(MutableSet::class.java, cls) as TypeToken<MutableSet<T>>
+        val typeToken = TypeToken.getParameterized(MutableSet::class.java, cls.java) as TypeToken<MutableSet<T>>
 
         for (lines in getDatagenFilesLines(folderPath)) {
             try {
-                val value = gson.fromJson(lines, cls)
+                val value = gson.fromJson(lines, cls.java)
                 result.add(value)
             }
             catch (_: JsonSyntaxException) {

@@ -1,115 +1,113 @@
-package me.itzisonn_.meazy;
+package me.itzisonn_.meazy
 
-import lombok.Getter;
-import me.itzisonn_.meazy.datagen.DatagenDeserializers;
-import me.itzisonn_.meazy.command.AbstractCommand;
-import me.itzisonn_.meazy.command.Commands;
-import me.itzisonn_.meazy.datagen.DatagenManager;
-import me.itzisonn_.meazy.text.Language;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.text.TranslationsBundle;
-import me.itzisonn_.meazy.text.Text;
-import me.itzisonn_.meazy.lexer.TokenType;
-import me.itzisonn_.meazy.lexer.TokenTypeSet;
-import me.itzisonn_.meazy.util.logger.LogLevel;
-import me.itzisonn_.meazy.util.logger.Logger;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.settings.SettingsManager;
-import me.itzisonn_.meazy.version.Version;
-import me.itzisonn_.registry.RegistryEntry;
-import me.itzisonn_.registry.RegistryIdentifier;
+import me.itzisonn_.meazy.command.Commands.getByName
+import me.itzisonn_.meazy.datagen.DatagenDeserializers
+import me.itzisonn_.meazy.datagen.DatagenManager
+import me.itzisonn_.meazy.lexer.TokenType
+import me.itzisonn_.meazy.lexer.TokenTypeSet
+import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.settings.SettingsManager.settings
+import me.itzisonn_.meazy.text.TranslationsBundle
+import me.itzisonn_.meazy.text.literal
+import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.logger.LogLevel
+import me.itzisonn_.meazy.util.logger.Logger
+import me.itzisonn_.meazy.version.Version
+import me.itzisonn_.registry.RegistryIdentifier
 
-import java.util.Arrays;
-
-public final class MeazyMain {
-    public static final Version VERSION = Version.of("3.0");
+object MeazyMain {
+    val VERSION = Version.of("3.0")
 
     /**
      * Regex used by all identifiers
      */
-    public static final String IDENTIFIER_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*";
+    const val IDENTIFIER_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*"
 
-    @Getter
-    private static boolean isInitialized = false;
+    var isInitialized = false
+        private set
 
-    private MeazyMain() {}
+    @JvmStatic
+    fun main(vararg args: String) {
+        val startLoadMillis = System.currentTimeMillis()
+        initialize()
+        val endLoadMillis = System.currentTimeMillis()
 
-
-
-    static void main(String[] args) {
-        long startLoadMillis = System.currentTimeMillis();
-        INITIALIZE();
-        long endLoadMillis = System.currentTimeMillis();
-
-        if (args.length == 0) {
-            showAvailableCommandsList();
-            return;
+        if (args.isEmpty()) {
+            showAvailableCommandsList()
+            return
         }
 
-        AbstractCommand command = Commands.INSTANCE.getByName(args[0]);
+        val command = getByName(args[0])
         if (command == null) {
-            Logger.INSTANCE.log(LogLevel.ERROR, TextKt.translatable("meazy:commands.unknown", args[0]));
-            showAvailableCommandsList();
-            return;
+            Logger.log(LogLevel.ERROR, translatable("meazy:commands.unknown", args[0]))
+            showAvailableCommandsList()
+            return
         }
 
-        String[] commandArgs = Arrays.copyOfRange(args, 1, args.length);
-        if (commandArgs.length != command.getArgs().size()) {
-            Logger.INSTANCE.log(LogLevel.ERROR, TextKt.translatable("meazy:commands.invalid_args", command.getArgs().size(), commandArgs.length));
-            return;
+        val commandArgs = args.copyOfRange(1, args.size)
+        if (commandArgs.size != command.args.size) {
+            Logger.log(LogLevel.ERROR, translatable("meazy:commands.invalid_args", command.args.size, commandArgs.size))
+            return
         }
 
-        Text log = command.execute(commandArgs);
+        val log = command.execute(*commandArgs)
         if (log != null) {
-            Logger.INSTANCE.log(LogLevel.INFO, TextKt.translatable("meazy:commands.loaded_info", ((double) endLoadMillis - (double) startLoadMillis) / 1000).append(TextKt.literal(". ")).append(log));
+            Logger.log(
+                LogLevel.INFO,
+                translatable(
+                    "meazy:commands.loaded_info",
+                    (endLoadMillis.toDouble() - startLoadMillis.toDouble()) / 1000
+                ).append(literal(". ")).append(log)
+            )
         }
     }
 
-    private static void showAvailableCommandsList() {
-        Logger.INSTANCE.log(LogLevel.INFO, TextKt.translatable("meazy:commands.available"));
+    private fun showAvailableCommandsList() {
+        Logger.log(LogLevel.INFO, translatable("meazy:commands.available"))
 
-        for (RegistryEntry<AbstractCommand> entry : Registries.COMMANDS.getEntries()) {
-            AbstractCommand command = entry.getValue();
-            Logger.INSTANCE.log(LogLevel.INFO, TextKt.literal("    " + command.getName() + " " + String.join(" ", command.getArgs().stream().map(arg -> "<" + arg + ">").toList())));
+        for (entry in Registries.COMMANDS.entries) {
+            val command = entry.getValue()
+            Logger.log(
+                LogLevel.INFO,
+                literal("    {0} {1}", command.name, command.args.joinToString(" ") { "<$it>" })
+            )
         }
     }
 
 
+    fun initialize() {
+        check(!isInitialized) { "MeazyMain have already been initialized" }
+        isInitialized = true
 
-    public static void INITIALIZE() {
-        if (isInitialized) throw new IllegalStateException("MeazyMain have already been initialized");
-        isInitialized = true;
+        Registries.INIT()
 
-        Registries.INIT();
+        val stringLanguage = settings.language
+        val languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage)
+        if (languagesEntry == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
+        else TranslationsBundle.setLanguage(languagesEntry.getValue())
 
-        String stringLanguage = SettingsManager.INSTANCE.getSettings().getLanguage();
-        RegistryEntry<Language> languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage);
-        if (languagesEntry == null) Logger.INSTANCE.log(LogLevel.ERROR, TextKt.translatable("meazy:settings.unknown_language", stringLanguage));
-        else TranslationsBundle.INSTANCE.setLanguage(languagesEntry.getValue());
-
-        DatagenManager meazyDatagenManager = new DatagenManager();
-
-        for (TokenType tokenType : meazyDatagenManager.getDeserializedMultiple("token_type", TokenType.class, DatagenDeserializers.INSTANCE.getTokenTypeDeserializer())) {
-            Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.getId()), tokenType);
+        for (tokenType in DatagenManager.getDeserializedMultiple("token_type", TokenType::class, DatagenDeserializers.tokenTypeDeserializer)) {
+            Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.getId()), tokenType)
         }
 
-        for (TokenTypeSet tokenTypeSet : meazyDatagenManager.getDeserializedSingle("token_type_set", TokenTypeSet.class, DatagenDeserializers.getTokenTypeSetDeserializer("meazy"))) {
-            Registries.TOKEN_TYPE_SETS.register(getDefaultIdentifier(tokenTypeSet.getId()), tokenTypeSet);
+        for (tokenTypeSet in DatagenManager.getDeserializedSingle("token_type_set", TokenTypeSet::class, DatagenDeserializers.tokenTypeSetDeserializer)) {
+            Registries.TOKEN_TYPE_SETS.register(getDefaultIdentifier(tokenTypeSet.getId()), tokenTypeSet)
         }
     }
 
     /**
      * Creates new RegistryIdentifier with 'meazy' namespace
-     *
-     * @param id Identifier's id that matches {@link RegistryIdentifier#IDENTIFIER_REGEX}
+     * 
+     * @param id Identifier's id that matches [RegistryIdentifier.IDENTIFIER_REGEX]
      * @return New RegistryIdentifier
-     *
-     * @apiNote Recommended to use {@link RegistryIdentifier#of(String, String)} or {@link RegistryIdentifier#of(String)}
-     *          because 'meazy' namespace belongs to core identifiers
-     *
-     * @throws IllegalArgumentException If id doesn't match {@link RegistryIdentifier#IDENTIFIER_REGEX}
+     * 
+     * @apiNote Recommended to use [RegistryIdentifier.of] or [RegistryIdentifier.of]
+     * because 'meazy' namespace belongs to core identifiers
+     * 
+     * @throws IllegalArgumentException If id doesn't match [RegistryIdentifier.IDENTIFIER_REGEX]
      */
-    public static RegistryIdentifier getDefaultIdentifier(String id) throws IllegalArgumentException {
-        return RegistryIdentifier.of("meazy", id);
+    @JvmStatic
+    fun getDefaultIdentifier(id: String): RegistryIdentifier {
+        return RegistryIdentifier.of("meazy", id)
     }
 }
