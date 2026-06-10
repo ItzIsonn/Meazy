@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
@@ -17,7 +18,6 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @NullMarked
@@ -55,7 +55,7 @@ public class ForeachStatement implements LocalStatement {
                 ClassDesc.of("java.lang.Iterable"),
                 "iterator", 
                 MethodTypeDesc.of(ClassDesc.of("java.util.Iterator")),
-                _ -> {},
+                _ -> Unit.INSTANCE,
                 InvokeType.INTERFACE
         );
 
@@ -72,7 +72,7 @@ public class ForeachStatement implements LocalStatement {
                 ClassDesc.of("java.util.Iterator"),
                 "hasNext",
                 MethodTypeDesc.of(ConstantDescs.CD_boolean),
-                _ -> {},
+                _ -> Unit.INSTANCE,
                 InvokeType.INTERFACE
         );
         instructionsSet.gotoLabelIfEqualsZero(endLabel);
@@ -82,7 +82,7 @@ public class ForeachStatement implements LocalStatement {
                 ClassDesc.of("java.util.Iterator"),
                 "next",
                 MethodTypeDesc.of(ConstantDescs.CD_Object),
-                _ -> {},
+                _ -> Unit.INSTANCE,
                 InvokeType.INTERFACE
         );
 

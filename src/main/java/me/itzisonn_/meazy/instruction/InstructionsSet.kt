@@ -42,6 +42,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
 
+
     fun withField(id: String, type: ClassDesc, flags: MutableSet<AccessFlag>) {
         with(WithFieldInstruction(id, type, toIntFlags(flags)))
     }
@@ -63,95 +64,59 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
 
-    fun withMethod(
-        id: String,
-        methodTypeDesc: MethodTypeDesc,
-        flags: MutableSet<AccessFlag>,
-        bodyInstructions: Consumer<InstructionsSet>
-    ) {
+
+    fun withMethod(id: String, methodTypeDesc: MethodTypeDesc, flags: Set<AccessFlag>, bodyInstructions: Consumer<InstructionsSet>) {
         with(WithMethodInstruction(id, methodTypeDesc, toIntFlags(flags), bodyInstructions))
     }
 
-    fun withConstructor(
-        methodTypeDesc: MethodTypeDesc,
-        flags: MutableSet<AccessFlag>,
-        bodyInstructions: Consumer<InstructionsSet>
-    ) {
+    fun withConstructor(methodTypeDesc: MethodTypeDesc, flags: Set<AccessFlag>, bodyInstructions: Consumer<InstructionsSet>) {
         with(WithConstructorInstruction(methodTypeDesc, toIntFlags(flags), bodyInstructions))
     }
 
     fun withClass(
-        classDesc: ClassDesc,
-        superClass: ClassDesc?,
-        interfaceClasses: MutableSet<ClassDesc>,
-        flags: MutableSet<AccessFlag>,
-        attributes: MutableList<InnerClassesAttribute>,
-        classInstructions: Consumer<InstructionsSet>
+        classDesc: ClassDesc, superClass: ClassDesc?, interfaceClasses: Set<ClassDesc>,
+        flags: Set<AccessFlag>, attributes: List<InnerClassesAttribute>, classInstructions: (InstructionsSet) -> Unit
     ) {
-        with(
-            WithClassInstruction(
-                classDesc,
-                superClass,
-                interfaceClasses,
-                toIntFlags(flags),
-                attributes,
-                classInstructions
-            )
-        )
+        with(WithClassInstruction(
+            classDesc, superClass, interfaceClasses,
+            toIntFlags(flags), attributes, classInstructions
+        ))
     }
 
 
+
     fun invokeMethod(
-        owner: ClassDesc,
-        id: String,
-        methodTypeDesc: MethodTypeDesc,
-        argsInstructions: Consumer<InstructionsSet>,
-        invokeType: InvokeType
+        owner: ClassDesc, id: String, methodTypeDesc: MethodTypeDesc,
+        argsInstructions: (InstructionsSet) -> Unit, invokeType: InvokeType
     ) {
         with(InvokeMethodInstruction(owner, id, methodTypeDesc, argsInstructions, invokeType))
     }
 
-    fun invokeDynamicMethod(
-        bootstrapMethod: DirectMethodHandleDesc,
-        id: String,
-        methodTypeDesc: MethodTypeDesc,
-        vararg args: ConstantDesc
-    ) {
+    fun invokeDynamicMethod(bootstrapMethod: DirectMethodHandleDesc, id: String, methodTypeDesc: MethodTypeDesc, vararg args: ConstantDesc) {
         with(InvokeDynamicMethodInstruction(bootstrapMethod, id, methodTypeDesc, listOf(*args)))
     }
 
-    fun invokeConstructor(
-        owner: ClassDesc,
-        constructorTypeDesc: MethodTypeDesc,
-        argsInstructions: Consumer<InstructionsSet>
-    ) {
+    fun invokeConstructor(owner: ClassDesc, constructorTypeDesc: MethodTypeDesc, argsInstructions: (InstructionsSet) -> Unit) {
         with(InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, false))
     }
 
-    fun invokeSuperClass(
-        owner: ClassDesc,
-        constructorTypeDesc: MethodTypeDesc,
-        argsInstructions: Consumer<InstructionsSet>
-    ) {
+    fun invokeSuperClass(owner: ClassDesc, constructorTypeDesc: MethodTypeDesc, argsInstructions: (InstructionsSet) -> Unit) {
         with(InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, true))
     }
 
 
-    fun loadConstant(constant: ConstantDesc?) {
-        with(LoadConstantInstruction(constant))
-    }
 
-    fun loadConstant(constant: Boolean) {
-        loadConstant(Integer.valueOf(if (constant) 1 else 0) as Integer)
-    }
+    fun loadConstant(constant: Int) = with(LoadConstantInstruction(constant))
+    fun loadConstant(constant: Long) = with(LoadConstantInstruction(constant))
+    fun loadConstant(constant: Float) = with(LoadConstantInstruction(constant))
+    fun loadConstant(constant: Double) = with(LoadConstantInstruction(constant))
+    fun loadConstant(constant: Boolean) = with(LoadConstantInstruction(constant))
+    fun loadConstant(constant: String) = with(LoadConstantInstruction(constant))
+    fun loadConstant(constant: ClassDesc) = with(LoadConstantInstruction(constant))
+    fun loadNull() = with(LoadConstantInstruction())
 
-    fun loadNull() {
-        loadConstant(null)
-    }
+    fun loadThisReference() = with(LoadThisReferenceInstruction())
 
-    fun loadThisReference() {
-        with(LoadThisReferenceInstruction())
-    }
 
 
     fun getLocal(type: ClassDesc, slot: Int) {
@@ -167,6 +132,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
 
+
     fun newReferenceArray(type: ClassDesc) {
         with(NewReferenceArrayInstruction(type))
     }
@@ -174,6 +140,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     fun storeReferenceIntoArray() {
         with(StoreReferenceIntoArrayInstruction())
     }
+
 
 
     fun negateNumber(type: NumberType) {
@@ -197,6 +164,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
 
+
     fun instanceOf(target: ClassDesc) {
         with(InstanceOfInstruction(target))
     }
@@ -214,6 +182,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
 
+
     fun duplicate() {
         with(DuplicateInstruction())
     }
@@ -221,6 +190,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     fun pop() {
         with(PopInstruction())
     }
+
 
 
     fun createLabel(): Uuid {
@@ -248,6 +218,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
 
+
     fun gotoLabelIfNonNull(uuid: Uuid) {
         with(GotoLabelIfNonNullInstruction(uuid))
     }
@@ -259,6 +230,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     fun gotoLabelIfComparisonTrue(type: NumberType, operation: ComparisonOperation, uuid: Uuid) {
         with(GotoLabelIfComparisonTrueInstruction(type, operation, uuid))
     }
+
 
 
     companion object {

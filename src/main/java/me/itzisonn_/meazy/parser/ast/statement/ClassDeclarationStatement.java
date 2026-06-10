@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
@@ -137,7 +138,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
                                 bodyInstructions.invokeSuperClass(
                                         baseClass,
                                         MethodTypeDesc.of(ConstantDescs.CD_void),
-                                        _ -> {}
+                                        _ -> Unit.INSTANCE
                                 );
 
                                 for (VariableValue variableValue : classEnvironment.getVariables()) {
@@ -166,6 +167,8 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
                                 bodyInstructions.returnVoid();
                             }
                     );
+
+                    return Unit.INSTANCE;
                 }
         );
     }

@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.operator.custom;
 
+import kotlin.Unit;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.NumberType;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
@@ -46,7 +47,7 @@ public class PowerOperator extends Operator {
                 ClassDesc.of("java.lang.Math"),
                 "pow",
                 MethodTypeDesc.of(ConstantDescs.CD_double, ConstantDescs.CD_double, ConstantDescs.CD_double),
-                _ -> {},
+                _ -> Unit.INSTANCE,
                 InvokeType.STATIC
         );
     }

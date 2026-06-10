@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.expression;
 
+import kotlin.Unit;
 import kotlin.uuid.Uuid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,6 @@ import java.lang.constant.ClassDesc;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @NullMarked
@@ -85,6 +85,8 @@ public class CallExpression implements Expression, LocalStatement {
                                 }
                             }
                         }
+
+                        return Unit.INSTANCE;
                     },
                     resolvedFunction.getTarget() == null ?
                             resolvedFunction.isInterface() ? InvokeType.STATIC_INTERFACE : InvokeType.STATIC :
@@ -106,6 +108,8 @@ public class CallExpression implements Expression, LocalStatement {
                         for (Expression arg : args) {
                             arg.emit(argsInstructions, environment, this);
                         }
+
+                        return Unit.INSTANCE;
                     }
             );
         }

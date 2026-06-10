@@ -5,12 +5,11 @@ import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import java.lang.constant.ClassDesc
 import java.lang.constant.MethodTypeDesc
-import java.util.function.Consumer
 
 class InvokeConstructorInstruction(
     private val owner: ClassDesc,
     private val constructorTypeDesc: MethodTypeDesc,
-    private val argsInstructions: Consumer<InstructionsSet>,
+    private val argsInstructions: (InstructionsSet) -> Unit,
     private val isSuper: Boolean
 ) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
@@ -22,7 +21,7 @@ class InvokeConstructorInstruction(
         }
 
         val instructionsSet = InstructionsSet(bytecodeBuilders)
-        argsInstructions.accept(instructionsSet)
+        argsInstructions(instructionsSet)
 
         for (instruction in instructionsSet.instructions) {
             instruction.emit(bytecodeBuilders)

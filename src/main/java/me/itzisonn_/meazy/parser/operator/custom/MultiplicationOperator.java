@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.operator.custom;
 
+import kotlin.Unit;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
 import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation;
@@ -71,7 +72,7 @@ public class MultiplicationOperator extends Operator {
                 ConstantDescs.CD_String,
                 "repeat",
                 MethodTypeDesc.of(ConstantDescs.CD_String, ConstantDescs.CD_int),
-                _ -> {},
+                _ -> Unit.INSTANCE,
                 InvokeType.VIRTUAL
         );
     }

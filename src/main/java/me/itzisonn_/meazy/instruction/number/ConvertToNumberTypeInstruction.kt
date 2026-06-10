@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.NumberType
 import org.jspecify.annotations.NullMarked
 import java.lang.classfile.CodeBuilder
+import java.lang.classfile.TypeKind
 import java.lang.constant.MethodTypeDesc
 
 @NullMarked
@@ -19,49 +20,10 @@ class ConvertToNumberTypeInstruction(private val from: NumberType, private val t
     }
 
     private fun emitUnboxed(codeBuilder: CodeBuilder, from: NumberType, to: NumberType) {
-        when (from) {
-            NumberType.INT -> {
-                when (to) {
-                    NumberType.INT -> {}
-                    NumberType.LONG -> codeBuilder.i2l()
-                    NumberType.FLOAT -> codeBuilder.i2f()
-                    NumberType.DOUBLE -> codeBuilder.i2d()
-                    else -> error("Invalid call")
-                }
-            }
-
-            NumberType.LONG -> {
-                when (to) {
-                    NumberType.INT -> codeBuilder.l2i()
-                    NumberType.LONG -> {}
-                    NumberType.FLOAT -> codeBuilder.l2f()
-                    NumberType.DOUBLE -> codeBuilder.l2d()
-                    else -> error("Invalid call")
-                }
-            }
-
-            NumberType.FLOAT -> {
-                when (to) {
-                    NumberType.INT -> codeBuilder.f2i()
-                    NumberType.LONG -> codeBuilder.f2l()
-                    NumberType.FLOAT -> {}
-                    NumberType.DOUBLE -> codeBuilder.f2d()
-                    else -> error("Invalid call")
-                }
-            }
-
-            NumberType.DOUBLE -> {
-                when (to) {
-                    NumberType.INT -> codeBuilder.d2i()
-                    NumberType.LONG -> codeBuilder.d2l()
-                    NumberType.FLOAT -> codeBuilder.d2f()
-                    NumberType.DOUBLE -> {}
-                    else -> error("Invalid call")
-                }
-            }
-
-            else -> error("Invalid call")
-        }
+        codeBuilder.conversion(
+            TypeKind.from(from.classDesc),
+            TypeKind.from(to.classDesc)
+        )
     }
 
     private fun emitBoxedToUnboxed(codeBuilder: CodeBuilder, from: NumberType, to: NumberType) {

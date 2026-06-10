@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.expression.collection_creation;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
@@ -28,7 +29,10 @@ public class ListCreationExpression implements Expression {
         instructionsSet.invokeConstructor(
                 ClassDesc.of("java.util.ArrayList"),
                 MethodTypeDesc.of(ConstantDescs.CD_void, List.of(ClassDesc.of("java.util.Collection"))),
-                argsInstructions -> arrayListArgsInstructions(argsInstructions, environment)
+                argsInstructions -> {
+                    arrayListArgsInstructions(argsInstructions, environment);
+                    return Unit.INSTANCE;
+                }
         );
     }
 
@@ -42,7 +46,10 @@ public class ListCreationExpression implements Expression {
                 ConstantDescs.CD_List,
                 "of",
                 MethodTypeDesc.of(ConstantDescs.CD_List, ConstantDescs.CD_Object.arrayType()),
-                argsInstructions -> ofArgsInstructions(argsInstructions, environment),
+                argsInstructions -> {
+                    ofArgsInstructions(argsInstructions, environment);
+                    return Unit.INSTANCE;
+                },
                 InvokeType.STATIC_INTERFACE
         );
     }
