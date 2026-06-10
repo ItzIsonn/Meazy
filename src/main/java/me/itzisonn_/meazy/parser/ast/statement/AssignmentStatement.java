@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
+import me.itzisonn_.meazy.runtime.VariableValue;
 import me.itzisonn_.meazy.util.MiscUtils;
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;

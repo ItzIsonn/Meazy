@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
-import kotlin.uuid.Uuid;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.registry.Registries;
@@ -9,7 +8,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
+import me.itzisonn_.meazy.runtime.VariableValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -19,7 +18,6 @@ import java.lang.reflect.AccessFlag;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @NullMarked

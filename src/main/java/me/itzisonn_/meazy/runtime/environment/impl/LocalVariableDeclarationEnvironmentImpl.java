@@ -3,14 +3,14 @@ package me.itzisonn_.meazy.runtime.environment.impl;
 import kotlin.uuid.Uuid;
 import lombok.Getter;
 import lombok.Setter;
+import me.itzisonn_.meazy.runtime.VariableValueKt;
 import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
+import me.itzisonn_.meazy.runtime.VariableValue;
 import me.itzisonn_.meazy.runtime.EvaluationException;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValueImpl;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -48,7 +48,7 @@ public class LocalVariableDeclarationEnvironmentImpl extends VariableDeclaration
             parentEnvironment = localEnvironment.getParent();
         }
 
-        VariableValue variableValue = new VariableValueImpl(id, dataType, isConstant, Set.of(), slot, value, this);
+        VariableValue variableValue = VariableValueKt.VariableValue(id, dataType, isConstant, Set.of(), slot, value, this);
         variables.add(variableValue);
         return variableValue;
     }
