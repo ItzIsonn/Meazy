@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.environment.factory.impl;
 
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
-import me.itzisonn_.meazy.runtime.environment.impl.FileEnvironmentImpl;
+import me.itzisonn_.meazy.runtime.environment.FileEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.factory.FileEnvironmentFactory;
 import org.jspecify.annotations.NullMarked;
 
