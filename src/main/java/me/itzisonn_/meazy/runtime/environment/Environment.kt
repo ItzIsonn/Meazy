@@ -17,3 +17,9 @@ interface Environment {
     val fullClassName: String?
         get() = null
 }
+
+
+
+abstract class EnvironmentImpl(private val parent: Environment) : Environment {
+    override fun getParent(): Environment = parent
+}

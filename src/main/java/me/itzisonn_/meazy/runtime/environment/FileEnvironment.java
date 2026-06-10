@@ -26,9 +26,7 @@ public interface FileEnvironment extends VariableDeclarationEnvironment, Functio
     String getClassName();
 
     @Override
-    default String getFullClassName() {
-        return getPackageName() + "." + getClassName();
-    }
+    String getFullClassName();
 
 
 

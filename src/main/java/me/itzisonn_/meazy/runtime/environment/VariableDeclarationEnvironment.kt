@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.VariableValue
-import me.itzisonn_.meazy.runtime.environment.impl.EnvironmentImpl
 import me.itzisonn_.meazy.text.translatable
 import java.util.Optional
 
