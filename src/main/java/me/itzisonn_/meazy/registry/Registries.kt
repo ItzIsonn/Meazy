@@ -1,287 +1,319 @@
-package me.itzisonn_.meazy.registry;
+package me.itzisonn_.meazy.registry
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.command.AbstractCommand;
-import me.itzisonn_.meazy.command.Commands;
-import me.itzisonn_.meazy.instruction.Instruction;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.text.Language;
-import me.itzisonn_.meazy.lexer.*;
-import me.itzisonn_.meazy.parser.*;
-import me.itzisonn_.meazy.instruction.BytecodeBuilders;
-import me.itzisonn_.meazy.parser.ast.program.ProgramFactory;
-import me.itzisonn_.meazy.parser.ast.program.impl.ProgramFactoryImpl;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.parser.operator.Operators;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions;
-import me.itzisonn_.meazy.runtime.ClassLoaderWrapper;
-import me.itzisonn_.meazy.runtime.RunProgramFunction;
-import me.itzisonn_.meazy.runtime.environment.factory.*;
-import me.itzisonn_.meazy.runtime.environment.factory.impl.*;
-import me.itzisonn_.registry.RegistryEntry;
-import me.itzisonn_.meazy.parser.ast.program.Program;
-import me.itzisonn_.registry.multiple_entry.OrderedRegistry;
-import me.itzisonn_.registry.multiple_entry.SetRegistry;
-import me.itzisonn_.registry.single_entry.SingleEntryRegistry;
-import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl;
-import me.itzisonn_.meazy.runtime.environment.*;
-
-import java.lang.constant.ClassDesc;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.regex.Matcher;
+import me.itzisonn_.meazy.MeazyMain
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.command.Commands
+import me.itzisonn_.meazy.command.AbstractCommand
+import me.itzisonn_.meazy.instruction.BytecodeBuilders
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.lexer.*
+import me.itzisonn_.meazy.parser.*
+import me.itzisonn_.meazy.parser.ast.program.Program
+import me.itzisonn_.meazy.parser.ast.program.ProgramFactory
+import me.itzisonn_.meazy.parser.ast.program.impl.ProgramFactoryImpl
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions
+import me.itzisonn_.meazy.registry.Registries.PARSING_FUNCTIONS
+import me.itzisonn_.meazy.registry.Registries.TOKEN_TYPES
+import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
+import me.itzisonn_.meazy.runtime.RunProgramFunction
+import me.itzisonn_.meazy.runtime.environment.factory.*
+import me.itzisonn_.meazy.runtime.environment.factory.impl.*
+import me.itzisonn_.meazy.text.Language
+import me.itzisonn_.registry.multiple_entry.OrderedRegistry
+import me.itzisonn_.registry.multiple_entry.SetRegistry
+import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl
+import java.lang.reflect.InvocationTargetException
 
 /**
  * All basic Registries
  */
-public final class Registries {
-    private static boolean isInit = false;
-
-    private Registries() {}
-
-
+object Registries {
+    private var isInit = false
 
     /**
      * Registry for all Languages
-     *
+     * 
      * @see Language
      */
-    public static final LanguageRegistry LANGUAGES = new LanguageRegistry();
+    val LANGUAGES = LanguageRegistry()
 
 
 
     /**
      * Registry for all Commands
-     *
+     * 
      * @see AbstractCommand
      */
-    public static final CommandRegistry COMMANDS = new CommandRegistry();
+    val COMMANDS = CommandRegistry()
 
 
 
     /**
      * Registry for all TokenTypes
      */
-    public static final SetRegistry<TokenType> TOKEN_TYPES = new SetRegistry<>();
+    val TOKEN_TYPES = SetRegistry<TokenType>()
 
     /**
      * Registry for all TokenTypesSets
      */
-    public static final SetRegistry<TokenTypeSet> TOKEN_TYPE_SETS = new SetRegistry<>();
+    val TOKEN_TYPE_SETS = SetRegistry<TokenTypeSet>()
 
     /**
      * Registry for tokenization function that is used to tokenize given string
-     *
+     * 
      * @see Token
-     * @see Registries#TOKEN_TYPES
+     * @see TOKEN_TYPES
      */
-    public static final SingleEntryRegistry<TokenizationFunction> TOKENIZATION_FUNCTION = new SingleEntryRegistryImpl<>();
+    val TOKENIZATION_FUNCTION = SingleEntryRegistryImpl<TokenizationFunction>()
 
 
 
     /**
      * Registry for all Modifiers
      */
-    public static final SetRegistry<Modifier> MODIFIERS = new SetRegistry<>();
+    @JvmField
+    val MODIFIERS = SetRegistry<Modifier>()
 
     /**
      * Registry for all Operators
      */
-    public static final OperatorRegistry OPERATORS = new OperatorRegistry();
+    @JvmField
+    val OPERATORS = OperatorRegistry()
 
     /**
      * Registry for all ParsingFunctions
-     *
+     * 
      * @see ParsingFunction
      * @see Parser
      */
-    public static final OrderedRegistry<ParsingFunction<?>> PARSING_FUNCTIONS = new OrderedRegistry<>();
+    @JvmField
+    val PARSING_FUNCTIONS = OrderedRegistry<ParsingFunction<*>>()
 
     /**
-     * Registry for function that uses {@link Registries#PARSING_FUNCTIONS} to parse tokens into {@link Program}
-     *
+     * Registry for function that uses [PARSING_FUNCTIONS] to parse tokens into [Program]
+     * 
      * @see ParsingFunction
      * @see Parser
      */
-    public static final SingleEntryRegistry<ParseTokensFunction> PARSE_TOKENS_FUNCTION = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val PARSE_TOKENS_FUNCTION = SingleEntryRegistryImpl<ParseTokensFunction>()
 
     /**
-     * Registry for {@link ProgramFactory}
+     * Registry for [ProgramFactory]
      */
-    public static final SingleEntryRegistry<ProgramFactory> PROGRAM_FACTORY = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val PROGRAM_FACTORY = SingleEntryRegistryImpl<ProgramFactory>()
 
 
 
     /**
-     * Registry for function that compiles {@link Program} to bytecode
+     * Registry for function that compiles [Program] to bytecode
      * @see CompileProgramFunction
      */
-    public static final SingleEntryRegistry<CompileProgramFunction> COMPILE_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
+    val COMPILE_PROGRAM_FUNCTION = SingleEntryRegistryImpl<CompileProgramFunction>()
 
     /**
-     * Registry for function that runs {@link Program}
+     * Registry for function that runs [Program]
      * @see RunProgramFunction
      */
-    public static final SingleEntryRegistry<RunProgramFunction> RUN_PROGRAM_FUNCTION = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val RUN_PROGRAM_FUNCTION = SingleEntryRegistryImpl<RunProgramFunction>()
 
 
 
     /**
-     * Registry for {@link GlobalEnvironmentFactory}
+     * Registry for [GlobalEnvironmentFactory]
      */
-    public static final SingleEntryRegistry<GlobalEnvironmentFactory> GLOBAL_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
-    /**
-     * Registry for {@link FileEnvironmentFactory}
-     */
-    public static final SingleEntryRegistry<FileEnvironmentFactory> FILE_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    val GLOBAL_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<GlobalEnvironmentFactory>()
 
     /**
-     * Registry for {@link ClassEnvironmentFactory}
+     * Registry for [FileEnvironmentFactory]
      */
-    public static final SingleEntryRegistry<ClassEnvironmentFactory> CLASS_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val FILE_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<FileEnvironmentFactory>()
 
     /**
-     * Registry for {@link FunctionEnvironmentFactory}
+     * Registry for [ClassEnvironmentFactory]
      */
-    public static final SingleEntryRegistry<FunctionEnvironmentFactory> FUNCTION_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val CLASS_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<ClassEnvironmentFactory>()
 
     /**
-     * Registry for {@link ConstructorEnvironmentFactory}
+     * Registry for [FunctionEnvironmentFactory]
      */
-    public static final SingleEntryRegistry<ConstructorEnvironmentFactory> CONSTRUCTOR_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val FUNCTION_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<FunctionEnvironmentFactory>()
 
     /**
-     * Registry for {@link LoopEnvironmentFactory}
+     * Registry for [ConstructorEnvironmentFactory]
      */
-    public static final SingleEntryRegistry<LoopEnvironmentFactory> LOOP_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val CONSTRUCTOR_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<ConstructorEnvironmentFactory>()
 
     /**
-     * Registry for {@link LocalVariableDeclarationEnvironmentFactory}
+     * Registry for [LoopEnvironmentFactory]
      */
-    public static final SingleEntryRegistry<LocalVariableDeclarationEnvironmentFactory> LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY = new SingleEntryRegistryImpl<>();
+    @JvmField
+    val LOOP_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<LoopEnvironmentFactory>()
+
+    /**
+     * Registry for [LocalVariableDeclarationEnvironmentFactory]
+     */
+    @JvmField
+    val LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<LocalVariableDeclarationEnvironmentFactory>()
 
 
 
     /**
      * Initializes Registries
-     * <p>
-     * <i>Don't use this method because it's called once at {@link MeazyMain} initialization</i>
-     *
+     * 
+     * 
+     * *Don't use this method because it's called once at [MeazyMain] initialization*
+     * 
      * @throws IllegalStateException If Registries has already been initialized
      */
-    public static void INIT() {
-        if (isInit) throw new IllegalStateException("Registries have already been initialized");
-        isInit = true;
+    fun init() {
+        check(!isInit) { "Registries have already been initialized" }
+        isInit = true
 
-        LANGUAGES.register(MeazyMain.getDefaultIdentifier("english"), new Language("en", "English"));
-        LANGUAGES.register(MeazyMain.getDefaultIdentifier("russian"), new Language("ru", "Русский"));
+        LANGUAGES.register(getDefaultIdentifier("english"), Language("en", "English"))
+        LANGUAGES.register(getDefaultIdentifier("russian"), Language("ru", "Русский"))
 
-        Commands.INSTANCE.register();
-        TokenTypes.INSTANCE.register();
-        Modifiers.REGISTER();
-        Operators.REGISTER();
-        ParsingFunctions.REGISTER();
+        Commands.register()
+        TokenTypes.register()
+        Modifiers.REGISTER()
+        Operators.REGISTER()
+        ParsingFunctions.REGISTER()
 
-        TOKENIZATION_FUNCTION.register(MeazyMain.getDefaultIdentifier("tokens_function"), lines -> {
-            List<Token> tokens = new ArrayList<>();
-            int lineNumber = 1;
+        TOKENIZATION_FUNCTION.register(getDefaultIdentifier("tokens_function")) { lines ->
+            val tokens = mutableListOf<Token>()
+            var lineNumber = 1
 
-            for (int i = 0; i < lines.length(); i++) {
-                String string = lines.substring(i);
-                Token token = null;
-                for (RegistryEntry<TokenType> entry : TOKEN_TYPES.getEntries()) {
-                    TokenType tokenType = entry.getValue();
-                    if (tokenType.getPattern() == null) continue;
+            var i = 0
+            while (i < lines.length) {
+                val string = lines.substring(i)
+                var token: Token? = null
 
-                    Matcher matcher = tokenType.getPattern().matcher(string);
+                for (entry in TOKEN_TYPES.getEntries()) {
+                    val tokenType: TokenType = entry.getValue()!!
+                    if (tokenType.pattern == null) continue
+
+                    val matcher = tokenType.pattern.matcher(string)
                     if (matcher.find()) {
-                        int end = matcher.end();
-                        String matched = string.substring(0, end);
-                        if (!tokenType.getCanMatch().invoke(matched)) continue;
+                        val end = matcher.end()
+                        val matched = string.substring(0, end)
+                        if (!tokenType.canMatch.invoke(matched)) continue
 
-                        if (token == null || token.getValue().length() < matched.length()) {
-                            token = new Token(lineNumber, i, end, tokenType, matched);
+                        if (token == null || token.value.length < matched.length) {
+                            token = Token(lineNumber, i, end, tokenType, matched)
                         }
                     }
                 }
 
                 if (token == null) {
-                    String errorString = string.split("\n")[0];
-                    if (errorString.length() > 20) errorString = errorString.substring(0, 20) + "...";
+                    var errorString = string.split("\n".toRegex()).dropLastWhile { it.isEmpty() }[0]
+                    if (errorString.length > 20) errorString = errorString.substring(0, 20) + "..."
 
-                    throw new UnknownTokenException(lineNumber, errorString);
+                    throw UnknownTokenException(lineNumber, errorString)
                 }
 
-                i += token.getValue().length() - 1;
-                if (!token.getType().getShouldSkip()) tokens.add(token);
+                i += token.value.length - 1
+                if (!token.type.shouldSkip) tokens.add(token)
 
-                lineNumber += token.getValue().length() - token.getValue().replace("\n", "").length();
+                lineNumber += token.value.length - token.value.replace("\n", "").length
+                i++
             }
 
-            tokens.add(new Token(lineNumber, lines.length(), lines.length(), TokenTypes.END_OF_FILE(), ""));
-            return tokens;
-        });
+            tokens.add(Token(lineNumber, lines.length, lines.length, TokenTypes.endOfFile, ""))
+            tokens
+        }
 
-        PARSE_TOKENS_FUNCTION.register(MeazyMain.getDefaultIdentifier("parse_tokens"), (file, tokens) -> {
-            ParsingContext parsingContext = new ParsingContext(tokens);
-            Parser parser = parsingContext.getParser();
-            return parser.parse(MeazyMain.getDefaultIdentifier("program"), Program.class, file);
-        });
+        PARSE_TOKENS_FUNCTION.register(getDefaultIdentifier("parse_tokens")) { file, tokens ->
+            val parsingContext = ParsingContext(tokens)
+            val parser = parsingContext.parser
 
-        COMPILE_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("compile_program"), program -> {
-            GlobalEnvironment globalEnvironment = GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue().create();
+            parser.parse(getDefaultIdentifier("program"), Program::class.java, file)
+        }
 
-            BytecodeBuilders bytecodeBuilders = BytecodeBuilders.of(null, null);
-            InstructionsSet instructionsSet = new InstructionsSet(bytecodeBuilders);
-            program.declare(globalEnvironment);
-            program.resolve(globalEnvironment);
-            program.emit(instructionsSet, globalEnvironment, null);
+        COMPILE_PROGRAM_FUNCTION.register(getDefaultIdentifier("compile_program")) { program ->
+            val globalEnvironment = GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue()!!.create()
+            val bytecodeBuilders = BytecodeBuilders.of(null, null)
+            val instructionsSet = InstructionsSet(bytecodeBuilders)
 
-            for (Instruction instruction : instructionsSet.getInstructions()) {
-                instruction.emit(bytecodeBuilders);
+            program.declare(globalEnvironment)
+            program.resolve(globalEnvironment)
+            program.emit(instructionsSet, globalEnvironment, null)
+
+            for (instruction in instructionsSet.instructions) {
+                instruction.emit(bytecodeBuilders)
             }
+            bytecodeBuilders.getClasses()
+        }
 
-            return bytecodeBuilders.getClasses();
-        });
+        RUN_PROGRAM_FUNCTION.register(getDefaultIdentifier("run_program")) { classes ->
+            val classLoader = ClassLoaderWrapper()
+            for (classDesc in classes.keys) {
+                val classFile: ByteArray = classes[classDesc]!!
 
-        RUN_PROGRAM_FUNCTION.register(MeazyMain.getDefaultIdentifier("run_program"), classes -> {
-            ClassLoaderWrapper classLoader = new ClassLoaderWrapper();
-
-            for (ClassDesc classDesc : classes.keySet()) {
-                byte[] classFile = classes.get(classDesc);
-
-                Class<?> loadedClass = classLoader.defineClass(classFile);
+                val loadedClass = classLoader.defineClass(classFile)
                 try {
-                    Method method = loadedClass.getDeclaredMethod("main");
-                    if (method.getReturnType() != void.class || method.getParameters().length != 0) {
-                        System.err.println("Main method has invalid signature in class" + classDesc); //TODO
-                        continue;
-                    }
-                    if (!method.canAccess(null)) {
-                        System.err.println("Main method is inaccessible in class " + classDesc);
-                        continue;
+                    val method = loadedClass.getDeclaredMethod("main")
+
+                    if (method.returnType != Void.TYPE || method.parameters.size != 0) {
+                        System.err.println("Main method has invalid signature in class$classDesc") //TODO
+                        continue
                     }
 
-                    method.invoke(null);
+                    if (!method.canAccess(null)) {
+                        System.err.println("Main method is inaccessible in class $classDesc")
+                        continue
+                    }
+
+                    method.invoke(null)
                 }
-                catch (NoSuchMethodException _) {
-                    System.err.println("No method main in class " + classDesc);
+                catch (`_`: NoSuchMethodException) {
+                    System.err.println("No method main in class $classDesc")
                 }
-                catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                catch (e: IllegalAccessException) {
+                    throw RuntimeException(e)
+                }
+                catch (e: InvocationTargetException) {
+                    throw RuntimeException(e)
                 }
             }
-        });
+        }
 
-        PROGRAM_FACTORY.register(MeazyMain.getDefaultIdentifier("program_factory"), new ProgramFactoryImpl());
-        GLOBAL_ENVIRONMENT_FACTORY.register(MeazyMain.getDefaultIdentifier("global_environment_factory"), new GlobalEnvironmentFactoryImpl());
-        FILE_ENVIRONMENT_FACTORY.register(MeazyMain.getDefaultIdentifier("file_environment_factory"), new FileEnvironmentFactoryImpl());
-        CLASS_ENVIRONMENT_FACTORY.register(MeazyMain.getDefaultIdentifier("class_environment_factory"), new ClassEnvironmentFactoryImpl());
-        FUNCTION_ENVIRONMENT_FACTORY.register(MeazyMain.getDefaultIdentifier("function_environment_factory"), new FunctionEnvironmentFactoryImpl());
-        CONSTRUCTOR_ENVIRONMENT_FACTORY.register(MeazyMain.getDefaultIdentifier("constructor_environment_factory"), new ConstructorEnvironmentFactoryImpl());
-        LOOP_ENVIRONMENT_FACTORY.register(MeazyMain.getDefaultIdentifier("loop_environment_factory"), new LoopEnvironmentFactoryImpl());
-        LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY.register(MeazyMain.getDefaultIdentifier("local_variable_declaration_environment_factory"), new LocalVariableDeclarationEnvironmentFactoryImpl());
+        PROGRAM_FACTORY.register(getDefaultIdentifier("program_factory"), ProgramFactoryImpl())
+        GLOBAL_ENVIRONMENT_FACTORY.register(
+            getDefaultIdentifier("global_environment_factory"),
+            GlobalEnvironmentFactoryImpl()
+        )
+        FILE_ENVIRONMENT_FACTORY.register(
+            getDefaultIdentifier("file_environment_factory"),
+            FileEnvironmentFactoryImpl()
+        )
+        CLASS_ENVIRONMENT_FACTORY.register(
+            getDefaultIdentifier("class_environment_factory"),
+            ClassEnvironmentFactoryImpl()
+        )
+        FUNCTION_ENVIRONMENT_FACTORY.register(
+            getDefaultIdentifier("function_environment_factory"),
+            FunctionEnvironmentFactoryImpl()
+        )
+        CONSTRUCTOR_ENVIRONMENT_FACTORY.register(
+            getDefaultIdentifier("constructor_environment_factory"),
+            ConstructorEnvironmentFactoryImpl()
+        )
+        LOOP_ENVIRONMENT_FACTORY.register(
+            getDefaultIdentifier("loop_environment_factory"),
+            LoopEnvironmentFactoryImpl()
+        )
+        LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY.register(
+            getDefaultIdentifier("local_variable_declaration_environment_factory"),
+            LocalVariableDeclarationEnvironmentFactoryImpl()
+        )
     }
 }
