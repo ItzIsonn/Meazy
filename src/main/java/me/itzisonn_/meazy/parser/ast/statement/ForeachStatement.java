@@ -43,7 +43,6 @@ public class ForeachStatement implements LocalStatement {
         }
 
         VariableValue iterableVariableValue = localVariableDeclarationEnvironment.declareVariable(
-                null,
                 DataType.ofNonNull(ClassDesc.of("java.lang.Iterable")),
                 true,
                 null
@@ -91,7 +90,7 @@ public class ForeachStatement implements LocalStatement {
 
         VariableValue variableValue = localVariableDeclarationEnvironment.declareVariable(id, dataType, isConstant, null);
         instructionsSet.storeLocal(variableValue.getDataType().getClassDesc(), variableValue.getSlot());
-        instructionsSet.setLocalName(variableValue.getSlot(), variableValue.getId(), variableValue.getDataType().getClassDesc(), conditionLabel, endLabel);
+        instructionsSet.setLocalName(variableValue.getSlot(), id, variableValue.getDataType().getClassDesc(), conditionLabel, endLabel);
 
         for (Statement statement : body) {
             statement.emit(instructionsSet, loopEnvironment, this);

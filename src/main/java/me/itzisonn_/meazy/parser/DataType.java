@@ -1,7 +1,5 @@
 package me.itzisonn_.meazy.parser;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
 import org.jspecify.annotations.NullMarked;
@@ -12,8 +10,6 @@ import java.lang.constant.ConstantDescs;
 /**
  * Defines which values can be stored in variables, args, etc.
  */
-@Getter
-@EqualsAndHashCode
 @NullMarked
 public final class DataType {
     /**
@@ -40,7 +36,6 @@ public final class DataType {
     }
 
 
-
     public DataType with(ClassDesc classDesc) {
         return of(classDesc, isNullable);
     }
@@ -58,7 +53,6 @@ public final class DataType {
     }
 
 
-
     public static DataType of(ClassDesc classDesc, boolean isNullable) {
         return new DataType(classDesc, isNullable);
     }
@@ -70,7 +64,6 @@ public final class DataType {
     public static DataType ofNonNull(ClassDesc classDesc) {
         return of(classDesc, false);
     }
-
 
 
     public static DataType commonOf(Environment environment, DataType dataType1, DataType dataType2) {
@@ -85,5 +78,33 @@ public final class DataType {
     public static boolean matches(Environment environment, DataType dataType, DataType target) {
         return EnvironmentUtils.isInstanceOf(environment, dataType.getClassDesc(), target.getClassDesc())
                 && (!dataType.isNullable() || target.isNullable());
+    }
+
+    public ClassDesc getClassDesc() {
+        return this.classDesc;
+    }
+
+    public boolean isNullable() {
+        return this.isNullable;
+    }
+
+    public boolean equals(final Object o) {
+        if (o == this) return true;
+        if (!(o instanceof DataType)) return false;
+        final DataType other = (DataType) o;
+        final Object this$classDesc = this.getClassDesc();
+        final Object other$classDesc = other.getClassDesc();
+        if (this$classDesc == null ? other$classDesc != null : !this$classDesc.equals(other$classDesc)) return false;
+        if (this.isNullable() != other.isNullable()) return false;
+        return true;
+    }
+
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final Object $classDesc = this.getClassDesc();
+        result = result * PRIME + ($classDesc == null ? 43 : $classDesc.hashCode());
+        result = result * PRIME + (this.isNullable() ? 79 : 97);
+        return result;
     }
 }
