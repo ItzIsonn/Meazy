@@ -16,7 +16,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
+import me.itzisonn_.meazy.runtime.VariableValue;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy.util.MiscUtils;
 import me.itzisonn_.meazy.parser.ast.statement.ClassDeclarationStatement;

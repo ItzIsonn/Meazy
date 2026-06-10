@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime.environment;
 import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
+import me.itzisonn_.meazy.runtime.VariableValue;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 

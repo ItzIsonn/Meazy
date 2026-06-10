@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
+import me.itzisonn_.meazy.runtime.VariableValueKt;
 import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -8,9 +9,8 @@ import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
+import me.itzisonn_.meazy.runtime.VariableValue;
 import me.itzisonn_.meazy.runtime.EvaluationException;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValueImpl;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -97,7 +97,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
             throw new EvaluationException(TextKt.translatable("meazy:runtime.variable.already_exists", id));
         }
 
-        VariableValue variableValue = new VariableValueImpl(id, dataType, isConstant, Set.of(), variables.size(), value, this);
+        VariableValue variableValue = VariableValueKt.VariableValue(id, dataType, isConstant, Set.of(), variables.size(), value, this);
         variables.add(variableValue);
         return variableValue;
     }

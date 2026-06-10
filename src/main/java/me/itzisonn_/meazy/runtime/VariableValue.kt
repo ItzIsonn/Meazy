@@ -1,73 +1,75 @@
-package me.itzisonn_.meazy.runtime.variable_value;
+package me.itzisonn_.meazy.runtime
 
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.util.Set;
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment
 
 /**
  * Represents runtime variable value
  */
-@NullMarked
-public interface VariableValue {
+interface VariableValue {
     /**
      * @return Id
      */
-    String getId();
+    val id: String?
 
     /**
      * @return DataType
      */
-    DataType getDataType();
+    val dataType: DataType
 
     /**
      * @return Whether value is constant
      */
-    boolean isConstant();
+    val isConstant: Boolean
 
     //TODO
-    int getSlot();
+    val slot: Int
 
-    @Nullable
-    Expression getInitializer();
+    val initializer: Expression?
 
     /**
      * @return Parent environment
      */
-    VariableDeclarationEnvironment getParentEnvironment();
+    val parentEnvironment: VariableDeclarationEnvironment
 
 
 
     /**
-     * @param target Target modifier
-     * @return Whether this runtime value has given modifier
+     * @param modifier Target modifier
+     * @return Whether this variable value has given modifier
      */
-    default boolean hasModifier(Modifier target) {
-        for (Modifier modifier : getModifiers()) {
-            if (modifier == target) return true;
-        }
-
-        return false;
-    }
+    fun hasModifier(modifier: Modifier) = modifiers.contains(modifier)
 
     /**
      * @param id Modifier's id
-     * @return Whether this runtime value has modifier with given id
+     * @return Whether this variable value has modifier with given id
      */
-    default boolean hasModifier(String id) {
-        for (Modifier modifier : getModifiers()) {
-            if (modifier.getId().equals(id)) return true;
-        }
-
-        return false;
-    }
+    fun hasModifier(id: String) = modifiers.find { it.id == id } != null
 
     /**
      * @return Modifiers
      */
-    Set<Modifier> getModifiers();
+    val modifiers: Set<Modifier>
 }
+
+
+
+private data class VariableValueImpl(
+    override val id: String?,
+    override val dataType: DataType,
+    override val isConstant: Boolean,
+    override val modifiers: Set<Modifier>,
+    override val slot: Int,
+    override val initializer: Expression?,
+    override val parentEnvironment: VariableDeclarationEnvironment
+) : VariableValue
+
+fun VariableValue(
+    id: String?, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
+    slot: Int, initializer: Expression?, parentEnvironment: VariableDeclarationEnvironment
+): VariableValue = VariableValueImpl(
+    id, dataType, isConstant, modifiers.toSet(),
+    slot, initializer, parentEnvironment
+)

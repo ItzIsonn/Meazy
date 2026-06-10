@@ -1,13 +1,13 @@
 package me.itzisonn_.meazy.runtime.environment.impl;
 
+import me.itzisonn_.meazy.runtime.VariableValueKt;
 import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValue;
+import me.itzisonn_.meazy.runtime.VariableValue;
 import me.itzisonn_.meazy.runtime.EvaluationException;
-import me.itzisonn_.meazy.runtime.variable_value.VariableValueImpl;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -30,7 +30,7 @@ public class VariableDeclarationEnvironmentImpl extends EnvironmentImpl implemen
             throw new EvaluationException(TextKt.translatable("meazy:runtime.variable.already_exists", id));
         }
 
-        VariableValue variableValue = new VariableValueImpl(id, dataType, isConstant, Set.of(), -1, value, this);
+        VariableValue variableValue = VariableValueKt.VariableValue(id, dataType, isConstant, Set.of(), -1, value, this);
         variables.add(variableValue);
         return variableValue;
     }
