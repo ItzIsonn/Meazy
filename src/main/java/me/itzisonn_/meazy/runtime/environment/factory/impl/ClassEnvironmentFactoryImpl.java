@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime.environment.factory.impl;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.impl.ClassEnvironmentImpl;
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.factory.ClassEnvironmentFactory;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

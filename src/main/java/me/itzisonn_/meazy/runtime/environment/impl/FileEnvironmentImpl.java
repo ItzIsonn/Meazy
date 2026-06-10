@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.environment.impl;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.runtime.VariableValueKt;
+import me.itzisonn_.meazy.runtime.environment.FunctionDeclarationEnvironmentImpl;
 import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;

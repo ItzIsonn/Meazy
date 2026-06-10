@@ -1,51 +1,78 @@
-package me.itzisonn_.meazy.runtime.environment;
+package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import org.jspecify.annotations.NullMarked;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.runtime.EvaluationException
+import me.itzisonn_.meazy.runtime.environment.impl.EnvironmentImpl
+import me.itzisonn_.meazy.text.translatable
+import java.util.Optional
 
 /**
  * Adds to Environment ability to declare functions
  */
-@NullMarked
-public interface FunctionDeclarationEnvironment extends Environment {
+interface FunctionDeclarationEnvironment : Environment {
     /**
      * Declares given function in this environment
      * TODO
      */
-    void declareFunction(FunctionEnvironment functionEnvironment);
+    fun declareFunction(functionEnvironment: FunctionEnvironment)
 
     /**
      * @param id Id
      * @param args Parameters
      * @return Declared function with given id and args or null
      */
-    default Optional<FunctionEnvironment> getFunction(String id, List<DataType> args) {
-        main:
-        for (FunctionEnvironment functionEnvironment : getFunctions()) {
-            if (!functionEnvironment.getId().equals(id)) continue;
+    fun getFunction(id: String, args: List<DataType>): Optional<FunctionEnvironment> {
+        main@ for (functionEnvironment in functions) {
+            if (functionEnvironment.id != id) continue
 
-            List<ParameterExpression> parameters = functionEnvironment.getParameters();
-            if (parameters.size() != args.size()) continue;
+            val parameters = functionEnvironment.parameters
+            if (parameters.size != args.size) continue
 
-            for (int i = 0; i < args.size(); i++) {
-                DataType parameter = parameters.get(i).getDataType();
-                DataType arg = args.get(i);
-                if (!DataType.matches(this, arg, parameter)) continue main;
+            for (i in args.indices) {
+                val parameter = parameters[i].getDataType()
+                val arg = args[i]
+                if (!DataType.matches(this, arg, parameter)) continue@main
             }
 
-            return Optional.of(functionEnvironment);
+            return Optional.of(functionEnvironment)
         }
 
-        return Optional.empty();
+        return Optional.empty()
     }
 
     /**
      * @return All declared functions
      */
-    Set<FunctionEnvironment> getFunctions();
+    val functions: Set<FunctionEnvironment>
+}
+
+
+
+abstract class FunctionDeclarationEnvironmentImpl(
+    parent: Environment,
+    override val isShared: Boolean
+) : EnvironmentImpl(parent),
+    FunctionDeclarationEnvironment {
+    private val _functions = mutableSetOf<FunctionEnvironment>()
+
+    override val functions get() = _functions.toSet()
+
+    override fun declareFunction(functionEnvironment: FunctionEnvironment) {
+        val parameters = functionEnvironment.parameters
+
+        main@ for (otherFunctionEnvironment in _functions) {
+            if (otherFunctionEnvironment.id == functionEnvironment.id) {
+                val otherParameters = otherFunctionEnvironment.parameters
+                if (parameters.size != otherParameters.size) continue
+
+                for (i in parameters.indices) {
+                    if (otherParameters[i].getDataType() != parameters[i].getDataType()) continue@main
+                }
+
+                throw EvaluationException(translatable("meazy:runtime.function.already_exists", functionEnvironment.id))
+            }
+        }
+
+        _functions.add(functionEnvironment)
+    }
 }
