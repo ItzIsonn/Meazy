@@ -3,35 +3,29 @@ package me.itzisonn_.meazy.instruction.misc
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.InstructionsSet
-import org.jspecify.annotations.NullMarked
-import java.lang.classfile.ClassBuilder
 import java.lang.classfile.attribute.InnerClassesAttribute
 import java.lang.constant.ClassDesc
-import java.util.function.Consumer
 
-@NullMarked
 class WithClassInstruction(
     private val classDesc: ClassDesc,
     private val superClass: ClassDesc?,
-    private val interfaceClasses: MutableSet<ClassDesc>,
+    private val interfaceClasses: Set<ClassDesc>,
     private val flags: Int,
-    private val attributes: MutableList<InnerClassesAttribute>,
-    private val classInstructions: Consumer<InstructionsSet>
+    private val attributes: List<InnerClassesAttribute>,
+    private val classInstructions: (InstructionsSet) -> Unit
 ) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
-        bytecodeBuilders.withClass(
-            classDesc
-        ) { classBuilder: ClassBuilder? ->
-            classBuilder!!.withFlags(flags)
+        bytecodeBuilders.withClass(classDesc) { classBuilder ->
+            classBuilder.withFlags(flags)
             for (attribute in attributes) classBuilder.with(attribute)
 
             if (superClass != null) classBuilder.withSuperclass(superClass)
-            classBuilder.withInterfaceSymbols(*interfaceClasses.toTypedArray<ClassDesc>())
+            classBuilder.withInterfaceSymbols(interfaceClasses.toList())
 
             val classBytecodeBuilders = bytecodeBuilders.copy(classBuilder)
             val instructionsSet = InstructionsSet(classBytecodeBuilders)
 
-            classInstructions.accept(instructionsSet)
+            classInstructions(instructionsSet)
             for (instruction in instructionsSet.instructions) {
                 instruction.emit(classBytecodeBuilders)
             }

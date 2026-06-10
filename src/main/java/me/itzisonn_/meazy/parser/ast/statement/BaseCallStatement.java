@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
+import kotlin.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
@@ -40,6 +41,8 @@ public class BaseCallStatement implements LocalStatement {
                     for (Expression arg : args) {
                         arg.emit(argsInstructions, environment, this);
                     }
+
+                    return Unit.INSTANCE;
                 }
         );
     }

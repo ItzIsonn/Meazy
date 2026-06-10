@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
@@ -109,6 +110,8 @@ public class InterfaceDeclarationStatement extends ModifierStatement implements 
                     for (Statement statement : body) {
                         statement.emit(classInstructions, classEnvironment, this);
                     }
+
+                    return Unit.INSTANCE;
                 }
         );
     }

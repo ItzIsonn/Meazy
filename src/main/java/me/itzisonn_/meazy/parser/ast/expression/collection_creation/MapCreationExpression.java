@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.expression.collection_creation;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
@@ -29,7 +30,10 @@ public class MapCreationExpression implements Expression {
         instructionsSet.invokeConstructor(
                 ClassDesc.of("java.util.HashMap"),
                 MethodTypeDesc.of(ConstantDescs.CD_void, List.of(ClassDesc.of("java.util.Map"))),
-                argsInstructions -> hashMapArgsInstructions(argsInstructions, environment)
+                argsInstructions -> {
+                    hashMapArgsInstructions(argsInstructions, environment);
+                    return Unit.INSTANCE;
+                }
         );
     }
 
@@ -43,7 +47,10 @@ public class MapCreationExpression implements Expression {
                 ConstantDescs.CD_Map,
                 "ofEntries",
                 MethodTypeDesc.of(ConstantDescs.CD_Map, ClassDesc.of("java.util.Map$Entry").arrayType()),
-                argsInstructions -> ofEntriesArgsInstructions(argsInstructions, environment),
+                argsInstructions -> {
+                    ofEntriesArgsInstructions(argsInstructions, environment);
+                    return Unit.INSTANCE;
+                },
                 InvokeType.STATIC_INTERFACE
         );
     }
@@ -67,6 +74,7 @@ public class MapCreationExpression implements Expression {
 
                         key.emit(argsInstructions, environment, this);
                         value.emit(argsInstructions, environment, this);
+                        return Unit.INSTANCE;
                     },
                     InvokeType.STATIC_INTERFACE
             );

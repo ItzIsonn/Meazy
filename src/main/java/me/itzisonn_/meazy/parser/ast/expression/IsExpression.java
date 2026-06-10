@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.expression;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
@@ -44,7 +45,7 @@ public class IsExpression implements Expression {
                 ConstantDescs.CD_Object,
                 "getClass",
                 MethodTypeDesc.of(ConstantDescs.CD_Class),
-                _ -> {},
+                _ -> Unit.INSTANCE,
                 InvokeType.VIRTUAL
         );
 
@@ -52,7 +53,10 @@ public class IsExpression implements Expression {
                 ConstantDescs.CD_Object,
                 "equals",
                 MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object),
-                argsInstructions -> argsInstructions.loadConstant(classDesc),
+                argsInstructions -> {
+                    argsInstructions.loadConstant(classDesc);
+                    return Unit.INSTANCE;
+                },
                 InvokeType.VIRTUAL
         );
     }

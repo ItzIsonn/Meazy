@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.program.impl;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.statement.DeclarationStatement;
@@ -139,7 +140,7 @@ public class ProgramImpl implements Program {
                                 bodyInstructions.invokeSuperClass(
                                         ConstantDescs.CD_Object,
                                         MethodTypeDesc.of(ConstantDescs.CD_void),
-                                        _ -> {}
+                                        _ -> Unit.INSTANCE
                                 );
 
                                 bodyInstructions.returnVoid();
@@ -174,6 +175,8 @@ public class ProgramImpl implements Program {
                                 bodyInstructions.returnVoid();
                             }
                     );
+
+                    return Unit.INSTANCE;
                 }
         );
     }

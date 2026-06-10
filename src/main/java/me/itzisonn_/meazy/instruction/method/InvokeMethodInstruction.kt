@@ -5,20 +5,19 @@ import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import java.lang.constant.ClassDesc
 import java.lang.constant.MethodTypeDesc
-import java.util.function.Consumer
 
 class InvokeMethodInstruction(
     private val owner: ClassDesc,
     private val id: String,
     private val methodTypeDesc: MethodTypeDesc,
-    private val argsInstructions: Consumer<InstructionsSet>,
+    private val argsInstructions: (InstructionsSet) -> Unit,
     private val invokeType: InvokeType
 ) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
         val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")
 
         val instructionsSet = InstructionsSet(bytecodeBuilders)
-        argsInstructions.accept(instructionsSet)
+        argsInstructions(instructionsSet)
 
         for (instruction in instructionsSet.instructions) {
             instruction.emit(bytecodeBuilders)
