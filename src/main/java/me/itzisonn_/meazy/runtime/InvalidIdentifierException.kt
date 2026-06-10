@@ -1,18 +1,10 @@
-package me.itzisonn_.meazy.runtime;
+package me.itzisonn_.meazy.runtime
 
-import me.itzisonn_.meazy.text.TextException;
-import me.itzisonn_.meazy.text.Text;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.text.TextException
 
 /**
  * Is thrown when resolver can't find object with requested identifier
+ * @param text Text
  */
-@NullMarked
-public class InvalidIdentifierException extends TextException {
-    /**
-     * @param text Text
-     */
-    public InvalidIdentifierException(Text text) {
-        super(text);
-    }
-}
+class InvalidIdentifierException(text: Text) : TextException(text)
