@@ -1,16 +1,12 @@
-package me.itzisonn_.meazy.runtime.environment;
+package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.modifier.Modifier;
+import me.itzisonn_.meazy.parser.modifier.Modifier
 
-import java.util.Set;
-
-public interface ModifieredEnvironment extends Environment {
+interface ModifieredEnvironment : Environment {
     /**
      * @return This class environment's modifiers
      */
-    Set<Modifier> getModifiers();
+    val modifiers: Set<Modifier>
 
-    default boolean hasModifier(Modifier modifier) {
-        return getModifiers().contains(modifier);
-    }
+    fun hasModifier(modifier: Modifier) = modifiers.contains(modifier)
 }
