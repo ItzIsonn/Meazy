@@ -21,13 +21,13 @@ interface FunctionEnvironment : LocalVariableDeclarationEnvironment, ModifieredE
 
     var returnDataType: DataType?
 
-    override val parent: FunctionDeclarationEnvironment
+    override fun getParent(): FunctionDeclarationEnvironment
 }
 
 
 
 class FunctionEnvironmentImpl(
-    override val parent: FunctionDeclarationEnvironment,
+    parent: FunctionDeclarationEnvironment,
     startLabel: Uuid?,
     endLabel: Uuid?,
     override val id: String,
@@ -35,4 +35,6 @@ class FunctionEnvironmentImpl(
     override var returnDataType: DataType?,
     override val isShared: Boolean,
     override val modifiers: Set<Modifier>
-) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), FunctionEnvironment
+) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), FunctionEnvironment {
+    override fun getParent() = super.getParent() as FunctionDeclarationEnvironment
+}

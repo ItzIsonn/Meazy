@@ -7,7 +7,7 @@ interface Environment {
     /**
      * @return This environment's parent
      */
-    val parent: Environment?
+    fun getParent(): Environment?
 
     /**
      * @return Whether this environment is shared

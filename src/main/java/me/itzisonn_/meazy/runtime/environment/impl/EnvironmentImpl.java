@@ -5,12 +5,13 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public abstract class EnvironmentImpl implements Environment {
-    protected final Environment parent;
+    private final Environment parent;
 
     public EnvironmentImpl(Environment parent) {
         this.parent = parent;
     }
 
+    @Override
     public Environment getParent() {
         return this.parent;
     }

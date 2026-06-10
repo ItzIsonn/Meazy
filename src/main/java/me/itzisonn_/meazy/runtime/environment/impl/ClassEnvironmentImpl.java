@@ -64,7 +64,7 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
 
     @Override
     public ClassDeclarationEnvironment getParent() {
-        return (ClassDeclarationEnvironment) parent;
+        return (ClassDeclarationEnvironment) super.getParent();
     }
 
     @Override
@@ -75,8 +75,8 @@ public class ClassEnvironmentImpl extends FunctionDeclarationEnvironmentImpl imp
     @Override
     public void resolveBaseClasses() {
         for (String unresolvedBaseClass : unresolvedBaseClasses) {
-            ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(parent, unresolvedBaseClass, false);
-            ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(parent, classDesc).orElseThrow();
+            ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(getParent(), unresolvedBaseClass, false);
+            ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(getParent(), classDesc).orElseThrow();
 
             if (baseClassEnvironment.isInterface()) interfaces.add(baseClassEnvironment.getClassDesc());
             else {
