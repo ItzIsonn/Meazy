@@ -15,8 +15,11 @@ interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment {
     fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): VariableValue
 
     //TODO
-    var startLabel: Uuid?
-    var endLabel: Uuid?
+    fun getStartLabel(): Uuid?
+    fun getEndLabel(): Uuid?
+
+    fun setStartLabel(label: Uuid)
+    fun setEndLabel(label: Uuid)
     val usedSlotsCount: Int
 }
 
@@ -24,8 +27,8 @@ interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment {
 
 open class LocalVariableDeclarationEnvironmentImpl(
     parent: Environment,
-    override var startLabel: Uuid?,
-    override var endLabel: Uuid?
+    private var startLabel: Uuid?,
+    private var endLabel: Uuid?
 ) : VariableDeclarationEnvironmentImpl(parent), LocalVariableDeclarationEnvironment {
     override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue {
         if (getVariable(id).isPresent) {
@@ -60,6 +63,12 @@ open class LocalVariableDeclarationEnvironmentImpl(
         _variables.add(variableValue)
         return variableValue
     }
+
+    override fun getStartLabel() = startLabel
+    override fun getEndLabel() = endLabel
+
+    override fun setStartLabel(label: Uuid) { startLabel = label }
+    override fun setEndLabel(label: Uuid) { endLabel = label }
 
     override val usedSlotsCount: Int
         get() {
