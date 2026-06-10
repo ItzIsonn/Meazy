@@ -179,6 +179,7 @@ public final class Registries {
         LANGUAGES.register(MeazyMain.getDefaultIdentifier("russian"), new Language("ru", "Русский"));
 
         Commands.INSTANCE.register();
+        TokenTypes.INSTANCE.register();
         Modifiers.REGISTER();
         Operators.REGISTER();
         ParsingFunctions.REGISTER();
@@ -198,7 +199,7 @@ public final class Registries {
                     if (matcher.find()) {
                         int end = matcher.end();
                         String matched = string.substring(0, end);
-                        if (!tokenType.canMatch(matched)) continue;
+                        if (!tokenType.getCanMatch().invoke(matched)) continue;
 
                         if (token == null || token.getValue().length() < matched.length()) {
                             token = new Token(lineNumber, i, end, tokenType, matched);
@@ -214,7 +215,7 @@ public final class Registries {
                 }
 
                 i += token.getValue().length() - 1;
-                if (!token.getType().isShouldSkip()) tokens.add(token);
+                if (!token.getType().getShouldSkip()) tokens.add(token);
 
                 lineNumber += token.getValue().length() - token.getValue().replace("\n", "").length();
             }

@@ -1,103 +1,79 @@
-package me.itzisonn_.meazy.lexer;
+package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.registry.Registries;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.util.regex.Pattern;
+import me.itzisonn_.meazy.MeazyMain
+import me.itzisonn_.meazy.registry.Registries
+import java.util.regex.Pattern
 
 /**
  * Represents type of token
  *
- * @see Registries#TOKEN_TYPES
+ * @param id         Id
+ * @param pattern    Pattern that is used to match this token type
+ * @param shouldSkip Should [Token]s with this type be skipped (not added in list
+ * @param canMatch   Function that checks whether given string can match this token type
+ *
+ * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
+ * 
+ * @see Registries.TOKEN_TYPES
  */
-@NullMarked
-public class TokenType {
-    /**
-     * Id
-     */
-    private final String id;
+class TokenType(
+    val id: String,
+    pattern: Pattern?,
+    val shouldSkip: Boolean,
+    val canMatch: (String) -> Boolean = { true }
+) {
     /**
      * Pattern that is used to match this token type
      */
-    @Nullable
-    private final Pattern pattern;
-    /**
-     * Should {@link Token}s with this type be skipped (not added in list)
-     */
-    private final boolean shouldSkip;
+    val pattern: Pattern?
 
-    /**
-     * Main constructor
-     *
-     * @param id         Id
-     * @param pattern    Pattern that is used to match this token type
-     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
-     * @throws IllegalArgumentException If given id doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
-     */
-    public TokenType(String id, @Nullable Pattern pattern, boolean shouldSkip) throws IllegalArgumentException {
-        if (!id.matches(MeazyMain.IDENTIFIER_REGEX)) throw new IllegalArgumentException("Invalid id");
+    init {
+        var pattern = pattern
+        require(id.matches(MeazyMain.IDENTIFIER_REGEX.toRegex())) { "Invalid id" }
 
         if (pattern != null && !pattern.pattern().startsWith("^")) {
-            pattern = Pattern.compile("^(" + pattern.pattern() + ")", pattern.flags());
+            pattern = Pattern.compile("^(${pattern.pattern()})", pattern.flags())
         }
 
-        this.id = id;
-        this.pattern = pattern;
-        this.shouldSkip = shouldSkip;
+        this.pattern = pattern
     }
 
     /**
      * Constructor with regex that is compiled into pattern
-     *
+     * 
      * @param id         Id
-     * @param regex      Regex that is compiled into {@link Pattern}
-     * @param shouldSkip Should {@link Token}s with this type be skipped (not added in list)
-     * @throws IllegalArgumentException If given id doesn't match {@link MeazyMain#IDENTIFIER_REGEX}
+     * @param regex      Regex that is compiled into [Pattern]
+     * @param shouldSkip Should [Token]s with this type be skipped (not added in list)
+     * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
      */
-    public TokenType(String id, @Nullable String regex, boolean shouldSkip) throws IllegalArgumentException {
-        this(id, regex == null ? null : Pattern.compile(regex, Pattern.DOTALL), shouldSkip);
+    constructor(
+        id: String,
+        regex: String?,
+        shouldSkip: Boolean,
+        canMatch: (String) -> Boolean = { true }
+    ) : this(
+        id,
+        if (regex == null) null else Pattern.compile(regex, Pattern.DOTALL),
+        shouldSkip,
+        canMatch
+    )
+
+
+
+    override fun toString(): String {
+        return "TokenType($id)"
     }
 
-    /**
-     * @param string String to check
-     * @return Whether given string can match this token type
-     */
-    public boolean canMatch(String string) {
-        return true;
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other !is TokenType) return false
+
+        val thisId = this.id
+        val otherId = other.id
+        return thisId == otherId
     }
 
-
-    @Override
-    public String toString() {
-        return "TokenType(" + id + ")";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (!(o instanceof TokenType other)) return false;
-
-        String thisId = getId();
-        String otherId = other.getId();
-        return thisId.equals(otherId);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    public String getId() {
-        return this.id;
-    }
-
-    public @Nullable Pattern getPattern() {
-        return this.pattern;
-    }
-
-    public boolean isShouldSkip() {
-        return this.shouldSkip;
+    override fun hashCode(): Int {
+        return id.hashCode()
     }
 }

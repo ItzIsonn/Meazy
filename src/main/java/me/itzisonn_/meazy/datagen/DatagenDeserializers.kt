@@ -4,13 +4,10 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.lexer.NativeCanMatch
 import me.itzisonn_.meazy.lexer.TokenType
 import me.itzisonn_.meazy.lexer.TokenTypeSet
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.registry.RegistryIdentifier
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
 import java.lang.reflect.Type
 
 /**
@@ -57,53 +54,16 @@ object DatagenDeserializers {
             val regex = if (jsonObject.get("regex") != null) jsonObject.get("regex").asString else null
             val shouldSkip = jsonObject.get("should_skip") != null && jsonObject.get("should_skip").asBoolean
 
-            if (jsonObject.get("can_match") != null) {
-                val path = jsonObject.get("can_match").asString.split("#".toRegex()).dropLastWhile { it.isEmpty() }
-                val className = path[0]
-                val methodName = path[1]
-
-                var cls: Class<*>?
-                try {
-                    cls = Class.forName(className)
-                }
-                catch (e: ClassNotFoundException) {
-                    throw RuntimeException(
-                        "Can't find specified class $className for canMatch method in TokenType with id $id",
-                        e
-                    )
+            if (jsonObject.has("expect") && jsonObject.get("expect").asBoolean) {
+                check(!jsonObject.has("regex") && !jsonObject.has("should_skip")) {
+                    "Expected token type can't have neither regex nor should_skip members"
                 }
 
-                val method: Method?
-                try {
-                    method = cls.getDeclaredMethod(methodName, String::class.java)
-                }
-                catch (e: NoSuchMethodException) {
-                    throw RuntimeException(
-                        "Can't find specified method $methodName for canMatch method in TokenType with id $id",
-                        e
-                    )
-                }
-
-                if (!method.isAnnotationPresent(NativeCanMatch::class.java)) throw RuntimeException("Specified non-native method for canMatch method in TokenType with id $id")
-                if (!method.canAccess(null)) throw RuntimeException("Specified inaccessible method for canMatch method in TokenType with id $id")
-                if (!Boolean::class.javaPrimitiveType!!.isAssignableFrom(method.returnType)) throw RuntimeException(
-                    "Specifier method with non-boolean return type for canMatch method in TokenType with id $id"
-                )
-
-                return@JsonDeserializer object : TokenType(id, regex, shouldSkip) {
-                    override fun canMatch(string: String): Boolean {
-                        try {
-                            return method.invoke(null, string) as Boolean
-                        }
-                        catch (e: IllegalAccessException) {
-                            throw RuntimeException(e)
-                        }
-                        catch (e: InvocationTargetException) {
-                            throw RuntimeException(e)
-                        }
-                    }
-                }
+                val entry = Registries.TOKEN_TYPES.getEntry(MeazyMain.getDefaultIdentifier(id))
+                    ?: error("Expected registered token type with id '$id'")
+                return@JsonDeserializer entry.getValue()
             }
+
             TokenType(id, regex, shouldSkip)
         }
 }

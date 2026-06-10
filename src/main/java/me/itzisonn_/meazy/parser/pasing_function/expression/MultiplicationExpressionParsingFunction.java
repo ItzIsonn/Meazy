@@ -22,7 +22,7 @@ public class MultiplicationExpressionParsingFunction extends AbstractParsingFunc
         Parser parser = context.getParser();
         Expression left = parser.parseAfter(MeazyMain.getDefaultIdentifier("multiplication_expression"), Expression.class);
 
-        while (TokenTypeSets.MULTIPLICATION().contains(parser.getCurrent().getType())) {
+        while (TokenTypeSets.INSTANCE.getMultiplication().contains(parser.getCurrent().getType())) {
             String operator = parser.getCurrentAndNext().getValue();
             Expression right = parser.parseAfter(MeazyMain.getDefaultIdentifier("multiplication_expression"), Expression.class);
             left = new OperatorExpression(left, right, operator, OperatorType.INFIX);

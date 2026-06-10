@@ -32,7 +32,7 @@ public class AssignmentStatementParsingFunction extends AbstractParsingFunction<
             Expression value = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
             return new AssignmentStatement(left, value);
         }
-        else if (TokenTypeSets.OPERATOR_ASSIGN().contains(parser.getCurrent().getType())) {
+        else if (TokenTypeSets.INSTANCE.getOperatorAssign().contains(parser.getCurrent().getType())) {
             Token token = parser.getCurrentAndNext();
 
             Expression value = new OperatorExpression(

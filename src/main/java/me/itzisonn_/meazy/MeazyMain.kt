@@ -87,11 +87,13 @@ object MeazyMain {
         else TranslationsBundle.setLanguage(languagesEntry.getValue())
 
         for (tokenType in DatagenManager.getDeserializedMultiple("token_type", TokenType::class, DatagenDeserializers.tokenTypeDeserializer)) {
-            Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.getId()), tokenType)
+            val id = getDefaultIdentifier(tokenType.id)
+            if (Registries.TOKEN_TYPES.getEntry(id) != null) continue
+            Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.id), tokenType)
         }
 
         for (tokenTypeSet in DatagenManager.getDeserializedSingle("token_type_set", TokenTypeSet::class, DatagenDeserializers.tokenTypeSetDeserializer)) {
-            Registries.TOKEN_TYPE_SETS.register(getDefaultIdentifier(tokenTypeSet.getId()), tokenTypeSet)
+            Registries.TOKEN_TYPE_SETS.register(getDefaultIdentifier(tokenTypeSet.id), tokenTypeSet)
         }
     }
 
