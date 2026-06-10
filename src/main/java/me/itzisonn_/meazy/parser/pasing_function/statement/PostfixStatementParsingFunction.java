@@ -27,7 +27,7 @@ public class PostfixStatementParsingFunction extends AbstractParsingFunction<Sta
         Parser parser = context.getParser();
 
         Expression left = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-        Token token = parser.getCurrentAndNext(TokenTypeSets.OPERATOR_POSTFIX(), TextKt.translatable("meazy:parser.expected.end_statement", "operator_postfix", "postfix_statement"));
+        Token token = parser.getCurrentAndNext(TokenTypeSets.INSTANCE.getOperatorPostfix(), TextKt.translatable("meazy:parser.expected.end_statement", "operator_postfix", "postfix_statement"));
 
         Expression value = new OperatorExpression(
                 left,

@@ -1,22 +1,18 @@
-package me.itzisonn_.meazy.lexer;
+package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.registry.Registries;
-import org.jspecify.annotations.NullMarked;
-
-import java.util.List;
+import me.itzisonn_.meazy.registry.Registries
 
 /**
  * Represents function that is used to tokenize lines
- * @see Registries#TOKENIZATION_FUNCTION
+ *
+ * @see Registries.TOKENIZATION_FUNCTION
  * @see Token
  */
-@FunctionalInterface
-@NullMarked
-public interface TokenizationFunction {
+fun interface TokenizationFunction {
     /**
      * Tokenizes given string
      * @param string String to tokenize
      * @return List of resulted tokens
      */
-    List<Token> tokenize(String string);
+    fun tokenize(string: String): List<Token>
 }

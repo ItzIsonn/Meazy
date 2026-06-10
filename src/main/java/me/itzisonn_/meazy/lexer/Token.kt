@@ -1,43 +1,31 @@
-package me.itzisonn_.meazy.lexer;
-
-import lombok.Getter;
-import org.jspecify.annotations.NullMarked;
+package me.itzisonn_.meazy.lexer
 
 /**
  * Represents code unit
+ *
+ * @param line  Line on which this token is located
+ * @param start Start index of this token
+ * @param end   End index of this token
+ * @param type  TokenType
+ * @param value String that matches this token's type
+ *
+ * @throws IllegalArgumentException If line is negative
  */
-@Getter
-@NullMarked
-public class Token {
-    private final int line;
-    private final int start;
-    private final int end;
-    private final TokenType type;
-    private final String value;
-
-    /**
-     * @param line Line on which this token is located
-     * @param start Start index of this token
-     * @param end End index of this token
-     * @param type TokenType
-     * @param value String that matches this token's type
-     *
-     * @throws IllegalArgumentException If line is negative
-     */
-    public Token(int line, int start, int end, TokenType type, String value) {
-        if (line < 0) throw new IllegalArgumentException("Line can't be negative");
-        if (start < 0) throw new IllegalArgumentException("Start can't be negative");
-        if (end < 0) throw new IllegalArgumentException("End can't be negative");
-
-        this.start = start;
-        this.end = end;
-        this.line = line;
-        this.type = type;
-        this.value = value;
+class Token(
+    val line: Int,
+    val start: Int,
+    val end: Int,
+    val type: TokenType,
+    val value: String
+) {
+    init {
+        require(line >= 0) { "Line can't be negative" }
+        require(start >= 0) { "Start can't be negative" }
+        require(end >= 0) { "End can't be negative" }
     }
 
-    @Override
-    public String toString() {
-        return "Token(" + line + "," + type + "," + value.replaceAll("\n", "\\\\n") + ")";
+    override fun toString(): String {
+        val inlinedValue = value.replace("\n", "\\\\n")
+        return "Token($line,$type,$inlinedValue)"
     }
 }

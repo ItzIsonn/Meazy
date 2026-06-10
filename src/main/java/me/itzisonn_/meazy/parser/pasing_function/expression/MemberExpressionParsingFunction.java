@@ -26,7 +26,7 @@ public class MemberExpressionParsingFunction extends AbstractParsingFunction<Exp
         Parser parser = context.getParser();
         Expression object = parser.parseAfter(MeazyMain.getDefaultIdentifier("member_expression"), Expression.class);
 
-        while (TokenTypeSets.MEMBER_ACCESS().contains(parser.getCurrent().getType())) {
+        while (TokenTypeSets.INSTANCE.getMemberAccess().contains(parser.getCurrent().getType())) {
             boolean isNullSafe = parser.getCurrentAndNext().getType().equals(TokenTypes.QUESTION_DOT());
             Expression member = parser.parseAfter(MeazyMain.getDefaultIdentifier("member_expression"), Expression.class);
 

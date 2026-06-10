@@ -22,7 +22,7 @@ public class AdditionExpressionParsingFunction extends AbstractParsingFunction<E
         Parser parser = context.getParser();
         Expression left = parser.parseAfter(MeazyMain.getDefaultIdentifier("addition_expression"), Expression.class);
 
-        while (TokenTypeSets.ADDITION().contains(parser.getCurrent().getType())) {
+        while (TokenTypeSets.INSTANCE.getAddition().contains(parser.getCurrent().getType())) {
             String operator = parser.getCurrentAndNext().getValue();
             Expression right = parser.parse(MeazyMain.getDefaultIdentifier("addition_expression"), Expression.class);
             left = new OperatorExpression(left, right, operator, OperatorType.INFIX);

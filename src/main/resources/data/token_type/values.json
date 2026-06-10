@@ -4,5 +4,5 @@
   { "id": "string", "regex":"\"[^\"\n]*(\")?" },
   { "id": "boolean", "regex": "true|false" },
   { "id": "this", "regex": "this" },
-  { "id": "id", "regex": "[a-zA-Z_][a-zA-Z0-9_]*", "can_match": "me.itzisonn_.meazy.lexer.TokenTypes#canMatchId" }
+  { "id": "id", "expect": true }
 ]
