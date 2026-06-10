@@ -28,10 +28,10 @@ class RunCommand : AbstractCommand("run", listOf("target_file")) {
         val startMillis = System.currentTimeMillis()
 
         val tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue()(getLines(file))
-        val program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(file, tokens)
+        val program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue()(file, tokens)
 
-        val classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue().compile(program)
-        Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue().run(classes)
+        val classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue()(program)
+        Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue()(classes)
 
         val endMillis = System.currentTimeMillis()
         return translatable("meazy:commands.run.info", (endMillis - startMillis).toDouble() / 1000)

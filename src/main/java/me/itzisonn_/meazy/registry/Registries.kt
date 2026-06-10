@@ -18,13 +18,14 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions
 import me.itzisonn_.meazy.registry.Registries.PARSING_FUNCTIONS
 import me.itzisonn_.meazy.registry.Registries.TOKEN_TYPES
 import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
-import me.itzisonn_.meazy.runtime.RunProgramFunction
 import me.itzisonn_.meazy.runtime.environment.factory.*
 import me.itzisonn_.meazy.runtime.environment.factory.impl.*
 import me.itzisonn_.meazy.text.Language
 import me.itzisonn_.registry.multiple_entry.OrderedRegistry
 import me.itzisonn_.registry.multiple_entry.SetRegistry
 import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl
+import java.io.File
+import java.lang.constant.ClassDesc
 import java.lang.reflect.InvocationTargetException
 
 /**
@@ -98,8 +99,7 @@ object Registries {
      * @see ParsingFunction
      * @see Parser
      */
-    @JvmField
-    val PARSE_TOKENS_FUNCTION = SingleEntryRegistryImpl<ParseTokensFunction>()
+    val PARSE_TOKENS_FUNCTION = SingleEntryRegistryImpl<(File?, List<Token>) -> Program>()
 
     /**
      * Registry for [ProgramFactory]
@@ -111,16 +111,13 @@ object Registries {
 
     /**
      * Registry for function that compiles [Program] to bytecode
-     * @see CompileProgramFunction
      */
-    val COMPILE_PROGRAM_FUNCTION = SingleEntryRegistryImpl<CompileProgramFunction>()
+    val COMPILE_PROGRAM_FUNCTION = SingleEntryRegistryImpl<(Program) -> Map<ClassDesc, ByteArray>>()
 
     /**
      * Registry for function that runs [Program]
-     * @see RunProgramFunction
      */
-    @JvmField
-    val RUN_PROGRAM_FUNCTION = SingleEntryRegistryImpl<RunProgramFunction>()
+    val RUN_PROGRAM_FUNCTION = SingleEntryRegistryImpl<(Map<ClassDesc, ByteArray>) -> Unit>()
 
 
 

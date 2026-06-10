@@ -1,18 +1,10 @@
-package me.itzisonn_.meazy.runtime;
+package me.itzisonn_.meazy.runtime
 
-import me.itzisonn_.meazy.text.TextException;
-import me.itzisonn_.meazy.text.Text;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.text.TextException
 
 /**
  * Is thrown TODO
+ * @param text Text
  */
-@NullMarked
-public class EvaluationException extends TextException {
-    /**
-     * @param text Text
-     */
-    public EvaluationException(Text text) {
-        super(text);
-    }
-}
+class EvaluationException(text: Text) : TextException(text)
