@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.environment.impl;
 
 import kotlin.uuid.Uuid;
 import me.itzisonn_.meazy.runtime.environment.Environment;
+import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironmentImpl;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
 import org.jspecify.annotations.NullMarked;
 

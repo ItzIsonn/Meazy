@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.runtime.environment.ConstructorDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
+import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironmentImpl;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
