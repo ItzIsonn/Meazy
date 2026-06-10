@@ -251,10 +251,10 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
 
 
     override fun declareConstructor(constructorEnvironment: ConstructorEnvironment) {
-        val parameters = constructorEnvironment.getParameters()
+        val parameters = constructorEnvironment.parameters
 
         main@ for (otherConstructorEnvironment in _constructors) {
-            val otherParameters = otherConstructorEnvironment.getParameters()
+            val otherParameters = otherConstructorEnvironment.parameters
             if (parameters.size != otherParameters.size) continue
 
             for (i in parameters.indices) {

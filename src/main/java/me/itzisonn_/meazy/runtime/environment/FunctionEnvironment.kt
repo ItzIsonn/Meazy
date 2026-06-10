@@ -31,10 +31,16 @@ class FunctionEnvironmentImpl(
     startLabel: Uuid?,
     endLabel: Uuid?,
     override val id: String,
-    override val parameters: List<ParameterExpression>,
+    parameters: List<ParameterExpression>,
     override var returnDataType: DataType?,
     override val isShared: Boolean,
-    override val modifiers: Set<Modifier>
+    modifiers: Set<Modifier>
 ) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), FunctionEnvironment {
     override fun getParent() = super.getParent() as FunctionDeclarationEnvironment
+
+    override val modifiers = modifiers.toSet()
+        get() = field.toSet()
+
+    override val parameters = parameters.toList()
+        get() = field.toList()
 }
