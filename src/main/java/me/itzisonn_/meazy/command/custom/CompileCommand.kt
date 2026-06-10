@@ -35,7 +35,7 @@ class CompileCommand : AbstractCommand(
         )
         val startMillis = System.currentTimeMillis()
 
-        val tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue().tokenize(getLines(file))
+        val tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue()(getLines(file))
         val program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue().parse(file, tokens)
         val classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue().compile(program)
 

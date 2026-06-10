@@ -67,7 +67,7 @@ object Registries {
      * @see Token
      * @see TOKEN_TYPES
      */
-    val TOKENIZATION_FUNCTION = SingleEntryRegistryImpl<TokenizationFunction>()
+    val TOKENIZATION_FUNCTION = SingleEntryRegistryImpl<(String) -> List<Token>>()
 
 
 
