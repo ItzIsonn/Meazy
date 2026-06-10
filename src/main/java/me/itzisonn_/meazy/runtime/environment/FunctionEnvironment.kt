@@ -1,31 +1,38 @@
-package me.itzisonn_.meazy.runtime.environment;
+package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.util.List;
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import kotlin.uuid.Uuid
 
 /**
  * Represents environment for functions
  */
-@NullMarked
-public interface FunctionEnvironment extends LocalVariableDeclarationEnvironment, ModifieredEnvironment {
+interface FunctionEnvironment : LocalVariableDeclarationEnvironment, ModifieredEnvironment {
     /**
      * @return Id
      */
-    String getId();
+    val id: String
 
     /**
      * @return Parameters
      */
-    List<ParameterExpression> getParameters();
+    val parameters: List<ParameterExpression>
 
-    @Nullable
-    DataType getReturnDataType();
-    void setReturnDataType(@Nullable DataType returnDataType);
+    var returnDataType: DataType?
 
-    @Override
-    FunctionDeclarationEnvironment getParent();
+    override val parent: FunctionDeclarationEnvironment
 }
+
+
+
+class FunctionEnvironmentImpl(
+    override val parent: FunctionDeclarationEnvironment,
+    startLabel: Uuid?,
+    endLabel: Uuid?,
+    override val id: String,
+    override val parameters: List<ParameterExpression>,
+    override var returnDataType: DataType?,
+    override val isShared: Boolean,
+    override val modifiers: Set<Modifier>
+) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), FunctionEnvironment
