@@ -38,10 +38,10 @@ open class LocalVariableDeclarationEnvironmentImpl(
         var slot = usedSlotsCount
         if (!isShared) slot++
 
-        var parentEnvironment: Environment? = parent
+        var parentEnvironment: Environment? = getParent()
         while (parentEnvironment is LocalVariableDeclarationEnvironment) {
             slot += parentEnvironment.usedSlotsCount
-            parentEnvironment = parentEnvironment.parent
+            parentEnvironment = parentEnvironment.getParent()
         }
 
         val variableValue = VariableValue(id, type, isConstant, setOf(), slot, value, this)
@@ -53,10 +53,10 @@ open class LocalVariableDeclarationEnvironmentImpl(
         var slot = usedSlotsCount
         if (!isShared) slot++
 
-        var parentEnvironment: Environment? = parent
+        var parentEnvironment: Environment? = getParent()
         while (parentEnvironment is LocalVariableDeclarationEnvironment) {
             slot += parentEnvironment.usedSlotsCount
-            parentEnvironment = parentEnvironment.parent
+            parentEnvironment = parentEnvironment.getParent()
         }
 
         val variableValue = VariableValue(null, type, isConstant, setOf(), slot, value, this)

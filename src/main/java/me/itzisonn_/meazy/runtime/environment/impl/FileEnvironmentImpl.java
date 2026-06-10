@@ -52,7 +52,7 @@ public class FileEnvironmentImpl extends FunctionDeclarationEnvironmentImpl impl
 
     @Override
     public GlobalEnvironment getParent() {
-        return (GlobalEnvironment) parent;
+        return (GlobalEnvironment) super.getParent();
     }
 
 

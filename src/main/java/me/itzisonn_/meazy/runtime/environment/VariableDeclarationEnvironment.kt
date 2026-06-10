@@ -47,5 +47,5 @@ open class VariableDeclarationEnvironmentImpl(parent: Environment) : Environment
         return variableValue
     }
 
-    override val isShared get() = parent.isShared
+    override val isShared get() = getParent().isShared
 }

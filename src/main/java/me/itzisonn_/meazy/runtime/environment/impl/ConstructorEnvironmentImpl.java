@@ -29,7 +29,7 @@ public class ConstructorEnvironmentImpl extends LocalVariableDeclarationEnvironm
 
     @Override
     public ConstructorDeclarationEnvironment getParent() {
-        return (ConstructorDeclarationEnvironment) parent;
+        return (ConstructorDeclarationEnvironment) super.getParent();
     }
 
     @Override
