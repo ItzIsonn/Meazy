@@ -1,35 +1,27 @@
-package me.itzisonn_.meazy.runtime.environment;
+package me.itzisonn_.meazy.runtime.environment
 
-import org.jspecify.annotations.NullMarked;
-
-import java.util.Optional;
-import java.util.Set;
+import java.util.Optional
 
 /**
  * Adds to Environment ability to declare classes
  */
-@NullMarked
-public interface ClassDeclarationEnvironment extends Environment {
+interface ClassDeclarationEnvironment : Environment {
     /**
      * Declares given class in this environment
      * TODO
      */
-    void declareClass(ClassEnvironment classEnvironment);
+    fun declareClass(classEnvironment: ClassEnvironment)
 
     /**
      * @param id Class's id
      * @return Declared class with given id or null
      */
-    default Optional<ClassEnvironment> getClass(String id) {
-        for (ClassEnvironment classEnvironment : getClasses()) {
-            if (classEnvironment.getId().equals(id)) return Optional.of(classEnvironment);
-        }
-
-        return Optional.empty();
+    fun getClass(id: String): Optional<ClassEnvironment> {
+        return Optional.ofNullable(classes.find { it.id == id })
     }
 
     /**
      * @return All declared classes
      */
-    Set<ClassEnvironment> getClasses();
+    val classes: Set<ClassEnvironment>
 }

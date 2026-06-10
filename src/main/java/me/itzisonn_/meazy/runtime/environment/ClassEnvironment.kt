@@ -130,9 +130,9 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
         _variables = mutableListOf()
         _constructors = mutableSetOf()
         this.baseClass = baseClass
-        this._interfaces = interfaces
+        _interfaces = interfaces
         unresolvedBaseClasses = mutableSetOf()
-        this._modifiers = modifiers
+        _modifiers = modifiers
         _operatorFunctions = mutableSetOf()
     }
 
@@ -151,7 +151,7 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
         baseClass = null
         _interfaces = mutableSetOf()
         this.unresolvedBaseClasses = unresolvedBaseClasses.toMutableSet()
-        this._modifiers = modifiers.toMutableSet()
+        _modifiers = modifiers.toMutableSet()
         _operatorFunctions = mutableSetOf()
     }
 
@@ -267,9 +267,8 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
         _constructors.add(constructorEnvironment)
     }
 
-    override fun getConstructors(): Set<ConstructorEnvironment> {
-        return _constructors.toSet()
-    }
+    override val constructors: Set<ConstructorEnvironment>
+        get() = _constructors.toSet()
 
     override val modifiers: Set<Modifier>
         get() = _modifiers.toSet()
