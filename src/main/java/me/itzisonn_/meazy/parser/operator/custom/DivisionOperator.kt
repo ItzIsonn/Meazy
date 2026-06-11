@@ -1,67 +1,58 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
+import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.DataType.Companion.ofNonNull
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
 
-@NullMarked
-public class DivisionOperator extends Operator {
-    public DivisionOperator() {
-        super("division", "/", OperatorType.INFIX);
-    }
+class DivisionOperator : Operator("division", "/", OperatorType.INFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-    @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
-
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't divide values " + leftType + " and " + rightType); //TODO
+            error("Can't divide values $leftType and $rightType") //TODO
         }
 
-        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't divide nullable numbers");
-        NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
+        if (leftType.isNullable || rightType.isNullable) error("Can't divide nullable numbers")
+        val commonNumberType = getCommonUnboxed(leftNumberType, rightNumberType)
 
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
+        left.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(leftNumberType, commonNumberType)
 
-        right.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(rightNumberType, commonNumberType);
+        right.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(rightNumberType, commonNumberType)
 
-        instructionsSet.arithmeticOperation(commonNumberType, ArithmeticOperation.DIVISION);
+        instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.DIVISION)
     }
 
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't get type to divide " + leftType + " and " + rightType); //TODO
+            error("Can't get type to divide $leftType and $rightType") //TODO
         }
 
-        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't divide nullable numbers");
-        return DataType.Companion.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
+        if (leftType.isNullable || rightType.isNullable) error("Can't divide nullable numbers")
+        return ofNonNull(getCommonUnboxed(leftNumberType, rightNumberType).classDesc)
     }
 }

@@ -280,3 +280,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
         }
     }
 }
+
+
+
+val String.java get() = this as java.lang.String

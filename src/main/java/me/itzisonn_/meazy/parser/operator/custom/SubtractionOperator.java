@@ -18,7 +18,7 @@ public class SubtractionOperator extends Operator {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
+    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
         Expression left = operatorExpression.getLeft();
         Expression right = operatorExpression.getRight();
         if (right == null) throw new NullPointerException("Right side of operator expression is null");
@@ -36,13 +36,13 @@ public class SubtractionOperator extends Operator {
         if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't subtract nullable numbers");
         NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
+        left.emit(instructions, environment, operatorExpression);
+        instructions.convertToNumberType(leftNumberType, commonNumberType);
 
-        right.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(rightNumberType, commonNumberType);
+        right.emit(instructions, environment, operatorExpression);
+        instructions.convertToNumberType(rightNumberType, commonNumberType);
 
-        instructionsSet.arithmeticOperation(commonNumberType, ArithmeticOperation.SUBTRACTION);
+        instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.SUBTRACTION);
     }
 
     @Override

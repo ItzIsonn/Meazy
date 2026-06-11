@@ -1,30 +1,21 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operators;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.runtime.environment.Environment
+import java.lang.constant.ConstantDescs
 
-import java.lang.constant.ConstantDescs;
-
-@NullMarked
-public class EqualsOperator extends Operator {
-    public EqualsOperator() {
-        super("equals", "==", OperatorType.INFIX);
+class EqualsOperator : Operator("equals", "==", OperatorType.INFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        Operators.produceCompare(instructions, environment, operatorExpression, ComparisonOperation.EQUALS)
     }
 
-    @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
-        Operators.produceCompare(instructionsSet, environment, operatorExpression, ComparisonOperation.EQUALS);
-    }
-
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        return DataType.Companion.ofNonNull(ConstantDescs.CD_boolean);
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        return DataType.ofNonNull(ConstantDescs.CD_boolean)
     }
 }
