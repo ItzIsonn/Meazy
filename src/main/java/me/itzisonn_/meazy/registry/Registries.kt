@@ -9,8 +9,6 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.lexer.*
 import me.itzisonn_.meazy.parser.*
 import me.itzisonn_.meazy.parser.ast.program.Program
-import me.itzisonn_.meazy.parser.ast.program.ProgramFactory
-import me.itzisonn_.meazy.parser.ast.program.impl.ProgramFactoryImpl
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.operator.Operators
@@ -22,7 +20,6 @@ import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.text.Language
 import me.itzisonn_.registry.multiple_entry.OrderedRegistry
 import me.itzisonn_.registry.multiple_entry.SetRegistry
-import me.itzisonn_.registry.single_entry.SingleEntryRegistryImpl
 import java.io.File
 import java.lang.constant.ClassDesc
 import java.lang.reflect.InvocationTargetException
@@ -101,12 +98,6 @@ object Registries {
      */
     lateinit var parseTokensFunction: (File?, List<Token>) -> Program
         private set
-
-    /**
-     * Registry for [ProgramFactory]
-     */
-    @JvmField
-    val PROGRAM_FACTORY = SingleEntryRegistryImpl<ProgramFactory>()
 
 
 
@@ -241,7 +232,5 @@ object Registries {
                 }
             }
         }
-
-        PROGRAM_FACTORY.register(getDefaultIdentifier("program_factory"), ProgramFactoryImpl())
     }
 }

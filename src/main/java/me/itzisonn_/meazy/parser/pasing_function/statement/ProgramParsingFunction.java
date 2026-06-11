@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.registry.Registries;
+import me.itzisonn_.meazy.parser.ast.program.impl.ProgramImpl;
 import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.TokenTypes;
@@ -63,6 +63,6 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             }
         }
 
-        return Registries.PROGRAM_FACTORY.getEntry().getValue().create(file, MeazyMain.INSTANCE.getVERSION(), body);
+        return new ProgramImpl(file, MeazyMain.INSTANCE.getVERSION(), body);
     }
 }

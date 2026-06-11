@@ -40,7 +40,7 @@ public class ProgramImpl implements Program {
     @Nullable
     private FileEnvironment fileEnvironment;
 
-    ProgramImpl(@Nullable File file, Version version, List<Statement> body) throws IllegalArgumentException {
+    public ProgramImpl(@Nullable File file, Version version, List<Statement> body) throws IllegalArgumentException {
         if (file != null) {
             if (!file.exists()) throw new IllegalArgumentException("File doesn't exist");
             if (file.isDirectory()) throw new IllegalArgumentException("File can't be directory");
