@@ -9,9 +9,9 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.VariableValue
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.getClass
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.getVariable
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
+import me.itzisonn_.meazy.runtime.environment.getClass
+import me.itzisonn_.meazy.runtime.environment.getVariable
 import java.lang.constant.ClassDesc
 import kotlin.uuid.Uuid
 
@@ -92,12 +92,11 @@ class VariableIdentifier(id: String) : Identifier(id) {
             val dataType = parent.receiver.getType(environment, this)
             val classDesc = dataType.classDesc
 
-            val classEnvironment = getClass(environment, classDesc).orElse(null) ?: return null
-
+            val classEnvironment = environment.getClass(classDesc) ?: return null
             return classEnvironment.getVariable(id).orElse(null)
         }
 
-        return getVariable(environment, id).orElse(null)
+        return environment.getVariable(id)
     }
 
     private class ResolvedVariable(

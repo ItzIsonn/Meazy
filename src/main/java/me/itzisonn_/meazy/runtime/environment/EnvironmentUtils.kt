@@ -64,26 +64,6 @@ object EnvironmentUtils {
     }
 
 
-    /**
-     * TODO
-     */
-    @JvmStatic
-    fun resolveClassDesc(environment: Environment, classDesc: String, allowPrimitives: Boolean): ClassDesc {
-        return environment.resolveClassDesc(ClassDesc.of(classDesc), allowPrimitives)
-    }
-
-
-
-    /**
-     * Searches for variable with given id in this environment and all parents
-     * 
-     * @param id Variable's id
-     * @return Environment that has requested variable or null
-     */
-    @JvmStatic
-    fun getVariable(environment: Environment, id: String): Optional<VariableValue> {
-        return Optional.ofNullable(environment.getVariable(id))
-    }
 
     @JvmStatic
     fun getClass(environment: Environment, id: String): Optional<ClassEnvironment> {

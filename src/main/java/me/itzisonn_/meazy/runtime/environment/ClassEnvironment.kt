@@ -30,7 +30,7 @@ sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDecl
 
 
 
-    fun getFunctionRecursively(id: String, args: MutableList<DataType>): Optional<FunctionEnvironment> {
+    fun getFunctionRecursively(id: String, args: List<DataType>): Optional<FunctionEnvironment> {
         var functionEnvironment = getFunction(id, args)
         if (functionEnvironment.isPresent) return functionEnvironment
 

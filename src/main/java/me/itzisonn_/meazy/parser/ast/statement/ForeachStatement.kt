@@ -1,111 +1,95 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import kotlin.Unit;
-import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
-import me.itzisonn_.meazy.runtime.VariableValue;
-import me.itzisonn_.meazy.runtime.environment.LoopEnvironmentKt;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
+import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
 
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
-import java.lang.constant.MethodTypeDesc;
-import java.util.List;
+class ForeachStatement(
+    val isConstant: Boolean,
+    val id: String,
+    val dataType: DataType,
+    val collection: Expression,
+    val body: List<LocalStatement>
+) : LocalStatement {
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        if (environment !is LocalVariableDeclarationEnvironment) {
+            throw RuntimeException("Foreach statement must be inside variableDeclarationEnvironment TODO")
+        }
 
-@Getter
-@NullMarked
-public class ForeachStatement implements LocalStatement {
-    private final boolean isConstant;
-    private final String id;
-    private final DataType dataType;
-    private final Expression collection;
-    private final List<LocalStatement> body;
+        val iterableVariableValue = environment.declareVariable(
+            DataType.ofNonNull(ClassDesc.of("java.lang.Iterable")),
+            true,
+            null
+        )
 
-    public ForeachStatement(boolean isConstant, String id, DataType dataType, Expression collection, List<LocalStatement> body) {
-        this.isConstant = isConstant;
-        this.id = id;
-        this.dataType = dataType;
-        this.collection = collection;
-        this.body = body;
+        collection.emit(instructions, environment, this)
+
+        instructions.invokeMethod(
+            ClassDesc.of("java.lang.Iterable"),
+            "iterator",
+            MethodTypeDesc.of(ClassDesc.of("java.util.Iterator")),
+            InvokeType.INTERFACE
+        )
+
+        instructions.storeLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.slot)
+
+        val conditionLabel = instructions.createAndInitLabel()
+        val endLabel = instructions.createAndInitLabel()
+        val loopEnvironment = LoopEnvironment(environment, conditionLabel, endLabel)
+
+        instructions.bindLabel(conditionLabel)
+
+        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.slot)
+        instructions.invokeMethod(
+            ClassDesc.of("java.util.Iterator"),
+            "hasNext",
+            MethodTypeDesc.of(ConstantDescs.CD_boolean),
+            InvokeType.INTERFACE
+        )
+        instructions.gotoLabelIfEqualsZero(endLabel)
+
+        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.slot)
+        instructions.invokeMethod(
+            ClassDesc.of("java.util.Iterator"),
+            "next",
+            MethodTypeDesc.of(ConstantDescs.CD_Object),
+            InvokeType.INTERFACE
+        )
+
+        dataType.resolve(environment)
+        instructions.checkCast(dataType.classDesc)
+
+        val variableValue = environment.declareVariable(id, dataType, isConstant, null)
+        instructions.storeLocal(variableValue.dataType.classDesc, variableValue.slot)
+        instructions.setLocalName(
+            variableValue.slot,
+            id,
+            variableValue.dataType.classDesc,
+            conditionLabel,
+            endLabel
+        )
+
+        for (statement in body) {
+            statement.emit(instructions, loopEnvironment, this)
+        }
+
+        instructions.gotoLabel(conditionLabel)
+        instructions.bindLabel(endLabel)
     }
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        if (!(environment instanceof LocalVariableDeclarationEnvironment localVariableDeclarationEnvironment)) {
-            throw new RuntimeException("Foreach statement must be inside variableDeclarationEnvironment TODO");
+    override fun alwaysReturns(): Boolean {
+        for (localStatement in body) {
+            if (localStatement.alwaysReturns()) return true
         }
 
-        VariableValue iterableVariableValue = localVariableDeclarationEnvironment.declareVariable(
-                DataType.ofNonNull(ClassDesc.of("java.lang.Iterable")),
-                true,
-                null
-        );
-
-        collection.emit(instructions, environment, this);
-
-        instructions.invokeMethod(
-                ClassDesc.of("java.lang.Iterable"),
-                "iterator", 
-                MethodTypeDesc.of(ClassDesc.of("java.util.Iterator")),
-                InvokeType.INTERFACE,
-                _ -> Unit.INSTANCE
-        );
-
-        instructions.storeLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
-
-        var conditionLabel = instructions.createAndInitLabel();
-        var endLabel = instructions.createAndInitLabel();
-        LoopEnvironment loopEnvironment = LoopEnvironmentKt.LoopEnvironment(environment, conditionLabel, endLabel);
-
-        instructions.bindLabel(conditionLabel);
-
-        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
-        instructions.invokeMethod(
-                ClassDesc.of("java.util.Iterator"),
-                "hasNext",
-                MethodTypeDesc.of(ConstantDescs.CD_boolean),
-                InvokeType.INTERFACE,
-                _ -> Unit.INSTANCE
-        );
-        instructions.gotoLabelIfEqualsZero(endLabel);
-
-        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
-        instructions.invokeMethod(
-                ClassDesc.of("java.util.Iterator"),
-                "next",
-                MethodTypeDesc.of(ConstantDescs.CD_Object),
-                InvokeType.INTERFACE,
-                _ -> Unit.INSTANCE
-        );
-
-        dataType.resolve(environment);
-        instructions.checkCast(dataType.getClassDesc());
-
-        VariableValue variableValue = localVariableDeclarationEnvironment.declareVariable(id, dataType, isConstant, null);
-        instructions.storeLocal(variableValue.getDataType().getClassDesc(), variableValue.getSlot());
-        instructions.setLocalName(variableValue.getSlot(), id, variableValue.getDataType().getClassDesc(), conditionLabel, endLabel);
-
-        for (Statement statement : body) {
-            statement.emit(instructions, loopEnvironment, this);
-        }
-
-        instructions.gotoLabel(conditionLabel);
-        instructions.bindLabel(endLabel);
-    }
-
-    @Override
-    public boolean alwaysReturns() {
-        for (LocalStatement localStatement : body) {
-            if (localStatement.alwaysReturns()) return true;
-        }
-
-        return false;
+        return false
     }
 }

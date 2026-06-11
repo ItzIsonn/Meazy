@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.resolveClassDesc
+import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
 import me.itzisonn_.meazy.util.MiscUtils.boxPrimitive
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
@@ -16,7 +16,7 @@ class IsExpression(
     val isLike: Boolean
 ) : Expression {
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
-        val classDesc = resolveClassDesc(environment, dataType, false)
+        val classDesc = environment.resolveClassDesc(dataType, false)
         val valueClassDesc = value.getType(environment, this).classDesc
 
         value.emit(instructions, environment, this)

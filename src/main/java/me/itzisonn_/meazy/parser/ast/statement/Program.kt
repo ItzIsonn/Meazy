@@ -4,9 +4,9 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
+import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 import me.itzisonn_.meazy.util.FileUtils
 import me.itzisonn_.meazy.util.MiscUtils
 import me.itzisonn_.meazy.version.Version
@@ -107,7 +107,7 @@ class Program(
                     val valueType = value.getType(fileEnvironment, this@Program).classDesc
                     val variableType = variableValue.dataType.classDesc
 
-                    if (!EnvironmentUtils.isInstanceOf(fileEnvironment, valueType, variableType)) {
+                    if (!fileEnvironment.isInstanceOf(valueType, variableType)) {
                         if (!MiscUtils.convertPrimitiveOrBoxed(this, valueType, variableType)) {
                             throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                         }
