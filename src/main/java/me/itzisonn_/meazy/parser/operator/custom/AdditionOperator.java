@@ -76,7 +76,7 @@ public class AdditionOperator extends Operator {
         DataType rightType = right.getType(environment, operatorExpression);
 
         if (leftType.getClassDesc().equals(ConstantDescs.CD_String) || rightType.getClassDesc().equals(ConstantDescs.CD_String)) {
-            return DataType.of(ConstantDescs.CD_String, leftType.isNullable() && rightType.isNullable());
+            return DataType.Companion.of(ConstantDescs.CD_String, leftType.isNullable() && rightType.isNullable());
         }
 
         NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
@@ -84,7 +84,7 @@ public class AdditionOperator extends Operator {
 
         if (leftNumberType != null && rightNumberType != null) {
             if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't add nullable numbers");
-            return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
+            return DataType.Companion.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
         }
 
         if (leftType.equals(rightType)) return leftType;

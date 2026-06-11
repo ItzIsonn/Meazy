@@ -54,6 +54,6 @@ public class PowerOperator extends Operator {
 
     @Override
     public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        return DataType.ofNonNull(ConstantDescs.CD_double);
+        return DataType.Companion.ofNonNull(ConstantDescs.CD_double);
     }
 }

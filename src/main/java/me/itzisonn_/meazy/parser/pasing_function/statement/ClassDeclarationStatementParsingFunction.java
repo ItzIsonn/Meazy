@@ -165,7 +165,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 "toString",
                 List.of(),
                 List.of(new ReturnStatement(toStringExpression)),
-                DataType.ofNonNull(ConstantDescs.CD_String)));
+                DataType.Companion.ofNonNull(ConstantDescs.CD_String)));
 
         List<Expression> copyArgs = new ArrayList<>();
         for (Parameter dataVariable : dataVariables) {
@@ -176,7 +176,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 "copy",
                 List.of(),
                 List.of(new ReturnStatement(new CallExpression(new ClassIdentifier(id), copyArgs))),
-                DataType.ofNonNull(ClassDesc.of(id))));
+                DataType.Companion.ofNonNull(ClassDesc.of(id))));
 
         Expression equalsExpression;
         if (!dataVariables.isEmpty()) {
@@ -210,7 +210,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         body.add(new FunctionDeclarationStatement(
                 Set.of(Modifiers.OPERATOR()),
                 "equals",
-                List.of(new Parameter("value", DataType.ofNullable(ConstantDescs.CD_Object), true)),
+                List.of(new Parameter("value", DataType.Companion.ofNullable(ConstantDescs.CD_Object), true)),
                 List.of(
                         new IfStatement(
                                 new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "==", OperatorType.INFIX),
@@ -221,7 +221,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                                 List.of(new ReturnStatement(new BooleanLiteral(false))),
                                 null),
                         new ReturnStatement(equalsExpression)),
-                DataType.ofNonNull(ConstantDescs.CD_boolean)
+                DataType.Companion.ofNonNull(ConstantDescs.CD_boolean)
         ));
 
         return body;
