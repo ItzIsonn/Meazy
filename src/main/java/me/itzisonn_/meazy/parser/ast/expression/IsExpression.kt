@@ -1,68 +1,48 @@
-package me.itzisonn_.meazy.parser.ast.expression;
+package me.itzisonn_.meazy.parser.ast.expression
 
-import kotlin.Unit;
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
-import me.itzisonn_.meazy.util.MiscUtils;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.resolveClassDesc
+import me.itzisonn_.meazy.util.MiscUtils.boxPrimitive
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
 
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
-import java.lang.constant.MethodTypeDesc;
+class IsExpression(
+    val value: Expression,
+    val dataType: String,
+    val isLike: Boolean
+) : Expression {
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        val classDesc = resolveClassDesc(environment, dataType, false)
+        val valueClassDesc = value.getType(environment, this).classDesc
 
-@Getter
-@NullMarked
-public class IsExpression implements Expression {
-    private final Expression value;
-    private final String dataType;
-    private final boolean isLike;
-
-    public IsExpression(Expression value, String dataType, boolean isLike) {
-        this.value = value;
-        this.dataType = dataType;
-        this.isLike = isLike;
-    }
-
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType, false);
-        ClassDesc valueClassDesc = value.getType(environment, this).getClassDesc();
-
-        value.emit(instructions, environment, this);
-        if (valueClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructions, valueClassDesc);
+        value.emit(instructions, environment, this)
+        if (valueClassDesc.isPrimitive) boxPrimitive(instructions, valueClassDesc)
 
         if (isLike) {
-            instructions.instanceOf(classDesc);
-            return;
+            instructions.instanceOf(classDesc)
+            return
         }
 
         instructions.invokeMethod(
-                ConstantDescs.CD_Object,
-                "getClass",
-                MethodTypeDesc.of(ConstantDescs.CD_Class),
-                InvokeType.VIRTUAL,
-                _ -> Unit.INSTANCE
-        );
+            ConstantDescs.CD_Object,
+            "getClass",
+            MethodTypeDesc.of(ConstantDescs.CD_Class),
+            InvokeType.VIRTUAL
+        )
 
         instructions.invokeMethod(
-                ConstantDescs.CD_Object,
-                "equals",
-                MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object),
-                InvokeType.VIRTUAL,
-                argsInstructions -> {
-                    argsInstructions.loadConstant(classDesc);
-                    return Unit.INSTANCE;
-                }
-        );
+            ConstantDescs.CD_Object,
+            "equals",
+            MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object),
+            InvokeType.VIRTUAL
+        ) { loadConstant(classDesc) }
     }
 
-    @Override
-    public DataType getType(Environment environment, ProgramUnit parent) {
-        return DataType.ofNonNull(ConstantDescs.CD_boolean);
+    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+        return DataType.ofNonNull(ConstantDescs.CD_boolean)
     }
 }

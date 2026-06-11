@@ -22,7 +22,7 @@ import kotlin.uuid.Uuid
 
 class CallExpression(
     val caller: Identifier,
-    val args: MutableList<Expression>
+    val args: List<Expression>
 ) : Expression, LocalStatement {
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
         if (caller is FunctionIdentifier) {
@@ -34,7 +34,7 @@ class CallExpression(
 
                 if (parent is MemberExpression) {
                     if (!parent.isNullSafe) {
-                        if (resolvedFunction.target.getType(environment, this).isNullable()) {
+                        if (resolvedFunction.target.getType(environment, this).isNullable) {
                             throw RuntimeException("Unsafe member call of function " + caller.getId() + " on object of type " + resolvedFunction.classDesc.descriptorString())
                         }
                     }
@@ -113,22 +113,19 @@ class CallExpression(
 
     private fun resolveFunction(environment: Environment, parent: ProgramUnit): ResolvedCallable {
         val functionEnvironment = resolveMeazyFunction(environment, parent)
-        if (functionEnvironment == null) {
-            throw RuntimeException("Can't find function for " + caller.getId() + " and args " + args)
-        }
+            ?: error("Can't find function for " + caller.getId() + " and args " + args)
 
         val className = functionEnvironment.getParent().fullClassName
-        if (className == null) throw RuntimeException("Invalid function's parent")
+            ?: error("Invalid function's parent")
 
-        val target: Expression?
-        if (parent is MemberExpression) {
-            target = if (parent.getObject() is ClassIdentifier) null else parent.getObject()
+        val target = if (parent is MemberExpression) {
+            if (parent.receiver is ClassIdentifier) null else parent.receiver
         }
         else if (functionEnvironment.modifiers.contains(Modifiers.SHARED()) || functionEnvironment.getParent() is FileEnvironment) {
-            target = null
+            null
         }
         else {
-            target = ThisLiteral()
+            ThisLiteral()
         }
 
         val returnDataType = functionEnvironment.returnDataType
@@ -136,11 +133,11 @@ class CallExpression(
         return ResolvedCallable(
             ClassDesc.of(className),
             MethodTypeDesc.of(
-                if (returnDataType == null) ConstantDescs.CD_void else returnDataType.getClassDesc(),
+                returnDataType?.classDesc ?: ConstantDescs.CD_void,
                 functionEnvironment.parameters
-                    .map { p -> p.getDataType().getClassDesc() }.toList()
+                    .map { it.dataType.classDesc }.toList()
             ),
-            returnDataType != null && returnDataType.isNullable(),
+            returnDataType != null && returnDataType.isNullable,
             target,
             functionEnvironment.getParent().run {
                 this is ClassEnvironment && isInterface
@@ -153,10 +150,10 @@ class CallExpression(
         val args = args.stream().map<DataType> { arg: Expression? -> arg!!.getType(environment, this) }.toList()
 
         if (parent is MemberExpression) {
-            val classDesc = parent.getObject().getType(environment, this).getClassDesc()
+            val classDesc = parent.receiver.getType(environment, this).classDesc
 
             val classEnvironment = getClass(environment, classDesc).orElse(null)
-            if (classEnvironment == null) return null
+                ?: return null
 
             return classEnvironment.getFunctionRecursively(id, args).orElse(null)
         }
@@ -167,7 +164,7 @@ class CallExpression(
 
     private fun resolveConstructor(environment: Environment): ResolvedCallable {
         val constructorEnvironment = resolveMeazyConstructor(environment)
-        if (constructorEnvironment == null) throw RuntimeException("Can't find constructor for " + caller.getId())
+            ?: error("Can't find constructor for " + caller.getId())
 
         val classEnvironment = constructorEnvironment.getParent()
         if (classEnvironment !is ClassEnvironment) {
@@ -178,8 +175,7 @@ class CallExpression(
             throw RuntimeException("Can't create instance of abstract class " + classEnvironment.id)
         }
 
-        val parameters = constructorEnvironment.parameters.stream()
-            .map<ClassDesc> { p: ParameterExpression? -> p!!.getDataType().getClassDesc() }.toList()
+        val parameters = constructorEnvironment.parameters.map { it.dataType.classDesc }.toList()
 
         return ResolvedCallable(
             ClassDesc.of(classEnvironment.fullClassName),

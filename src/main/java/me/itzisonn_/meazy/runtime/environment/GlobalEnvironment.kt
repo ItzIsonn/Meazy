@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.parser.DataType
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression
+import me.itzisonn_.meazy.parser.Parameter
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import java.lang.constant.ClassDesc
@@ -115,7 +115,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                         null,
                         method.name,
                         method.parameters.map { p ->
-                            ParameterExpression(
+                            Parameter(
                                 p.name,
                                 DataType.of(
                                     p.getType().describeConstable().orElseThrow(),
@@ -144,7 +144,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                         constructorModifiers,
                         constructor.parameters
                             .map { p ->
-                                ParameterExpression(
+                                Parameter(
                                     p.name,
                                     DataType.of(
                                         p.getType().describeConstable().orElseThrow(),

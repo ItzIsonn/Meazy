@@ -28,7 +28,7 @@ interface ConstructorDeclarationEnvironment : Environment {
             if (args.size != parameters.size) continue
 
             for (i in args.indices) {
-                val parameter = parameters[i].getDataType()
+                val parameter = parameters[i].dataType
                 val arg = args[i]
                 if (!DataType.matches(this, arg, parameter)) continue@main
             }
@@ -70,7 +70,7 @@ private class ConstructorDeclarationEnvironmentImpl(
             if (parameters.size != otherParameters.size) continue
 
             for (i in parameters.indices) {
-                if (otherParameters[i].getDataType() != parameters[i].getDataType()) continue@main
+                if (otherParameters[i].dataType != parameters[i].dataType) continue@main
             }
 
             throw EvaluationException(translatable("meazy:runtime.constructor.already_exists"))

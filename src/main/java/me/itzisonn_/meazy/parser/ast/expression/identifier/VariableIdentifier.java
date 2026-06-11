@@ -80,7 +80,7 @@ public class VariableIdentifier extends Identifier {
 
         Expression target;
         if (parent instanceof MemberExpression memberExpression) {
-            target = memberExpression.getObject() instanceof ClassIdentifier ? null : memberExpression.getObject();
+            target = memberExpression.getReceiver() instanceof ClassIdentifier ? null : memberExpression.getReceiver();
         }
         else if (variableValue.getModifiers().contains(Modifiers.SHARED()) || variableValue.getParentEnvironment() instanceof FileEnvironment) {
             target = null;
@@ -104,7 +104,7 @@ public class VariableIdentifier extends Identifier {
         String id = getId();
 
         if (parent instanceof MemberExpression memberExpression) {
-            DataType dataType = memberExpression.getObject().getType(environment, this);
+            DataType dataType = memberExpression.getReceiver().getType(environment, this);
             ClassDesc classDesc = dataType.getClassDesc();
 
             ClassEnvironment classEnvironment = EnvironmentUtils.getClass(environment, classDesc).orElse(null);

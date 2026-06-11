@@ -1,58 +1,50 @@
-package me.itzisonn_.meazy.parser.ast.expression;
+package me.itzisonn_.meazy.parser.ast.expression
 
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.util.MiscUtils;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.util.MiscUtils.boxPrimitive
+import me.itzisonn_.meazy.util.MiscUtils.getBoxedType
 
-import java.lang.constant.ClassDesc;
-
-@Getter
-@NullMarked
-public class NullCheckExpression implements Expression {
-    private final Expression checkExpression;
-    private final Expression nullExpression;
-
-    public NullCheckExpression(Expression checkExpression, Expression nullExpression) {
-        this.checkExpression = checkExpression;
-        this.nullExpression = nullExpression;
-    }
-
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        DataType checkExpressionType = checkExpression.getType(environment, this);
-        if (!checkExpressionType.isNullable()) {
-            checkExpression.emit(instructions, environment, this);
-            return;
+class NullCheckExpression(
+    val checkExpression: Expression,
+    val nullExpression: Expression
+) : Expression {
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        val checkExpressionType = checkExpression.getType(environment, this)
+        if (!checkExpressionType.isNullable) {
+            checkExpression.emit(instructions, environment, this)
+            return
         }
 
-        var endLabel = instructions.createAndInitLabel();
+        val endLabel = instructions.createAndInitLabel()
 
-        checkExpression.emit(instructions, environment, this);
-        instructions.duplicate();
-        instructions.gotoLabelIfNonNull(endLabel);
+        checkExpression.emit(instructions, environment, this)
+        instructions.duplicate()
+        instructions.gotoLabelIfNonNull(endLabel)
 
-        instructions.pop();
-        nullExpression.emit(instructions, environment, this);
-        ClassDesc nullExpressionClassDesc = nullExpression.getType(environment, this).getClassDesc();
-        if (nullExpressionClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructions, nullExpressionClassDesc);
-        instructions.gotoLabel(endLabel);
+        instructions.pop()
+        nullExpression.emit(instructions, environment, this)
+        val nullExpressionClassDesc = nullExpression.getType(environment, this).classDesc
+        if (nullExpressionClassDesc.isPrimitive) boxPrimitive(instructions, nullExpressionClassDesc)
+        instructions.gotoLabel(endLabel)
 
-        instructions.bindLabel(endLabel);
+        instructions.bindLabel(endLabel)
     }
 
-    @Override
-    public DataType getType(Environment environment, ProgramUnit parent) {
-        DataType checkExpressionType = checkExpression.getType(environment, this);
-        if (!checkExpressionType.isNullable()) return checkExpressionType;
+    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+        val checkExpressionType = checkExpression.getType(environment, this)
+        if (!checkExpressionType.isNullable) return checkExpressionType
 
-        DataType nullExpressionType = nullExpression.getType(environment, this);
-        ClassDesc nullExpressionClassDesc = nullExpressionType.getClassDesc();
-        if (nullExpressionClassDesc.isPrimitive()) nullExpressionClassDesc = MiscUtils.getBoxedType(nullExpressionClassDesc);
+        val nullExpressionType = nullExpression.getType(environment, this)
+        var nullExpressionClassDesc = nullExpressionType.classDesc
+        if (nullExpressionClassDesc.isPrimitive) nullExpressionClassDesc = getBoxedType(nullExpressionClassDesc)
 
-        return DataType.commonOf(environment, checkExpressionType.asNonNull(), nullExpressionType.with(nullExpressionClassDesc));
+        return DataType.commonOf(
+            environment,
+            checkExpressionType.asNonNull(),
+            nullExpressionType.with(nullExpressionClassDesc)
+        )
     }
 }

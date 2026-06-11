@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.Parameter;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.VariableValue;
@@ -27,7 +27,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
     private final String id;
     @Nullable
     private final String classId;
-    private final List<ParameterExpression> parameters;
+    private final List<Parameter> parameters;
     private final List<LocalStatement> body;
     @Nullable
     private final DataType returnDataType;
@@ -37,7 +37,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
     private FunctionEnvironment functionEnvironment;
 
     public FunctionDeclarationStatement(
-            Set<Modifier> modifiers, String id, @Nullable String classId, List<ParameterExpression> parameters,
+            Set<Modifier> modifiers, String id, @Nullable String classId, List<Parameter> parameters,
             List<LocalStatement> body, @Nullable DataType returnDataType, @Nullable Expression returnDataTypeValue
     ) {
         super(modifiers);
@@ -49,7 +49,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         this.returnDataTypeValue = returnDataTypeValue;
     }
 
-    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, List<ParameterExpression> parameters, List<LocalStatement> body, @Nullable DataType returnDataType) {
+    public FunctionDeclarationStatement(Set<Modifier> modifiers, String id, List<Parameter> parameters, List<LocalStatement> body, @Nullable DataType returnDataType) {
         this(modifiers, id, null, parameters, body, returnDataType, null);
     }
 
@@ -116,7 +116,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
         if (functionEnvironment.getParent() instanceof ClassEnvironment classEnvironment) {
             if (classEnvironment.getBaseClass() != null) {
                 EnvironmentUtils.getClass(classEnvironment, classEnvironment.getBaseClass()).orElseThrow()
-                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(ParameterExpression::getDataType).toList())
+                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(Parameter::getDataType).toList())
                         .ifPresent(f -> {
                             if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
                                 throw new RuntimeException("Can't override non-open function " + id);
@@ -127,7 +127,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
 
             for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
                 EnvironmentUtils.getClass(classEnvironment, interfaceClassDesc).orElseThrow()
-                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(ParameterExpression::getDataType).toList())
+                        .getFunctionRecursively(this.functionEnvironment.getId(), this.functionEnvironment.getParameters().stream().map(Parameter::getDataType).toList())
                         .ifPresent(f -> {
                             if (!f.getModifiers().contains(Modifiers.OPEN()) && !f.getModifiers().contains(Modifiers.ABSTRACT())) {
                                 throw new RuntimeException("Can't override non-open function " + id);
@@ -164,7 +164,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                     bodyInstructions.initLabel(startLabel);
                     bodyInstructions.initLabel(endLabel);
 
-                    for (ParameterExpression parameter : this.functionEnvironment.getParameters()) {
+                    for (Parameter parameter : this.functionEnvironment.getParameters()) {
                         VariableValue parameterValue = functionEnvironment.declareVariable(
                                 parameter.getId(),
                                 parameter.getDataType(),

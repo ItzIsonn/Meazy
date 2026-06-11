@@ -82,7 +82,7 @@ public class AssignmentStatement implements LocalStatement {
 
         Expression target;
         if (parent instanceof MemberExpression memberExpression) {
-            target = memberExpression.getObject() instanceof ClassIdentifier ? null : memberExpression.getObject();
+            target = memberExpression.getReceiver() instanceof ClassIdentifier ? null : memberExpression.getReceiver();
         }
         else if (variableValue.getModifiers().contains(Modifiers.SHARED()) || variableValue.getParentEnvironment() instanceof FileEnvironment) {
             target = null;
@@ -108,7 +108,7 @@ public class AssignmentStatement implements LocalStatement {
                 throw new RuntimeException("Cant assign value to not variable TODO");
             }
 
-            ClassDesc classDesc = memberExpression.getObject().getType(environment, this).getClassDesc();
+            ClassDesc classDesc = memberExpression.getReceiver().getType(environment, this).getClassDesc();
             ClassEnvironment classEnvironment = EnvironmentUtils.getClass(environment, classDesc).orElse(null);
             if (classEnvironment == null) return null;
 

@@ -1,60 +1,46 @@
-package me.itzisonn_.meazy.parser.ast.expression;
+package me.itzisonn_.meazy.parser.ast.expression
 
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.parser.operator.Operators;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.runtime.environment.Environment
 
-@Getter
-@NullMarked
-public class OperatorExpression implements Expression, LocalStatement {
-    private final Expression left;
-    @Nullable
-    private final Expression right;
-    private final Operator operator;
+class OperatorExpression : Expression, LocalStatement {
+    val left: Expression
+    val right: Expression?
+    val operator: Operator
 
-    public OperatorExpression(Expression left, @Nullable Expression right, Operator operator) {
-        this.left = left;
-        this.right = right;
-        this.operator = operator;
+    constructor(left: Expression, right: Expression?, operator: Operator) {
+        this.left = left
+        this.right = right
+        this.operator = operator
 
-        if (operator.getOperatorType() == OperatorType.INFIX) {
-            if (right == null) throw new IllegalArgumentException("Expression with infix operator must have both sides");
+        if (operator.operatorType == OperatorType.INFIX) {
+            requireNotNull(right) { "Expression with infix operator must have both sides" }
         }
         else {
-            if (right != null) throw new IllegalArgumentException("Expression with non-infix operator must have only left side");
+            require(right == null) { "Expression with non-infix operator must have only left side" }
         }
     }
 
-    public OperatorExpression(Expression left, @Nullable Expression right, String operatorSymbol, OperatorType operatorType) {
-        Operator operator = Operators.parse(operatorSymbol, operatorType);
-        if (operator == null) throw new IllegalArgumentException("Unknown operator with symbol " + operatorSymbol + " and type " + operatorType);
-        this(left, right, operator);
+    constructor(left: Expression, right: Expression?, operatorSymbol: String, operatorType: OperatorType)
+            : this(left, right, run {
+                val operator = Operators.parse(operatorSymbol, operatorType)
+                requireNotNull(operator) { "Unknown operator with symbol $operatorSymbol and type $operatorType" }
+                operator
+            })
+
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        operator.emit(instructions, environment, this)
     }
 
-    public OperatorType getOperatorType() {
-        return operator.getOperatorType();
+    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+        return operator.getType(environment, this)
     }
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        operator.emit(instructions, environment, this);
-    }
-
-    @Override
-    public DataType getType(Environment environment, ProgramUnit parent) {
-        return operator.getType(environment, this);
-    }
-
-    @Override
-    public boolean alwaysReturns() {
-        return false;
-    }
+    override fun alwaysReturns() = false
 }
