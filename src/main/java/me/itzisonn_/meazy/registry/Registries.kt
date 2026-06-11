@@ -22,7 +22,9 @@ import me.itzisonn_.registry.multiple_entry.OrderedRegistry
 import me.itzisonn_.registry.multiple_entry.SetRegistry
 import java.io.File
 import java.lang.constant.ClassDesc
-import java.lang.reflect.InvocationTargetException
+import kotlin.reflect.KCallable
+import kotlin.reflect.KVisibility
+import kotlin.reflect.typeOf
 
 /**
  * All basic Registries
@@ -203,34 +205,31 @@ object Registries {
 
         runProgramFunction = { classes ->
             val classLoader = ClassLoaderWrapper()
+            val mainMethods = mutableSetOf<KCallable<*>>()
+
             for ((classDesc, classFile) in classes) {
-                val loadedClass = classLoader.defineClass(classFile)
+                val loadedClass = classLoader.defineClass(classFile).kotlin
 
-                try {
-                    val method = loadedClass.getDeclaredMethod("main")
-
-                    if (method.returnType != Void.TYPE || method.parameters.size != 0) {
-                        System.err.println("Main method has invalid signature in class$classDesc") //TODO
-                        continue
-                    }
-
-                    if (!method.canAccess(null)) {
-                        System.err.println("Main method is inaccessible in class $classDesc")
-                        continue
-                    }
-
-                    method.invoke(null)
-                }
-                catch (_: NoSuchMethodException) {
+                val method = loadedClass.members.find { it.name == "main" }
+                if (method == null) {
                     System.err.println("No method main in class $classDesc")
+                    continue
                 }
-                catch (e: IllegalAccessException) {
-                    throw RuntimeException(e)
+
+                if (method.returnType != typeOf<Unit>() || method.parameters.isNotEmpty()) {
+                    System.err.println("Main method has invalid signature in class $classDesc") //TODO
+                    continue
                 }
-                catch (e: InvocationTargetException) {
-                    throw RuntimeException(e)
+
+                if (method.visibility != KVisibility.PUBLIC) {
+                    System.err.println("Main method is inaccessible in class $classDesc")
+                    continue
                 }
+
+                mainMethods += method
             }
+
+            mainMethods.forEach { it.call() }
         }
     }
 }
