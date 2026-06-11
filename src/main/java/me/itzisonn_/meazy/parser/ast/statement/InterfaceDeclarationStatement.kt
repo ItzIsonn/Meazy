@@ -25,11 +25,11 @@ class InterfaceDeclarationStatement(
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
-        val isInner = modifiers.contains(Modifiers.PRIVATE())
+        val isInner = Modifiers.private in modifiers
 
         val classEnvironment = ClassEnvironment(
             environment,
-            isInner || modifiers.contains(Modifiers.SHARED()),
+            isInner || Modifiers.shared in modifiers,
             true,
             id,
             baseClasses,
@@ -58,7 +58,7 @@ class InterfaceDeclarationStatement(
 
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
         require(environment is FileEnvironment) { "Environment must be file TODO" }
-        val isInner = modifiers.contains(Modifiers.PRIVATE())
+        val isInner = Modifiers.private in modifiers
 
         val classDesc = if (isInner) ClassDesc.of(environment.packageName + "." + environment.className + "$" + id)
         else ClassDesc.of(environment.packageName, id)
@@ -70,7 +70,7 @@ class InterfaceDeclarationStatement(
 
         if (isInner) attributes.add(getInnerClassesAttribute(environment))
         else {
-            if (modifiers.contains(Modifiers.PRIVATE())) flags.add(AccessFlag.PRIVATE)
+            if (Modifiers.private in modifiers) flags.add(AccessFlag.PRIVATE)
             else flags.add(AccessFlag.PUBLIC)
         }
 

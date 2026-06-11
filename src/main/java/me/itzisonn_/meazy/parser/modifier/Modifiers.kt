@@ -1,112 +1,75 @@
-package me.itzisonn_.meazy.parser.modifier;
+package me.itzisonn_.meazy.parser.modifier
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.parser.modifier.custom.*;
-import me.itzisonn_.registry.RegistryEntry;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.parser.modifier.custom.*
+import me.itzisonn_.meazy.registry.Registries
 
 /**
  * Modifiers registrar
- *
- * @see Registries#MODIFIERS
+ * 
+ * @see Registries.MODIFIERS
  */
-public final class Modifiers {
-    private static boolean hasRegistered = false;
+object Modifiers {
+    private var hasRegistered = false
 
-    private Modifiers() {}
-
-
-
-    public static Modifier PRIVATE() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("private")).getValue();
-    }
-
-    public static Modifier PROTECTED() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("protected")).getValue();
-    }
-
-    public static Modifier OPEN() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("open")).getValue();
-    }
-
-    public static Modifier SHARED() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("shared")).getValue();
-    }
-
-    public static Modifier OVERRIDE() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("override")).getValue();
-    }
-
-    public static Modifier ABSTRACT() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("abstract")).getValue();
-    }
-
-    public static Modifier GET() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("get")).getValue();
-    }
-
-    public static Modifier SET() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("set")).getValue();
-    }
-
-    public static Modifier DATA() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("data")).getValue();
-    }
-
-    public static Modifier OPERATOR() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("operator")).getValue();
-    }
-
-    public static Modifier ENUM() {
-        return Registries.MODIFIERS.getEntry(MeazyMain.getDefaultIdentifier("enum")).getValue();
-    }
-
-
+    val private get() = get("private")
+    val protected get() = get("protected")
+    val open get() = get("open")
+    val shared get() = get("shared")
+    val override get() = get("override")
+    val abstract get() = get("abstract")
+    val get get() = get("get")
+    val set get() = get("set")
+    val data get() = get("data")
+    val operator get() = get("operator")
+    val enum get() = get("enum")
 
     /**
      * Finds registered Modifier with given id
-     *
+     * 
      * @param id Id of Modifier
      * @return Modifier with given id or null
      */
-    @Nullable
-    public static Modifier parse(@NonNull String id) {
-        for (RegistryEntry<Modifier> entry : Registries.MODIFIERS.getEntries()) {
-            if (id.equals(entry.getValue().getId())) return entry.getValue();
+    fun parse(id: String): Modifier? {
+        for (entry in Registries.MODIFIERS.getEntries()) {
+            if (id == entry.getValue().id) return entry.getValue()
         }
 
-        return null;
+        return null
     }
 
-
+    
 
     /**
-     * Initializes {@link Registries#MODIFIERS} registry
-     * <p>
-     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
-     *
-     * @throws IllegalStateException If {@link Registries#MODIFIERS} registry has already been initialized
+     * Initializes [Registries.MODIFIERS] registry
+     * 
+     * 
+     * *Don't use this method because it's called once at [Registries] initialization*
+     * 
+     * @throws IllegalStateException If [Registries.MODIFIERS] registry has already been initialized
      */
-    public static void REGISTER() {
-        if (hasRegistered) throw new IllegalStateException("Modifiers have already been initialized");
-        hasRegistered = true;
+    fun register() {
+        check(!hasRegistered) { "Modifiers have already been initialized" }
+        hasRegistered = true
 
-        register(new PrivateModifier());
-        register(new ProtectedModifier());
-        register(new OpenModifier());
-        register(new SharedModifier());
-        register(new OverrideModifier());
-        register(new AbstractModifier());
-        register(new GetModifier());
-        register(new SetModifier());
-        register(new DataModifier());
-        register(new OperatorModifier());
-        register(new EnumModifier());
+        register(PrivateModifier())
+        register(ProtectedModifier())
+        register(OpenModifier())
+        register(SharedModifier())
+        register(OverrideModifier())
+        register(AbstractModifier())
+        register(GetModifier())
+        register(SetModifier())
+        register(DataModifier())
+        register(OperatorModifier())
+        register(EnumModifier())
     }
 
-    private static void register(Modifier modifier) {
-        Registries.MODIFIERS.register(MeazyMain.getDefaultIdentifier(modifier.getId()), modifier);
+    private fun register(modifier: Modifier) {
+        Registries.MODIFIERS.register(getDefaultIdentifier(modifier.id), modifier)
+    }
+
+    private fun get(id: String): Modifier {
+        return Registries.MODIFIERS.getEntry(getDefaultIdentifier(id)).value!!
     }
 }

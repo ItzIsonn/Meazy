@@ -1,25 +1,18 @@
-package me.itzisonn_.meazy.parser.modifier.custom;
+package me.itzisonn_.meazy.parser.modifier.custom
 
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
+import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
+import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.environment.Environment
 
-@NullMarked
-public class OverrideModifier extends Modifier {
-    public OverrideModifier() {
-        super("override");
+class OverrideModifier : Modifier("override") {
+    override fun canUse(modifierStatement: ModifierStatement, environment: Environment): Boolean {
+        return modifierStatement is FunctionDeclarationStatement
     }
 
-    @Override
-    public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
-        return modifierStatement instanceof FunctionDeclarationStatement;
-    }
-
-    @Override
-    public boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
-        return true;
-    }
+    override fun canAccess(
+        requestEnvironment: Environment, environment: Environment,
+        identifier: Identifier, hasModifier: Boolean
+    ) = true
 }

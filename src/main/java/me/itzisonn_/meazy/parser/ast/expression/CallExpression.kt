@@ -118,7 +118,7 @@ class CallExpression(
         val target = if (parent is MemberExpression) {
             if (parent.receiver is ClassIdentifier) null else parent.receiver
         }
-        else if (functionEnvironment.modifiers.contains(Modifiers.SHARED()) || functionEnvironment.getParent() is FileEnvironment) {
+        else if (Modifiers.shared in functionEnvironment.modifiers || functionEnvironment.getParent() is FileEnvironment) {
             null
         }
         else {
@@ -165,7 +165,7 @@ class CallExpression(
             throw RuntimeException("Invalid constructor")
         }
 
-        if (classEnvironment.hasModifier(Modifiers.ABSTRACT())) {
+        if (classEnvironment.hasModifier(Modifiers.abstract)) {
             throw RuntimeException("Can't create instance of abstract class " + classEnvironment.id)
         }
 

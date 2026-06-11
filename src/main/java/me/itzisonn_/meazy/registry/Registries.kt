@@ -134,7 +134,7 @@ object Registries {
 
         Commands.register()
         TokenTypes.register()
-        Modifiers.REGISTER()
+        Modifiers.register()
         Operators.REGISTER()
         ParsingFunctions.REGISTER()
 

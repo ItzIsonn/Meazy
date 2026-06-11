@@ -70,7 +70,7 @@ class VariableIdentifier(id: String) : Identifier(id) {
         val target = if (parent is MemberExpression) {
             if (parent.receiver is ClassIdentifier) null else parent.receiver
         }
-        else if (variableValue.modifiers.contains(Modifiers.SHARED()) || variableValue.parentEnvironment is FileEnvironment) {
+        else if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
             null
         }
         else {

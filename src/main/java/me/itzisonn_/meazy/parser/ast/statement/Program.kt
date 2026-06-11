@@ -70,7 +70,7 @@ class Program(
         val attributes = mutableListOf<InnerClassesAttribute>()
         for (statement in _body) {
             if (statement !is ClassDeclarationStatement) continue
-            if (!statement.modifiers.contains(Modifiers.PRIVATE())) continue
+            if (Modifiers.private !in statement.modifiers) continue
             attributes.add(statement.getInnerClassesAttribute(fileEnvironment))
         }
 

@@ -49,8 +49,8 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
         List<Parameter> parameters = ParsingHelper.parseParameters(context);
         DataType dataType = ParsingHelper.parseDataType(context);
 
-        if (modifiers.contains(Modifiers.ABSTRACT()) || (canBeAbstractWithoutModifier && parser.getCurrent().getType().equals(TokenTypes.NEW_LINE()))) {
-            modifiers.add(Modifiers.ABSTRACT());
+        if (modifiers.contains(Modifiers.INSTANCE.getAbstract()) || (canBeAbstractWithoutModifier && parser.getCurrent().getType().equals(TokenTypes.NEW_LINE()))) {
+            modifiers.add(Modifiers.INSTANCE.getAbstract());
             return new FunctionDeclarationStatement(modifiers, id, parameters, new ArrayList<>(), dataType);
         }
 

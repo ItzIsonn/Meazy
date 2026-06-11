@@ -68,9 +68,9 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
             )
 
             val classEnvironmentModifiers = mutableSetOf<Modifier>()
-            if (!java.lang.reflect.Modifier.isFinal(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.OPEN())
-            if (java.lang.reflect.Modifier.isPrivate(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.PRIVATE())
-            if (java.lang.reflect.Modifier.isAbstract(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.ABSTRACT())
+            if (!java.lang.reflect.Modifier.isFinal(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.open)
+            if (java.lang.reflect.Modifier.isPrivate(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.private)
+            if (java.lang.reflect.Modifier.isAbstract(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.abstract)
 
             val classEnvironment = ClassEnvironment(
                 fileEnvironment,
@@ -102,11 +102,11 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 }
 
                 val functionModifiers = mutableSetOf<Modifier>()
-                if (!java.lang.reflect.Modifier.isFinal(cls.modifiers)) functionModifiers.add(Modifiers.OPEN())
-                if (java.lang.reflect.Modifier.isPrivate(cls.modifiers)) functionModifiers.add(Modifiers.PRIVATE())
-                if (java.lang.reflect.Modifier.isProtected(cls.modifiers)) functionModifiers.add(Modifiers.PROTECTED())
-                if (java.lang.reflect.Modifier.isStatic(cls.modifiers)) functionModifiers.add(Modifiers.SHARED())
-                if (java.lang.reflect.Modifier.isAbstract(cls.modifiers)) functionModifiers.add(Modifiers.ABSTRACT())
+                if (!java.lang.reflect.Modifier.isFinal(cls.modifiers)) functionModifiers.add(Modifiers.open)
+                if (java.lang.reflect.Modifier.isPrivate(cls.modifiers)) functionModifiers.add(Modifiers.private)
+                if (java.lang.reflect.Modifier.isProtected(cls.modifiers)) functionModifiers.add(Modifiers.protected)
+                if (java.lang.reflect.Modifier.isStatic(cls.modifiers)) functionModifiers.add(Modifiers.shared)
+                if (java.lang.reflect.Modifier.isAbstract(cls.modifiers)) functionModifiers.add(Modifiers.abstract)
 
                 classEnvironment.declareFunction(
                     FunctionEnvironment(
@@ -133,8 +133,8 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
 
             for (constructor in cls.declaredConstructors) {
                 val constructorModifiers = mutableSetOf<Modifier>()
-                if (java.lang.reflect.Modifier.isPrivate(cls.modifiers)) constructorModifiers.add(Modifiers.PRIVATE())
-                if (java.lang.reflect.Modifier.isProtected(cls.modifiers)) constructorModifiers.add(Modifiers.PROTECTED())
+                if (java.lang.reflect.Modifier.isPrivate(cls.modifiers)) constructorModifiers.add(Modifiers.private)
+                if (java.lang.reflect.Modifier.isProtected(cls.modifiers)) constructorModifiers.add(Modifiers.protected)
 
                 classEnvironment.declareConstructor(
                     ConstructorEnvironment(

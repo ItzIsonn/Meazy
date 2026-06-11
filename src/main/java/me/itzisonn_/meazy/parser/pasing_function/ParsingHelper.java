@@ -26,7 +26,7 @@ public final class ParsingHelper {
 
         while (parser.getCurrent().getType().equals(TokenTypes.ID())) {
             String id = parser.getCurrent().getValue();
-            Modifier modifier = Modifiers.parse(id);
+            Modifier modifier = Modifiers.INSTANCE.parse(id);
 
             if (modifier == null) {
                 if (modifiers.isEmpty()) return modifiers;
