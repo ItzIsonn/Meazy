@@ -24,17 +24,17 @@ public class VariableIdentifier extends Identifier {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
 
         if (resolvedVariable.getClassDesc() == null) {
-            instructionsSet.getLocal(resolvedVariable.getType(), resolvedVariable.getSlot());
+            instructions.getLocal(resolvedVariable.getType(), resolvedVariable.getSlot());
         }
         else if (resolvedVariable.getTarget() == null) {
-            instructionsSet.getStaticField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
+            instructions.getStaticField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
         }
         else {
-            resolvedVariable.getTarget().emit(instructionsSet, environment, this);
+            resolvedVariable.getTarget().emit(instructions, environment, this);
             Uuid endLabel = null;
 
             if (parent instanceof MemberExpression memberExpression) {
@@ -44,24 +44,24 @@ public class VariableIdentifier extends Identifier {
                     }
                 }
                 else {
-                    var nonnullLabel = instructionsSet.createAndInitLabel();
-                    endLabel = instructionsSet.createAndInitLabel();
+                    var nonnullLabel = instructions.createAndInitLabel();
+                    endLabel = instructions.createAndInitLabel();
 
-                    instructionsSet.duplicate();
-                    instructionsSet.gotoLabelIfNonNull(nonnullLabel);
+                    instructions.duplicate();
+                    instructions.gotoLabelIfNonNull(nonnullLabel);
 
-                    instructionsSet.pop();
-                    instructionsSet.loadNull();
-                    instructionsSet.gotoLabel(endLabel);
+                    instructions.pop();
+                    instructions.loadNull();
+                    instructions.gotoLabel(endLabel);
 
-                    instructionsSet.bindLabel(nonnullLabel);
+                    instructions.bindLabel(nonnullLabel);
                 }
             }
 
-            instructionsSet.getField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
+            instructions.getField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
 
             if (endLabel != null) {
-                instructionsSet.bindLabel(endLabel);
+                instructions.bindLabel(endLabel);
             }
         }
     }

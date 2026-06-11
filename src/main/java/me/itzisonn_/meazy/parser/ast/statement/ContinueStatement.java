@@ -10,12 +10,12 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ContinueStatement implements LocalStatement {
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         LoopEnvironment loopEnvironment = EnvironmentUtils.getParentOrSelf(environment, LoopEnvironment.class).orElseThrow(
                 () -> new IllegalArgumentException("Parent environment for CONTINUE statement must be LoopEnvironment TODO")
         );
 
-        instructionsSet.gotoLabel(loopEnvironment.getStartLabel());
+        instructions.gotoLabel(loopEnvironment.getStartLabel());
     }
 
     @Override

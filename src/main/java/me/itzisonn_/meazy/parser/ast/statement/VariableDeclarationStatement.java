@@ -66,7 +66,7 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (variableValue == null) {
             if (!(environment instanceof FileEnvironment) && !(environment instanceof ClassEnvironment)) {
                 declare(environment);
@@ -84,7 +84,7 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
             else accessFlags.add(AccessFlag.PUBLIC);
 
-            instructionsSet.withField(id, variableType, accessFlags);
+            instructions.withField(id, variableType, accessFlags);
             return;
         }
 
@@ -97,29 +97,29 @@ public class VariableDeclarationStatement extends ModifierStatement implements D
             if (modifiers.contains(Modifiers.SHARED())) accessFlags.add(AccessFlag.STATIC);
             if (isConstant) accessFlags.add(AccessFlag.FINAL);
 
-            instructionsSet.withField(id, variableType, accessFlags);
+            instructions.withField(id, variableType, accessFlags);
             return;
         }
 
 
 
         if (value != null) {
-            value.emit(instructionsSet, environment, this);
+            value.emit(instructions, environment, this);
             ClassDesc valueType = value.getType(environment, this).getClassDesc();
 
             if (!EnvironmentUtils.isInstanceOf(environment, valueType, variableType)) {
-                if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, valueType, variableType)) {
+                if (!MiscUtils.convertPrimitiveOrBoxed(instructions, valueType, variableType)) {
                     throw new RuntimeException("Can't assign value of type " + valueType + " to variable with type " + variableType);
                 }
             }
         }
 
-        instructionsSet.storeLocal(variableType, variableValue.getSlot());
+        instructions.storeLocal(variableType, variableValue.getSlot());
 
         if (environment instanceof LocalVariableDeclarationEnvironment localDeclarationEnvironment) {
             if (localDeclarationEnvironment.getStartLabel() == null || localDeclarationEnvironment.getEndLabel() == null) return;
 
-            instructionsSet.setLocalName(
+            instructions.setLocalName(
                     variableValue.getSlot(), id, variableType,
                     localDeclarationEnvironment.getStartLabel(), localDeclarationEnvironment.getEndLabel()
             );

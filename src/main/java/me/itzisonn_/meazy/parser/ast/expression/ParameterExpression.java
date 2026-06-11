@@ -27,7 +27,7 @@ public class ParameterExpression implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
     }
 
     @Override

@@ -36,13 +36,13 @@ public class CallExpression implements Expression, LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (caller instanceof FunctionIdentifier) {
             ResolvedCallable resolvedFunction = resolveFunction(environment, parent);
             Uuid endLabel = null;
 
             if (resolvedFunction.getTarget() != null) {
-                resolvedFunction.getTarget().emit(instructionsSet, environment, this);
+                resolvedFunction.getTarget().emit(instructions, environment, this);
 
                 if (parent instanceof MemberExpression memberExpression) {
                     if (!memberExpression.isNullSafe()) {
@@ -51,22 +51,22 @@ public class CallExpression implements Expression, LocalStatement {
                         }
                     }
                     else {
-                        var nonnullLabel = instructionsSet.createAndInitLabel();
-                        endLabel = instructionsSet.createAndInitLabel();
+                        var nonnullLabel = instructions.createAndInitLabel();
+                        endLabel = instructions.createAndInitLabel();
 
-                        instructionsSet.duplicate();
-                        instructionsSet.gotoLabelIfNonNull(nonnullLabel);
+                        instructions.duplicate();
+                        instructions.gotoLabelIfNonNull(nonnullLabel);
 
-                        instructionsSet.pop();
-                        instructionsSet.loadNull();
-                        instructionsSet.gotoLabel(endLabel);
+                        instructions.pop();
+                        instructions.loadNull();
+                        instructions.gotoLabel(endLabel);
 
-                        instructionsSet.bindLabel(nonnullLabel);
+                        instructions.bindLabel(nonnullLabel);
                     }
                 }
             }
 
-            instructionsSet.invokeMethod(
+            instructions.invokeMethod(
                     resolvedFunction.getClassDesc(),
                     caller.getId(),
                     resolvedFunction.getMethodTypeDesc(),
@@ -80,7 +80,7 @@ public class CallExpression implements Expression, LocalStatement {
                             arg.emit(argsInstructions, environment, this);
 
                             if (!EnvironmentUtils.isInstanceOf(environment, argType, parameterType)) {
-                                if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, argType, parameterType)) {
+                                if (!MiscUtils.convertPrimitiveOrBoxed(instructions, argType, parameterType)) {
                                     throw new RuntimeException("Can't pass argument of type " + argType + " to parameter of type " + parameterType);
                                 }
                             }
@@ -94,14 +94,14 @@ public class CallExpression implements Expression, LocalStatement {
             );
 
             if (endLabel != null) {
-                instructionsSet.bindLabel(endLabel);
+                instructions.bindLabel(endLabel);
             }
         }
 
         else if (caller instanceof ClassIdentifier) {
             ResolvedCallable resolvedConstructor = resolveConstructor(environment);
 
-            instructionsSet.invokeConstructor(
+            instructions.invokeConstructor(
                     resolvedConstructor.getClassDesc(),
                     resolvedConstructor.getMethodTypeDesc(),
                     argsInstructions -> {

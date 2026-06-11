@@ -26,8 +26,8 @@ public class MapCreationExpression implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        instructionsSet.invokeConstructor(
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
+        instructions.invokeConstructor(
                 ClassDesc.of("java.util.HashMap"),
                 MethodTypeDesc.of(ConstantDescs.CD_void, List.of(ClassDesc.of("java.util.Map"))),
                 argsInstructions -> {

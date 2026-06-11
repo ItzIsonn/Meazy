@@ -14,8 +14,8 @@ import java.lang.constant.ClassDesc;
 @NullMarked
 public class ThisLiteral implements Expression {
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        instructionsSet.loadThisReference();
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
+        instructions.loadThisReference();
     }
 
     @Override

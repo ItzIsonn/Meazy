@@ -27,11 +27,11 @@ public class ReturnStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         Optional<ConstructorEnvironment> optionalConstructorEnvironment = EnvironmentUtils.getParentOrSelf(environment, ConstructorEnvironment.class);
         if (optionalConstructorEnvironment.isPresent()) {
             if (value != null) throw new RuntimeException("Constructor can't return value TODO");
-            instructionsSet.returnVoid();
+            instructions.returnVoid();
             return;
         }
 
@@ -46,7 +46,7 @@ public class ReturnStatement implements LocalStatement {
                 throw new RuntimeException("Function must return value TODO");
             }
 
-            instructionsSet.returnVoid();
+            instructions.returnVoid();
             return;
         }
 
@@ -54,17 +54,17 @@ public class ReturnStatement implements LocalStatement {
             throw new RuntimeException("Function must not return value TODO");
         }
 
-        value.emit(instructionsSet, environment, this);
+        value.emit(instructions, environment, this);
         ClassDesc valueClassDesc = value.getType(environment, this).getClassDesc();
         ClassDesc returnTypeClassDesc = returnDataType.getClassDesc();
 
         if (!EnvironmentUtils.isInstanceOf(functionEnvironment, valueClassDesc, returnTypeClassDesc)) {
-            if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, valueClassDesc, returnTypeClassDesc)) {
+            if (!MiscUtils.convertPrimitiveOrBoxed(instructions, valueClassDesc, returnTypeClassDesc)) {
                 throw new RuntimeException("Function's return value not matches its return data type TODO");
             }
         }
 
-        instructionsSet.returnValue(returnTypeClassDesc);
+        instructions.returnValue(returnTypeClassDesc);
     }
 
     @Override

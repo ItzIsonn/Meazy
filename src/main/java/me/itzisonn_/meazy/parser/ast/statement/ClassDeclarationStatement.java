@@ -93,7 +93,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (!(environment instanceof FileEnvironment fileEnvironment)) throw new IllegalArgumentException("Environment must be file TODO");
         if (classEnvironment == null) throw new RuntimeException("Declared class is unresolved TODO");
 
@@ -115,7 +115,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
             else if (!modifiers.contains(Modifiers.OPEN())) flags.add(AccessFlag.FINAL);
         }
 
-        instructionsSet.withClass(
+        instructions.withClass(
                 classDesc,
                 classEnvironment.getBaseClass(),
                 classEnvironment.getInterfaces(),

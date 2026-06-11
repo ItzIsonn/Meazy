@@ -12,8 +12,8 @@ import java.lang.constant.ConstantDescs;
 @NullMarked
 public class NullLiteral implements Expression {
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        instructionsSet.loadNull();
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
+        instructions.loadNull();
     }
 
     @Override

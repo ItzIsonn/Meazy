@@ -10,12 +10,12 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class BreakStatement implements LocalStatement {
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         LoopEnvironment loopEnvironment = EnvironmentUtils.getParentOrSelf(environment, LoopEnvironment.class).orElseThrow(
                 () -> new IllegalArgumentException("Parent environment for BREAK statement must be LoopEnvironment TODO")
         );
 
-        instructionsSet.gotoLabel(loopEnvironment.getEndLabel());
+        instructions.gotoLabel(loopEnvironment.getEndLabel());
     }
 
     @Override

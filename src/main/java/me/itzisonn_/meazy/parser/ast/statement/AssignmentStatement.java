@@ -30,7 +30,7 @@ public class AssignmentStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         ResolvedVariable resolvedVariable = resolveVariable(environment, parent);
         if (resolvedVariable.isConstant()) throw new RuntimeException("Can't reassign constant variable " + resolvedVariable.getId() + " TODO");
 
@@ -38,25 +38,25 @@ public class AssignmentStatement implements LocalStatement {
         ClassDesc valueType = value.getType(environment, this).getClassDesc();
 
         if (resolvedVariable.getClassDesc() != null && resolvedVariable.getTarget() != null) {
-            resolvedVariable.getTarget().emit(instructionsSet, environment, this);
+            resolvedVariable.getTarget().emit(instructions, environment, this);
         }
 
-        value.emit(instructionsSet, environment, this);
+        value.emit(instructions, environment, this);
 
         if (!EnvironmentUtils.isInstanceOf(environment, valueType, variableType)) {
-            if (!MiscUtils.convertPrimitiveOrBoxed(instructionsSet, valueType, variableType)) {
+            if (!MiscUtils.convertPrimitiveOrBoxed(instructions, valueType, variableType)) {
                 throw new RuntimeException("Can't assign value of type " + valueType + " to variable with type " + variableType);
             }
         }
 
         if (resolvedVariable.getClassDesc() == null) {
-            instructionsSet.storeLocal(resolvedVariable.getType(), resolvedVariable.getSlot());
+            instructions.storeLocal(resolvedVariable.getType(), resolvedVariable.getSlot());
         }
         else if (resolvedVariable.getTarget() == null) {
-            instructionsSet.storeStaticField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
+            instructions.storeStaticField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
         }
         else {
-            instructionsSet.storeField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
+            instructions.storeField(resolvedVariable.getClassDesc(), resolvedVariable.getId(), resolvedVariable.getType());
         }
     }
 

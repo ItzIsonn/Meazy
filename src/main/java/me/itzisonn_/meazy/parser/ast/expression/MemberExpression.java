@@ -24,8 +24,8 @@ public class MemberExpression implements Expression, LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        member.emit(instructionsSet, environment, this);
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
+        member.emit(instructions, environment, this);
     }
 
     @Override

@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.lexer.*
 import me.itzisonn_.meazy.parser.*
-import me.itzisonn_.meazy.parser.ast.program.Program
+import me.itzisonn_.meazy.parser.ast.statement.Program
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.operator.Operators
@@ -195,7 +195,7 @@ object Registries {
 
             program.declare(globalEnvironment)
             program.resolve(globalEnvironment)
-            program.emit(instructionsSet, globalEnvironment, null)
+            program.emit(instructionsSet, globalEnvironment)
 
             for (instruction in instructionsSet.instructions) {
                 instruction.emit(bytecodeBuilders)

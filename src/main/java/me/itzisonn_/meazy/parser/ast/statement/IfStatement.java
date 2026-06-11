@@ -30,21 +30,21 @@ public class IfStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        var startLabel = instructionsSet.createAndInitLabel();
-        var elseLabel = instructionsSet.createAndInitLabel();
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
+        var startLabel = instructions.createAndInitLabel();
+        var elseLabel = instructions.createAndInitLabel();
         LocalVariableDeclarationEnvironment ifEnvironment = LocalVariableDeclarationEnvironmentKt.LocalVariableDeclarationEnvironment(
                 environment, startLabel, elseLabel
         );
 
         if (condition == null) {
-            instructionsSet.bindLabel(startLabel);
+            instructions.bindLabel(startLabel);
 
             for (Statement statement : body) {
-                statement.emit(instructionsSet, ifEnvironment, this);
+                statement.emit(instructions, ifEnvironment, this);
             }
 
-            instructionsSet.bindLabel(elseLabel);
+            instructions.bindLabel(elseLabel);
             return;
         }
 
@@ -54,23 +54,23 @@ public class IfStatement implements LocalStatement {
             throw new RuntimeException("If statement must always use boolean TODO but uses " + condition.getType(environment, this));
         }
 
-        var endLabel = instructionsSet.createAndInitLabel();
-        condition.emit(instructionsSet, environment, this);
-        instructionsSet.convertToBooleanType(conditionType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
-        instructionsSet.gotoLabelIfEqualsZero(elseLabel);
+        var endLabel = instructions.createAndInitLabel();
+        condition.emit(instructions, environment, this);
+        instructions.convertToBooleanType(conditionType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
+        instructions.gotoLabelIfEqualsZero(elseLabel);
 
-        instructionsSet.bindLabel(startLabel);
+        instructions.bindLabel(startLabel);
         for (Statement statement : body) {
-            statement.emit(instructionsSet, ifEnvironment, this);
+            statement.emit(instructions, ifEnvironment, this);
         }
-        instructionsSet.gotoLabel(endLabel);
+        instructions.gotoLabel(endLabel);
 
-        instructionsSet.bindLabel(elseLabel);
+        instructions.bindLabel(elseLabel);
         if (elseStatement != null) {
-            elseStatement.emit(instructionsSet, environment, parent);
+            elseStatement.emit(instructions, environment, parent);
         }
 
-        instructionsSet.bindLabel(endLabel);
+        instructions.bindLabel(endLabel);
     }
 
     @Override

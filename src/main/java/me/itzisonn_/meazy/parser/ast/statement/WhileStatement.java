@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -13,7 +12,6 @@ import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ConstantDescs;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @NullMarked
@@ -27,25 +25,25 @@ public class WhileStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (!condition.getType(environment, this).equals(DataType.ofNonNull(ConstantDescs.CD_boolean))) {
             throw new RuntimeException("While statement must always use boolean TODO");
         }
 
-        var conditionLabel = instructionsSet.createAndInitLabel();
-        var endLabel = instructionsSet.createAndInitLabel();
+        var conditionLabel = instructions.createAndInitLabel();
+        var endLabel = instructions.createAndInitLabel();
         LoopEnvironment loopEnvironment = LoopEnvironmentKt.LoopEnvironment(environment, conditionLabel, endLabel);
 
-        instructionsSet.bindLabel(conditionLabel);
-        condition.emit(instructionsSet, environment, this);
-        instructionsSet.gotoLabelIfEqualsZero(endLabel);
+        instructions.bindLabel(conditionLabel);
+        condition.emit(instructions, environment, this);
+        instructions.gotoLabelIfEqualsZero(endLabel);
 
         for (Statement statement : body) {
-            statement.emit(instructionsSet, loopEnvironment, this);
+            statement.emit(instructions, loopEnvironment, this);
         }
 
-        instructionsSet.gotoLabel(conditionLabel);
-        instructionsSet.bindLabel(endLabel);
+        instructions.gotoLabel(conditionLabel);
+        instructions.bindLabel(endLabel);
     }
 
     @Override

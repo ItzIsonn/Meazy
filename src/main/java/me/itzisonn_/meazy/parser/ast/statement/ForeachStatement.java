@@ -37,7 +37,7 @@ public class ForeachStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (!(environment instanceof LocalVariableDeclarationEnvironment localVariableDeclarationEnvironment)) {
             throw new RuntimeException("Foreach statement must be inside variableDeclarationEnvironment TODO");
         }
@@ -48,9 +48,9 @@ public class ForeachStatement implements LocalStatement {
                 null
         );
 
-        collection.emit(instructionsSet, environment, this);
+        collection.emit(instructions, environment, this);
 
-        instructionsSet.invokeMethod(
+        instructions.invokeMethod(
                 ClassDesc.of("java.lang.Iterable"),
                 "iterator", 
                 MethodTypeDesc.of(ClassDesc.of("java.util.Iterator")),
@@ -58,26 +58,26 @@ public class ForeachStatement implements LocalStatement {
                 InvokeType.INTERFACE
         );
 
-        instructionsSet.storeLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
+        instructions.storeLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
 
-        var conditionLabel = instructionsSet.createAndInitLabel();
-        var endLabel = instructionsSet.createAndInitLabel();
+        var conditionLabel = instructions.createAndInitLabel();
+        var endLabel = instructions.createAndInitLabel();
         LoopEnvironment loopEnvironment = LoopEnvironmentKt.LoopEnvironment(environment, conditionLabel, endLabel);
 
-        instructionsSet.bindLabel(conditionLabel);
+        instructions.bindLabel(conditionLabel);
 
-        instructionsSet.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
-        instructionsSet.invokeMethod(
+        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
+        instructions.invokeMethod(
                 ClassDesc.of("java.util.Iterator"),
                 "hasNext",
                 MethodTypeDesc.of(ConstantDescs.CD_boolean),
                 _ -> Unit.INSTANCE,
                 InvokeType.INTERFACE
         );
-        instructionsSet.gotoLabelIfEqualsZero(endLabel);
+        instructions.gotoLabelIfEqualsZero(endLabel);
 
-        instructionsSet.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
-        instructionsSet.invokeMethod(
+        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
+        instructions.invokeMethod(
                 ClassDesc.of("java.util.Iterator"),
                 "next",
                 MethodTypeDesc.of(ConstantDescs.CD_Object),
@@ -86,18 +86,18 @@ public class ForeachStatement implements LocalStatement {
         );
 
         dataType.resolve(environment);
-        instructionsSet.checkCast(dataType.getClassDesc());
+        instructions.checkCast(dataType.getClassDesc());
 
         VariableValue variableValue = localVariableDeclarationEnvironment.declareVariable(id, dataType, isConstant, null);
-        instructionsSet.storeLocal(variableValue.getDataType().getClassDesc(), variableValue.getSlot());
-        instructionsSet.setLocalName(variableValue.getSlot(), id, variableValue.getDataType().getClassDesc(), conditionLabel, endLabel);
+        instructions.storeLocal(variableValue.getDataType().getClassDesc(), variableValue.getSlot());
+        instructions.setLocalName(variableValue.getSlot(), id, variableValue.getDataType().getClassDesc(), conditionLabel, endLabel);
 
         for (Statement statement : body) {
-            statement.emit(instructionsSet, loopEnvironment, this);
+            statement.emit(instructions, loopEnvironment, this);
         }
 
-        instructionsSet.gotoLabel(conditionLabel);
-        instructionsSet.bindLabel(endLabel);
+        instructions.gotoLabel(conditionLabel);
+        instructions.bindLabel(endLabel);
     }
 
     @Override

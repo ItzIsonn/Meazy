@@ -26,15 +26,15 @@ public class BaseCallStatement implements LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) { //TODO add support for automatic base calling before return
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) { //TODO add support for automatic base calling before return
         if (!EnvironmentUtils.hasParentOrSelf(environment, ConstructorEnvironment.class)) {
             throw new IllegalArgumentException("Parent environment for BASE statement must be ConstructorEnvironment TODO");
         }
 
         ResolvedConstructor resolvedConstructor = resolveConstructor(environment);
-        instructionsSet.loadThisReference();
+        instructions.loadThisReference();
 
-        instructionsSet.invokeSuperClass(
+        instructions.invokeSuperClass(
                 resolvedConstructor.getClassDesc(),
                 resolvedConstructor.getMethodTypeDesc(),
                 argsInstructions -> {

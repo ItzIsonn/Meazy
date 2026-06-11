@@ -20,14 +20,14 @@ public class NumberLiteral implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         try {
             int number = Integer.parseInt(value);
-            instructionsSet.loadConstant(number);
+            instructions.loadConstant(number);
         }
         catch (NumberFormatException e) {
             double number = Double.parseDouble(value);
-            instructionsSet.loadConstant(number);
+            instructions.loadConstant(number);
         }
     }
 

@@ -29,19 +29,19 @@ public class IsExpression implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         ClassDesc classDesc = EnvironmentUtils.resolveClassDesc(environment, dataType, false);
         ClassDesc valueClassDesc = value.getType(environment, this).getClassDesc();
 
-        value.emit(instructionsSet, environment, this);
-        if (valueClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructionsSet, valueClassDesc);
+        value.emit(instructions, environment, this);
+        if (valueClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructions, valueClassDesc);
 
         if (isLike) {
-            instructionsSet.instanceOf(classDesc);
+            instructions.instanceOf(classDesc);
             return;
         }
 
-        instructionsSet.invokeMethod(
+        instructions.invokeMethod(
                 ConstantDescs.CD_Object,
                 "getClass",
                 MethodTypeDesc.of(ConstantDescs.CD_Class),
@@ -49,7 +49,7 @@ public class IsExpression implements Expression {
                 InvokeType.VIRTUAL
         );
 
-        instructionsSet.invokeMethod(
+        instructions.invokeMethod(
                 ConstantDescs.CD_Object,
                 "equals",
                 MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object),
