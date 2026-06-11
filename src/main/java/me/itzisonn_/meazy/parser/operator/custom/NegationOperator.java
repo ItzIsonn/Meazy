@@ -39,6 +39,6 @@ public class NegationOperator extends Operator {
         if (leftNumberType == null) throw new RuntimeException("Can't negate non-number value");
         if (leftType.isNullable()) throw new RuntimeException("Can't negate nullable number");
 
-        return DataType.ofNonNull(leftNumberType.unbox().classDesc);
+        return DataType.Companion.ofNonNull(leftNumberType.unbox().classDesc);
     }
 }

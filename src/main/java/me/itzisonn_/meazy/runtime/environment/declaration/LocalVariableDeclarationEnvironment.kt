@@ -76,8 +76,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
             var usedSlots = 0
 
             for (variableValue in _variables) {
-                val classDesc = variableValue.dataType.getClassDesc()
-
+                val classDesc = variableValue.dataType.classDesc
                 usedSlots += if (classDesc == ConstantDescs.CD_double || classDesc == ConstantDescs.CD_long) 2 else 1
             }
 

@@ -117,10 +117,10 @@ public final class ParsingHelper {
 
             if (parser.getCurrent().getType().equals(TokenTypes.QUESTION())) {
                 parser.getCurrentAndNext();
-                return DataType.ofNullable(ClassDesc.of(dataTypeId));
+                return DataType.Companion.ofNullable(ClassDesc.of(dataTypeId));
             }
 
-            return DataType.ofNonNull(ClassDesc.of(dataTypeId));
+            return DataType.Companion.ofNonNull(ClassDesc.of(dataTypeId));
         }
 
         return null;

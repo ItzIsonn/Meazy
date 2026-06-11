@@ -24,6 +24,6 @@ public class NotEqualsOperator extends Operator {
     }
     @Override
     public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        return DataType.ofNonNull(ConstantDescs.CD_boolean);
+        return DataType.Companion.ofNonNull(ConstantDescs.CD_boolean);
     }
 }

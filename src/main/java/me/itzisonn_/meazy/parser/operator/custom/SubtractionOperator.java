@@ -62,6 +62,6 @@ public class SubtractionOperator extends Operator {
         }
 
         if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't subtract nullable numbers");
-        return DataType.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
+        return DataType.Companion.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
     }
 }
