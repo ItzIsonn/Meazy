@@ -1,11 +1,18 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.runtime.environment.Environment
 
 /**
- * Represents unit of the program with multiple lines possible
+ * Represents program unit with multiple lines possible
  */
-@NullMarked
-public interface Statement extends ProgramUnit { //TODO JAVADOC
+interface Statement : ProgramUnit
+
+interface LocalStatement : Statement {
+    fun alwaysReturns(): Boolean
+}
+
+interface DeclarationStatement : Statement {
+    fun declare(environment: Environment)
+    fun resolve(environment: Environment)
 }
