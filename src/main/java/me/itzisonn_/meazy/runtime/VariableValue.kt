@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.modifier.Modifier
-import me.itzisonn_.meazy.runtime.environment.VariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
 
 /**
  * Represents runtime variable value

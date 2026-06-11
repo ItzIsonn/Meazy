@@ -9,6 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
+import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked

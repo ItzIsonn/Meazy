@@ -2,19 +2,17 @@ package me.itzisonn_.meazy.parser.ast.statement;
 
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironmentKt;
+import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironmentKt;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.constant.ConstantDescs;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @NullMarked

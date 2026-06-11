@@ -45,11 +45,10 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
         _fileEnvironments.add(fileEnvironment)
     }
 
+    override fun getParent() = null
+    override val isShared = false
     override val fileEnvironments get() = _fileEnvironments.toSet()
 
-    override fun getParent() = null
-
-    override val isShared = false
 
 
     override fun resolveJavaClass(classDesc: ClassDesc): Optional<ClassEnvironment> {
