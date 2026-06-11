@@ -1,30 +1,23 @@
-package me.itzisonn_.meazy.runtime.environment;
+package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.runtime.VariableValue;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.runtime.VariableValue
+import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDescs
+import java.util.Optional
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-@NullMarked
-public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param info AND FULL TOO
-    private EnvironmentUtils() {}
-
-
-
+object EnvironmentUtils {
     /**
      * Searches for given environment as a parent in this environment and all parents
      * @param environment Environment to lookup
      * @return Whether this environment has requested parent
      */
-    public static boolean hasParent(Environment environment, Environment target) {
-        Environment parent = environment.getParent();
-        return target.equals(parent) || (parent != null && hasParent(parent, target));
+    @JvmStatic
+    fun hasParent(environment: Environment, target: Environment): Boolean {
+        val parent = environment.getParent()
+        return target == parent || (parent != null && hasParent(parent, target))
     }
 
     /**
@@ -32,9 +25,10 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param predicate Predicate that matches parent environment
      * @return Whether this environment has requested parent
      */
-    public static boolean hasParent(Environment environment, Predicate<@Nullable Environment> predicate) {
-        Environment parent = environment.getParent();
-        return predicate.test(parent) || parent != null && hasParent(parent, predicate);
+    @JvmStatic
+    fun hasParent(environment: Environment, predicate: (Environment?) -> Boolean): Boolean {
+        val parent = environment.getParent()
+        return predicate(parent) || parent != null && hasParent(parent, predicate)
     }
 
     /**
@@ -42,9 +36,9 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param predicate Predicate that matches parent environment
      * @return Whether this environment has requested parent
      */
-    public static boolean hasParentOrSelf(Environment environment, Predicate<@Nullable Environment> predicate) {
-        if (predicate.test(environment)) return true;
-        return hasParent(environment, predicate);
+    fun hasParentOrSelf(environment: Environment, predicate: (Environment?) -> Boolean): Boolean {
+        if (predicate(environment)) return true
+        return hasParent(environment, predicate)
     }
 
     /**
@@ -52,11 +46,11 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param cls Class of parent environment
      * @return Whether this environment has parent of given class
      */
-    public static <T extends Environment> boolean hasParent(Environment environment, Class<T> cls) {
-        Environment parent = environment.getParent();
-        if (cls.isInstance(parent)) return true;
-        if (parent != null) return hasParent(parent, cls);
-        return false;
+    fun <T : Environment> hasParent(environment: Environment, cls: KClass<T>): Boolean {
+        val parent = environment.getParent()
+        if (cls.isInstance(parent)) return true
+        if (parent != null) return hasParent(parent, cls)
+        return false
     }
 
     /**
@@ -64,9 +58,15 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param cls Class of parent environment
      * @return Whether this environment or its parent is instance of given class
      */
-    public static <T extends Environment> boolean hasParentOrSelf(Environment environment, Class<T> cls) {
-        if (cls.isInstance(environment)) return true;
-        return hasParent(environment, cls);
+    fun <T : Environment> hasParentOrSelf(environment: Environment, cls: KClass<T>): Boolean {
+        if (cls.isInstance(environment)) return true
+        return hasParent(environment, cls)
+    }
+
+    @JvmStatic
+    @Deprecated("Use function with KClass instead")
+    fun <T : Environment> hasParentOrSelf(environment: Environment, cls: Class<T>): Boolean {
+        return hasParentOrSelf(environment, cls.kotlin)
     }
 
 
@@ -76,11 +76,11 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param predicate Predicate that matches parent environment
      * @return Parent that matches given predicate or null
      */
-    public static Optional<Environment> getParent(Environment environment, Predicate<@Nullable Environment> predicate) {
-        Environment parent = environment.getParent();
-        if (predicate.test(parent)) return Optional.ofNullable(parent);
-        if (parent != null) return getParent(parent, predicate);
-        return Optional.empty();
+    fun getParent(environment: Environment, predicate: (Environment?) -> Boolean): Optional<Environment> {
+        val parent = environment.getParent()
+        if (predicate(parent)) return Optional.ofNullable(parent)
+        if (parent != null) return getParent(parent, predicate)
+        return Optional.empty()
     }
 
     /**
@@ -88,9 +88,9 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param predicate Predicate that matches parent environment
      * @return Parent or given environment that matches given predicate or null
      */
-    public static Optional<Environment> getParentOrSelf(Environment environment, Predicate<@Nullable Environment> predicate) {
-        if (predicate.test(environment)) return Optional.of(environment);
-        return getParent(environment, predicate);
+    fun getParentOrSelf(environment: Environment, predicate: (Environment?) -> Boolean): Optional<Environment> {
+        if (predicate(environment)) return Optional.of(environment)
+        return getParent(environment, predicate)
     }
 
     /**
@@ -98,13 +98,16 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param cls Class of parent environment
      * @return Parent of given class or null
      */
-    @SuppressWarnings("unchecked")
-    public static <T extends Environment> Optional<T> getParent(Environment environment, Class<T> cls) {
-        Environment parent = environment.getParent();
-        if (cls.isInstance(parent)) return Optional.of((T) parent);
+    fun <T : Environment> getParent(environment: Environment, cls: KClass<T>): Optional<T> {
+        val parent = environment.getParent() ?: return Optional.empty()
+        if (cls.isInstance(parent)) return Optional.of(cls.cast(parent))
+        return getParent(parent, cls)
+    }
 
-        if (parent != null) return getParent(parent, cls);
-        return Optional.empty();
+    @JvmStatic
+    @Deprecated("Use function with KClass instead")
+    fun <T : Environment> getParent(environment: Environment, cls: Class<T>): Optional<T> {
+        return getParent(environment, cls.kotlin)
     }
 
     /**
@@ -112,10 +115,15 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
      * @param cls Class of parent environment
      * @return Parent or given environment of given class or null
      */
-    @SuppressWarnings("unchecked")
-    public static <T extends Environment> Optional<T> getParentOrSelf(Environment environment, Class<T> cls) {
-        if (cls.isInstance(environment)) return Optional.of((T) environment);
-        return getParent(environment, cls);
+    fun <T : Environment> getParentOrSelf(environment: Environment, cls: KClass<T>): Optional<T> {
+        if (cls.isInstance(environment)) return Optional.of((cls.cast(environment)))
+        return getParent(environment, cls)
+    }
+
+    @JvmStatic
+    @Deprecated("Use function with KClass instead")
+    fun <T : Environment> getParentOrSelf(environment: Environment, cls: Class<T>): Optional<T> {
+        return getParentOrSelf(environment, cls.kotlin)
     }
 
 
@@ -123,95 +131,103 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
     /**
      * TODO
      */
-    public static boolean isInstanceOf(Environment environment, ClassDesc classDesc, ClassDesc target) {
-        if (classDesc.equals(target)) return true;
+    @JvmStatic
+    fun isInstanceOf(environment: Environment, classDesc: ClassDesc, target: ClassDesc): Boolean {
+        if (classDesc == target) return true
 
-        ClassEnvironment classEnvironment = getClassEnvironment(environment, classDesc).orElse(null);
-        if (classEnvironment == null) return false;
+        val classEnvironment = getClassEnvironment(environment, classDesc).orElse(null)
+            ?: return false
 
-        if (classEnvironment.getBaseClass() != null && isInstanceOf(environment, classEnvironment.getBaseClass(), target)) return true;
-
-        for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
-            if (isInstanceOf(environment, interfaceClassDesc, target)) return true;
+        val baseClass = classEnvironment.baseClass
+        if (baseClass != null && isInstanceOf(environment, baseClass, target)) {
+            return true
         }
 
-        return false;
+        for (interfaceClassDesc in classEnvironment.interfaces) {
+            if (isInstanceOf(environment, interfaceClassDesc, target)) return true
+        }
+
+        return false
     }
 
     /**
      * TODO
      */
-    @Nullable
-    public static ClassDesc getCommonOf(Environment environment, ClassDesc classDesc1, ClassDesc classDesc2) {
-        if (classDesc1.equals(classDesc2)) return classDesc1;
-        if (isInstanceOf(environment, classDesc1, classDesc2)) return classDesc2;
-        if (isInstanceOf(environment, classDesc2, classDesc1)) return classDesc1;
+    @JvmStatic
+    fun getCommonOf(environment: Environment, classDesc1: ClassDesc, classDesc2: ClassDesc): ClassDesc? {
+        if (classDesc1 == classDesc2) return classDesc1
+        if (isInstanceOf(environment, classDesc1, classDesc2)) return classDesc2
+        if (isInstanceOf(environment, classDesc2, classDesc1)) return classDesc1
 
-        ClassEnvironment classEnvironment = getClassEnvironment(environment, classDesc1).orElse(null);
-        if (classEnvironment == null) return null;
+        val classEnvironment = getClassEnvironment(environment, classDesc1).orElse(null)
+            ?: return null
 
-        boolean gotObjectAsCommon = false;
+        var gotObjectAsCommon = false
 
-        if (classEnvironment.getBaseClass() != null) {
-            ClassDesc commonClassDesc = getCommonOf(environment, classEnvironment.getBaseClass(), classDesc2);
-            if (ConstantDescs.CD_Object.equals(commonClassDesc)) gotObjectAsCommon = true;
-            else if (commonClassDesc != null) return commonClassDesc;
+        val baseClass = classEnvironment.baseClass
+        if (baseClass != null) {
+            val commonClassDesc = getCommonOf(environment, baseClass, classDesc2)
+            if (ConstantDescs.CD_Object == commonClassDesc) gotObjectAsCommon = true
+            else if (commonClassDesc != null) return commonClassDesc
         }
 
-        for (ClassDesc interfaceClassDesc : classEnvironment.getInterfaces()) {
-            ClassDesc commonClassDesc = getCommonOf(environment, interfaceClassDesc, classDesc2);
-            if (commonClassDesc != null) return commonClassDesc;
+        for (interfaceClassDesc in classEnvironment.interfaces) {
+            val commonClassDesc = getCommonOf(environment, interfaceClassDesc, classDesc2)
+            if (commonClassDesc != null) return commonClassDesc
         }
 
-        if (gotObjectAsCommon) return ConstantDescs.CD_Object;
-        return null;
+        if (gotObjectAsCommon) return ConstantDescs.CD_Object
+        return null
     }
 
     /**
      * TODO
      */
-    public static ClassDesc resolveClassDesc(Environment environment, ClassDesc classDesc, boolean allowPrimitives) {
-        if (classDesc.isPrimitive() || classDesc.isArray()) return classDesc;
-        if (!classDesc.packageName().isEmpty()) return classDesc;
+    @JvmStatic
+    fun resolveClassDesc(environment: Environment, classDesc: ClassDesc, allowPrimitives: Boolean): ClassDesc {
+        if (classDesc.isPrimitive || classDesc.isArray) return classDesc
+        if (!classDesc.packageName().isEmpty()) return classDesc
 
-        FileEnvironment fileEnvironment = getParentOrSelf(environment, FileEnvironment.class).orElse(null);
-        if (fileEnvironment == null) return classDesc;
+        val fileEnvironment = getParentOrSelf(environment, FileEnvironment::class).orElse(null)
+            ?: return classDesc
 
-        ClassEnvironment classEnvironment = fileEnvironment.getClass(classDesc.displayName()).orElse(null);
-        if (classEnvironment != null) return classEnvironment.getClassDesc();
+        var classEnvironment = fileEnvironment.getClass(classDesc.displayName()).orElse(null)
+        if (classEnvironment != null) return classEnvironment.classDesc
 
-        classEnvironment = getClassEnvironment(environment, classDesc).orElse(null);
-        if (classEnvironment != null) return classEnvironment.getClassDesc();
+        classEnvironment = getClassEnvironment(environment, classDesc).orElse(null)
+        if (classEnvironment != null) return classEnvironment.classDesc
 
-        String fullId;
-        ClassDesc fullClassDesc = fileEnvironment.getImports().get(classDesc.displayName());
+        val fullId: String
+        val fullClassDesc = fileEnvironment.imports[classDesc.displayName()]
         if (fullClassDesc != null) {
-            if (fullClassDesc.isPrimitive() || classDesc.isArray()) return fullClassDesc;
-            fullId = (fullClassDesc.packageName().isEmpty() ? "" : fullClassDesc.packageName() + ".") + fullClassDesc.displayName();
+            if (fullClassDesc.isPrimitive || classDesc.isArray) return fullClassDesc
+            fullId = (if (fullClassDesc.packageName().isEmpty()) ""
+            else fullClassDesc.packageName() + ".") + fullClassDesc.displayName()
         }
-        else fullId = classDesc.displayName();
+        else fullId = classDesc.displayName()
 
         if (allowPrimitives) {
-            if (classDesc.displayName().equals("Int")) return ConstantDescs.CD_int;
-            if (classDesc.displayName().equals("Long")) return ConstantDescs.CD_long;
-            if (classDesc.displayName().equals("Float")) return ConstantDescs.CD_float;
-            if (classDesc.displayName().equals("Double")) return ConstantDescs.CD_double;
-            if (classDesc.displayName().equals("Boolean")) return ConstantDescs.CD_boolean;
+            if (classDesc.displayName() == "Int") return ConstantDescs.CD_int
+            if (classDesc.displayName() == "Long") return ConstantDescs.CD_long
+            if (classDesc.displayName() == "Float") return ConstantDescs.CD_float
+            if (classDesc.displayName() == "Double") return ConstantDescs.CD_double
+            if (classDesc.displayName() == "Boolean") return ConstantDescs.CD_boolean
         }
 
-        classEnvironment = getClassEnvironment(environment, fullId).orElse(null);
-        if (classEnvironment != null) return classEnvironment.getClassDesc();
+        classEnvironment = getClassEnvironment(environment, fullId).orElse(null)
+        if (classEnvironment != null) return classEnvironment.classDesc
 
-        ClassDesc resolvedClassDesc = ClassDesc.of(fullId);
-        fileEnvironment.getParent().resolveJavaClass(resolvedClassDesc);
-        return resolvedClassDesc;
+        val resolvedClassDesc = ClassDesc.of(fullId)
+        fileEnvironment.getParent().resolveJavaClass(resolvedClassDesc)
+        return resolvedClassDesc
     }
 
     /**
      * TODO
      */
-    public static ClassDesc resolveClassDesc(Environment environment, String classDesc, boolean allowPrimitives) {
-        return resolveClassDesc(environment, ClassDesc.of(classDesc), allowPrimitives);
+    @JvmStatic
+    fun resolveClassDesc(environment: Environment, classDesc: String, allowPrimitives: Boolean): ClassDesc {
+        return resolveClassDesc(environment, ClassDesc.of(classDesc), allowPrimitives)
     }
 
 
@@ -219,136 +235,137 @@ public final class EnvironmentUtils { //TODO CHECK javadoc for incomplete param 
     /**
      * @return File environment in parent environments of given environment
      */
-    public static Optional<FileEnvironment> getFileEnvironment(Environment environment) {
-        if (environment instanceof FileEnvironment fileEnvironment) return Optional.of(fileEnvironment);
-        return getParent(environment, FileEnvironment.class);
+    fun getFileEnvironment(environment: Environment): Optional<FileEnvironment> {
+        if (environment is FileEnvironment) return Optional.of(environment)
+        return getParent(environment, FileEnvironment::class)
     }
 
-    public static Optional<String> getClassName(Environment environment) {
-        FileEnvironment parent = getFileEnvironment(environment).orElse(null);
-        if (parent == null) return Optional.empty();
-        return Optional.of(parent.getClassName());
+    fun getClassName(environment: Environment): Optional<String> {
+        val parent = getFileEnvironment(environment).orElse(null) ?: return Optional.empty()
+        return Optional.of(parent.className)
     }
 
     /**
      * @return Package name of this environment
      */
-    public static Optional<String> getPackageName(Environment environment) {
-        FileEnvironment parent = getFileEnvironment(environment).orElse(null);
-        if (parent == null) return Optional.empty();
-        return Optional.of(parent.getPackageName());
+    fun getPackageName(environment: Environment): Optional<String> {
+        val parent = getFileEnvironment(environment).orElse(null) ?: return Optional.empty()
+        return Optional.of(parent.packageName)
     }
 
     /**
      * @return Are two given environments from same package
      */
-    public static boolean areFromSamePackage(Environment environment1, Environment environment2) {
-        return getPackageName(environment1).equals(getPackageName(environment2));
+    @JvmStatic
+    fun areFromSamePackage(environment1: Environment, environment2: Environment): Boolean {
+        return getPackageName(environment1) == getPackageName(environment2)
     }
 
 
 
     /**
      * Searches for variable with given id in this environment and all parents
-     *
+     * 
      * @param id Variable's id
      * @return Environment that has requested variable or null
      */
-    public static Optional<VariableDeclarationEnvironment> getVariableDeclarationEnvironment(Environment environment, String id) {
-        return getVariableValue(environment, id).map(VariableValue::getParentEnvironment);
+    fun getVariableDeclarationEnvironment(environment: Environment, id: String): Optional<VariableDeclarationEnvironment> {
+        return getVariableValue(environment, id).map(VariableValue::parentEnvironment)
     }
 
     /**
      * Searches for variable with given id in this environment and all parents
-     *
+     * 
      * @param id Variable's id
      * @return Environment that has requested variable or null
      */
-    public static Optional<VariableValue> getVariableValue(Environment environment, String id) {
-        if (environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment) {
-            Optional<VariableValue> variableValue = variableDeclarationEnvironment.getVariable(id);
-            if (variableValue.isPresent()) return variableValue;
+    @JvmStatic
+    fun getVariableValue(environment: Environment, id: String): Optional<VariableValue> {
+        if (environment is VariableDeclarationEnvironment) {
+            val variableValue = environment.getVariable(id)
+            if (variableValue.isPresent) return variableValue
         }
 
-        if (environment instanceof GlobalEnvironment globalEnvironment) {
-            for (FileEnvironment fileEnvironment : globalEnvironment.getFileEnvironments()) {
-                Optional<VariableValue> variableValue = fileEnvironment.getVariable(id);
-                if (variableValue.isPresent()) return variableValue;
+        if (environment is GlobalEnvironment) {
+            for (fileEnvironment in environment.fileEnvironments) {
+                val variableValue = fileEnvironment.getVariable(id)
+                if (variableValue.isPresent) return variableValue
             }
 
-            return Optional.empty();
+            return Optional.empty()
         }
 
-        Environment parent = environment.getParent();
-        if (parent == null) return Optional.empty();
-        return getVariableValue(parent, id);
+        val parent = environment.getParent() ?: return Optional.empty()
+        return getVariableValue(parent, id)
     }
-
 
 
     /**
      * Searches for function with given id and args in this environment and all parents
-     *
+     * 
      * @param id Function's id
      * @param parameters Function's parameters
      * @return Environment that has requested function or null
      */
-    public static Optional<FunctionDeclarationEnvironment> getFunctionDeclarationEnvironment(Environment environment, String id, List<DataType> parameters) {
-        return getFunctionEnvironment(environment, id, parameters).map(FunctionEnvironment::getParent);
+    fun getFunctionDeclarationEnvironment(environment: Environment, id: String, parameters: List<DataType>): Optional<FunctionDeclarationEnvironment> {
+        return getFunctionEnvironment(environment, id, parameters).map { it.getParent() }
     }
 
     /**
      * Searches for function with given id and args in this environment and all parents
-     *
+     * 
      * @param id Function's id
      * @param args Function's args
      * @return Environment that has requested function or null
      */
-    public static Optional<FunctionEnvironment> getFunctionEnvironment(Environment environment, String id, List<DataType> args) {
-        if (environment instanceof FunctionDeclarationEnvironment functionDeclarationEnvironment) {
-            Optional<FunctionEnvironment> functionEnvironment = functionDeclarationEnvironment.getFunction(id, args);
-            if (functionEnvironment.isPresent()) return functionEnvironment;
+    @JvmStatic
+    fun getFunctionEnvironment(environment: Environment, id: String, args: List<DataType>): Optional<FunctionEnvironment> {
+        if (environment is FunctionDeclarationEnvironment) {
+            val functionEnvironment = environment.getFunction(id, args)
+            if (functionEnvironment.isPresent) return functionEnvironment
         }
 
-        if (environment instanceof GlobalEnvironment globalEnvironment) {
-            for (FileEnvironment fileEnvironment : globalEnvironment.getFileEnvironments()) {
-                Optional<FunctionEnvironment> functionEnvironment = fileEnvironment.getFunction(id, args);
-                if (functionEnvironment.isPresent()) return functionEnvironment;
+        EnvironmentUtils::class.java.kotlin
+
+        if (environment is GlobalEnvironment) {
+            for (fileEnvironment in environment.fileEnvironments) {
+                val functionEnvironment = fileEnvironment.getFunction(id, args)
+                if (functionEnvironment.isPresent) return functionEnvironment
             }
 
-            return Optional.empty();
+            return Optional.empty()
         }
 
-        Environment parent = environment.getParent();
-        if (parent == null) return Optional.empty();
-        return getFunctionEnvironment(parent, id, args);
+        val parent = environment.getParent() ?: return Optional.empty()
+        return getFunctionEnvironment(parent, id, args)
     }
 
 
-
-    public static Optional<ClassDeclarationEnvironment> getClassDeclarationEnvironment(Environment environment, String id) {
-        return getClassDeclarationEnvironment(environment, ClassDesc.of(id));
+    fun getClassDeclarationEnvironment(environment: Environment, id: String): Optional<ClassDeclarationEnvironment> {
+        return getClassDeclarationEnvironment(environment, ClassDesc.of(id))
     }
 
-    public static Optional<ClassDeclarationEnvironment> getClassDeclarationEnvironment(Environment environment, ClassDesc classDesc) {
-        return getClassEnvironment(environment, classDesc).map(ClassEnvironment::getParent);
+    fun getClassDeclarationEnvironment(environment: Environment, classDesc: ClassDesc): Optional<ClassDeclarationEnvironment> {
+        return getClassEnvironment(environment, classDesc).map { it.getParent() }
     }
 
-    public static Optional<ClassEnvironment> getClassEnvironment(Environment environment, String id) {
-        return getClassEnvironment(environment, ClassDesc.of(id));
+    @JvmStatic
+    fun getClassEnvironment(environment: Environment, id: String): Optional<ClassEnvironment> {
+        return getClassEnvironment(environment, ClassDesc.of(id))
     }
 
-    public static Optional<ClassEnvironment> getClassEnvironment(Environment environment, ClassDesc classDesc) {
-        if (classDesc.isPrimitive() || classDesc.isArray()) return Optional.empty();
+    @JvmStatic
+    fun getClassEnvironment(environment: Environment, classDesc: ClassDesc): Optional<ClassEnvironment> {
+        if (classDesc.isPrimitive || classDesc.isArray) return Optional.empty()
 
-        GlobalEnvironment globalEnvironment = getParentOrSelf(environment, GlobalEnvironment.class).orElse(null);
-        if (globalEnvironment == null) return Optional.empty();
+        val globalEnvironment = getParentOrSelf(environment, GlobalEnvironment::class).orElse(null)
+            ?: return Optional.empty()
 
-        for (FileEnvironment fileEnvironment : globalEnvironment.getFileEnvironments(classDesc.packageName())) {
-            Optional<ClassEnvironment> classEnvironment = fileEnvironment.getClass(classDesc.displayName());
-            if (classEnvironment.isPresent()) return classEnvironment;
+        for (fileEnvironment in globalEnvironment.getFileEnvironments(classDesc.packageName())) {
+            val classEnvironment = fileEnvironment.getClass(classDesc.displayName())
+            if (classEnvironment.isPresent) return classEnvironment
         }
 
-        return globalEnvironment.resolveJavaClass(classDesc);
+        return globalEnvironment.resolveJavaClass(classDesc)
     }
 }
