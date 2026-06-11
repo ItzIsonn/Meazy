@@ -28,11 +28,11 @@ class ClassDeclarationStatement @JvmOverloads constructor(
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
-        val isInner = modifiers.contains(Modifiers.PRIVATE())
+        val isInner = Modifiers.private in modifiers
 
         val classEnvironment = ClassEnvironment(
             environment,
-            isInner || modifiers.contains(Modifiers.SHARED()),
+            isInner || Modifiers.shared in modifiers,
             false,
             id,
             baseClasses,
@@ -69,7 +69,7 @@ class ClassDeclarationStatement @JvmOverloads constructor(
 
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
         require(environment is FileEnvironment) { "Environment must be file TODO" }
-        val isInner = modifiers.contains(Modifiers.PRIVATE())
+        val isInner = Modifiers.private in modifiers
 
         val classDesc = if (isInner) ClassDesc.of(environment.packageName + "." + environment.className + "$" + id)
         else ClassDesc.of(environment.packageName, id)
@@ -79,11 +79,11 @@ class ClassDeclarationStatement @JvmOverloads constructor(
 
         if (isInner) attributes.add(getInnerClassesAttribute(environment))
         else {
-            if (modifiers.contains(Modifiers.PRIVATE())) flags.add(AccessFlag.PRIVATE)
+            if (Modifiers.private in modifiers) flags.add(AccessFlag.PRIVATE)
             else flags.add(AccessFlag.PUBLIC)
 
-            if (modifiers.contains(Modifiers.ABSTRACT())) flags.add(AccessFlag.ABSTRACT)
-            else if (!modifiers.contains(Modifiers.OPEN())) flags.add(AccessFlag.FINAL)
+            if (Modifiers.abstract in modifiers) flags.add(AccessFlag.ABSTRACT)
+            else if (Modifiers.open !in modifiers) flags.add(AccessFlag.FINAL)
         }
 
         instructions.withClass(

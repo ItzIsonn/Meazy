@@ -49,9 +49,9 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "class")).getValue();
 
         List<Statement> generatedBody = new ArrayList<>();
-        if (modifiers.contains(Modifiers.DATA())) {
+        if (modifiers.contains(Modifiers.INSTANCE.getData())) {
             generatedBody.addAll(generateDataBody(id, ParsingHelper.parseParameters(context)));
-            modifiers.remove(Modifiers.DATA());
+            modifiers.remove(Modifiers.INSTANCE.getData());
         }
 
         Set<String> baseClasses = new HashSet<>();
@@ -81,7 +81,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         parser.moveOverOptionalNewLines();
 
         LinkedHashMap<String, List<Expression>> enumIds = new LinkedHashMap<>();
-        if (modifiers.contains(Modifiers.ENUM())) {
+        if (modifiers.contains(Modifiers.INSTANCE.getEnum())) {
             if (!baseClasses.isEmpty()) throw new InvalidSyntaxException(baseClassesLineNumber, TextKt.translatable("meazy:parser.exception.enums.base_classes"));
 
             String enumId = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
@@ -112,13 +112,13 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             body.add(statement);
 
             if (statement instanceof VariableDeclarationStatement variableDeclarationStatement) {
-                if (variableDeclarationStatement.getModifiers().contains(Modifiers.GET())) {
+                if (variableDeclarationStatement.getModifiers().contains(Modifiers.INSTANCE.getGet())) {
                     body.add(getGetFunction(variableDeclarationStatement.getId(), variableDeclarationStatement.getDataType()));
-                    variableDeclarationStatement.getModifiers().remove(Modifiers.GET());
+                    variableDeclarationStatement.getModifiers().remove(Modifiers.INSTANCE.getGet());
                 }
-                if (variableDeclarationStatement.getModifiers().contains(Modifiers.SET()) && !variableDeclarationStatement.isConstant()) {
+                if (variableDeclarationStatement.getModifiers().contains(Modifiers.INSTANCE.getSet()) && !variableDeclarationStatement.isConstant()) {
                     body.add(getSetFunction(variableDeclarationStatement.getId(), variableDeclarationStatement.getDataType()));
-                    variableDeclarationStatement.getModifiers().remove(Modifiers.SET());
+                    variableDeclarationStatement.getModifiers().remove(Modifiers.INSTANCE.getSet());
                 }
             }
 
@@ -136,7 +136,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
 
         for (Parameter dataVariable : dataVariables) {
             body.add(new VariableDeclarationStatement(
-                    Set.of(Modifiers.PRIVATE()),
+                    Set.of(Modifiers.INSTANCE.getPrivate()),
                     dataVariable.isConstant(),
                     dataVariable.getId(),
                     dataVariable.getDataType(),
@@ -208,7 +208,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         }
         else equalsExpression = new BooleanLiteral(true);
         body.add(new FunctionDeclarationStatement(
-                Set.of(Modifiers.OPERATOR()),
+                Set.of(Modifiers.INSTANCE.getOperator()),
                 "equals",
                 List.of(new Parameter("value", DataType.Companion.ofNullable(ConstantDescs.CD_Object), true)),
                 List.of(

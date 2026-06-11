@@ -59,8 +59,8 @@ class ConstructorDeclarationStatement(
         )
 
         val accessFlags = mutableSetOf<AccessFlag>()
-        if (constructorEnvironment.modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE)
-        else if (constructorEnvironment.modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED)
+        if (Modifiers.private in constructorEnvironment.modifiers) accessFlags.add(AccessFlag.PRIVATE)
+        else if (Modifiers.protected in constructorEnvironment.modifiers) accessFlags.add(AccessFlag.PROTECTED)
         else accessFlags.add(AccessFlag.PUBLIC)
 
         instructions.withConstructor(

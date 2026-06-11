@@ -1,42 +1,36 @@
-package me.itzisonn_.meazy.parser.modifier.custom;
+package me.itzisonn_.meazy.parser.modifier.custom
 
-import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.parser.ast.statement.ClassDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
+import me.itzisonn_.meazy.parser.ast.statement.*
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.FileEnvironment
+import me.itzisonn_.meazy.runtime.environment.areFromSamePackage
 
-@NullMarked
-public class OpenModifier extends Modifier {
-    public OpenModifier() {
-        super("open");
-    }
+class OpenModifier : Modifier("open") {
+    override fun canUse(modifierStatement: ModifierStatement, environment: Environment): Boolean {
+        if (Modifiers.private in modifierStatement.modifiers || Modifiers.protected in modifierStatement.modifiers) return false
 
-    @Override
-    public boolean canUse(ModifierStatement modifierStatement, Environment environment) {
-        if (modifierStatement.getModifiers().contains(Modifiers.PRIVATE()) || modifierStatement.getModifiers().contains(Modifiers.PROTECTED())) return false;
-
-        if (environment instanceof FileEnvironment) {
-            return modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
-                    modifierStatement instanceof ClassDeclarationStatement;
+        if (environment is FileEnvironment) {
+            return modifierStatement is VariableDeclarationStatement || modifierStatement is FunctionDeclarationStatement ||
+                    modifierStatement is ClassDeclarationStatement
         }
 
-        if (environment instanceof ClassEnvironment classEnvironment && classEnvironment.getModifiers().contains(Modifiers.OPEN())) {
-            return modifierStatement instanceof VariableDeclarationStatement || modifierStatement instanceof FunctionDeclarationStatement ||
-                    modifierStatement instanceof ConstructorDeclarationStatement;
+        if (environment is ClassEnvironment && Modifiers.open in environment.modifiers) {
+            return modifierStatement is VariableDeclarationStatement || modifierStatement is FunctionDeclarationStatement ||
+                    modifierStatement is ConstructorDeclarationStatement
         }
 
-        return false;
+        return false
     }
 
-    @Override
-    public boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
-        if (hasModifier) return true;
-        return EnvironmentUtilsKt.areFromSamePackage(environment, requestEnvironment);
+    override fun canAccess(
+        requestEnvironment: Environment, environment: Environment,
+        identifier: Identifier, hasModifier: Boolean
+    ): Boolean {
+        if (hasModifier) return true
+        return areFromSamePackage(environment, requestEnvironment)
     }
 }

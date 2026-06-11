@@ -152,7 +152,7 @@ private class ClassEnvironmentImpl(
     override val fullClassName: String
         get() {
             val classSpecifier =
-                if (_modifiers.contains(Modifiers.PRIVATE())) getClassName()!! + "$"
+                if (Modifiers.private in _modifiers) getClassName()!! + "$"
                 else ""
 
             return getPackageName()!! + "." + classSpecifier + id

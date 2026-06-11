@@ -56,7 +56,7 @@ class VariableDeclarationStatement(
             val accessFlags = mutableSetOf(AccessFlag.STATIC)
             if (isConstant) accessFlags.add(AccessFlag.FINAL)
 
-            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE)
+            if (Modifiers.private in modifiers) accessFlags.add(AccessFlag.PRIVATE)
             else accessFlags.add(AccessFlag.PUBLIC)
 
             instructions.withField(id, variableType, accessFlags)
@@ -65,11 +65,11 @@ class VariableDeclarationStatement(
 
         if (environment is ClassEnvironment) {
             val accessFlags = mutableSetOf<AccessFlag>()
-            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE)
-            else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED)
+            if (Modifiers.private in modifiers) accessFlags.add(AccessFlag.PRIVATE)
+            else if (Modifiers.protected in modifiers) accessFlags.add(AccessFlag.PROTECTED)
             else accessFlags.add(AccessFlag.PUBLIC)
 
-            if (modifiers.contains(Modifiers.SHARED())) accessFlags.add(AccessFlag.STATIC)
+            if (Modifiers.shared in modifiers) accessFlags.add(AccessFlag.STATIC)
             if (isConstant) accessFlags.add(AccessFlag.FINAL)
 
             instructions.withField(id, variableType, accessFlags)

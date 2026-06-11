@@ -38,7 +38,7 @@ class FunctionDeclarationStatement(
             throw RuntimeException("CANT DECLARE FUNCTION HERE TODO")
         }
 
-        val isShared = modifiers.contains(Modifiers.SHARED()) || environment is FileEnvironment
+        val isShared = Modifiers.shared in modifiers || environment is FileEnvironment
 
         val functionEnvironment = FunctionEnvironment(
             environment, null, null, id, parameters,
@@ -48,7 +48,7 @@ class FunctionDeclarationStatement(
         environment.declareFunction(functionEnvironment)
         this.functionEnvironment = functionEnvironment
 
-        if (modifiers.contains(Modifiers.ABSTRACT())) return
+        if (Modifiers.abstract in modifiers) return
 
         for (localStatement in body) {
             if (localStatement.alwaysReturns()) return
@@ -93,12 +93,10 @@ class FunctionDeclarationStatement(
                     functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
                 )
                     .ifPresent { f ->
-                        if (!f.modifiers.contains(Modifiers.OPEN()) && !f.modifiers.contains(
-                                Modifiers.ABSTRACT()
-                            )) {
+                        if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
                             throw RuntimeException("Can't override non-open function $id")
                         }
-                        if (!functionEnvironment.modifiers.contains(Modifiers.OVERRIDE())) throw RuntimeException(
+                        if (Modifiers.override !in functionEnvironment.modifiers) throw RuntimeException(
                             "Must specify override keyword on function $id"
                         )
                     }
@@ -112,12 +110,10 @@ class FunctionDeclarationStatement(
                     functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
                 )
                     .ifPresent { f ->
-                        if (!f.modifiers.contains(Modifiers.OPEN()) && !f.modifiers.contains(
-                                Modifiers.ABSTRACT()
-                            )) {
+                        if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
                             throw RuntimeException("Can't override non-open function $id")
                         }
-                        if (!functionEnvironment.modifiers.contains(Modifiers.OVERRIDE())) throw RuntimeException(
+                        if (Modifiers.override !in functionEnvironment.modifiers) throw RuntimeException(
                             "Must specify override keyword on function $id"
                         )
                     }
@@ -133,13 +129,13 @@ class FunctionDeclarationStatement(
         )
 
         val accessFlags = mutableSetOf<AccessFlag>()
-        if (functionEnvironment.modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE)
-        else if (functionEnvironment.modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED)
+        if (Modifiers.private in functionEnvironment.modifiers) accessFlags.add(AccessFlag.PRIVATE)
+        else if (Modifiers.protected in functionEnvironment.modifiers) accessFlags.add(AccessFlag.PROTECTED)
         else accessFlags.add(AccessFlag.PUBLIC)
 
         if (isShared) accessFlags.add(AccessFlag.STATIC)
-        if (functionEnvironment.modifiers.contains(Modifiers.ABSTRACT())) accessFlags.add(AccessFlag.ABSTRACT)
-        else if (!functionEnvironment.modifiers.contains(Modifiers.OPEN()) &&
+        if (Modifiers.abstract in functionEnvironment.modifiers) accessFlags.add(AccessFlag.ABSTRACT)
+        else if (Modifiers.open !in functionEnvironment.modifiers &&
             !(functionEnvironment.getParent() is ClassEnvironment && (functionEnvironment.getParent() as ClassEnvironment).isInterface)) {
             accessFlags.add(AccessFlag.FINAL)
         }
