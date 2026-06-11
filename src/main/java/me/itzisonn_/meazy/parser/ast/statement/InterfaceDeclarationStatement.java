@@ -76,7 +76,7 @@ public class InterfaceDeclarationStatement extends ModifierStatement implements 
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (!(environment instanceof FileEnvironment fileEnvironment)) throw new IllegalArgumentException("Environment must be file TODO");
         if (classEnvironment == null) throw new RuntimeException("Declared class is unresolved TODO");
 
@@ -97,7 +97,7 @@ public class InterfaceDeclarationStatement extends ModifierStatement implements 
             else flags.add(AccessFlag.PUBLIC);
         }
 
-        instructionsSet.withClass(
+        instructions.withClass(
                 classDesc,
                 null,
                 classEnvironment.getInterfaces(),

@@ -44,8 +44,8 @@ public class OperatorExpression implements Expression, LocalStatement {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        operator.emit(instructionsSet, environment, this);
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
+        operator.emit(instructions, environment, this);
     }
 
     @Override

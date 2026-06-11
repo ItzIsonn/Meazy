@@ -102,13 +102,13 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (functionEnvironment == null) {
             throw new RuntimeException("Declared function is unresolved TODO");
         }
 
-        var startLabel = instructionsSet.createLabel();
-        var endLabel = instructionsSet.createLabel();
+        var startLabel = instructions.createLabel();
+        var endLabel = instructions.createLabel();
         functionEnvironment.setStartLabel(startLabel);
         functionEnvironment.setEndLabel(endLabel);
 
@@ -155,7 +155,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
             accessFlags.add(AccessFlag.FINAL);
         }
 
-        instructionsSet.withMethod(
+        instructions.withMethod(
                 this.functionEnvironment.getId(),
                 methodTypeDesc,
                 accessFlags,

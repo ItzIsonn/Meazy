@@ -20,8 +20,8 @@ public class StringLiteral implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
-        instructionsSet.loadConstant(value);
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
+        instructions.loadConstant(value);
     }
 
     @Override

@@ -68,13 +68,13 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         if (constructorEnvironment == null) {
             throw new RuntimeException("Declared function is unresolved TODO");
         }
 
-        var startLabel = instructionsSet.createLabel();
-        var endLabel = instructionsSet.createLabel();
+        var startLabel = instructions.createLabel();
+        var endLabel = instructions.createLabel();
         constructorEnvironment.setStartLabel(startLabel);
         constructorEnvironment.setEndLabel(endLabel);
 
@@ -88,7 +88,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
         else if (this.constructorEnvironment.getModifiers().contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
         else accessFlags.add(AccessFlag.PUBLIC);
 
-        instructionsSet.withConstructor(
+        instructions.withConstructor(
                 methodTypeDesc,
                 accessFlags,
                 bodyInstructions -> {

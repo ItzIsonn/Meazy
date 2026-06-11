@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.util.MiscUtils;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
-import java.util.UUID;
 
 @Getter
 @NullMarked
@@ -23,26 +22,26 @@ public class NullCheckExpression implements Expression {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         DataType checkExpressionType = checkExpression.getType(environment, this);
         if (!checkExpressionType.isNullable()) {
-            checkExpression.emit(instructionsSet, environment, this);
+            checkExpression.emit(instructions, environment, this);
             return;
         }
 
-        var endLabel = instructionsSet.createAndInitLabel();
+        var endLabel = instructions.createAndInitLabel();
 
-        checkExpression.emit(instructionsSet, environment, this);
-        instructionsSet.duplicate();
-        instructionsSet.gotoLabelIfNonNull(endLabel);
+        checkExpression.emit(instructions, environment, this);
+        instructions.duplicate();
+        instructions.gotoLabelIfNonNull(endLabel);
 
-        instructionsSet.pop();
-        nullExpression.emit(instructionsSet, environment, this);
+        instructions.pop();
+        nullExpression.emit(instructions, environment, this);
         ClassDesc nullExpressionClassDesc = nullExpression.getType(environment, this).getClassDesc();
-        if (nullExpressionClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructionsSet, nullExpressionClassDesc);
-        instructionsSet.gotoLabel(endLabel);
+        if (nullExpressionClassDesc.isPrimitive()) MiscUtils.boxPrimitive(instructions, nullExpressionClassDesc);
+        instructions.gotoLabel(endLabel);
 
-        instructionsSet.bindLabel(endLabel);
+        instructions.bindLabel(endLabel);
     }
 
     @Override

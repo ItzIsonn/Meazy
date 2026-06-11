@@ -14,7 +14,7 @@ public class ClassIdentifier extends Identifier {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
+    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
         throw new UnsupportedOperationException("Can't emit class identifier");
     }
 
