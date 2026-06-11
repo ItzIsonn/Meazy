@@ -3,10 +3,8 @@ package me.itzisonn_.meazy.instruction.method
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.InstructionsSet
-import java.lang.classfile.MethodBuilder
 import java.lang.constant.MethodTypeDesc
 import java.lang.reflect.AccessFlag
-import java.util.function.Consumer
 
 class WithMethodInstruction(
     private val id: String,
@@ -18,7 +16,7 @@ class WithMethodInstruction(
         val classBuilder = bytecodeBuilders.classBuilder ?: error("Class builder is null")
 
         if ((AccessFlag.ABSTRACT.mask() and flags) != 0) {
-            classBuilder.withMethod(id, methodTypeDesc, flags, Consumer { `_`: MethodBuilder? -> })
+            classBuilder.withMethod(id, methodTypeDesc, flags) {}
             return
         }
 

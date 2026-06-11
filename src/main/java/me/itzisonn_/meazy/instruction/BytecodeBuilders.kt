@@ -6,7 +6,6 @@ import java.lang.classfile.CodeBuilder
 import java.lang.classfile.Label
 import java.lang.constant.ClassDesc
 import java.util.Optional
-import java.util.function.Consumer
 import kotlin.uuid.Uuid
 
 class BytecodeBuilders private constructor(
@@ -15,13 +14,13 @@ class BytecodeBuilders private constructor(
     private val classes: LinkedHashMap<ClassDesc, ByteArray>,
     private val labels: MutableMap<Uuid, Optional<Label>>
 ) {
-    fun withClass(classDesc: ClassDesc, classBuilder: Consumer<ClassBuilder>) {
+    fun withClass(classDesc: ClassDesc, classBuilder: ClassBuilder.() -> Unit) {
         val classFile = ClassFile.of().build(classDesc, classBuilder)
         classes[classDesc] = classFile
     }
 
-    fun getClasses(): MutableMap<ClassDesc, ByteArray> {
-        return LinkedHashMap(classes)
+    fun getClasses(): Map<ClassDesc, ByteArray> {
+        return classes.toMap()
     }
 
     fun getLabel(uuid: Uuid): Label {

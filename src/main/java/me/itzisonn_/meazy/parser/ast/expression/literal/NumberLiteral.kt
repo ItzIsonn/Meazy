@@ -1,44 +1,31 @@
-package me.itzisonn_.meazy.parser.ast.expression.literal;
+package me.itzisonn_.meazy.parser.ast.expression.literal
 
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.runtime.environment.Environment
+import java.lang.constant.ConstantDescs
 
-import java.lang.constant.ConstantDescs;
+class NumberLiteral(val value: String) : Expression {
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        val int = value.toIntOrNull()
+        if (int != null) {
+            instructions.loadConstant(int)
+            return
+        }
 
-@Getter
-@NullMarked
-public class NumberLiteral implements Expression {
-    private final String value;
-
-    public NumberLiteral(String value) {
-        this.value = value;
+        val double = value.toDoubleOrNull() ?: error("Invalid number $value")
+        instructions.loadConstant(double)
     }
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        try {
-            int number = Integer.parseInt(value);
-            instructions.loadConstant(number);
+    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+        val classDesc = when {
+            value.toIntOrNull() != null -> ConstantDescs.CD_int
+            value.toDoubleOrNull() != null -> ConstantDescs.CD_double
+            else -> error("Invalid number $value")
         }
-        catch (NumberFormatException e) {
-            double number = Double.parseDouble(value);
-            instructions.loadConstant(number);
-        }
-    }
 
-    @Override
-    public DataType getType(Environment environment, ProgramUnit parent) {
-        try {
-            Integer.parseInt(value);
-            return DataType.ofNonNull(ConstantDescs.CD_int);
-        }
-        catch (NumberFormatException e) {
-            return DataType.ofNonNull(ConstantDescs.CD_double);
-        }
+        return DataType.ofNonNull(classDesc)
     }
 }
