@@ -1,131 +1,104 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import kotlin.Unit;
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.FileEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
+import java.lang.classfile.attribute.InnerClassInfo
+import java.lang.classfile.attribute.InnerClassesAttribute
+import java.lang.constant.ClassDesc
+import java.lang.reflect.AccessFlag
+import java.util.Optional
 
-import java.lang.classfile.attribute.InnerClassInfo;
-import java.lang.classfile.attribute.InnerClassesAttribute;
-import java.lang.constant.ClassDesc;
-import java.lang.reflect.AccessFlag;
-import java.util.*;
+class InterfaceDeclarationStatement(
+    modifiers: Set<Modifier>,
+    val id: String,
+    val baseClasses: Set<String>,
+    val body: List<Statement>
+) : ModifierStatement(modifiers), DeclarationStatement {
+    private lateinit var classEnvironment: ClassEnvironment
 
-@Getter
-@NullMarked
-public class InterfaceDeclarationStatement extends ModifierStatement implements DeclarationStatement {
-    private final String id;
-    private final Set<String> baseClasses;
-    private final List<Statement> body;
-    @Nullable
-    private ClassEnvironment classEnvironment;
+    override fun declare(environment: Environment) {
+        require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
-    public InterfaceDeclarationStatement(Set<Modifier> modifiers, String id, Set<String> baseClasses, List<Statement> body) {
-        super(modifiers);
-        this.id = id;
-        this.baseClasses = baseClasses;
-        this.body = body;
-    }
+        val isInner = modifiers.contains(Modifiers.PRIVATE())
 
-    @Override
-    public void declare(Environment environment) {
-        if (!(environment instanceof ClassDeclarationEnvironment classDeclarationEnvironment)) {
-            throw new IllegalArgumentException("Environment must be file TODO");
-        }
+        val classEnvironment = ClassEnvironment(
+            environment,
+            isInner || modifiers.contains(Modifiers.SHARED()),
+            true,
+            id,
+            baseClasses,
+            modifiers
+        )
 
-        boolean isInner = getModifiers().contains(Modifiers.PRIVATE());
+        environment.declareClass(classEnvironment)
+        this.classEnvironment = classEnvironment
 
-        ClassEnvironment classEnvironment = ClassEnvironmentKt.ClassEnvironment(
-                classDeclarationEnvironment,
-                isInner || modifiers.contains(Modifiers.SHARED()),
-                true,
-                id,
-                baseClasses,
-                modifiers
-        );
-
-        classDeclarationEnvironment.declareClass(classEnvironment);
-        this.classEnvironment = classEnvironment;
-
-        for (Statement statement : body) {
-            if (statement instanceof DeclarationStatement declarationStatement) {
-                declarationStatement.declare(classEnvironment);
+        for (statement in body) {
+            if (statement is DeclarationStatement) {
+                statement.declare(classEnvironment)
             }
         }
     }
 
-    @Override
-    public void resolve(Environment environment) {
-        if (classEnvironment == null) {
-            throw new RuntimeException("Class isn't declared TODO");
-        }
+    override fun resolve(environment: Environment) {
+        classEnvironment.resolveBaseClasses()
 
-        classEnvironment.resolveBaseClasses();
-
-        for (Statement statement : body) {
-            if (statement instanceof DeclarationStatement declarationStatement) {
-                declarationStatement.resolve(classEnvironment);
+        for (statement in body) {
+            if (statement is DeclarationStatement) {
+                statement.resolve(classEnvironment)
             }
         }
     }
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        if (!(environment instanceof FileEnvironment fileEnvironment)) throw new IllegalArgumentException("Environment must be file TODO");
-        if (classEnvironment == null) throw new RuntimeException("Declared class is unresolved TODO");
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        require(environment is FileEnvironment) { "Environment must be file TODO" }
+        val isInner = modifiers.contains(Modifiers.PRIVATE())
 
-        boolean isInner = getModifiers().contains(Modifiers.PRIVATE());
+        val classDesc = if (isInner) ClassDesc.of(environment.packageName + "." + environment.className + "$" + id)
+        else ClassDesc.of(environment.packageName, id)
 
-        ClassDesc classDesc;
-        if (isInner) classDesc = ClassDesc.of(fileEnvironment.getPackageName() + "." + fileEnvironment.getClassName() + "$" + id);
-        else classDesc = ClassDesc.of(fileEnvironment.getPackageName(), id);
+        val attributes = mutableListOf<InnerClassesAttribute>()
+        val flags = mutableSetOf<AccessFlag>()
+        flags.add(AccessFlag.INTERFACE)
+        flags.add(AccessFlag.ABSTRACT)
 
-        List<InnerClassesAttribute> attributes = new ArrayList<>();
-        Set<AccessFlag> flags = new HashSet<>();
-        flags.add(AccessFlag.INTERFACE);
-        flags.add(AccessFlag.ABSTRACT);
-
-        if (isInner) attributes.add(getInnerClassesAttribute(fileEnvironment));
+        if (isInner) attributes.add(getInnerClassesAttribute(environment))
         else {
-            if (modifiers.contains(Modifiers.PRIVATE())) flags.add(AccessFlag.PRIVATE);
-            else flags.add(AccessFlag.PUBLIC);
+            if (modifiers.contains(Modifiers.PRIVATE())) flags.add(AccessFlag.PRIVATE)
+            else flags.add(AccessFlag.PUBLIC)
         }
 
         instructions.withClass(
-                classDesc,
-                null,
-                classEnvironment.getInterfaces(),
-                flags,
-                attributes,
-                classInstructions -> {
-                    for (Statement statement : body) {
-                        statement.emit(classInstructions, classEnvironment, this);
-                    }
-
-                    return Unit.INSTANCE;
-                }
-        );
+            classDesc,
+            null,
+            classEnvironment.interfaces,
+            flags,
+            attributes
+        ) {
+            for (statement in body) {
+                statement.emit(this, classEnvironment, this@InterfaceDeclarationStatement)
+            }
+        }
     }
 
-    public InnerClassesAttribute getInnerClassesAttribute(FileEnvironment fileEnvironment) {
-        String outerClassId = fileEnvironment.getPackageName() + "." + fileEnvironment.getClassName();
-        System.out.println("Outer class id is " + outerClassId);
-        ClassDesc outerClassDesc = ClassDesc.of(outerClassId);
-        ClassDesc innerClassDesc = ClassDesc.of(outerClassId + "$" + id);
+    fun getInnerClassesAttribute(fileEnvironment: FileEnvironment): InnerClassesAttribute {
+        val outerClassId = fileEnvironment.fullClassName
+        val outerClassDesc = ClassDesc.of(outerClassId)
+        val innerClassDesc = ClassDesc.of("$outerClassId$$id")
 
         return InnerClassesAttribute.of(
-                InnerClassInfo.of(
-                        innerClassDesc,
-                        Optional.of(outerClassDesc),
-                        Optional.of(id),
-                        AccessFlag.PRIVATE, AccessFlag.STATIC
-                )
-        );
+            InnerClassInfo.of(
+                innerClassDesc,
+                Optional.of(outerClassDesc),
+                Optional.of(id),
+                AccessFlag.PRIVATE, AccessFlag.STATIC
+            )
+        )
     }
 }
