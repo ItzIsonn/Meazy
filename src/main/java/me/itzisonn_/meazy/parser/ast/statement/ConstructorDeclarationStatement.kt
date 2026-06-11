@@ -1,119 +1,97 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import kotlin.Unit;
-import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.Parameter;
-import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.VariableValue;
-import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.Parameter
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
+import java.lang.reflect.AccessFlag
 
-import java.lang.constant.ConstantDescs;
-import java.lang.constant.MethodTypeDesc;
-import java.lang.reflect.AccessFlag;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+class ConstructorDeclarationStatement(
+    modifiers: Set<Modifier>,
+    val parameters: List<Parameter>,
+    val body: MutableList<LocalStatement>
+) : ModifierStatement(modifiers), DeclarationStatement {
+    private lateinit var constructorEnvironment: ConstructorEnvironment
 
-@Getter
-@NullMarked
-public class ConstructorDeclarationStatement extends ModifierStatement implements DeclarationStatement {
-    private final List<Parameter> parameters;
-    private final List<LocalStatement> body;
-    @Nullable
-    private ConstructorEnvironment constructorEnvironment;
+    override fun declare(environment: Environment) {
+        if (environment !is ConstructorDeclarationEnvironment) {
+            throw RuntimeException("CANT DECLARE CONSTRUCTOR HERE TODO")
+        }
 
-    public ConstructorDeclarationStatement(Set<Modifier> modifiers, List<Parameter> parameters, List<LocalStatement> body) {
-        super(modifiers);
-        this.parameters = parameters;
-        this.body = body;
+        val constructorEnvironment = ConstructorEnvironment(
+            environment, null, null, modifiers, parameters
+        )
+
+        environment.declareConstructor(constructorEnvironment)
+        this.constructorEnvironment = constructorEnvironment
+
+        var alwaysReturns = false
+        var hasBaseCall = false
+
+        for (localStatement in body) {
+            if (localStatement.alwaysReturns()) alwaysReturns = true
+            if (localStatement is BaseCallStatement) hasBaseCall = true
+        }
+
+        if (!hasBaseCall) body.addFirst(BaseCallStatement(listOf()))
+        if (!alwaysReturns) body.add(ReturnStatement(null))
     }
 
-    @Override
-    public void declare(Environment environment) {
-        if (!(environment instanceof ConstructorDeclarationEnvironment constructorDeclarationEnvironment)) {
-            throw new RuntimeException("CANT DECLARE CONSTRUCTOR HERE TODO");
-        }
-
-        ConstructorEnvironment constructorEnvironment = ConstructorEnvironmentKt.ConstructorEnvironment(
-                constructorDeclarationEnvironment, null, null, modifiers, parameters
-        );
-
-        constructorDeclarationEnvironment.declareConstructor(constructorEnvironment);
-        this.constructorEnvironment = constructorEnvironment;
-
-        boolean alwaysReturns = false;
-        boolean hasBaseCall = false;
-
-        for (LocalStatement localStatement : body) {
-            if (localStatement.alwaysReturns()) alwaysReturns = true;
-            if (localStatement instanceof BaseCallStatement) hasBaseCall = true;
-        }
-
-        if (!hasBaseCall) body.addFirst(new BaseCallStatement(List.of()));
-        if (!alwaysReturns) body.add(new ReturnStatement(null));
+    override fun resolve(environment: Environment) {
+        constructorEnvironment.parameters.forEach { it.dataType.resolve(environment) }
     }
 
-    @Override
-    public void resolve(Environment environment) {
-        if (constructorEnvironment == null) {
-            throw new RuntimeException("Constructor isn't declared TODO");
-        }
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        val startLabel = instructions.createLabel()
+        val endLabel = instructions.createLabel()
+        constructorEnvironment.setStartLabel(startLabel)
+        constructorEnvironment.setEndLabel(endLabel)
 
-        constructorEnvironment.getParameters().forEach(parameter -> parameter.getDataType().resolve(environment));
-    }
+        val methodTypeDesc = MethodTypeDesc.of(
+            ConstantDescs.CD_void,
+            constructorEnvironment.parameters.map { it.dataType.classDesc }.toList()
+        )
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        if (constructorEnvironment == null) {
-            throw new RuntimeException("Declared function is unresolved TODO");
-        }
-
-        var startLabel = instructions.createLabel();
-        var endLabel = instructions.createLabel();
-        constructorEnvironment.setStartLabel(startLabel);
-        constructorEnvironment.setEndLabel(endLabel);
-
-        MethodTypeDesc methodTypeDesc = MethodTypeDesc.of(
-                ConstantDescs.CD_void,
-                this.constructorEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList()
-        );
-
-        Set<AccessFlag> accessFlags = new HashSet<>();
-        if (this.constructorEnvironment.getModifiers().contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
-        else if (this.constructorEnvironment.getModifiers().contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
-        else accessFlags.add(AccessFlag.PUBLIC);
+        val accessFlags = mutableSetOf<AccessFlag>()
+        if (constructorEnvironment.modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE)
+        else if (constructorEnvironment.modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED)
+        else accessFlags.add(AccessFlag.PUBLIC)
 
         instructions.withConstructor(
-                methodTypeDesc,
-                accessFlags,
-                bodyInstructions -> {
-                    bodyInstructions.initLabel(startLabel);
-                    bodyInstructions.initLabel(endLabel);
+            methodTypeDesc,
+            accessFlags
+        ) {
+            initLabel(startLabel)
+            initLabel(endLabel)
 
-                    for (Parameter parameter : this.constructorEnvironment.getParameters()) {
-                        VariableValue parameterValue = constructorEnvironment.declareVariable(
-                                parameter.getId(),
-                                parameter.getDataType(),
-                                parameter.isConstant(),
-                                null
-                        );
+            for (parameter in constructorEnvironment.parameters) {
+                val parameterValue = constructorEnvironment.declareVariable(
+                    parameter.id,
+                    parameter.dataType,
+                    parameter.isConstant,
+                    null
+                )
 
-                        bodyInstructions.setLocalName(parameterValue.getSlot(), parameter.getId(), parameter.getDataType().getClassDesc(), startLabel, endLabel);
-                    }
+                setLocalName(
+                    parameterValue.slot,
+                    parameter.id,
+                    parameter.dataType.classDesc,
+                    startLabel,
+                    endLabel
+                )
+            }
 
-                    bodyInstructions.bindLabel(startLabel);
-                    for (Statement statement : body) {
-                        statement.emit(bodyInstructions, constructorEnvironment, this);
-                    }
-                    bodyInstructions.bindLabel(endLabel);
-                    return Unit.INSTANCE;
-                }
-        );
+            bindLabel(startLabel)
+            for (statement in body) {
+                statement.emit(this, constructorEnvironment, this@ConstructorDeclarationStatement)
+            }
+            bindLabel(endLabel)
+        }
     }
 }
