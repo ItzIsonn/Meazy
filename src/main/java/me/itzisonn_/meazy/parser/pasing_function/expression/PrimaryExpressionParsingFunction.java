@@ -31,13 +31,13 @@ public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Ex
         TokenType tokenType = token.getType();
 
         if (tokenType.equals(TokenTypes.ID())) {
-            if (parser.getTokens().size() > parser.getPos() + 1 && parser.getTokens().get(parser.getPos() + 1).getType().equals(TokenTypes.LEFT_PARENTHESIS())) {
+            if (parser.getSize() > parser.getPos() + 1 && parser.get(parser.getPos() + 1).getType().equals(TokenTypes.LEFT_PARENTHESIS())) {
                 String id = parser.getCurrentAndNext().getValue();
                 if (Character.isUpperCase(id.charAt(0))) return new ClassIdentifier(id);
                 else return new FunctionIdentifier(id);
             }
 
-            if (parser.getPos() > 0 && parser.getTokens().get(parser.getPos() - 1).getType().equals(TokenTypes.DOT())) {
+            if (parser.getPos() > 0 && parser.get(parser.getPos() - 1).getType().equals(TokenTypes.DOT())) {
                 return new VariableIdentifier(parser.getCurrentAndNext().getValue());
             }
 
