@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.VariableValue
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.text.translatable
 import java.lang.constant.ClassDesc
@@ -16,7 +17,8 @@ import java.util.Optional
 /**
  * Represents environment for classes
  */
-sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment, ModifieredEnvironment {
+sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment,
+    ConstructorDeclarationEnvironment, ModifieredEnvironment {
     override fun getParent(): ClassDeclarationEnvironment
 
     /**
@@ -113,10 +115,10 @@ private class ClassEnvironmentImpl(
     modifiers: Set<Modifier>
 ) : ClassEnvironment,
     FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, isShared),
+    ConstructorDeclarationEnvironment by ConstructorDeclarationEnvironment(parent, isShared),
     EnvironmentImpl(parent) {
     private val _variables = mutableListOf<VariableValue>()
-    private val _constructors = mutableSetOf<ConstructorEnvironment>()
-    override var baseClass: ClassDesc? = baseClass
+    override var baseClass = baseClass
         private set
     private val _interfaces = interfaces.toMutableSet()
     private val unresolvedBaseClasses = unresolvedBaseClasses.toMutableSet()
@@ -136,9 +138,8 @@ private class ClassEnvironmentImpl(
     )
 
 
-    override fun getParent(): ClassDeclarationEnvironment {
-        return super.getParent() as ClassDeclarationEnvironment
-    }
+    override fun getParent() = super.getParent() as ClassDeclarationEnvironment
+    override val isShared = isShared
 
     override val interfaces: Set<ClassDesc>
         get() = _interfaces.toSet()
@@ -186,8 +187,7 @@ private class ClassEnvironmentImpl(
         return Optional.empty()
     }
 
-    override val variables: List<VariableValue>
-        get() = _variables.toList()
+    override val variables get() = _variables.toList()
 
 
     override fun declareOperatorFunction(functionEnvironment: FunctionEnvironment) {
@@ -214,8 +214,7 @@ private class ClassEnvironmentImpl(
         _operatorFunctions.add(functionEnvironment)
     }
 
-    override val operatorFunctions: Set<FunctionEnvironment>
-        get() = _operatorFunctions.toSet()
+    override val operatorFunctions get() = _operatorFunctions.toSet()
 
 
     override fun getFunction(id: String, args: List<DataType>): Optional<FunctionEnvironment> {
@@ -229,29 +228,7 @@ private class ClassEnvironmentImpl(
         return Optional.empty()
     }
 
-
-    override fun declareConstructor(constructorEnvironment: ConstructorEnvironment) {
-        val parameters = constructorEnvironment.parameters
-
-        main@ for (otherConstructorEnvironment in _constructors) {
-            val otherParameters = otherConstructorEnvironment.parameters
-            if (parameters.size != otherParameters.size) continue
-
-            for (i in parameters.indices) {
-                if (otherParameters[i].getDataType() != parameters[i].getDataType()) continue@main
-            }
-
-            throw EvaluationException(translatable("meazy:runtime.constructor.already_exists"))
-        }
-
-        _constructors.add(constructorEnvironment)
-    }
-
-    override val constructors: Set<ConstructorEnvironment>
-        get() = _constructors.toSet()
-
-    override val modifiers: Set<Modifier>
-        get() = _modifiers.toSet()
+    override val modifiers get() = _modifiers.toSet()
 
     override val fullClassName: String
         get() {
@@ -262,8 +239,7 @@ private class ClassEnvironmentImpl(
             return getPackageName()!! + "." + classSpecifier + id
         }
 
-    override val classDesc: ClassDesc
-        get() = ClassDesc.of(fullClassName)
+    override val classDesc get() = ClassDesc.of(fullClassName)
 }
 
 
