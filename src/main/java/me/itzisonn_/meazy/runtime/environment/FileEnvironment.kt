@@ -2,16 +2,17 @@ package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.VariableValue
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
 /**
  * Represents file environment
  */
-interface FileEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ClassDeclarationEnvironment {
+interface FileEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment,
+    ClassDeclarationEnvironment {
     override fun getParent(): GlobalEnvironment
 
 
@@ -51,13 +52,14 @@ private class FileEnvironmentImpl(
     parent: GlobalEnvironment,
     override val packageName: String,
     override val className: String
-) : FunctionDeclarationEnvironmentImpl(parent, true), FileEnvironment {
+) : FileEnvironment,
+    FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, true),
+    ClassDeclarationEnvironment by ClassDeclarationEnvironment(parent, true),
+    EnvironmentImpl(parent) {
     private val _imports = mutableMapOf<String, ClassDesc>()
     private val _variables = mutableListOf<VariableValue>()
-    private val _classes = mutableSetOf<ClassEnvironment>()
 
     init {
-
         addImport("java.lang.String")
         addImport("java.lang.System")
         addImport("java.lang.IO")
@@ -72,6 +74,7 @@ private class FileEnvironmentImpl(
 
 
     override fun getParent() = super.getParent() as GlobalEnvironment
+    override val isShared = true
     override val fullClassName get() = "$packageName.$className"
 
 
@@ -101,20 +104,6 @@ private class FileEnvironmentImpl(
     }
 
     override val variables get() = _variables.toList()
-
-
-
-    override fun declareClass(classEnvironment: ClassEnvironment) {
-        for (otherEnvironment in classes) {
-            if (otherEnvironment.id == classEnvironment.id) {
-                throw EvaluationException(translatable("meazy:runtime.class.already_exists", classEnvironment.id))
-            }
-        }
-
-        _classes.add(classEnvironment)
-    }
-
-    override val classes get() = _classes.toSet()
 }
 
 
