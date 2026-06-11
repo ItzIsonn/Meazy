@@ -35,9 +35,9 @@ class CompileCommand : AbstractCommand(
         )
         val startMillis = System.currentTimeMillis()
 
-        val tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue()(getLines(file))
-        val program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue()(file, tokens)
-        val classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue()(program)
+        val tokens = Registries.tokenizationFunction(getLines(file))
+        val program = Registries.parseTokensFunction(file, tokens)
+        val classes = Registries.compileProgramFunction(program)
 
         val outputDirectory = File(args[1])
         if (!outputDirectory.exists()) {
@@ -46,8 +46,7 @@ class CompileCommand : AbstractCommand(
             }
         }
 
-        for (classDesc in classes.keys) {
-            val classFile: ByteArray = classes[classDesc]!!
+        for ((classDesc, classFile) in classes) {
             val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
 
             try {
