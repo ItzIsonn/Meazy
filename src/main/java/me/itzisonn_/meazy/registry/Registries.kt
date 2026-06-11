@@ -18,8 +18,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions
 import me.itzisonn_.meazy.registry.Registries.PARSING_FUNCTIONS
 import me.itzisonn_.meazy.registry.Registries.TOKEN_TYPES
 import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
-import me.itzisonn_.meazy.runtime.environment.factory.*
-import me.itzisonn_.meazy.runtime.environment.factory.impl.*
+import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.text.Language
 import me.itzisonn_.registry.multiple_entry.OrderedRegistry
 import me.itzisonn_.registry.multiple_entry.SetRegistry
@@ -122,49 +121,6 @@ object Registries {
 
 
     /**
-     * Registry for [GlobalEnvironmentFactory]
-     */
-    val GLOBAL_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<GlobalEnvironmentFactory>()
-
-    /**
-     * Registry for [FileEnvironmentFactory]
-     */
-    @JvmField
-    val FILE_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<FileEnvironmentFactory>()
-
-    /**
-     * Registry for [ClassEnvironmentFactory]
-     */
-    @JvmField
-    val CLASS_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<ClassEnvironmentFactory>()
-
-    /**
-     * Registry for [FunctionEnvironmentFactory]
-     */
-    @JvmField
-    val FUNCTION_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<FunctionEnvironmentFactory>()
-
-    /**
-     * Registry for [ConstructorEnvironmentFactory]
-     */
-    @JvmField
-    val CONSTRUCTOR_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<ConstructorEnvironmentFactory>()
-
-    /**
-     * Registry for [LoopEnvironmentFactory]
-     */
-    @JvmField
-    val LOOP_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<LoopEnvironmentFactory>()
-
-    /**
-     * Registry for [LocalVariableDeclarationEnvironmentFactory]
-     */
-    @JvmField
-    val LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY = SingleEntryRegistryImpl<LocalVariableDeclarationEnvironmentFactory>()
-
-
-
-    /**
      * Initializes Registries
      * 
      * 
@@ -236,7 +192,7 @@ object Registries {
         }
 
         COMPILE_PROGRAM_FUNCTION.register(getDefaultIdentifier("compile_program")) { program ->
-            val globalEnvironment = GLOBAL_ENVIRONMENT_FACTORY.getEntry().getValue()!!.create()
+            val globalEnvironment = GlobalEnvironment()
             val bytecodeBuilders = BytecodeBuilders.of(null, null)
             val instructionsSet = InstructionsSet(bytecodeBuilders)
 
@@ -284,33 +240,5 @@ object Registries {
         }
 
         PROGRAM_FACTORY.register(getDefaultIdentifier("program_factory"), ProgramFactoryImpl())
-        GLOBAL_ENVIRONMENT_FACTORY.register(
-            getDefaultIdentifier("global_environment_factory"),
-            GlobalEnvironmentFactoryImpl()
-        )
-        FILE_ENVIRONMENT_FACTORY.register(
-            getDefaultIdentifier("file_environment_factory"),
-            FileEnvironmentFactoryImpl()
-        )
-        CLASS_ENVIRONMENT_FACTORY.register(
-            getDefaultIdentifier("class_environment_factory"),
-            ClassEnvironmentFactoryImpl()
-        )
-        FUNCTION_ENVIRONMENT_FACTORY.register(
-            getDefaultIdentifier("function_environment_factory"),
-            FunctionEnvironmentFactoryImpl()
-        )
-        CONSTRUCTOR_ENVIRONMENT_FACTORY.register(
-            getDefaultIdentifier("constructor_environment_factory"),
-            ConstructorEnvironmentFactoryImpl()
-        )
-        LOOP_ENVIRONMENT_FACTORY.register(
-            getDefaultIdentifier("loop_environment_factory"),
-            LoopEnvironmentFactoryImpl()
-        )
-        LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY.register(
-            getDefaultIdentifier("local_variable_declaration_environment_factory"),
-            LocalVariableDeclarationEnvironmentFactoryImpl()
-        )
     }
 }

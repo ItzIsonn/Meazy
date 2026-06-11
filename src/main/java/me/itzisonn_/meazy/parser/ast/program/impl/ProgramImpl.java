@@ -5,7 +5,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.statement.DeclarationStatement;
 import me.itzisonn_.meazy.parser.ast.statement.ImportStatement;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.util.FileUtils;
 import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
@@ -13,9 +13,6 @@ import me.itzisonn_.meazy.parser.ast.statement.Statement;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.ast.program.Program;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
-import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment;
 import me.itzisonn_.meazy.runtime.VariableValue;
 import me.itzisonn_.meazy.version.Version;
 import me.itzisonn_.meazy.util.MiscUtils;
@@ -73,7 +70,7 @@ public class ProgramImpl implements Program {
         String id = FileUtils.getNameWithoutExtension(file);
         id = id.substring(0, 1).toUpperCase() + id.substring(1);
 
-        fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(globalEnvironment, path.get(path.size() - 2), id);
+        fileEnvironment = FileEnvironmentKt.FileEnvironment(globalEnvironment, path.get(path.size() - 2), id);
         globalEnvironment.addFileEnvironment(fileEnvironment);
 
         for (Statement statement : body) {

@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
+import me.itzisonn_.meazy.runtime.environment.LoopEnvironmentKt;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ConstantDescs;
@@ -33,7 +34,7 @@ public class WhileStatement implements LocalStatement {
 
         var conditionLabel = instructionsSet.createAndInitLabel();
         var endLabel = instructionsSet.createAndInitLabel();
-        LoopEnvironment loopEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment, conditionLabel, endLabel);
+        LoopEnvironment loopEnvironment = LoopEnvironmentKt.LoopEnvironment(environment, conditionLabel, endLabel);
 
         instructionsSet.bindLabel(conditionLabel);
         condition.emit(instructionsSet, environment, this);

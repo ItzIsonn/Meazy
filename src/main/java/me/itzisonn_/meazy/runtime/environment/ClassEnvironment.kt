@@ -14,7 +14,7 @@ import java.util.Optional
 /**
  * Represents environment for classes
  */
-interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment, ModifieredEnvironment {
+sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment, ModifieredEnvironment {
     override fun getParent(): ClassDeclarationEnvironment
 
     /**
@@ -100,7 +100,7 @@ interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclaration
 
 
 
-class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironment {
+private class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironment {
     override val id: String
     override val isInterface: Boolean
     private val _variables: MutableList<VariableValue>
@@ -118,17 +118,17 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
         isInterface: Boolean,
         id: String,
         baseClass: ClassDesc?,
-        interfaces: MutableSet<ClassDesc>,
-        modifiers: MutableSet<Modifier>
+        interfaces: Set<ClassDesc>,
+        modifiers: Set<Modifier>
     ) : super(parent, isShared) {
         this.id = id
         this.isInterface = isInterface
         _variables = mutableListOf()
         _constructors = mutableSetOf()
         this.baseClass = baseClass
-        _interfaces = interfaces
+        _interfaces = interfaces.toMutableSet()
         unresolvedBaseClasses = mutableSetOf()
-        _modifiers = modifiers
+        _modifiers = modifiers.toMutableSet()
         _operatorFunctions = mutableSetOf()
     }
 
@@ -281,3 +281,39 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
     override val classDesc: ClassDesc
         get() = ClassDesc.of(fullClassName)
 }
+
+
+
+/** TODO javadoc for baseclass
+ * Creates class environment
+ *
+ * @param parent Parent
+ * @param isShared Whether class environment is shared
+ * @param id Id
+ * @param modifiers Modifiers
+ * @return New class environment
+ */
+fun ClassEnvironment(
+    parent: ClassDeclarationEnvironment, isShared: Boolean, isInterface: Boolean,
+    id: String, baseClass: ClassDesc?, interfaces: Set<ClassDesc>, modifiers: Set<Modifier>
+): ClassEnvironment = ClassEnvironmentImpl(
+    parent, isShared, isInterface,
+    id, baseClass, interfaces, modifiers
+)
+
+/**
+ * Creates class environment
+ *
+ * @param parent Parent
+ * @param isShared Whether class environment is shared
+ * @param id Id
+ * @param modifiers Modifiers
+ * @return New class environment
+ */
+fun ClassEnvironment(
+    parent: ClassDeclarationEnvironment, isShared: Boolean, isInterface: Boolean,
+    id: String, unresolvedBaseClasses: MutableSet<String>, modifiers: MutableSet<Modifier>
+): ClassEnvironment = ClassEnvironmentImpl(
+    parent, isShared, isInterface,
+    id, unresolvedBaseClasses, modifiers
+)

@@ -7,10 +7,7 @@ import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.runtime.environment.ClassDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -44,7 +41,7 @@ public class InterfaceDeclarationStatement extends ModifierStatement implements 
 
         boolean isInner = getModifiers().contains(Modifiers.PRIVATE());
 
-        ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+        ClassEnvironment classEnvironment = ClassEnvironmentKt.ClassEnvironment(
                 classDeclarationEnvironment,
                 isInner || modifiers.contains(Modifiers.SHARED()),
                 true,

@@ -4,14 +4,13 @@ import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
-import me.itzisonn_.meazy.registry.Registries
 import java.lang.constant.ClassDesc
 import java.util.Optional
 
 /**
  * Represents global environment
  */
-interface GlobalEnvironment : Environment {
+sealed interface GlobalEnvironment : Environment {
     /**
      * Adds to this global environment file environment
      * @param fileEnvironment FileEnvironment to add
@@ -39,7 +38,7 @@ interface GlobalEnvironment : Environment {
 
 
 
-class GlobalEnvironmentImpl : GlobalEnvironment {
+private class GlobalEnvironmentImpl : GlobalEnvironment {
     private val _fileEnvironments = mutableSetOf<FileEnvironment>()
 
     override fun addFileEnvironment(fileEnvironment: FileEnvironment) {
@@ -65,7 +64,7 @@ class GlobalEnvironmentImpl : GlobalEnvironment {
                 if (classEnvironment.isPresent) return classEnvironment
             }
 
-            val fileEnvironment = Registries.FILE_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+            val fileEnvironment = FileEnvironment(
                 this, packageName, cls.getSimpleName()
             )
 
@@ -74,7 +73,7 @@ class GlobalEnvironmentImpl : GlobalEnvironment {
             if (java.lang.reflect.Modifier.isPrivate(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.PRIVATE())
             if (java.lang.reflect.Modifier.isAbstract(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.ABSTRACT())
 
-            val classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+            val classEnvironment = ClassEnvironment(
                 fileEnvironment,
                 false,
                 cls.isInterface,
@@ -111,7 +110,7 @@ class GlobalEnvironmentImpl : GlobalEnvironment {
                 if (java.lang.reflect.Modifier.isAbstract(cls.modifiers)) functionModifiers.add(Modifiers.ABSTRACT())
 
                 classEnvironment.declareFunction(
-                    Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                    FunctionEnvironment(
                         classEnvironment,
                         null,
                         null,
@@ -139,7 +138,7 @@ class GlobalEnvironmentImpl : GlobalEnvironment {
                 if (java.lang.reflect.Modifier.isProtected(cls.modifiers)) constructorModifiers.add(Modifiers.PROTECTED())
 
                 classEnvironment.declareConstructor(
-                    Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+                    ConstructorEnvironment(
                         classEnvironment,
                         null,
                         null,
@@ -185,3 +184,11 @@ class GlobalEnvironmentImpl : GlobalEnvironment {
         }
     }
 }
+
+
+
+/**
+ * Creates global environment
+ * @return New global environment
+ */
+fun GlobalEnvironment(): GlobalEnvironment = GlobalEnvironmentImpl()

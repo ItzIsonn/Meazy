@@ -47,7 +47,7 @@ interface FileEnvironment : VariableDeclarationEnvironment, FunctionDeclarationE
 
 
 
-class FileEnvironmentImpl(
+private class FileEnvironmentImpl(
     parent: GlobalEnvironment,
     override val packageName: String,
     override val className: String
@@ -116,3 +116,16 @@ class FileEnvironmentImpl(
 
     override val classes get() = _classes.toSet()
 }
+
+
+
+/**
+ * Creates file environment
+ *
+ * @param parent Parent
+ * @param packageName Package name
+ * @param className Class name
+ * @return New file environment
+ */
+fun FileEnvironment(parent: GlobalEnvironment, packageName: String, className: String): FileEnvironment =
+    FileEnvironmentImpl(parent, packageName, className)

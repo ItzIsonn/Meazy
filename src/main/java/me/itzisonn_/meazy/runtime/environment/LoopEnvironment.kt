@@ -5,14 +5,14 @@ import kotlin.uuid.Uuid
 /**
  * Represents environment for loops
  */
-interface LoopEnvironment : LocalVariableDeclarationEnvironment {
+sealed interface LoopEnvironment : LocalVariableDeclarationEnvironment {
     override fun getStartLabel(): Uuid
     override fun getEndLabel(): Uuid
 }
 
 
 
-class LoopEnvironmentImpl(parent: Environment, startLabel: Uuid, endLabel: Uuid) :
+private class LoopEnvironmentImpl(parent: Environment, startLabel: Uuid, endLabel: Uuid) :
     LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), LoopEnvironment {
     override fun getStartLabel(): Uuid {
         return super.getStartLabel() ?: error("StartLabel is null")
@@ -22,3 +22,14 @@ class LoopEnvironmentImpl(parent: Environment, startLabel: Uuid, endLabel: Uuid)
         return super.getEndLabel() ?: error("EndLabel is null")
     }
 }
+
+
+
+/** TODO javadoc
+ * Creates non-shared loop environment
+ *
+ * @param parent Parent
+ * @return New loop environment
+ */
+fun LoopEnvironment(parent: Environment, startLabel: Uuid, endLabel: Uuid): LoopEnvironment =
+    LoopEnvironmentImpl(parent, startLabel, endLabel)
