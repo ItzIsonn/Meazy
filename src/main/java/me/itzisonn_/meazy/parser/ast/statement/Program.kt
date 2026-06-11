@@ -41,7 +41,7 @@ class Program(
 
         for (statement in _body) {
             if (statement is ImportStatement) {
-                fileEnvironment.addImport(statement.getName())
+                fileEnvironment.addImport(statement.name)
             }
         }
 
@@ -65,7 +65,7 @@ class Program(
         var id = FileUtils.getNameWithoutExtension(file)
         id = id.substring(0, 1).uppercase() + id.substring(1)
 
-        val classDesc = ClassDesc.of(path.get(path.size - 2), id)
+        val classDesc = ClassDesc.of(path[path.size - 2], id)
 
         val attributes = mutableListOf<InnerClassesAttribute>()
         for (statement in _body) {
@@ -80,46 +80,47 @@ class Program(
             setOf(),
             setOf(AccessFlag.PUBLIC, AccessFlag.FINAL),
             attributes
-        ) { classInstructions ->
+        ) {
             for (statement in _body) {
-                statement.emit(classInstructions, fileEnvironment, this)
+                statement.emit(this, fileEnvironment, this@Program)
             }
-            classInstructions.withConstructor(
+            withConstructor(
                 MethodTypeDesc.of(ConstantDescs.CD_void),
                 setOf(AccessFlag.PRIVATE)
-            ) { bodyInstructions ->
-                bodyInstructions.loadThisReference()
-                bodyInstructions.invokeSuperClass(
+            ) {
+                loadThisReference()
+                invokeSuperClass(
                     ConstantDescs.CD_Object,
                     MethodTypeDesc.of(ConstantDescs.CD_void)
-                ) {}
-                bodyInstructions.returnVoid()
+                )
+                returnVoid()
             }
 
-            classInstructions.withConstructor(
+            withConstructor(
                 MethodTypeDesc.of(ConstantDescs.CD_void),
                 setOf(AccessFlag.STATIC)
-            ) { bodyInstructions ->
+            ) {
                 for (variableValue in fileEnvironment.variables) {
                     val value = variableValue.initializer ?: continue
 
-                    value.emit(bodyInstructions, fileEnvironment, this)
-                    val valueType = value.getType(fileEnvironment, this).getClassDesc()
-                    val variableType = variableValue.dataType.getClassDesc()
+                    value.emit(this, fileEnvironment, this@Program)
+                    val valueType = value.getType(fileEnvironment, this@Program).classDesc
+                    val variableType = variableValue.dataType.classDesc
 
                     if (!EnvironmentUtils.isInstanceOf(fileEnvironment, valueType, variableType)) {
-                        if (!MiscUtils.convertPrimitiveOrBoxed(bodyInstructions, valueType, variableType)) {
+                        if (!MiscUtils.convertPrimitiveOrBoxed(this, valueType, variableType)) {
                             throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                         }
                     }
 
-                    bodyInstructions.storeStaticField(
+                    storeStaticField(
                         classDesc,
                         variableValue.id!!,
                         variableType
                     )
                 }
-                bodyInstructions.returnVoid()
+
+                returnVoid()
             }
         }
     }

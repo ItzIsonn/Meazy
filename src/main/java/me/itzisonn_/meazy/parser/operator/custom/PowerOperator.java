@@ -47,8 +47,8 @@ public class PowerOperator extends Operator {
                 ClassDesc.of("java.lang.Math"),
                 "pow",
                 MethodTypeDesc.of(ConstantDescs.CD_double, ConstantDescs.CD_double, ConstantDescs.CD_double),
-                _ -> Unit.INSTANCE,
-                InvokeType.STATIC
+                InvokeType.STATIC,
+                _ -> Unit.INSTANCE
         );
     }
 

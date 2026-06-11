@@ -3,8 +3,8 @@ package me.itzisonn_.meazy.parser.ast.expression;
 import lombok.Getter;
 import lombok.Setter;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.DataType;
+import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import org.jspecify.annotations.NullMarked;
@@ -37,4 +37,5 @@ public class MemberExpression implements Expression, LocalStatement {
     public boolean alwaysReturns() {
         return false;
     }
+
 }
