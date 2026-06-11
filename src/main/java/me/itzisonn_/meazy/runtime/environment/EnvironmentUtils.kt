@@ -34,45 +34,13 @@ object EnvironmentUtils {
 
     @JvmStatic
     @Deprecated("Use function with KClass instead")
-    fun <T : Environment> hasParentOrSelf(environment: Environment, cls: Class<T>): Boolean {
-        return environment.hasParentOrSelf(cls.kotlin)
-    }
-
-
-
-    @JvmStatic
-    @Deprecated("Use function with KClass instead")
     fun <T : Environment> getParent(environment: Environment, cls: Class<T>): Optional<T> {
         return Optional.ofNullable(environment.getParent(cls.kotlin))
     }
 
-
-    @JvmStatic
-    @Deprecated("Use function with KClass instead")
-    fun <T : Environment> getParentOrSelf(environment: Environment, cls: Class<T>): Optional<T> {
-        return Optional.ofNullable(environment.getParentOrSelf(cls.kotlin))
-    }
-
-
-
-    /**
-     * TODO
-     */
-    @JvmStatic
-    fun isInstanceOf(environment: Environment, classDesc: ClassDesc, target: ClassDesc): Boolean {
-        return environment.isInstanceOf(classDesc, target)
-    }
-
-
-
     @JvmStatic
     fun getClass(environment: Environment, id: String): Optional<ClassEnvironment> {
         return Optional.ofNullable(environment.getClass(id))
-    }
-
-    @JvmStatic
-    fun getClass(environment: Environment, classDesc: ClassDesc): Optional<ClassEnvironment> {
-        return Optional.ofNullable(environment.getClass(classDesc))
     }
 }
 

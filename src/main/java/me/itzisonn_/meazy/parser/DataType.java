@@ -77,7 +77,7 @@ public final class DataType {
     }
 
     public static boolean matches(Environment environment, DataType dataType, DataType target) {
-        return EnvironmentUtils.isInstanceOf(environment, dataType.getClassDesc(), target.getClassDesc())
+        return EnvironmentUtilsKt.isInstanceOf(environment, dataType.getClassDesc(), target.getClassDesc())
                 && (!dataType.isNullable() || target.isNullable());
     }
 

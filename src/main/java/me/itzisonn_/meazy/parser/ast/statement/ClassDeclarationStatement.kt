@@ -28,7 +28,7 @@ class ClassDeclarationStatement @JvmOverloads constructor(
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
-        val isInner = getModifiers().contains(Modifiers.PRIVATE())
+        val isInner = modifiers.contains(Modifiers.PRIVATE())
 
         val classEnvironment = ClassEnvironment(
             environment,
@@ -69,7 +69,7 @@ class ClassDeclarationStatement @JvmOverloads constructor(
 
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
         require(environment is FileEnvironment) { "Environment must be file TODO" }
-        val isInner = getModifiers().contains(Modifiers.PRIVATE())
+        val isInner = modifiers.contains(Modifiers.PRIVATE())
 
         val classDesc = if (isInner) ClassDesc.of(environment.packageName + "." + environment.className + "$" + id)
         else ClassDesc.of(environment.packageName, id)

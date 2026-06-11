@@ -1,133 +1,104 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.*;
-import me.itzisonn_.meazy.runtime.VariableValue;
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment;
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment;
-import me.itzisonn_.meazy.util.MiscUtils;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.VariableValue
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.FileEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.isInstanceOf
+import me.itzisonn_.meazy.util.MiscUtils.convertPrimitiveOrBoxed
+import java.lang.reflect.AccessFlag
 
-import java.lang.constant.ClassDesc;
-import java.lang.reflect.AccessFlag;
-import java.util.HashSet;
-import java.util.Set;
+class VariableDeclarationStatement(
+    modifiers: Set<Modifier>,
+    val isConstant: Boolean,
+    val id: String,
+    val dataType: DataType?,
+    val value: Expression?
+) : ModifierStatement(modifiers), DeclarationStatement, LocalStatement {
+    private lateinit var variableValue: VariableValue
+    private var declared = false
 
-@Getter
-@NullMarked
-public class VariableDeclarationStatement extends ModifierStatement implements DeclarationStatement, LocalStatement {
-    private final boolean isConstant;
-    private final String id;
-    @Nullable
-    private final DataType dataType;
-    @Nullable
-    private final Expression value;
-    @Nullable
-    private VariableValue variableValue;
+    override fun declare(environment: Environment) {
+        if (environment !is VariableDeclarationEnvironment) {
+            throw RuntimeException("CANT DECLARE variable HERE TODO")
+        }
+        val dataType = dataType ?: value?.getType(environment, this)
+            ?: error("Variable without a data type must have initializer TODO")
 
-    public VariableDeclarationStatement(Set<Modifier> modifiers, boolean isConstant, String id, @Nullable DataType dataType, @Nullable Expression value) {
-        super(modifiers);
-        this.isConstant = isConstant;
-        this.id = id;
-        this.dataType = dataType;
-        this.value = value;
+        variableValue = environment.declareVariable(id, dataType, isConstant, value)
+        declared = true
     }
 
-    @Override
-    public void declare(Environment environment) {
-        if (!(environment instanceof VariableDeclarationEnvironment variableDeclarationEnvironment)) {
-            throw new RuntimeException("CANT DECLARE variable HERE TODO");
-        }
-
-        DataType dataType;
-        if (this.dataType != null) dataType = this.dataType;
-        else {
-            if (value == null) throw new RuntimeException("Variable without a data type must have initializer TODO");
-            else dataType = value.getType(environment, this);
-        }
-
-        variableValue = variableDeclarationEnvironment.declareVariable(id, dataType, isConstant, value);
+    override fun resolve(environment: Environment) {
+        variableValue.dataType.resolve(environment)
     }
 
-    @Override
-    public void resolve(Environment environment) {
-        if (variableValue == null) {
-            throw new RuntimeException("Variable isn't declared TODO");
-        }
-
-        variableValue.getDataType().resolve(environment);
-    }
-
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        if (variableValue == null) {
-            if (!(environment instanceof FileEnvironment) && !(environment instanceof ClassEnvironment)) {
-                declare(environment);
-                resolve(environment);
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        if (!declared) {
+            if (environment !is FileEnvironment && environment !is ClassEnvironment) {
+                declare(environment)
+                resolve(environment)
             }
-            else throw new RuntimeException("Declared variable is unresolved TODO");
+            else throw RuntimeException("Declared variable is unresolved TODO")
         }
 
-        ClassDesc variableType = variableValue.getDataType().getClassDesc();
+        val variableType = variableValue.dataType.classDesc
 
-        if (environment instanceof FileEnvironment) {
-            Set<AccessFlag> accessFlags = new HashSet<>(Set.of(AccessFlag.STATIC));
-            if (isConstant) accessFlags.add(AccessFlag.FINAL);
+        if (environment is FileEnvironment) {
+            val accessFlags = mutableSetOf(AccessFlag.STATIC)
+            if (isConstant) accessFlags.add(AccessFlag.FINAL)
 
-            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
-            else accessFlags.add(AccessFlag.PUBLIC);
+            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE)
+            else accessFlags.add(AccessFlag.PUBLIC)
 
-            instructions.withField(id, variableType, accessFlags);
-            return;
+            instructions.withField(id, variableType, accessFlags)
+            return
         }
 
-        if (environment instanceof ClassEnvironment) {
-            Set<AccessFlag> accessFlags = new HashSet<>();
-            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE);
-            else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED);
-            else accessFlags.add(AccessFlag.PUBLIC);
+        if (environment is ClassEnvironment) {
+            val accessFlags = mutableSetOf<AccessFlag>()
+            if (modifiers.contains(Modifiers.PRIVATE())) accessFlags.add(AccessFlag.PRIVATE)
+            else if (modifiers.contains(Modifiers.PROTECTED())) accessFlags.add(AccessFlag.PROTECTED)
+            else accessFlags.add(AccessFlag.PUBLIC)
 
-            if (modifiers.contains(Modifiers.SHARED())) accessFlags.add(AccessFlag.STATIC);
-            if (isConstant) accessFlags.add(AccessFlag.FINAL);
+            if (modifiers.contains(Modifiers.SHARED())) accessFlags.add(AccessFlag.STATIC)
+            if (isConstant) accessFlags.add(AccessFlag.FINAL)
 
-            instructions.withField(id, variableType, accessFlags);
-            return;
+            instructions.withField(id, variableType, accessFlags)
+            return
         }
-
 
 
         if (value != null) {
-            value.emit(instructions, environment, this);
-            ClassDesc valueType = value.getType(environment, this).getClassDesc();
+            value.emit(instructions, environment, this)
+            val valueType = value.getType(environment, this).classDesc
 
-            if (!EnvironmentUtils.isInstanceOf(environment, valueType, variableType)) {
-                if (!MiscUtils.convertPrimitiveOrBoxed(instructions, valueType, variableType)) {
-                    throw new RuntimeException("Can't assign value of type " + valueType + " to variable with type " + variableType);
+            if (!environment.isInstanceOf(valueType, variableType)) {
+                if (!convertPrimitiveOrBoxed(instructions, valueType, variableType)) {
+                    throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                 }
             }
         }
 
-        instructions.storeLocal(variableType, variableValue.getSlot());
+        instructions.storeLocal(variableType, variableValue.slot)
 
-        if (environment instanceof LocalVariableDeclarationEnvironment localDeclarationEnvironment) {
-            if (localDeclarationEnvironment.getStartLabel() == null || localDeclarationEnvironment.getEndLabel() == null) return;
+        if (environment is LocalVariableDeclarationEnvironment) {
+            if (environment.getStartLabel() == null || environment.getEndLabel() == null) return
 
             instructions.setLocalName(
-                    variableValue.getSlot(), id, variableType,
-                    localDeclarationEnvironment.getStartLabel(), localDeclarationEnvironment.getEndLabel()
-            );
+                variableValue.slot, id, variableType,
+                environment.getStartLabel()!!, environment.getEndLabel()!!
+            )
         }
     }
 
-    @Override
-    public boolean alwaysReturns() {
-        return false;
-    }
+    override fun alwaysReturns() = false
 }

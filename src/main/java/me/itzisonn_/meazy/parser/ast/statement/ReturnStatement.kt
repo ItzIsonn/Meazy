@@ -1,74 +1,54 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
-import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment;
-import me.itzisonn_.meazy.util.MiscUtils;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
+import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.isInstanceOf
+import me.itzisonn_.meazy.util.MiscUtils.convertPrimitiveOrBoxed
 
-import java.lang.constant.ClassDesc;
-import java.util.Optional;
-
-@Getter
-@NullMarked
-public class ReturnStatement implements LocalStatement {
-    @Nullable
-    private final Expression value;
-
-    public ReturnStatement(@Nullable Expression value) {
-        this.value = value;
-    }
-
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-        Optional<ConstructorEnvironment> optionalConstructorEnvironment = EnvironmentUtils.getParentOrSelf(environment, ConstructorEnvironment.class);
-        if (optionalConstructorEnvironment.isPresent()) {
-            if (value != null) throw new RuntimeException("Constructor can't return value TODO");
-            instructions.returnVoid();
-            return;
+class ReturnStatement(val value: Expression?) : LocalStatement {
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        if (environment.hasParentOrSelf<ConstructorEnvironment>()) {
+            if (value != null) throw RuntimeException("Constructor can't return value TODO")
+            instructions.returnVoid()
+            return
         }
 
-        FunctionEnvironment functionEnvironment = EnvironmentUtils.getParentOrSelf(environment, FunctionEnvironment.class).orElseThrow(
-                () -> new IllegalArgumentException("Parent environment for RETURN statement must be FunctionEnvironment TODO")
-        );
+        val functionEnvironment = environment.getParentOrSelf<FunctionEnvironment>()
+            ?: error("Parent environment for RETURN statement must be FunctionEnvironment TODO")
 
-        DataType returnDataType = functionEnvironment.getReturnDataType();
+        val returnDataType = functionEnvironment.returnDataType
 
         if (value == null) {
             if (returnDataType != null) {
-                throw new RuntimeException("Function must return value TODO");
+                throw RuntimeException("Function must return value TODO")
             }
 
-            instructions.returnVoid();
-            return;
+            instructions.returnVoid()
+            return
         }
 
         if (returnDataType == null) {
-            throw new RuntimeException("Function must not return value TODO");
+            throw RuntimeException("Function must not return value TODO")
         }
 
-        value.emit(instructions, environment, this);
-        ClassDesc valueClassDesc = value.getType(environment, this).getClassDesc();
-        ClassDesc returnTypeClassDesc = returnDataType.getClassDesc();
+        value.emit(instructions, environment, this)
+        val valueClassDesc = value.getType(environment, this).classDesc
+        val returnTypeClassDesc = returnDataType.classDesc
 
-        if (!EnvironmentUtils.isInstanceOf(functionEnvironment, valueClassDesc, returnTypeClassDesc)) {
-            if (!MiscUtils.convertPrimitiveOrBoxed(instructions, valueClassDesc, returnTypeClassDesc)) {
-                throw new RuntimeException("Function's return value not matches its return data type TODO");
+        if (!functionEnvironment.isInstanceOf(valueClassDesc, returnTypeClassDesc)) {
+            if (!convertPrimitiveOrBoxed(instructions, valueClassDesc, returnTypeClassDesc)) {
+                throw RuntimeException("Function's return value not matches its return data type TODO")
             }
         }
 
-        instructions.returnValue(returnTypeClassDesc);
+        instructions.returnValue(returnTypeClassDesc)
     }
 
-    @Override
-    public boolean alwaysReturns() {
-        return true;
-    }
+    override fun alwaysReturns() = true
 }
