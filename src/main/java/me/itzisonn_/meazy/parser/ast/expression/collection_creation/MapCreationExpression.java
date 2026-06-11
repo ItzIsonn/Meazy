@@ -47,11 +47,11 @@ public class MapCreationExpression implements Expression {
                 ConstantDescs.CD_Map,
                 "ofEntries",
                 MethodTypeDesc.of(ConstantDescs.CD_Map, ClassDesc.of("java.util.Map$Entry").arrayType()),
+                InvokeType.STATIC_INTERFACE,
                 argsInstructions -> {
                     ofEntriesArgsInstructions(argsInstructions, environment);
                     return Unit.INSTANCE;
-                },
-                InvokeType.STATIC_INTERFACE
+                }
         );
     }
 
@@ -68,6 +68,7 @@ public class MapCreationExpression implements Expression {
                     ClassDesc.of("java.util.Map"),
                     "entry",
                     MethodTypeDesc.of(ClassDesc.of("java.util.Map$Entry"), ConstantDescs.CD_Object, ConstantDescs.CD_Object),
+                    InvokeType.STATIC_INTERFACE,
                     argsInstructions -> {
                         argsInstructions.duplicate();
                         argsInstructions.loadConstant(finalI);
@@ -75,8 +76,7 @@ public class MapCreationExpression implements Expression {
                         key.emit(argsInstructions, environment, this);
                         value.emit(argsInstructions, environment, this);
                         return Unit.INSTANCE;
-                    },
-                    InvokeType.STATIC_INTERFACE
+                    }
             );
 
             instructionsSet.storeReferenceIntoArray();

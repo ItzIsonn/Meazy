@@ -46,11 +46,11 @@ public class ListCreationExpression implements Expression {
                 ConstantDescs.CD_List,
                 "of",
                 MethodTypeDesc.of(ConstantDescs.CD_List, ConstantDescs.CD_Object.arrayType()),
+                InvokeType.STATIC_INTERFACE,
                 argsInstructions -> {
                     ofArgsInstructions(argsInstructions, environment);
                     return Unit.INSTANCE;
-                },
-                InvokeType.STATIC_INTERFACE
+                }
         );
     }
 

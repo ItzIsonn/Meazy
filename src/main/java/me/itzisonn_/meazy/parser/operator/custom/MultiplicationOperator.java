@@ -72,8 +72,8 @@ public class MultiplicationOperator extends Operator {
                 ConstantDescs.CD_String,
                 "repeat",
                 MethodTypeDesc.of(ConstantDescs.CD_String, ConstantDescs.CD_int),
-                _ -> Unit.INSTANCE,
-                InvokeType.VIRTUAL
+                InvokeType.VIRTUAL,
+                _ -> Unit.INSTANCE
         );
     }
 

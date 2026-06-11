@@ -1,6 +1,8 @@
 plugins {
     java
     kotlin("jvm") version "2.4.0"
+    kotlin("plugin.lombok") version "2.4.0" //FIXME remove after removing java
+    id("io.freefair.lombok") version "9.5.0"
 }
 
 group = "me.itzisonn_.meazy"

@@ -29,9 +29,7 @@ import java.lang.constant.ConstantDesc
 import java.lang.constant.DirectMethodHandleDesc
 import java.lang.constant.MethodTypeDesc
 import java.lang.reflect.AccessFlag
-import java.util.function.Consumer
 import kotlin.uuid.Uuid
-import kotlin.uuid.Uuid.Companion.random
 
 class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     private val _instructions: MutableList<Instruction> = mutableListOf()
@@ -43,7 +41,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
 
-    fun withField(id: String, type: ClassDesc, flags: MutableSet<AccessFlag>) {
+    fun withField(id: String, type: ClassDesc, flags: Set<AccessFlag>) {
         with(WithFieldInstruction(id, type, toIntFlags(flags)))
     }
 
@@ -65,17 +63,34 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
 
-    fun withMethod(id: String, methodTypeDesc: MethodTypeDesc, flags: Set<AccessFlag>, bodyInstructions: Consumer<InstructionsSet>) {
-        with(WithMethodInstruction(id, methodTypeDesc, toIntFlags(flags), bodyInstructions))
+    fun withMethod(
+        id: String,
+        methodTypeDesc: MethodTypeDesc,
+        flags: Set<AccessFlag>,
+        bodyInstructions: InstructionsSet.() -> Unit
+    ) {
+        with(WithMethodInstruction(
+            id, methodTypeDesc, toIntFlags(flags), bodyInstructions
+        ))
     }
 
-    fun withConstructor(methodTypeDesc: MethodTypeDesc, flags: Set<AccessFlag>, bodyInstructions: Consumer<InstructionsSet>) {
-        with(WithConstructorInstruction(methodTypeDesc, toIntFlags(flags), bodyInstructions))
+    fun withConstructor(
+        methodTypeDesc: MethodTypeDesc,
+        flags: Set<AccessFlag>,
+        bodyInstructions: InstructionsSet.() -> Unit
+    ) {
+        with(WithConstructorInstruction(
+            methodTypeDesc, toIntFlags(flags), bodyInstructions
+        ))
     }
 
     fun withClass(
-        classDesc: ClassDesc, superClass: ClassDesc?, interfaceClasses: Set<ClassDesc>,
-        flags: Set<AccessFlag>, attributes: List<InnerClassesAttribute>, classInstructions: (InstructionsSet) -> Unit
+        classDesc: ClassDesc,
+        superClass: ClassDesc?,
+        interfaceClasses: Set<ClassDesc>,
+        flags: Set<AccessFlag>,
+        attributes: List<InnerClassesAttribute>,
+        classInstructions: InstructionsSet.() -> Unit
     ) {
         with(WithClassInstruction(
             classDesc, superClass, interfaceClasses,
@@ -86,22 +101,46 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
     fun invokeMethod(
-        owner: ClassDesc, id: String, methodTypeDesc: MethodTypeDesc,
-        argsInstructions: (InstructionsSet) -> Unit, invokeType: InvokeType
+        owner: ClassDesc,
+        id: String,
+        methodTypeDesc: MethodTypeDesc,
+        invokeType: InvokeType,
+        argsInstructions: InstructionsSet.() -> Unit = {}
     ) {
-        with(InvokeMethodInstruction(owner, id, methodTypeDesc, argsInstructions, invokeType))
+        with(InvokeMethodInstruction(
+            owner, id, methodTypeDesc, argsInstructions, invokeType
+        ))
     }
 
-    fun invokeDynamicMethod(bootstrapMethod: DirectMethodHandleDesc, id: String, methodTypeDesc: MethodTypeDesc, vararg args: ConstantDesc) {
-        with(InvokeDynamicMethodInstruction(bootstrapMethod, id, methodTypeDesc, listOf(*args)))
+    fun invokeDynamicMethod(
+        bootstrapMethod: DirectMethodHandleDesc,
+        id: String,
+        methodTypeDesc: MethodTypeDesc,
+        vararg args: ConstantDesc
+    ) {
+        with(InvokeDynamicMethodInstruction(
+            bootstrapMethod, id, methodTypeDesc, listOf(*args)
+        ))
     }
 
-    fun invokeConstructor(owner: ClassDesc, constructorTypeDesc: MethodTypeDesc, argsInstructions: (InstructionsSet) -> Unit) {
-        with(InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, false))
+    fun invokeConstructor(
+        owner: ClassDesc,
+        constructorTypeDesc: MethodTypeDesc,
+        argsInstructions: InstructionsSet.() -> Unit = {}
+    ) {
+        with(InvokeConstructorInstruction(
+            owner, constructorTypeDesc, argsInstructions, false
+        ))
     }
 
-    fun invokeSuperClass(owner: ClassDesc, constructorTypeDesc: MethodTypeDesc, argsInstructions: (InstructionsSet) -> Unit) {
-        with(InvokeConstructorInstruction(owner, constructorTypeDesc, argsInstructions, true))
+    fun invokeSuperClass(
+        owner: ClassDesc,
+        constructorTypeDesc: MethodTypeDesc,
+        argsInstructions: InstructionsSet.() -> Unit = {}
+    ) {
+        with(InvokeConstructorInstruction(
+            owner, constructorTypeDesc, argsInstructions, true
+        ))
     }
 
 
@@ -194,7 +233,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
     fun createLabel(): Uuid {
-        val uuid = random()
+        val uuid = Uuid.random()
         bytecodeBuilders.addLabel(uuid)
         return uuid
     }
@@ -236,8 +275,8 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     companion object {
         private fun toIntFlags(accessFlags: Collection<AccessFlag>): Int {
             return accessFlags
-                .map { obj: AccessFlag -> obj.mask() }
-                .reduceOrNull { i1: Int, i2: Int -> i1 or i2 } ?: 0
+                .map { it.mask() }
+                .reduceOrNull { i1, i2 -> i1 or i2 } ?: 0
         }
     }
 }

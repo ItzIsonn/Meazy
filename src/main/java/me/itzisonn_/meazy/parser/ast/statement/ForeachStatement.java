@@ -54,8 +54,8 @@ public class ForeachStatement implements LocalStatement {
                 ClassDesc.of("java.lang.Iterable"),
                 "iterator", 
                 MethodTypeDesc.of(ClassDesc.of("java.util.Iterator")),
-                _ -> Unit.INSTANCE,
-                InvokeType.INTERFACE
+                InvokeType.INTERFACE,
+                _ -> Unit.INSTANCE
         );
 
         instructions.storeLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.getSlot());
@@ -71,8 +71,8 @@ public class ForeachStatement implements LocalStatement {
                 ClassDesc.of("java.util.Iterator"),
                 "hasNext",
                 MethodTypeDesc.of(ConstantDescs.CD_boolean),
-                _ -> Unit.INSTANCE,
-                InvokeType.INTERFACE
+                InvokeType.INTERFACE,
+                _ -> Unit.INSTANCE
         );
         instructions.gotoLabelIfEqualsZero(endLabel);
 
@@ -81,8 +81,8 @@ public class ForeachStatement implements LocalStatement {
                 ClassDesc.of("java.util.Iterator"),
                 "next",
                 MethodTypeDesc.of(ConstantDescs.CD_Object),
-                _ -> Unit.INSTANCE,
-                InvokeType.INTERFACE
+                InvokeType.INTERFACE,
+                _ -> Unit.INSTANCE
         );
 
         dataType.resolve(environment);

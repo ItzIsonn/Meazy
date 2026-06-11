@@ -6,12 +6,11 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import java.lang.classfile.CodeBuilder
 import java.lang.constant.MethodTypeDesc
 import java.lang.reflect.AccessFlag
-import java.util.function.Consumer
 
 class WithConstructorInstruction(
     private val methodTypeDesc: MethodTypeDesc,
     private val flags: Int,
-    private val bodyInstructions: Consumer<InstructionsSet>
+    private val bodyInstructions: (InstructionsSet) -> Unit
 ) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
         val classBuilder = bytecodeBuilders.classBuilder ?: error("Class builder is null")
@@ -25,7 +24,7 @@ class WithConstructorInstruction(
             val constructorBytecodeBuilders = bytecodeBuilders.copy(codeBuilder)
             val instructionsSet = InstructionsSet(constructorBytecodeBuilders)
 
-            bodyInstructions.accept(instructionsSet)
+            bodyInstructions(instructionsSet)
             for (instruction in instructionsSet.instructions) {
                 instruction.emit(constructorBytecodeBuilders)
             }

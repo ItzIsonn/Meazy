@@ -45,19 +45,19 @@ public class IsExpression implements Expression {
                 ConstantDescs.CD_Object,
                 "getClass",
                 MethodTypeDesc.of(ConstantDescs.CD_Class),
-                _ -> Unit.INSTANCE,
-                InvokeType.VIRTUAL
+                InvokeType.VIRTUAL,
+                _ -> Unit.INSTANCE
         );
 
         instructions.invokeMethod(
                 ConstantDescs.CD_Object,
                 "equals",
                 MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object),
+                InvokeType.VIRTUAL,
                 argsInstructions -> {
                     argsInstructions.loadConstant(classDesc);
                     return Unit.INSTANCE;
-                },
-                InvokeType.VIRTUAL
+                }
         );
     }
 

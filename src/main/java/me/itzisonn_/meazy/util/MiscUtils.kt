@@ -52,7 +52,6 @@ object MiscUtils {
             boxedClassDesc,
             "valueOf",
             MethodTypeDesc.of(boxedClassDesc, classDesc),
-            { `_`: InstructionsSet? -> },
             InvokeType.STATIC
         )
     }

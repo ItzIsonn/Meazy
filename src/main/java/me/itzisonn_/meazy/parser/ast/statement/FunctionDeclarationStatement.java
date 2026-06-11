@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
@@ -179,6 +180,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
                         statement.emit(bodyInstructions, functionEnvironment, this);
                     }
                     bodyInstructions.bindLabel(endLabel);
+                    return Unit.INSTANCE;
                 }
         );
     }

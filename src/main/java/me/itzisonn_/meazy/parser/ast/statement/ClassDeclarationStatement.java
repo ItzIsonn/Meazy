@@ -167,6 +167,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
                                 }
 
                                 bodyInstructions.returnVoid();
+                                return Unit.INSTANCE;
                             }
                     );
 

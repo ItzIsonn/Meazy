@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.ast.statement;
 
+import kotlin.Unit;
 import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
@@ -111,6 +112,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
                         statement.emit(bodyInstructions, constructorEnvironment, this);
                     }
                     bodyInstructions.bindLabel(endLabel);
+                    return Unit.INSTANCE;
                 }
         );
     }
