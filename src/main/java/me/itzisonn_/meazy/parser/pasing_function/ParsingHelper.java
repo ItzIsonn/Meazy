@@ -1,17 +1,14 @@
 package me.itzisonn_.meazy.parser.pasing_function;
 
 import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.parser.ParsingContext;
+import me.itzisonn_.meazy.parser.*;
 import me.itzisonn_.meazy.text.TextKt;
 import me.itzisonn_.meazy.lexer.Token;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.Parameter;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.InvalidStatementException;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -56,18 +53,35 @@ public final class ParsingHelper {
         return result;
     }
 
-    public static List<ParameterExpression> parseParameters(ParsingContext context) {
+    private static Parameter parseParameter(ParsingContext context) {
+        Parser parser = context.getParser();
+
+        if (!parser.getCurrent().getType().equals(TokenTypes.VARIABLE())) {
+            throw new UnexpectedTokenException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.expected.start_expression", "variable", "parameter"));
+        }
+
+        boolean isConstant = parser.getCurrentAndNext().getValue().equals("val");
+        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "variable")).getValue();
+
+        int lineNumber = parser.getCurrent().getLine();
+        DataType dataType = ParsingHelper.parseDataType(context);
+        if (dataType == null) throw new InvalidSyntaxException(lineNumber, TextKt.translatable("meazy:parser.exception.parameter_without_datatype"));
+
+        return new Parameter(id, dataType, isConstant);
+    }
+
+    public static List<Parameter> parseParameters(ParsingContext context) {
         Parser parser = context.getParser();
 
         parser.getCurrentAndNext(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start_expression", "left_parenthesis", "parameters"));
-        List<ParameterExpression> parameters = new ArrayList<>();
+        List<Parameter> parameters = new ArrayList<>();
 
         if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_PARENTHESIS())) {
-            parameters.add(parser.parse(MeazyMain.getDefaultIdentifier("parameter_expression"), ParameterExpression.class));
+            parameters.add(parseParameter(context));
 
             while (parser.getCurrent().getType().equals(TokenTypes.COMMA())) {
                 parser.next();
-                parameters.add(parser.parse(MeazyMain.getDefaultIdentifier("parameter_expression"), ParameterExpression.class));
+                parameters.add(parseParameter(context));
             }
         }
 

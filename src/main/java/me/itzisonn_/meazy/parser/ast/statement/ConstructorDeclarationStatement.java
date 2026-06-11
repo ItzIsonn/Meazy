@@ -5,7 +5,7 @@ import lombok.Getter;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.Parameter;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
 import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.runtime.VariableValue;
@@ -23,12 +23,12 @@ import java.util.Set;
 @Getter
 @NullMarked
 public class ConstructorDeclarationStatement extends ModifierStatement implements DeclarationStatement {
-    private final List<ParameterExpression> parameters;
+    private final List<Parameter> parameters;
     private final List<LocalStatement> body;
     @Nullable
     private ConstructorEnvironment constructorEnvironment;
 
-    public ConstructorDeclarationStatement(Set<Modifier> modifiers, List<ParameterExpression> parameters, List<LocalStatement> body) {
+    public ConstructorDeclarationStatement(Set<Modifier> modifiers, List<Parameter> parameters, List<LocalStatement> body) {
         super(modifiers);
         this.parameters = parameters;
         this.body = body;
@@ -81,7 +81,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
 
         MethodTypeDesc methodTypeDesc = MethodTypeDesc.of(
                 ConstantDescs.CD_void,
-                this.constructorEnvironment.getParameters().stream().map(p -> p.getType(environment, this).getClassDesc()).toList()
+                this.constructorEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList()
         );
 
         Set<AccessFlag> accessFlags = new HashSet<>();
@@ -96,7 +96,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
                     bodyInstructions.initLabel(startLabel);
                     bodyInstructions.initLabel(endLabel);
 
-                    for (ParameterExpression parameter : this.constructorEnvironment.getParameters()) {
+                    for (Parameter parameter : this.constructorEnvironment.getParameters()) {
                         VariableValue parameterValue = constructorEnvironment.declareVariable(
                                 parameter.getId(),
                                 parameter.getDataType(),

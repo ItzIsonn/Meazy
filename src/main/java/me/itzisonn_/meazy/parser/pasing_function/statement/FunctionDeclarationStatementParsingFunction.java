@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.Parameter;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
@@ -46,7 +46,7 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
             id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
         }
 
-        List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
+        List<Parameter> parameters = ParsingHelper.parseParameters(context);
         DataType dataType = ParsingHelper.parseDataType(context);
 
         if (modifiers.contains(Modifiers.ABSTRACT()) || (canBeAbstractWithoutModifier && parser.getCurrent().getType().equals(TokenTypes.NEW_LINE()))) {

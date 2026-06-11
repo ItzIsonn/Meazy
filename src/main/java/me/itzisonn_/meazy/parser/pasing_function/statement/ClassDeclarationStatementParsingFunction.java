@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ParsingContext;
 import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.Parameter;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.statement.*;
@@ -131,10 +131,10 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
 
 
 
-    private static List<Statement> generateDataBody(String id, List<ParameterExpression> dataVariables) {
+    private static List<Statement> generateDataBody(String id, List<Parameter> dataVariables) {
         List<Statement> body = new ArrayList<>();
 
-        for (ParameterExpression dataVariable : dataVariables) {
+        for (Parameter dataVariable : dataVariables) {
             body.add(new VariableDeclarationStatement(
                     Set.of(Modifiers.PRIVATE()),
                     dataVariable.isConstant(),
@@ -145,16 +145,16 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         }
 
         List<LocalStatement> constructorBody = new ArrayList<>();
-        for (ParameterExpression callArgExpression : dataVariables) {
+        for (Parameter callArgExpression : dataVariables) {
             constructorBody.add(new AssignmentStatement(new MemberExpression(new ThisLiteral(), new VariableIdentifier(callArgExpression.getId()), false), new VariableIdentifier(callArgExpression.getId())));
         }
         body.add(new ConstructorDeclarationStatement(Set.of(), dataVariables, constructorBody));
 
-        for (ParameterExpression dataVariable : dataVariables) {
+        for (Parameter dataVariable : dataVariables) {
             body.add(getGetFunction(dataVariable.getId(), dataVariable.getDataType()));
         }
 
-        for (ParameterExpression dataVariable : dataVariables) {
+        for (Parameter dataVariable : dataVariables) {
             if (dataVariable.isConstant()) continue;
             body.add(getSetFunction(dataVariable.getId(), dataVariable.getDataType()));
         }
@@ -168,7 +168,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 DataType.ofNonNull(ConstantDescs.CD_String)));
 
         List<Expression> copyArgs = new ArrayList<>();
-        for (ParameterExpression dataVariable : dataVariables) {
+        for (Parameter dataVariable : dataVariables) {
             copyArgs.add(new VariableIdentifier(dataVariable.getId()));
         }
         body.add(new FunctionDeclarationStatement(
@@ -190,7 +190,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                             false),
                     "==", OperatorType.INFIX);
             for (int i = 1; i < dataVariables.size(); i++) {
-                ParameterExpression dataVariable = dataVariables.get(i);
+                Parameter dataVariable = dataVariables.get(i);
                 equalsExpression = new OperatorExpression(
                         equalsExpression,
                         new OperatorExpression(
@@ -210,7 +210,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         body.add(new FunctionDeclarationStatement(
                 Set.of(Modifiers.OPERATOR()),
                 "equals",
-                List.of(new ParameterExpression("value", DataType.ofNullable(ConstantDescs.CD_Object), true)),
+                List.of(new Parameter("value", DataType.ofNullable(ConstantDescs.CD_Object), true)),
                 List.of(
                         new IfStatement(
                                 new OperatorExpression(new VariableIdentifier("value"), new NullLiteral(), "==", OperatorType.INFIX),
@@ -227,10 +227,10 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         return body;
     }
 
-    private static Expression getToStringExpression(String id, List<ParameterExpression> dataVariables) {
+    private static Expression getToStringExpression(String id, List<Parameter> dataVariables) {
         Expression toStringExpression = new StringLiteral(id + "(" + (dataVariables.isEmpty() ? ")" : ""));
         for (int i = 0; i < dataVariables.size(); i++) {
-            ParameterExpression dataVariable = dataVariables.get(i);
+            Parameter dataVariable = dataVariables.get(i);
 
             Expression endingExpression;
             if (i == dataVariables.size() - 1) endingExpression = new OperatorExpression(
@@ -264,7 +264,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         return new FunctionDeclarationStatement(
                 Set.of(),
                 MiscUtils.generatePrefixedName("set", id),
-                List.of(new ParameterExpression(id, dataType, true)),
+                List.of(new Parameter(id, dataType, true)),
                 List.of(new AssignmentStatement(new MemberExpression(new ThisLiteral(), new VariableIdentifier(id), false), new VariableIdentifier(id))),
                 null);
     }

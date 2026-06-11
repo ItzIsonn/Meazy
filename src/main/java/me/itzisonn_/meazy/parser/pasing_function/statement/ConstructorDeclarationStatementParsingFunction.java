@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes;
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression;
+import me.itzisonn_.meazy.parser.Parameter;
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
@@ -30,7 +30,7 @@ public class ConstructorDeclarationStatementParsingFunction extends AbstractPars
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
         parser.next(TokenTypes.CONSTRUCTOR(), TextKt.translatable("meazy:parser.expected.keyword", "constructor"));
 
-        List<ParameterExpression> parameters = ParsingHelper.parseParameters(context);
+        List<Parameter> parameters = ParsingHelper.parseParameters(context);
 
         if (!parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
             return new ConstructorDeclarationStatement(modifiers, parameters, new ArrayList<>());

@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.parser.DataType
-import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression
+import me.itzisonn_.meazy.parser.Parameter
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
@@ -20,7 +20,7 @@ sealed interface FunctionEnvironment : LocalVariableDeclarationEnvironment, Modi
     /**
      * @return Parameters
      */
-    val parameters: List<ParameterExpression>
+    val parameters: List<Parameter>
 
     var returnDataType: DataType?
 
@@ -34,7 +34,7 @@ private class FunctionEnvironmentImpl(
     startLabel: Uuid?,
     endLabel: Uuid?,
     override val id: String,
-    parameters: List<ParameterExpression>,
+    parameters: List<Parameter>,
     override var returnDataType: DataType?,
     override val isShared: Boolean,
     modifiers: Set<Modifier>
@@ -59,7 +59,7 @@ private class FunctionEnvironmentImpl(
  */
 fun FunctionEnvironment(
     parent: FunctionDeclarationEnvironment, startLabel: Uuid?, endLabel: Uuid?, id: String,
-    parameters: List<ParameterExpression>, returnDataType: DataType?,
+    parameters: List<Parameter>, returnDataType: DataType?,
     isShared: Boolean, modifiers: Set<Modifier>
 ): FunctionEnvironment = FunctionEnvironmentImpl(
     parent, startLabel, endLabel, id, parameters, returnDataType, isShared, modifiers

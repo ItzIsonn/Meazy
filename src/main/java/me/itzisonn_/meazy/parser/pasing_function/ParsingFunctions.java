@@ -41,7 +41,6 @@ public final class ParsingFunctions {
         register(new InterfaceDeclarationStatementParsingFunction());
         register(new InterfaceBodyStatementParsingFunction());
         register(new FunctionDeclarationStatementParsingFunction());
-        register(new ParameterExpressionParsingFunction());
         register(new VariableDeclarationStatementParsingFunction());
         register(new ConstructorDeclarationStatementParsingFunction());
         register(new BaseCallStatementParsingFunction());
