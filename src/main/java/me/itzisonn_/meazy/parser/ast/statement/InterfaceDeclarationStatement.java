@@ -6,8 +6,8 @@ import me.itzisonn_.meazy.instruction.InstructionsSet;
 import me.itzisonn_.meazy.parser.ast.ProgramUnit;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.registry.Registries;
 import me.itzisonn_.meazy.runtime.environment.*;
+import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 

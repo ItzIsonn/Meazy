@@ -6,6 +6,8 @@ import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.VariableValue
+import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.text.translatable
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
@@ -100,37 +102,26 @@ sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDecl
 
 
 
-private class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironment {
-    override val id: String
-    override val isInterface: Boolean
-    private val _variables: MutableList<VariableValue>
-    private val _constructors: MutableSet<ConstructorEnvironment>
-    override var baseClass: ClassDesc?
+private class ClassEnvironmentImpl(
+    parent: ClassDeclarationEnvironment,
+    isShared: Boolean,
+    override val isInterface: Boolean,
+    override val id: String,
+    baseClass: ClassDesc?,
+    interfaces: Set<ClassDesc>,
+    unresolvedBaseClasses: Set<String>,
+    modifiers: Set<Modifier>
+) : ClassEnvironment,
+    FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, isShared),
+    EnvironmentImpl(parent) {
+    private val _variables = mutableListOf<VariableValue>()
+    private val _constructors = mutableSetOf<ConstructorEnvironment>()
+    override var baseClass: ClassDesc? = baseClass
         private set
-    private val _interfaces: MutableSet<ClassDesc>
-    private val unresolvedBaseClasses: MutableSet<String>
-    private val _modifiers: MutableSet<Modifier>
-    private val _operatorFunctions: MutableSet<FunctionEnvironment>
-
-    constructor(
-        parent: ClassDeclarationEnvironment,
-        isShared: Boolean,
-        isInterface: Boolean,
-        id: String,
-        baseClass: ClassDesc?,
-        interfaces: Set<ClassDesc>,
-        modifiers: Set<Modifier>
-    ) : super(parent, isShared) {
-        this.id = id
-        this.isInterface = isInterface
-        _variables = mutableListOf()
-        _constructors = mutableSetOf()
-        this.baseClass = baseClass
-        _interfaces = interfaces.toMutableSet()
-        unresolvedBaseClasses = mutableSetOf()
-        _modifiers = modifiers.toMutableSet()
-        _operatorFunctions = mutableSetOf()
-    }
+    private val _interfaces = interfaces.toMutableSet()
+    private val unresolvedBaseClasses = unresolvedBaseClasses.toMutableSet()
+    private val _modifiers = modifiers.toMutableSet()
+    private val _operatorFunctions = mutableSetOf<FunctionEnvironment>()
 
     constructor(
         parent: ClassDeclarationEnvironment,
@@ -139,17 +130,10 @@ private class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEn
         id: String,
         unresolvedBaseClasses: Set<String>,
         modifiers: Set<Modifier>
-    ) : super(parent, isShared) {
-        this.id = id
-        this.isInterface = isInterface
-        _variables = mutableListOf()
-        _constructors = mutableSetOf()
-        baseClass = null
-        _interfaces = mutableSetOf()
-        this.unresolvedBaseClasses = unresolvedBaseClasses.toMutableSet()
-        _modifiers = modifiers.toMutableSet()
-        _operatorFunctions = mutableSetOf()
-    }
+    ) : this(
+        parent, isShared, isInterface, id,
+        null, setOf(), unresolvedBaseClasses, modifiers
+    )
 
 
     override fun getParent(): ClassDeclarationEnvironment {
@@ -235,7 +219,7 @@ private class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEn
 
 
     override fun getFunction(id: String, args: List<DataType>): Optional<FunctionEnvironment> {
-        val functionEnvironment: Optional<FunctionEnvironment> = super<FunctionDeclarationEnvironmentImpl>.getFunction(id, args)
+        val functionEnvironment: Optional<FunctionEnvironment> = super<FunctionDeclarationEnvironment>.getFunction(id, args)
         if (functionEnvironment.isPresent) return functionEnvironment
 
         val baseClass = baseClass ?: return Optional.empty()
@@ -298,7 +282,7 @@ fun ClassEnvironment(
     id: String, baseClass: ClassDesc?, interfaces: Set<ClassDesc>, modifiers: Set<Modifier>
 ): ClassEnvironment = ClassEnvironmentImpl(
     parent, isShared, isInterface,
-    id, baseClass, interfaces, modifiers
+    id, baseClass, interfaces, setOf(), modifiers
 )
 
 /**

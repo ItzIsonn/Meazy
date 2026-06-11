@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.runtime.environment
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.ParameterExpression
 import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import kotlin.uuid.Uuid
 
 /**

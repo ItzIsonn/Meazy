@@ -1,7 +1,10 @@
-package me.itzisonn_.meazy.runtime.environment
+package me.itzisonn_.meazy.runtime.environment.declaration
 
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.runtime.EvaluationException
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
+import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 import me.itzisonn_.meazy.text.translatable
 import java.util.Optional
 
@@ -47,11 +50,10 @@ interface FunctionDeclarationEnvironment : Environment {
 
 
 
-abstract class FunctionDeclarationEnvironmentImpl(
+private class FunctionDeclarationEnvironmentImpl(
     parent: Environment,
     override val isShared: Boolean
-) : EnvironmentImpl(parent),
-    FunctionDeclarationEnvironment {
+) : FunctionDeclarationEnvironment, EnvironmentImpl(parent) {
     private val _functions = mutableSetOf<FunctionEnvironment>()
 
     override val functions get() = _functions.toSet()
@@ -75,3 +77,8 @@ abstract class FunctionDeclarationEnvironmentImpl(
         _functions.add(functionEnvironment)
     }
 }
+
+
+
+fun FunctionDeclarationEnvironment(parent: Environment, isShared: Boolean): FunctionDeclarationEnvironment =
+    FunctionDeclarationEnvironmentImpl(parent, isShared)
