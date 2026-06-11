@@ -17,6 +17,7 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
     implementation("com.google.code.gson:gson:2.14.0")
     implementation(files("libs/Registry.jar"))
 
