@@ -1,10 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.DataType
-import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.runtime.VariableValue
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironmentImpl
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
@@ -55,9 +54,8 @@ private class FileEnvironmentImpl(
 ) : FileEnvironment,
     FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, true),
     ClassDeclarationEnvironment by ClassDeclarationEnvironment(parent, true),
-    EnvironmentImpl(parent) {
+    VariableDeclarationEnvironmentImpl(parent) {
     private val _imports = mutableMapOf<String, ClassDesc>()
-    private val _variables = mutableListOf<VariableValue>()
 
     init {
         addImport("java.lang.String")
@@ -89,21 +87,6 @@ private class FileEnvironmentImpl(
     }
 
     override val imports get() = _imports.toMap()
-
-
-
-    override fun declareVariable(
-        id: String,
-        type: DataType,
-        isConstant: Boolean,
-        value: Expression?
-    ): VariableValue {
-        val variableValue = VariableValue(id, type, isConstant, setOf(), _variables.size, value, this)
-        _variables.add(variableValue)
-        return variableValue
-    }
-
-    override val variables get() = _variables.toList()
 }
 
 

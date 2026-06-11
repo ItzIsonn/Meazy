@@ -1,9 +1,11 @@
-package me.itzisonn_.meazy.runtime.environment
+package me.itzisonn_.meazy.runtime.environment.declaration
 
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.VariableValue
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.text.translatable
 import java.util.Optional
 
@@ -15,7 +17,7 @@ interface VariableDeclarationEnvironment : Environment {
      * Declares given VariableValue in this environment
      * @param id VariableValue TODO
      */
-    fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue?
+    fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue
 
     /**
      * @param id Variable's id

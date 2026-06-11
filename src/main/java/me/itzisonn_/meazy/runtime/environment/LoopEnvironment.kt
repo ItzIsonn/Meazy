@@ -1,5 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment
 
+import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironmentImpl
 import kotlin.uuid.Uuid
 
 /**
@@ -13,7 +15,7 @@ sealed interface LoopEnvironment : LocalVariableDeclarationEnvironment {
 
 
 private class LoopEnvironmentImpl(parent: Environment, startLabel: Uuid, endLabel: Uuid) :
-    LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), LoopEnvironment {
+    LoopEnvironment, LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
     override fun getStartLabel(): Uuid {
         return super.getStartLabel() ?: error("StartLabel is null")
     }

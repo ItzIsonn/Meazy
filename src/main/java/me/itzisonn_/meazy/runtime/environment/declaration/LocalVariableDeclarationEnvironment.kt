@@ -1,9 +1,10 @@
-package me.itzisonn_.meazy.runtime.environment
+package me.itzisonn_.meazy.runtime.environment.declaration
 
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.VariableValue
+import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.text.translatable
 import java.lang.constant.ConstantDescs
 import kotlin.uuid.Uuid
