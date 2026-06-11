@@ -174,13 +174,13 @@ public class CallExpression implements Expression, LocalStatement {
         if (parent instanceof MemberExpression memberExpression) {
             ClassDesc classDesc = memberExpression.getObject().getType(environment, this).getClassDesc();
 
-            ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, classDesc).orElse(null);
+            ClassEnvironment classEnvironment = EnvironmentUtils.getClass(environment, classDesc).orElse(null);
             if (classEnvironment == null) return null;
 
             return classEnvironment.getFunctionRecursively(id, args).orElse(null);
         }
 
-        return EnvironmentUtils.getFunctionEnvironment(environment, id, args).orElse(null);
+        return EnvironmentUtilsKt.getFunction(environment, id, args);
     }
 
 
@@ -213,7 +213,7 @@ public class CallExpression implements Expression, LocalStatement {
         String id = caller.getId();
         List<DataType> args = this.args.stream().map(arg -> arg.getType(environment, this)).toList();
 
-        ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, EnvironmentUtils.resolveClassDesc(environment, id, false)).orElse(null);
+        ClassEnvironment classEnvironment = EnvironmentUtils.getClass(environment, EnvironmentUtils.resolveClassDesc(environment, id, false)).orElse(null);
         if (classEnvironment == null) return null;
 
         return classEnvironment.getConstructor(args).orElse(null);

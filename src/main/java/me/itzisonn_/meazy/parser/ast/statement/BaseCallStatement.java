@@ -81,7 +81,7 @@ public class BaseCallStatement implements LocalStatement {
 
         List<DataType> args = this.args.stream().map(arg -> arg.getType(environment, this)).toList();
 
-        ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, baseClassDesc).orElse(null);
+        ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClass(environment, baseClassDesc).orElse(null);
         if (baseClassEnvironment == null) return null;
 
         return baseClassEnvironment.getConstructor(args).orElse(null);

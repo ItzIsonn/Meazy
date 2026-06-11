@@ -107,13 +107,13 @@ public class VariableIdentifier extends Identifier {
             DataType dataType = memberExpression.getObject().getType(environment, this);
             ClassDesc classDesc = dataType.getClassDesc();
 
-            ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, classDesc).orElse(null);
+            ClassEnvironment classEnvironment = EnvironmentUtils.getClass(environment, classDesc).orElse(null);
             if (classEnvironment == null) return null;
 
             return classEnvironment.getVariable(id).orElse(null);
         }
 
-        return EnvironmentUtils.getVariableValue(environment, id).orElse(null);
+        return EnvironmentUtils.getVariable(environment, id).orElse(null);
     }
 
     @Getter

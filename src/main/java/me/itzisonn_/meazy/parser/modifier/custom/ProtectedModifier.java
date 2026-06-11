@@ -47,7 +47,7 @@ public class ProtectedModifier extends Modifier {
                                     if (declarationEnvironment == null) return false;
                                     if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, classEnvironment.getId()).orElse(null);
+                                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClass(environment, classEnvironment.getId()).orElse(null);
                                     if (parentClassEnvironment == null) {
                                         throw new InvalidIdentifierException(TextKt.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                                     }
@@ -68,7 +68,7 @@ public class ProtectedModifier extends Modifier {
                                     if (declarationEnvironment == null) return false;
                                     if (classEnvironment.getId().equals(declarationEnvironment.getId())) return true;
 
-                                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(environment, classEnvironment.getId()).orElse(null);
+                                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClass(environment, classEnvironment.getId()).orElse(null);
                                     if (parentClassEnvironment == null) {
                                         throw new InvalidIdentifierException(TextKt.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                                     }
@@ -82,7 +82,7 @@ public class ProtectedModifier extends Modifier {
                 if (env instanceof ClassEnvironment classEnvironment) {
                     if (classEnvironment.getId().equals(identifier.getId())) return true;
 
-                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClassEnvironment(requestEnvironment, classEnvironment.getId()).orElse(null);
+                    ClassEnvironment parentClassEnvironment = EnvironmentUtils.getClass(requestEnvironment, classEnvironment.getId()).orElse(null);
                     if (parentClassEnvironment == null) {
                         throw new InvalidIdentifierException(TextKt.translatable("meazy:runtime.class.doesnt_exist", classEnvironment.getId()));
                     }

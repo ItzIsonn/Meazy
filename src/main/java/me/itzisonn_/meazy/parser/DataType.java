@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser;
 
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
+import me.itzisonn_.meazy.runtime.environment.EnvironmentUtilsKt;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
@@ -32,7 +33,7 @@ public final class DataType {
     }
 
     public void resolve(Environment environment) {
-        classDesc = EnvironmentUtils.resolveClassDesc(environment, classDesc, !isNullable);
+        classDesc = EnvironmentUtilsKt.resolveClassDesc(environment, classDesc, !isNullable);
     }
 
 
@@ -67,7 +68,7 @@ public final class DataType {
 
 
     public static DataType commonOf(Environment environment, DataType dataType1, DataType dataType2) {
-        ClassDesc classDesc = EnvironmentUtils.getCommonOf(environment, dataType1.getClassDesc(), dataType2.getClassDesc());
+        ClassDesc classDesc = EnvironmentUtilsKt.getCommonOf(environment, dataType1.getClassDesc(), dataType2.getClassDesc());
 
         return of(
                 classDesc == null ? ConstantDescs.CD_Object : classDesc,
