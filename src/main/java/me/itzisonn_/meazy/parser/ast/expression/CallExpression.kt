@@ -35,7 +35,7 @@ class CallExpression(
                 if (parent is MemberExpression) {
                     if (!parent.isNullSafe) {
                         if (resolvedFunction.target.getType(environment, this).isNullable) {
-                            throw RuntimeException("Unsafe member call of function " + caller.getId() + " on object of type " + resolvedFunction.classDesc.descriptorString())
+                            throw RuntimeException("Unsafe member call of function " + caller.id + " on object of type " + resolvedFunction.classDesc.descriptorString())
                         }
                     }
                     else {
@@ -56,7 +56,7 @@ class CallExpression(
 
             instructions.invokeMethod(
                 resolvedFunction.classDesc,
-                caller.getId(),
+                caller.id,
                 resolvedFunction.methodTypeDesc,
                 if (resolvedFunction.target == null)
                     if (resolvedFunction.isInterface) InvokeType.STATIC_INTERFACE else InvokeType.STATIC
@@ -113,7 +113,7 @@ class CallExpression(
 
     private fun resolveFunction(environment: Environment, parent: ProgramUnit): ResolvedCallable {
         val functionEnvironment = resolveMeazyFunction(environment, parent)
-            ?: error("Can't find function for " + caller.getId() + " and args " + args)
+            ?: error("Can't find function for " + caller.id + " and args " + args)
 
         val className = functionEnvironment.getParent().fullClassName
             ?: error("Invalid function's parent")
@@ -146,7 +146,7 @@ class CallExpression(
     }
 
     private fun resolveMeazyFunction(environment: Environment, parent: ProgramUnit): FunctionEnvironment? {
-        val id = caller.getId()
+        val id = caller.id
         val args = args.stream().map<DataType> { arg: Expression? -> arg!!.getType(environment, this) }.toList()
 
         if (parent is MemberExpression) {
@@ -164,7 +164,7 @@ class CallExpression(
 
     private fun resolveConstructor(environment: Environment): ResolvedCallable {
         val constructorEnvironment = resolveMeazyConstructor(environment)
-            ?: error("Can't find constructor for " + caller.getId())
+            ?: error("Can't find constructor for " + caller.id)
 
         val classEnvironment = constructorEnvironment.getParent()
         if (classEnvironment !is ClassEnvironment) {
@@ -187,7 +187,7 @@ class CallExpression(
     }
 
     private fun resolveMeazyConstructor(environment: Environment): ConstructorEnvironment? {
-        val id = caller.getId()
+        val id = caller.id
         val args = args.stream().map<DataType> { arg: Expression? -> arg!!.getType(environment, this) }.toList()
 
         val classEnvironment =

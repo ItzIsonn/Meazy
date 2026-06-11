@@ -1,15 +1,5 @@
-package me.itzisonn_.meazy.parser.ast.expression.identifier;
+package me.itzisonn_.meazy.parser.ast.expression.identifier
 
-import lombok.Getter;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.parser.ast.expression.Expression
 
-@Getter
-@NullMarked
-public abstract class Identifier implements Expression {
-    protected final String id;
-
-    public Identifier(String id) {
-        this.id = id;
-    }
-}
+abstract class Identifier(val id: String) : Expression

@@ -15,14 +15,14 @@ class WithClassInstruction(
     private val classInstructions: (InstructionsSet) -> Unit
 ) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
-        bytecodeBuilders.withClass(classDesc) { classBuilder ->
-            classBuilder.withFlags(flags)
-            for (attribute in attributes) classBuilder.with(attribute)
+        bytecodeBuilders.withClass(classDesc) {
+            withFlags(flags)
+            for (attribute in attributes) with(attribute)
 
-            if (superClass != null) classBuilder.withSuperclass(superClass)
-            classBuilder.withInterfaceSymbols(interfaceClasses.toList())
+            if (superClass != null) withSuperclass(superClass)
+            withInterfaceSymbols(interfaceClasses.toList())
 
-            val classBytecodeBuilders = bytecodeBuilders.copy(classBuilder)
+            val classBytecodeBuilders = bytecodeBuilders.copy(this)
             val instructionsSet = InstructionsSet(classBytecodeBuilders)
 
             classInstructions(instructionsSet)

@@ -1,8 +1,4 @@
-package me.itzisonn_.meazy.parser.ast.expression.identifier;
+package me.itzisonn_.meazy.parser.ast.expression.identifier
 
-@Deprecated
-public class ConstructorClassIdentifier extends ClassIdentifier {
-    public ConstructorClassIdentifier(String id) {
-        super(id);
-    }
-}
+@Deprecated("Do not use it for ANY reasons")
+class ConstructorClassIdentifier(id: String) : ClassIdentifier(id)
