@@ -22,25 +22,28 @@ class Parser(
     private val context: ParsingContext,
     tokens: List<Token>
 ) {
+    private val tokens = tokens.toList()
+
     /**
-     * Position of current element in [_tokens]
+     * Position of current element
      */
     var pos = 0
         private set
 
-
-
-    private val _tokens = tokens.toList()
+    /**
+     * Amount of tokens
+     */
+    val size get() = tokens.size
 
     /**
-     * @return Copy of tokens list
+     * @return Token at position [pos]
      */
-    val tokens get() = _tokens.toList()
+    val current get() = tokens[pos]
 
     /**
-     * @return Token at [pos] in [tokens]
+     * @return Token at position [i]
      */
-    val current get() = _tokens[pos]
+    operator fun get(i: Int) = tokens[i]
 
 
 
@@ -84,9 +87,8 @@ class Parser(
 
 
     /**
-     * Returns token at current position and increments position by 1
-     *
-     * @return Token at [pos] in [tokens]
+     * Returns token at current position and increments position by 1\
+     * @return Token at [pos] in tokens
      */
     fun getCurrentAndNext(): Token {
         val token = current
@@ -99,7 +101,7 @@ class Parser(
      * 
      * @param tokenType Required TokenType
      * @param text      Exception's text
-     * @return Token at [pos] in [tokens]
+     * @return Token at [pos] in tokens
      *
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
@@ -116,7 +118,7 @@ class Parser(
      * 
      * @param tokenTypeSet Required TokenTypeSet
      * @param text         Exception's text
-     * @return Token at [pos] in [tokens]
+     * @return Token at [pos] in tokens
      *
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
@@ -129,7 +131,7 @@ class Parser(
     }
 
     /**
-     * Skips all [TokenTypes.NEW_LINE] tokens
+     * Skips all [TokenTypes.newLine] tokens
      */
     fun moveOverOptionalNewLines() {
         while (current.type == TokenTypes.newLine) pos++
@@ -142,8 +144,8 @@ class Parser(
      * @return Whether current line has token with given tokenType
      */
     fun currentLineHasToken(tokenType: TokenType): Boolean {
-        for (i in pos..<_tokens.size) {
-            val current = _tokens[i].type
+        for (i in pos..<tokens.size) {
+            val current = tokens[i].type
             if (current == TokenTypes.newLine) return false
             if (current == tokenType) return true
         }
@@ -158,8 +160,8 @@ class Parser(
      * @return Whether current line has token with type inside given tokenTypeSet
      */
     fun currentLineHasToken(tokenTypeSet: TokenTypeSet): Boolean {
-        for (i in pos..<_tokens.size) {
-            val current = _tokens[i].type
+        for (i in pos..<tokens.size) {
+            val current = tokens[i].type
             if (current == NEW_LINE()) return false
             if (current in tokenTypeSet) return true
         }

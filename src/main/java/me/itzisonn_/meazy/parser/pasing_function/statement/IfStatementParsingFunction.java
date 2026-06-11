@@ -42,7 +42,7 @@ public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatem
         else body.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
 
         int elsePos = parser.getPos() + 1;
-        if (elsePos < parser.getTokens().size() && parser.getTokens().get(elsePos).getType().equals(TokenTypes.ELSE())) {
+        if (elsePos < parser.getSize() && parser.get(elsePos).getType().equals(TokenTypes.ELSE())) {
             parser.next(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected.end_statement", "new_line"));
         }
 
