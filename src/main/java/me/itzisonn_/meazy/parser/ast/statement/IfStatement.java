@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.parser.DataType;
 import me.itzisonn_.meazy.parser.ast.expression.Expression;
 import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
+import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironmentKt;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -34,7 +35,7 @@ public class IfStatement implements LocalStatement {
     public void emit(InstructionsSet instructionsSet, Environment environment, ProgramUnit parent) {
         var startLabel = instructionsSet.createAndInitLabel();
         var elseLabel = instructionsSet.createAndInitLabel();
-        LocalVariableDeclarationEnvironment ifEnvironment = Registries.LOCAL_VARIABLE_DECLARATION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+        LocalVariableDeclarationEnvironment ifEnvironment = LocalVariableDeclarationEnvironmentKt.LocalVariableDeclarationEnvironment(
                 environment, startLabel, elseLabel
         );
 

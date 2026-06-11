@@ -83,3 +83,14 @@ open class LocalVariableDeclarationEnvironmentImpl(
             return usedSlots
         }
 }
+
+
+
+/** TODO javadoc
+ * Creates non-shared loop environment
+ *
+ * @param parent Parent
+ * @return New loop environment
+ */
+fun LocalVariableDeclarationEnvironment(parent: Environment, startLabel: Uuid?, endLabel: Uuid?): LocalVariableDeclarationEnvironment =
+    LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel)

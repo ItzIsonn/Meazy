@@ -60,7 +60,7 @@ public class FunctionDeclarationStatement extends ModifierStatement implements D
 
         boolean isShared = modifiers.contains(Modifiers.SHARED()) || environment instanceof FileEnvironment;
 
-        FunctionEnvironment functionEnvironment = Registries.FUNCTION_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+        FunctionEnvironment functionEnvironment = FunctionEnvironmentKt.FunctionEnvironment(
                 functionDeclarationEnvironment, null, null, id, parameters,
                 returnDataType, isShared, modifiers
         );

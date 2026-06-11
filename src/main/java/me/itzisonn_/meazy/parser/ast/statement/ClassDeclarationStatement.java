@@ -52,7 +52,7 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
 
         boolean isInner = getModifiers().contains(Modifiers.PRIVATE());
 
-        ClassEnvironment classEnvironment = Registries.CLASS_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+        ClassEnvironment classEnvironment = ClassEnvironmentKt.ClassEnvironment(
                 classDeclarationEnvironment,
                 isInner || modifiers.contains(Modifiers.SHARED()),
                 false,
@@ -71,7 +71,9 @@ public class ClassDeclarationStatement extends ModifierStatement implements Decl
         }
 
         if (!classEnvironment.hasConstructor()) {
-            classEnvironment.declareConstructor(Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(classEnvironment, null, null, Set.of(), List.of()));
+            classEnvironment.declareConstructor(ConstructorEnvironmentKt.ConstructorEnvironment(
+                    classEnvironment, null, null, Set.of(), List.of()
+            ));
         }
     }
 

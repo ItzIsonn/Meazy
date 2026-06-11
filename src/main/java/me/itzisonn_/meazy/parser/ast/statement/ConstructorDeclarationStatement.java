@@ -39,7 +39,7 @@ public class ConstructorDeclarationStatement extends ModifierStatement implement
             throw new RuntimeException("CANT DECLARE CONSTRUCTOR HERE TODO");
         }
 
-        ConstructorEnvironment constructorEnvironment = Registries.CONSTRUCTOR_ENVIRONMENT_FACTORY.getEntry().getValue().create(
+        ConstructorEnvironment constructorEnvironment = ConstructorEnvironmentKt.ConstructorEnvironment(
                 constructorDeclarationEnvironment, null, null, modifiers, parameters
         );
 

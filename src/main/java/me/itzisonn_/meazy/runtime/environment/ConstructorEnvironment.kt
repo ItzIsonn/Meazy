@@ -7,7 +7,7 @@ import kotlin.uuid.Uuid
 /**
  * Represents environment for constructors
  */
-interface ConstructorEnvironment : LocalVariableDeclarationEnvironment, ModifieredEnvironment {
+sealed interface ConstructorEnvironment : LocalVariableDeclarationEnvironment, ModifieredEnvironment {
     override fun getParent(): ConstructorDeclarationEnvironment
 
     val parameters: List<ParameterExpression>
@@ -15,12 +15,12 @@ interface ConstructorEnvironment : LocalVariableDeclarationEnvironment, Modifier
 
 
 
-class ConstructorEnvironmentImpl(
+private class ConstructorEnvironmentImpl(
     parent: ConstructorDeclarationEnvironment,
     startLabel: Uuid?,
     endLabel: Uuid?,
-    modifiers: MutableSet<Modifier>,
-    parameters: MutableList<ParameterExpression>
+    modifiers: Set<Modifier>,
+    parameters: List<ParameterExpression>
 ) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), ConstructorEnvironment {
     override val isShared get() = false
     override fun getParent() = super.getParent() as ConstructorDeclarationEnvironment
@@ -31,3 +31,18 @@ class ConstructorEnvironmentImpl(
     override val parameters = parameters.toList()
         get() = field.toList()
 }
+
+
+
+/** TODO javadoc
+ * Creates constructor environment
+ *
+ * @param parent Parent
+ * @return New constructor environment
+ */
+fun ConstructorEnvironment(
+    parent: ConstructorDeclarationEnvironment, startLabel: Uuid?, endLabel: Uuid?,
+    modifiers: Set<Modifier>, parameters: List<ParameterExpression>
+): ConstructorEnvironment = ConstructorEnvironmentImpl(
+    parent, startLabel, endLabel, modifiers, parameters
+)

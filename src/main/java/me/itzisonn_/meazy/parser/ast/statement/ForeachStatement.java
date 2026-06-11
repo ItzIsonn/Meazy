@@ -12,6 +12,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment;
 import me.itzisonn_.meazy.runtime.environment.LocalVariableDeclarationEnvironment;
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment;
 import me.itzisonn_.meazy.runtime.VariableValue;
+import me.itzisonn_.meazy.runtime.environment.LoopEnvironmentKt;
 import org.jspecify.annotations.NullMarked;
 
 import java.lang.constant.ClassDesc;
@@ -62,7 +63,7 @@ public class ForeachStatement implements LocalStatement {
 
         var conditionLabel = instructionsSet.createAndInitLabel();
         var endLabel = instructionsSet.createAndInitLabel();
-        LoopEnvironment loopEnvironment = Registries.LOOP_ENVIRONMENT_FACTORY.getEntry().getValue().create(environment, conditionLabel, endLabel);
+        LoopEnvironment loopEnvironment = LoopEnvironmentKt.LoopEnvironment(environment, conditionLabel, endLabel);
 
         instructionsSet.bindLabel(conditionLabel);
 

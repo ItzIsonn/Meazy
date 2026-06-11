@@ -8,7 +8,7 @@ import kotlin.uuid.Uuid
 /**
  * Represents environment for functions
  */
-interface FunctionEnvironment : LocalVariableDeclarationEnvironment, ModifieredEnvironment {
+sealed interface FunctionEnvironment : LocalVariableDeclarationEnvironment, ModifieredEnvironment {
     /**
      * @return Id
      */
@@ -26,7 +26,7 @@ interface FunctionEnvironment : LocalVariableDeclarationEnvironment, ModifieredE
 
 
 
-class FunctionEnvironmentImpl(
+private class FunctionEnvironmentImpl(
     parent: FunctionDeclarationEnvironment,
     startLabel: Uuid?,
     endLabel: Uuid?,
@@ -44,3 +44,20 @@ class FunctionEnvironmentImpl(
     override val parameters = parameters.toList()
         get() = field.toList()
 }
+
+
+
+/** TODO javadoc
+ * Creates function environment
+ *
+ * @param parent Parent
+ * @param isShared Whether function environment is shared
+ * @return New function environment
+ */
+fun FunctionEnvironment(
+    parent: FunctionDeclarationEnvironment, startLabel: Uuid?, endLabel: Uuid?, id: String,
+    parameters: List<ParameterExpression>, returnDataType: DataType?,
+    isShared: Boolean, modifiers: Set<Modifier>
+): FunctionEnvironment = FunctionEnvironmentImpl(
+    parent, startLabel, endLabel, id, parameters, returnDataType, isShared, modifiers
+)
