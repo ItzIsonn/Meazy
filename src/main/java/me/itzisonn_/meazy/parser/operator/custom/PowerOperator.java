@@ -23,7 +23,7 @@ public class PowerOperator extends Operator {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
+    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
         Expression left = operatorExpression.getLeft();
         Expression right = operatorExpression.getRight();
         if (right == null) throw new NullPointerException("Right side of operator expression is null");
@@ -37,13 +37,13 @@ public class PowerOperator extends Operator {
         if (leftNumberType == null || rightNumberType == null) throw new RuntimeException("Can't raise to a power types " + leftType + " and " + rightType); //TODO
         if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't rais to a power nullable numbers");
 
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(leftNumberType, NumberType.DOUBLE);
+        left.emit(instructions, environment, operatorExpression);
+        instructions.convertToNumberType(leftNumberType, NumberType.DOUBLE);
 
-        right.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(rightNumberType, NumberType.DOUBLE);
+        right.emit(instructions, environment, operatorExpression);
+        instructions.convertToNumberType(rightNumberType, NumberType.DOUBLE);
 
-        instructionsSet.invokeMethod(
+        instructions.invokeMethod(
                 ClassDesc.of("java.lang.Math"),
                 "pow",
                 MethodTypeDesc.of(ConstantDescs.CD_double, ConstantDescs.CD_double, ConstantDescs.CD_double),

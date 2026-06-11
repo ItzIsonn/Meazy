@@ -1,15 +1,12 @@
 plugins {
     java
     kotlin("jvm") version "2.4.0"
-    kotlin("plugin.lombok") version "2.4.0" //FIXME remove after removing java
-    id("io.freefair.lombok") version "9.5.0"
 }
 
 group = "me.itzisonn_.meazy"
 version = "3.0"
 description = "Meazy"
 
-val lombokVersion = "1.18.46"
 val junitVersion = "6.1.0"
 
 
@@ -24,9 +21,6 @@ dependencies {
     implementation(files("libs/Registry.jar"))
 
     implementation("org.jspecify:jspecify:1.0.0")
-
-    compileOnly("org.projectlombok:lombok:${lombokVersion}")
-    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
     testImplementation("org.junit.jupiter:junit-jupiter:${junitVersion}")
     testImplementation("org.junit.platform:junit-platform-suite-api:${junitVersion}")

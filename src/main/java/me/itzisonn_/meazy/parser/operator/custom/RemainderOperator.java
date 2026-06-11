@@ -20,7 +20,7 @@ public class RemainderOperator extends Operator {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
+    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
         Expression left = operatorExpression.getLeft();
         Expression right = operatorExpression.getRight();
         if (right == null) throw new NullPointerException("Right side of operator expression is null");
@@ -37,13 +37,13 @@ public class RemainderOperator extends Operator {
 
         NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
 
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
+        left.emit(instructions, environment, operatorExpression);
+        instructions.convertToNumberType(leftNumberType, commonNumberType);
 
-        right.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(rightNumberType, commonNumberType);
+        right.emit(instructions, environment, operatorExpression);
+        instructions.convertToNumberType(rightNumberType, commonNumberType);
 
-        instructionsSet.arithmeticOperation(commonNumberType, ArithmeticOperation.REMAINDER);
+        instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.REMAINDER);
     }
 
     @Override

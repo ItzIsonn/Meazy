@@ -19,8 +19,8 @@ public class NotEqualsOperator extends Operator {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
-        Operators.produceCompare(instructionsSet, environment, operatorExpression, ComparisonOperation.NOT_EQUALS);
+    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
+        Operators.produceCompare(instructions, environment, operatorExpression, ComparisonOperation.NOT_EQUALS);
     }
     @Override
     public DataType getType(Environment environment, OperatorExpression operatorExpression) {

@@ -1,49 +1,38 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.util.MiscUtils;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.util.MiscUtils.isBoolean
+import java.lang.constant.ConstantDescs
 
-import java.lang.constant.ConstantDescs;
-import java.util.UUID;
+class InversionOperator : Operator("inversion", "!", OperatorType.PREFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
 
-@NullMarked
-public class InversionOperator extends Operator {
-    public InversionOperator() {
-        super("inversion", "!", OperatorType.PREFIX);
+        val leftType = left.getType(environment, operatorExpression)
+        if (!isBoolean(leftType.classDesc)) error("Can only invert booleans TODO")
+
+        val trueLabel = instructions.createAndInitLabel()
+        val endLabel = instructions.createAndInitLabel()
+
+        left.emit(instructions, environment, operatorExpression)
+        instructions.convertToBooleanType(leftType.classDesc == ConstantDescs.CD_Boolean, false)
+        instructions.gotoLabelIfEqualsZero(trueLabel)
+
+        instructions.loadConstant(0)
+        instructions.gotoLabel(endLabel)
+
+        instructions.bindLabel(trueLabel)
+        instructions.loadConstant(1)
+
+        instructions.bindLabel(endLabel)
     }
 
-    @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-
-        DataType leftType = left.getType(environment, operatorExpression);
-        if (!MiscUtils.isBoolean(leftType.getClassDesc())) throw new RuntimeException("Can only invert booleans TODO");
-
-        var trueLabel = instructionsSet.createAndInitLabel();
-        var endLabel = instructionsSet.createAndInitLabel();
-
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToBooleanType(leftType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
-        instructionsSet.gotoLabelIfEqualsZero(trueLabel);
-
-        instructionsSet.loadConstant(0);
-        instructionsSet.gotoLabel(endLabel);
-
-        instructionsSet.bindLabel(trueLabel);
-        instructionsSet.loadConstant(1);
-
-        instructionsSet.bindLabel(endLabel);
-    }
-
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        return DataType.Companion.ofNonNull(ConstantDescs.CD_boolean);
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        return DataType.ofNonNull(ConstantDescs.CD_boolean)
     }
 }

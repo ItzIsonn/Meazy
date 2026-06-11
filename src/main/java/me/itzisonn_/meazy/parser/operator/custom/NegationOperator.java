@@ -17,7 +17,7 @@ public class NegationOperator extends Operator {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
+    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
         Expression left = operatorExpression.getLeft();
         DataType leftType = left.getType(environment, operatorExpression);
 
@@ -25,9 +25,9 @@ public class NegationOperator extends Operator {
         if (leftNumberType == null) throw new RuntimeException("Can't negate non-number value");
         if (leftType.isNullable()) throw new RuntimeException("Can't negate nullable number");
 
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(leftNumberType, leftNumberType.unbox());
-        instructionsSet.negateNumber(leftNumberType);
+        left.emit(instructions, environment, operatorExpression);
+        instructions.convertToNumberType(leftNumberType, leftNumberType.unbox());
+        instructions.negateNumber(leftNumberType);
     }
 
     @Override

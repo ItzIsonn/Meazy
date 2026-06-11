@@ -20,7 +20,7 @@ public class OrOperator extends Operator {
     }
 
     @Override
-    public void emit(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression) {
+    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
         Expression left = operatorExpression.getLeft();
         Expression right = operatorExpression.getRight();
         if (right == null) throw new NullPointerException("Right side of operator expression is null");
@@ -31,13 +31,13 @@ public class OrOperator extends Operator {
         if (!MiscUtils.isBoolean(leftType.getClassDesc()) || !MiscUtils.isBoolean(rightType.getClassDesc())) throw new RuntimeException("Invalid operands TODO");
         if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't get logical or of nullable booleans");
 
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToBooleanType(leftType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
+        left.emit(instructions, environment, operatorExpression);
+        instructions.convertToBooleanType(leftType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
 
-        right.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToBooleanType(rightType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
+        right.emit(instructions, environment, operatorExpression);
+        instructions.convertToBooleanType(rightType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
 
-        instructionsSet.logicalOperation(LogicalOperation.OR);
+        instructions.logicalOperation(LogicalOperation.OR);
     }
 
     @Override
