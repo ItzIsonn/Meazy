@@ -35,15 +35,15 @@ interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclaration
 
         val baseClass = baseClass
         if (baseClass != null) {
-            val baseClass = EnvironmentUtils.resolveClassDesc(this, baseClass, false)
-            val classEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElseThrow()
+            val baseClass = resolveClassDesc(baseClass, false)
+            val classEnvironment = getClass(baseClass)!!
             functionEnvironment = classEnvironment.getFunctionRecursively(id, args)
             if (functionEnvironment.isPresent) return functionEnvironment
         }
 
         for (interfaceClassDesc in interfaces) {
-            val baseClass: ClassDesc = EnvironmentUtils.resolveClassDesc(this, interfaceClassDesc, false)
-            val classEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass).orElseThrow()
+            val baseClass: ClassDesc = resolveClassDesc(interfaceClassDesc, false)
+            val classEnvironment = getClass(baseClass)!!
             functionEnvironment = classEnvironment.getFunctionRecursively(id, args)
             if (functionEnvironment.isPresent) return functionEnvironment
         }
@@ -72,11 +72,7 @@ interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclaration
                 for (i in parameters.indices) {
                     val functionParameterClassDesc = functionParameters[i].getDataType().getClassDesc()
                     val parameterClassDesc = parameters[i]
-                    if (!EnvironmentUtils.isInstanceOf(
-                            this,
-                            parameterClassDesc,
-                            functionParameterClassDesc
-                        )) continue@main
+                    if (!isInstanceOf(parameterClassDesc, functionParameterClassDesc)) continue@main
                 }
 
                 return Optional.of(functionEnvironment)
@@ -165,8 +161,8 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
 
     override fun resolveBaseClasses() {
         for (unresolvedBaseClass in unresolvedBaseClasses) {
-            val classDesc = EnvironmentUtils.resolveClassDesc(getParent(), unresolvedBaseClass, false)
-            val baseClassEnvironment = EnvironmentUtils.getClassEnvironment(getParent(), classDesc).orElseThrow()
+            val classDesc = getParent().resolveClassDesc(unresolvedBaseClass, false)
+            val baseClassEnvironment = getParent().getClass(classDesc)!!
 
             if (baseClassEnvironment.isInterface) _interfaces.add(baseClassEnvironment.classDesc)
             else {
@@ -200,7 +196,7 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
         if (variableValue.isPresent) return variableValue
 
         val baseClass = baseClass ?: return Optional.empty()
-        val baseClassEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass.displayName()).orElse(null)
+        val baseClassEnvironment = getClass(baseClass.displayName())
 
         if (baseClassEnvironment != null) return baseClassEnvironment.getVariable(id)
         return Optional.empty()
@@ -242,11 +238,11 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
         val functionEnvironment: Optional<FunctionEnvironment> = super<FunctionDeclarationEnvironmentImpl>.getFunction(id, args)
         if (functionEnvironment.isPresent) return functionEnvironment
 
-        if (baseClass == null) return Optional.empty<FunctionEnvironment>()
-        val baseClassEnvironment = EnvironmentUtils.getClassEnvironment(this, baseClass!!).orElse(null)
+        val baseClass = baseClass ?: return Optional.empty()
+        val baseClassEnvironment = getClass(baseClass)
 
         if (baseClassEnvironment != null) return baseClassEnvironment.getFunction(id, args)
-        return Optional.empty<FunctionEnvironment>()
+        return Optional.empty()
     }
 
 
@@ -276,10 +272,10 @@ class ClassEnvironmentImpl : FunctionDeclarationEnvironmentImpl, ClassEnvironmen
     override val fullClassName: String
         get() {
             val classSpecifier =
-                if (_modifiers.contains(Modifiers.PRIVATE())) EnvironmentUtils.getClassName(this).orElseThrow() + "$"
+                if (_modifiers.contains(Modifiers.PRIVATE())) getClassName()!! + "$"
                 else ""
 
-            return EnvironmentUtils.getPackageName(this).orElseThrow() + "." + classSpecifier + id
+            return getPackageName()!! + "." + classSpecifier + id
         }
 
     override val classDesc: ClassDesc

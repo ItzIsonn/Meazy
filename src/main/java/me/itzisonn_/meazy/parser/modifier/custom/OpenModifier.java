@@ -4,10 +4,7 @@ import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement;
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
 import me.itzisonn_.meazy.parser.modifier.Modifier;
 import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils;
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment;
+import me.itzisonn_.meazy.runtime.environment.*;
 import me.itzisonn_.meazy.parser.ast.statement.ClassDeclarationStatement;
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
@@ -40,6 +37,6 @@ public class OpenModifier extends Modifier {
     @Override
     public boolean canAccess(Environment requestEnvironment, Environment environment, Identifier identifier, boolean hasModifier) {
         if (hasModifier) return true;
-        return EnvironmentUtils.areFromSamePackage(environment, requestEnvironment);
+        return EnvironmentUtilsKt.areFromSamePackage(environment, requestEnvironment);
     }
 }

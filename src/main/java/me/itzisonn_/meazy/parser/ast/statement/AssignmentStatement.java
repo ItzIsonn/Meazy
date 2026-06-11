@@ -109,7 +109,7 @@ public class AssignmentStatement implements LocalStatement {
             }
 
             ClassDesc classDesc = memberExpression.getObject().getType(environment, this).getClassDesc();
-            ClassEnvironment classEnvironment = EnvironmentUtils.getClassEnvironment(environment, classDesc).orElse(null);
+            ClassEnvironment classEnvironment = EnvironmentUtils.getClass(environment, classDesc).orElse(null);
             if (classEnvironment == null) return null;
 
             return classEnvironment.getVariable(variableIdentifier.getId()).orElse(null);
@@ -119,7 +119,7 @@ public class AssignmentStatement implements LocalStatement {
             throw new RuntimeException("Cant assign value to not variable TODO");
         }
 
-        return EnvironmentUtils.getVariableValue(environment, variableIdentifier.getId()).orElse(null);
+        return EnvironmentUtils.getVariable(environment, variableIdentifier.getId()).orElse(null);
     }
 
     @Getter
