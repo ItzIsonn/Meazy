@@ -1,293 +1,269 @@
-package me.itzisonn_.meazy.parser;
+package me.itzisonn_.meazy.parser
 
-import lombok.Getter;
-import me.itzisonn_.meazy.text.Text;
-import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.lexer.TokenType;
-import me.itzisonn_.meazy.lexer.TokenTypeSet;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.registry.RegistryEntry;
-import me.itzisonn_.registry.RegistryIdentifier;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
+import me.itzisonn_.meazy.lexer.Token
+import me.itzisonn_.meazy.lexer.TokenType
+import me.itzisonn_.meazy.lexer.TokenTypeSet
+import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.NEW_LINE
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.registry.RegistryIdentifier
 
 /**
  * Is used to store and parse tokens
- * @see Registries#PARSING_FUNCTIONS
+ *
+ * @param context Parsing context
+ * @param tokens  List of tokens
+ * 
+ * @see Registries.PARSING_FUNCTIONS
  */
-@NullMarked
-public class Parser { //TODO change all Statement to ProgramUnit in javadoc
-    private final ParsingContext context;
-    private final List<Token> tokens;
-
+class Parser(
+    private val context: ParsingContext,
+    tokens: List<Token>
+) {
     /**
-     * Position of current element in {@link Parser#tokens}
+     * Position of current element in [_tokens]
      */
-    @Getter
-    private int pos = 0;
-
-    /**
-     *
-     * @param context Parsing context
-     * @param tokens List of tokens
-     */
-    public Parser(ParsingContext context, List<Token> tokens) {
-        this.context = context;
-        this.tokens = tokens;
-    }
+    var pos = 0
+        private set
 
 
+
+    private val _tokens = tokens.toList()
 
     /**
      * @return Copy of tokens list
      */
-    public List<Token> getTokens() {
-        return new ArrayList<>(tokens);
-    }
+    val tokens get() = _tokens.toList()
 
     /**
-     * @return Token at {@link Parser#pos} in {@link Parser#tokens}
+     * @return Token at [pos] in [tokens]
      */
-    public Token getCurrent() {
-        return tokens.get(pos);
-    }
+    val current get() = _tokens[pos]
 
 
 
     /**
      * Increments position by 1
      */
-    public void next() {
-        pos++;
-    }
+    fun next() { pos++ }
 
     /**
      * Increments position by 1
-     *
+     * 
      * @param tokenType Required TokenType
-     * @param text Exception's text=
+     * @param text      Exception's text
      *
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
-    public void next(TokenType tokenType, Text text) throws UnexpectedTokenException {
-        if (!getCurrent().getType().equals(tokenType)) {
-            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+    fun next(tokenType: TokenType, text: Text) {
+        if (current.type != tokenType) {
+            throw UnexpectedTokenException(current.line, text)
         }
 
-        next();
+        next()
     }
 
     /**
      * Increments position by 1
-     *
+     * 
      * @param tokenTypeSet Required TokenTypeSet
-     * @param text Exception's text
+     * @param text         Exception's text
      *
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
-    public void next(TokenTypeSet tokenTypeSet, Text text) throws UnexpectedTokenException {
-        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) {
-            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+    fun next(tokenTypeSet: TokenTypeSet, text: Text) {
+        if (current.type !in tokenTypeSet.getTokenTypes()) {
+            throw UnexpectedTokenException(current.line, text)
         }
 
-        next();
+        next()
     }
 
 
 
     /**
      * Returns token at current position and increments position by 1
-     * @return Token at {@link Parser#pos} in {@link Parser#tokens}
+     *
+     * @return Token at [pos] in [tokens]
      */
-    public Token getCurrentAndNext() {
-        Token token = getCurrent();
-        pos++;
-        return token;
+    fun getCurrentAndNext(): Token {
+        val token = current
+        pos++
+        return token
     }
 
     /**
      * Returns token at current position increments position by 1
-     *
+     * 
      * @param tokenType Required TokenType
-     * @param text Exception's text
-     * @return Token at {@link Parser#pos} in {@link Parser#tokens}
+     * @param text      Exception's text
+     * @return Token at [pos] in [tokens]
      *
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
-    public Token getCurrentAndNext(TokenType tokenType, Text text) throws UnexpectedTokenException {
-        if (!getCurrent().getType().equals(tokenType)) {
-            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+    fun getCurrentAndNext(tokenType: TokenType, text: Text): Token {
+        if (current.type != tokenType) {
+            throw UnexpectedTokenException(current.line, text)
         }
 
-        return getCurrentAndNext();
+        return getCurrentAndNext()
     }
 
     /**
      * Returns token at current position and increments position by 1
-     *
+     * 
      * @param tokenTypeSet Required TokenTypeSet
-     * @param text Exception's text
-     * @return Token at {@link Parser#pos} in {@link Parser#tokens}
+     * @param text         Exception's text
+     * @return Token at [pos] in [tokens]
      *
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
-    public Token getCurrentAndNext(TokenTypeSet tokenTypeSet, Text text) throws UnexpectedTokenException {
-        if (!tokenTypeSet.getTokenTypes().contains(getCurrent().getType())) {
-            throw new UnexpectedTokenException(getCurrent().getLine(), text);
+    fun getCurrentAndNext(tokenTypeSet: TokenTypeSet, text: Text): Token {
+        if (current.type !in tokenTypeSet.getTokenTypes()) {
+            throw UnexpectedTokenException(current.line, text)
         }
 
-        return getCurrentAndNext();
+        return getCurrentAndNext()
     }
 
     /**
-     * Skips all {@link TokenTypes#NEW_LINE()} tokens
+     * Skips all [TokenTypes.NEW_LINE] tokens
      */
-    public void moveOverOptionalNewLines() {
-        while (getCurrent().getType().equals(TokenTypes.NEW_LINE())) pos++;
+    fun moveOverOptionalNewLines() {
+        while (current.type == TokenTypes.newLine) pos++
     }
 
     /**
      * Checks current line for presence of token with given tokenType
-     *
+     * 
      * @param tokenType Required TokenType
      * @return Whether current line has token with given tokenType
      */
-    public boolean currentLineHasToken(TokenType tokenType) {
-        for (int i = pos; i < tokens.size(); i++) {
-            TokenType current = tokens.get(i).getType();
-            if (current.equals(TokenTypes.NEW_LINE())) return false;
-            if (current.equals(tokenType)) return true;
+    fun currentLineHasToken(tokenType: TokenType): Boolean {
+        for (i in pos..<_tokens.size) {
+            val current = _tokens[i].type
+            if (current == TokenTypes.newLine) return false
+            if (current == tokenType) return true
         }
 
-        return false;
+        return false
     }
 
     /**
      * Checks current line for presence of token with type inside given tokenTypeSet
-     *
+     * 
      * @param tokenTypeSet Required TokenTypeSet
      * @return Whether current line has token with type inside given tokenTypeSet
      */
-    public boolean currentLineHasToken(TokenTypeSet tokenTypeSet) {
-        for (int i = pos; i < tokens.size(); i++) {
-            TokenType current = tokens.get(i).getType();
-            if (current.equals(TokenTypes.NEW_LINE())) return false;
-            if (tokenTypeSet.contains(current)) return true;
+    fun currentLineHasToken(tokenTypeSet: TokenTypeSet): Boolean {
+        for (i in pos..<_tokens.size) {
+            val current = _tokens[i].type
+            if (current == NEW_LINE()) return false
+            if (current in tokenTypeSet) return true
         }
 
-        return false;
+        return false
     }
 
 
 
     /**
      * Executes ParsingFunction with given id
-     *
-     * @param id Id of ParsingFunction
+     * 
+     * @param id    Id of ParsingFunction
      * @param extra Extra info
-     * @return Parsed statement
+     * @return Parsed program unit
      *
      * @throws IllegalArgumentException When can't find ParsingFunction with given id
      */
-    public ProgramUnit parse(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
-        ParsingFunction<? extends ProgramUnit> parsingFunction = getParsingFunctionOrNull(id);
-        if (parsingFunction == null) throw new IllegalArgumentException("Can't find ParsingFunction with id " + id);
-        return parsingFunction.parse(context, extra);
+    fun parse(id: RegistryIdentifier, vararg extra: Any?): ProgramUnit {
+        val parsingFunction = getParsingFunctionOrNull(id)
+        requireNotNull(parsingFunction) { "Can't find ParsingFunction with id $id" }
+        return parsingFunction.parse(context, *extra)
     }
 
     /**
      * Executes ParsingFunction with given id
-     *
-     * @param id Id of ParsingFunction
-     * @param cls Required returned statement's class
+     * 
+     * @param id    Id of ParsingFunction
+     * @param cls   Required program unit's class
      * @param extra Extra info
-     * @param <T> Returned statement's type
-     * @return Parsed statement
+     * @param T     Returned program unit's type
+     * @return Parsed program unit
      *
      * @throws IllegalArgumentException When can't find ParsingFunction with given id
-     *                                  or return type of ParsingFunction doesn't match requested
+     * or return type of ParsingFunction doesn't match requested
      */
-    @SuppressWarnings("unchecked")
-    public <T extends ProgramUnit> T parse(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
-        ProgramUnit programUnit = parse(id, extra);
+    fun <T : ProgramUnit> parse(id: RegistryIdentifier, cls: Class<T>, vararg extra: Any?): T {
+        val programUnit = parse(id, *extra)
 
-        if (!cls.isInstance(programUnit)) {
-            throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
+        require(cls.isInstance(programUnit)) {
+            "Return type of ParsingFunction with id $id doesn't match requested (${cls.getName()})"
         }
 
-        return (T) programUnit;
+        return cls.cast(programUnit)
     }
 
     /**
      * Executes ParsingFunction after ParsingFunction with given id
-     *
-     * @param id Id of ParsingFunction
+     * 
+     * @param id    Id of ParsingFunction
      * @param extra Extra info
-     * @return Parsed statement
+     * @return Parsed program unit
      *
      * @throws IllegalArgumentException When can't find ParsingFunction with given id
      */
-    public ProgramUnit parseAfter(RegistryIdentifier id, @Nullable Object... extra) throws IllegalArgumentException {
-        ParsingFunction<? extends ProgramUnit> parsingFunction = getParsingFunctionAfterOrNull(id);
-        if (parsingFunction == null) throw new IllegalArgumentException("Can't find ParsingFunction with id " + id);
-
-        return parsingFunction.parse(context, extra);
+    fun parseAfter(id: RegistryIdentifier, vararg extra: Any?): ProgramUnit {
+        val parsingFunction = getParsingFunctionAfterOrNull(id)
+        requireNotNull(parsingFunction) { "Can't find ParsingFunction with id $id" }
+        return parsingFunction.parse(context, *extra)
     }
 
     /**
      * Executes ParsingFunction after ParsingFunction with given id
-     *
-     * @param id Id of ParsingFunction
-     * @param cls Required returned statement's class
+     * 
+     * @param id    Id of ParsingFunction
+     * @param cls   Required program unit's class
      * @param extra Extra info
-     * @param <T> Returned statement's type
-     * @return Parsed statement
+     * @param T     Returned program unit's type
+     * @return Parsed program unit
      *
      * @throws IllegalArgumentException When can't find ParsingFunction with given id
-     *                                  or return type of ParsingFunction doesn't match requested
+     * or return type of ParsingFunction doesn't match requested
      */
-    @SuppressWarnings("unchecked")
-    public <T extends ProgramUnit> T parseAfter(RegistryIdentifier id, Class<T> cls, @Nullable Object... extra) throws IllegalArgumentException {
-        ProgramUnit programUnit = parseAfter(id, extra);
+    fun <T : ProgramUnit> parseAfter(id: RegistryIdentifier, cls: Class<T>, vararg extra: Any?): T {
+        val programUnit = parseAfter(id, *extra)
 
-        if (!cls.isInstance(programUnit)) {
-            throw new IllegalArgumentException("Return type of ParsingFunction with id " + id + " doesn't match requested (" + cls.getName() + ")");
+        require(cls.isInstance(programUnit)) {
+            "Return type of ParsingFunction with id $id doesn't match requested (${cls.getName()})"
         }
 
-        return (T) programUnit;
+        return cls.cast(programUnit)
     }
 
 
 
     /**
      * Finds ParsingFunction with given id
-     *
+     * 
      * @param id Id
      * @return ParsingFunction with given id or null
      */
-    @Nullable
-    private ParsingFunction<? extends ProgramUnit> getParsingFunctionOrNull(RegistryIdentifier id) {
-        RegistryEntry<ParsingFunction<? extends ProgramUnit>> entry = Registries.PARSING_FUNCTIONS.getEntry(id);
-        if (entry == null) return null;
-        return entry.getValue();
+    private fun getParsingFunctionOrNull(id: RegistryIdentifier): ParsingFunction<out ProgramUnit>? {
+        val entry = Registries.PARSING_FUNCTIONS.getEntry(id) ?: return null
+        return entry.getValue()
     }
 
     /**
      * Finds ParsingFunction after ParsingFunction with given id
-     *
+     * 
      * @param id Id
      * @return ParsingFunction after ParsingFunction with given id or null
      */
-    @Nullable
-    private ParsingFunction<? extends ProgramUnit> getParsingFunctionAfterOrNull(RegistryIdentifier id) {
-        RegistryEntry<ParsingFunction<? extends ProgramUnit>> entry = Registries.PARSING_FUNCTIONS.getEntryAfter(id);
-        if (entry == null) return null;
-
-        return entry.getValue();
+    private fun getParsingFunctionAfterOrNull(id: RegistryIdentifier): ParsingFunction<out ProgramUnit>? {
+        val entry = Registries.PARSING_FUNCTIONS.getEntryAfter(id) ?: return null
+        return entry.getValue()
     }
 }

@@ -37,7 +37,7 @@ class TokenTypeSet(val id: String, tokenTypes: Set<TokenType>) {
      * @param tokenType TokenType
      * @return Whether this token type set contains given tokenType
      */
-    fun contains(tokenType: TokenType): Boolean {
+    operator fun contains(tokenType: TokenType): Boolean {
         return tokenTypes.contains(tokenType)
     }
 }
