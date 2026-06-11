@@ -1,98 +1,74 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import kotlin.Unit;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.runtime.environment.*;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
+import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.getClass
+import me.itzisonn_.meazy.runtime.environment.getParent
+import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
+import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
+import kotlin.collections.map
 
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
-import java.lang.constant.MethodTypeDesc;
-import java.util.List;
-
-@Getter
-@NullMarked
-public class BaseCallStatement implements LocalStatement {
-    protected final List<Expression> args;
-
-    public BaseCallStatement(List<Expression> args) {
-        this.args = args;
-    }
-
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) { //TODO add support for automatic base calling before return
-        if (!EnvironmentUtils.hasParentOrSelf(environment, ConstructorEnvironment.class)) {
-            throw new IllegalArgumentException("Parent environment for BASE statement must be ConstructorEnvironment TODO");
+class BaseCallStatement(val args: List<Expression>) : LocalStatement {
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+        //TODO add support for automatic base calling before return
+        require(environment.hasParentOrSelf<ConstructorEnvironment>()) {
+            "Parent environment for BASE statement must be ConstructorEnvironment TODO"
         }
 
-        ResolvedConstructor resolvedConstructor = resolveConstructor(environment);
-        instructions.loadThisReference();
+        val resolvedConstructor = resolveConstructor(environment)
+        instructions.loadThisReference()
 
         instructions.invokeSuperClass(
-                resolvedConstructor.getClassDesc(),
-                resolvedConstructor.getMethodTypeDesc(),
-                argsInstructions -> {
-                    for (Expression arg : args) {
-                        arg.emit(argsInstructions, environment, this);
-                    }
-
-                    return Unit.INSTANCE;
-                }
-        );
+            resolvedConstructor.classDesc,
+            resolvedConstructor.methodTypeDesc
+        ) {
+            for (arg in args) {
+                arg.emit(this, environment, this@BaseCallStatement)
+            }
+        }
     }
 
-    @Override
-    public boolean alwaysReturns() {
-        return false;
-    }
+    override fun alwaysReturns() = false
 
 
 
-    private ResolvedConstructor resolveConstructor(Environment environment) {
-        ConstructorEnvironment constructorEnvironment = resolveMeazyConstructor(environment);
-        if (constructorEnvironment == null) throw new RuntimeException();
+    private fun resolveConstructor(environment: Environment): ResolvedConstructor {
+        val constructorEnvironment = resolveMeazyConstructor(environment)
+            ?: error("Failed to resolve constructor")
 
-        if (!(constructorEnvironment.getParent() instanceof ClassEnvironment classEnvironment)) {
-            throw new RuntimeException("Can't call super class not inside class");
+        if (constructorEnvironment.getParent() !is ClassEnvironment) {
+            throw RuntimeException("Can't call super class not inside class")
         }
 
-        List<ClassDesc> parameters = constructorEnvironment.getParameters().stream().map(p -> p.getDataType().getClassDesc()).toList();
+        val parameters = constructorEnvironment.parameters.map { it.dataType.classDesc }.toList()
 
-        return new ResolvedConstructor(
-                ClassDesc.of(classEnvironment.getFullClassName()),
-                MethodTypeDesc.of(ConstantDescs.CD_void, parameters)
-        );
+        return ResolvedConstructor(
+            ClassDesc.of(constructorEnvironment.getParent().fullClassName),
+            MethodTypeDesc.of(ConstantDescs.CD_void, parameters)
+        )
     }
 
-    @Nullable
-    private ConstructorEnvironment resolveMeazyConstructor(Environment environment) {
-        ClassEnvironment classEnvironment = EnvironmentUtils.getParent(environment, ClassEnvironment.class).orElseThrow(
-                () -> new RuntimeException("Can't call super class not inside class")
-        );
+    private fun resolveMeazyConstructor(environment: Environment): ConstructorEnvironment? {
+        val classEnvironment = environment.getParent<ClassEnvironment>()
+            ?: error("Can't call super class not inside class")
 
-        ClassDesc baseClassDesc = classEnvironment.getBaseClass();
-        if (baseClassDesc == null) return null;
+        val baseClassDesc = classEnvironment.baseClass ?: return null
+        val baseClassEnvironment = getClass(environment, baseClassDesc).orElse(null) ?: return null
 
-        List<DataType> args = this.args.stream().map(arg -> arg.getType(environment, this)).toList();
+        val args = args.map { it.getType(environment, this) }.toList()
 
-        ClassEnvironment baseClassEnvironment = EnvironmentUtils.getClass(environment, baseClassDesc).orElse(null);
-        if (baseClassEnvironment == null) return null;
-
-        return baseClassEnvironment.getConstructor(args).orElse(null);
+        return baseClassEnvironment.getConstructor(args).orElse(null)
     }
 
 
-
-    @Getter
-    @AllArgsConstructor
-    private static class ResolvedConstructor {
-        private final ClassDesc classDesc;
-        private final MethodTypeDesc methodTypeDesc;
-    }
+    private class ResolvedConstructor(
+        val classDesc: ClassDesc,
+        val methodTypeDesc: MethodTypeDesc
+    )
 }

@@ -191,7 +191,7 @@ fun ClassEnvironment(
  */
 fun ClassEnvironment(
     parent: ClassDeclarationEnvironment, isShared: Boolean, isInterface: Boolean,
-    id: String, unresolvedBaseClasses: MutableSet<String>, modifiers: MutableSet<Modifier>
+    id: String, unresolvedBaseClasses: Set<String>, modifiers: Set<Modifier>
 ): ClassEnvironment = ClassEnvironmentImpl(
     parent, isShared, isInterface,
     id, unresolvedBaseClasses, modifiers
