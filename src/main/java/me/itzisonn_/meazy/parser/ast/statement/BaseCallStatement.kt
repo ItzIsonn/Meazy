@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.getClass
+import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getParent
 import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
 import java.lang.constant.ClassDesc
@@ -59,10 +59,9 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
             ?: error("Can't call super class not inside class")
 
         val baseClassDesc = classEnvironment.baseClass ?: return null
-        val baseClassEnvironment = getClass(environment, baseClassDesc).orElse(null) ?: return null
+        val baseClassEnvironment = environment.getClass(baseClassDesc) ?: return null
 
-        val args = args.map { it.getType(environment, this) }.toList()
-
+        val args = args.map { it.getType(environment, this) }
         return baseClassEnvironment.getConstructor(args).orElse(null)
     }
 

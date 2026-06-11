@@ -11,9 +11,6 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.*
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.getClass
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.isInstanceOf
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.resolveClassDesc
 import me.itzisonn_.meazy.util.MiscUtils.convertPrimitiveOrBoxed
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
@@ -70,7 +67,7 @@ class CallExpression(
 
                     arg.emit(this, environment, this@CallExpression)
 
-                    if (!isInstanceOf(environment, argType, parameterType)) {
+                    if (!environment.isInstanceOf(argType, parameterType)) {
                         if (!convertPrimitiveOrBoxed(instructions, argType, parameterType)) {
                             throw RuntimeException("Can't pass argument of type $argType to parameter of type $parameterType")
                         }
@@ -151,10 +148,7 @@ class CallExpression(
 
         if (parent is MemberExpression) {
             val classDesc = parent.receiver.getType(environment, this).classDesc
-
-            val classEnvironment = getClass(environment, classDesc).orElse(null)
-                ?: return null
-
+            val classEnvironment = environment.getClass(classDesc) ?: return null
             return classEnvironment.getFunctionRecursively(id, args).orElse(null)
         }
 
@@ -188,17 +182,13 @@ class CallExpression(
 
     private fun resolveMeazyConstructor(environment: Environment): ConstructorEnvironment? {
         val id = caller.id
-        val args = args.stream().map<DataType> { arg: Expression? -> arg!!.getType(environment, this) }.toList()
+        val args = args.map { it.getType(environment, this) }
 
-        val classEnvironment =
-            getClass(environment, resolveClassDesc(environment, id, false)).orElse(null) ?: return null
-
+        val classEnvironment = environment.getClass(environment.resolveClassDesc(id, false)) ?: return null
         return classEnvironment.getConstructor(args).orElse(null)
     }
 
-    override fun alwaysReturns(): Boolean {
-        return false
-    }
+    override fun alwaysReturns() = false
 
 
     private class ResolvedCallable(

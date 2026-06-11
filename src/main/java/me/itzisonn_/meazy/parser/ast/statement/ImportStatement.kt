@@ -1,28 +1,11 @@
-package me.itzisonn_.meazy.parser.ast.statement;
+package me.itzisonn_.meazy.parser.ast.statement
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.runtime.environment.Environment
 
-@NullMarked
-public class ImportStatement implements LocalStatement {
-    private final String name;
+class ImportStatement(val name: String) : LocalStatement {
+    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {}
 
-    public ImportStatement(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, ProgramUnit parent) {
-    }
-
-    @Override
-    public boolean alwaysReturns() {
-        return false;
-    }
-
-    public String getName() {
-        return this.name;
-    }
+    override fun alwaysReturns() = false
 }

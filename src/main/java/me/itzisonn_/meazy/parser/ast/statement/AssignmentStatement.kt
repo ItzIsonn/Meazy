@@ -11,10 +11,10 @@ import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.VariableValue
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.getClass
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.getVariable
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.isInstanceOf
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
+import me.itzisonn_.meazy.runtime.environment.getClass
+import me.itzisonn_.meazy.runtime.environment.getVariable
+import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 import me.itzisonn_.meazy.util.MiscUtils.convertPrimitiveOrBoxed
 import java.lang.constant.ClassDesc
 
@@ -32,7 +32,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
 
         value.emit(instructions, environment, this)
 
-        if (!isInstanceOf(environment, valueType, variableType)) {
+        if (!environment.isInstanceOf(valueType, variableType)) {
             if (!convertPrimitiveOrBoxed(instructions, valueType, variableType)) {
                 throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
             }
@@ -89,7 +89,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
             }
 
             val classDesc: ClassDesc = id.receiver.getType(environment, this).classDesc
-            val classEnvironment = getClass(environment, classDesc).orElse(null) ?: return null
+            val classEnvironment = environment.getClass(classDesc) ?: return null
 
             return classEnvironment.getVariable(id.member.id).orElse(null)
         }
@@ -98,7 +98,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
             throw RuntimeException("Cant assign value to not variable TODO")
         }
 
-        return getVariable(environment, id.id).orElse(null)
+        return environment.getVariable(id.id)
     }
 
     private class ResolvedVariable(

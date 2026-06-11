@@ -121,7 +121,7 @@ class ClassDeclarationStatement @JvmOverloads constructor(
                     val valueType = value.getType(classEnvironment, this@ClassDeclarationStatement).classDesc
                     val variableType = variableValue.dataType.classDesc
 
-                    if (!EnvironmentUtils.isInstanceOf(classEnvironment, valueType, variableType)) {
+                    if (!classEnvironment.isInstanceOf(valueType, variableType)) {
                         if (!MiscUtils.convertPrimitiveOrBoxed(this, valueType, variableType)) {
                             throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                         }
