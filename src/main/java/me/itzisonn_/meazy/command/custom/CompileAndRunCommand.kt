@@ -35,9 +35,9 @@ class CompileAndRunCommand : AbstractCommand(
         )
         val startCompileMillis = System.currentTimeMillis()
 
-        val tokens = Registries.TOKENIZATION_FUNCTION.getEntry().getValue()(getLines(file))
-        val program = Registries.PARSE_TOKENS_FUNCTION.getEntry().getValue()(file, tokens)
-        val classes = Registries.COMPILE_PROGRAM_FUNCTION.getEntry().getValue()(program)
+        val tokens = Registries.tokenizationFunction(getLines(file))
+        val program = Registries.parseTokensFunction(file, tokens)
+        val classes = Registries.compileProgramFunction(program)
 
         val outputDirectory = File(args[1])
         if (!outputDirectory.exists()) {
@@ -47,8 +47,7 @@ class CompileAndRunCommand : AbstractCommand(
         }
         else outputDirectory.listFiles()?.forEach { obj: File? -> obj!!.delete() }
 
-        for (classDesc in classes.keys) {
-            val classFile = classes[classDesc]!!
+        for ((classDesc, classFile) in classes) {
             val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
 
             try {
@@ -67,7 +66,7 @@ class CompileAndRunCommand : AbstractCommand(
 
         Logger.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
         val startRunMillis = System.currentTimeMillis()
-        Registries.RUN_PROGRAM_FUNCTION.getEntry().getValue()(classes)
+        Registries.runProgramFunction(classes)
 
         val endRunMillis = System.currentTimeMillis()
         return translatable("meazy:commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)

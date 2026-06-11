@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.text.TextException
 import me.itzisonn_.meazy.text.translatable
 
 /**
- * Is thrown when [Registries.TOKENIZATION_FUNCTION] can't recognize token
+ * Is thrown when [Registries.tokenizationFunction] can't recognize token
  *
  * @param lineNumber Line number
  * @param errorString Error string

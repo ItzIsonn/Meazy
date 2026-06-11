@@ -79,7 +79,7 @@ object MeazyMain {
         check(!isInitialized) { "MeazyMain have already been initialized" }
         isInitialized = true
 
-        Registries.init()
+        Registries.initialize()
 
         val stringLanguage = settings.language
         val languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage)

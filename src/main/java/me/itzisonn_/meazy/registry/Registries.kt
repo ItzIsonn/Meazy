@@ -31,7 +31,7 @@ import java.lang.reflect.InvocationTargetException
  * All basic Registries
  */
 object Registries {
-    private var isInit = false
+    private var isInitialized = false
 
     /**
      * Registry for all Languages
@@ -67,7 +67,8 @@ object Registries {
      * @see Token
      * @see TOKEN_TYPES
      */
-    val TOKENIZATION_FUNCTION = SingleEntryRegistryImpl<(String) -> List<Token>>()
+    lateinit var tokenizationFunction: (String) -> List<Token>
+        private set
 
 
 
@@ -98,7 +99,8 @@ object Registries {
      * @see ParsingFunction
      * @see Parser
      */
-    val PARSE_TOKENS_FUNCTION = SingleEntryRegistryImpl<(File?, List<Token>) -> Program>()
+    lateinit var parseTokensFunction: (File?, List<Token>) -> Program
+        private set
 
     /**
      * Registry for [ProgramFactory]
@@ -111,12 +113,14 @@ object Registries {
     /**
      * Registry for function that compiles [Program] to bytecode
      */
-    val COMPILE_PROGRAM_FUNCTION = SingleEntryRegistryImpl<(Program) -> Map<ClassDesc, ByteArray>>()
+    lateinit var compileProgramFunction: (Program) -> Map<ClassDesc, ByteArray>
+        private set
 
     /**
      * Registry for function that runs [Program]
      */
-    val RUN_PROGRAM_FUNCTION = SingleEntryRegistryImpl<(Map<ClassDesc, ByteArray>) -> Unit>()
+    lateinit var runProgramFunction: (Map<ClassDesc, ByteArray>) -> Unit
+        private set
 
 
 
@@ -128,9 +132,9 @@ object Registries {
      * 
      * @throws IllegalStateException If Registries has already been initialized
      */
-    fun init() {
-        check(!isInit) { "Registries have already been initialized" }
-        isInit = true
+    fun initialize() {
+        check(!isInitialized) { "Registries have already been initialized" }
+        isInitialized = true
 
         LANGUAGES.register(getDefaultIdentifier("english"), Language("en", "English"))
         LANGUAGES.register(getDefaultIdentifier("russian"), Language("ru", "Русский"))
@@ -141,7 +145,7 @@ object Registries {
         Operators.REGISTER()
         ParsingFunctions.REGISTER()
 
-        TOKENIZATION_FUNCTION.register(getDefaultIdentifier("tokens_function")) { lines ->
+        tokenizationFunction = { lines ->
             val tokens = mutableListOf<Token>()
             var lineNumber = 1
 
@@ -151,7 +155,7 @@ object Registries {
                 var token: Token? = null
 
                 for (entry in TOKEN_TYPES.getEntries()) {
-                    val tokenType: TokenType = entry.getValue()!!
+                    val tokenType = entry.getValue()!!
                     if (tokenType.pattern == null) continue
 
                     val matcher = tokenType.pattern.matcher(string)
@@ -184,14 +188,14 @@ object Registries {
             tokens
         }
 
-        PARSE_TOKENS_FUNCTION.register(getDefaultIdentifier("parse_tokens")) { file, tokens ->
+        parseTokensFunction = { file, tokens ->
             val parsingContext = ParsingContext(tokens)
             val parser = parsingContext.parser
 
             parser.parse(getDefaultIdentifier("program"), Program::class.java, file)
         }
 
-        COMPILE_PROGRAM_FUNCTION.register(getDefaultIdentifier("compile_program")) { program ->
+        compileProgramFunction = { program ->
             val globalEnvironment = GlobalEnvironment()
             val bytecodeBuilders = BytecodeBuilders.of(null, null)
             val instructionsSet = InstructionsSet(bytecodeBuilders)
@@ -206,12 +210,11 @@ object Registries {
             bytecodeBuilders.getClasses()
         }
 
-        RUN_PROGRAM_FUNCTION.register(getDefaultIdentifier("run_program")) { classes ->
+        runProgramFunction = { classes ->
             val classLoader = ClassLoaderWrapper()
-            for (classDesc in classes.keys) {
-                val classFile: ByteArray = classes[classDesc]!!
-
+            for ((classDesc, classFile) in classes) {
                 val loadedClass = classLoader.defineClass(classFile)
+
                 try {
                     val method = loadedClass.getDeclaredMethod("main")
 
@@ -227,7 +230,7 @@ object Registries {
 
                     method.invoke(null)
                 }
-                catch (`_`: NoSuchMethodException) {
+                catch (_: NoSuchMethodException) {
                     System.err.println("No method main in class $classDesc")
                 }
                 catch (e: IllegalAccessException) {
