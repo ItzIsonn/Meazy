@@ -25,7 +25,7 @@ public class PowerExpressionParsingFunction extends AbstractParsingFunction<Expr
         while (parser.getCurrent().getType().equals(TokenTypes.POWER())) {
             parser.next();
             Expression right = parser.parseAfter(MeazyMain.getDefaultIdentifier("power_expression"), Expression.class);
-            left = new OperatorExpression(left, right, Operators.POWER());
+            left = new OperatorExpression(left, right, Operators.INSTANCE.getPower());
         }
 
         return left;

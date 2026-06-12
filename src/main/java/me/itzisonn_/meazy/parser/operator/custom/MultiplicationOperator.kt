@@ -1,104 +1,96 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import kotlin.Unit;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.NumberType
+import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
+import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.DataType.Companion.of
+import me.itzisonn_.meazy.parser.DataType.Companion.ofNonNull
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
 
-import java.lang.constant.ConstantDescs;
-import java.lang.constant.MethodTypeDesc;
+class MultiplicationOperator : Operator("multiplication", "*", OperatorType.INFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-@NullMarked
-public class MultiplicationOperator extends Operator {
-    public MultiplicationOperator() {
-        super("multiplication", "*", OperatorType.INFIX);
-    }
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
-
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
-
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType != null && rightNumberType != null) {
-            if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't multiply nullable numbers");
-            NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
+            if (leftType.isNullable || rightType.isNullable) error("Can't multiply nullable numbers")
+            val commonNumberType = getCommonUnboxed(leftNumberType, rightNumberType)
 
-            left.emit(instructions, environment, operatorExpression);
-            instructions.convertToNumberType(leftNumberType, commonNumberType);
+            left.emit(instructions, environment, operatorExpression)
+            instructions.convertToNumberType(leftNumberType, commonNumberType)
 
-            right.emit(instructions, environment, operatorExpression);
-            instructions.convertToNumberType(rightNumberType, commonNumberType);
+            right.emit(instructions, environment, operatorExpression)
+            instructions.convertToNumberType(rightNumberType, commonNumberType)
 
-            instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.MULTIPLICATION);
-            return;
+            instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.MULTIPLICATION)
+            return
         }
 
-        Expression string;
-        Expression number;
-        NumberType numberType;
+        val string: Expression?
+        val number: Expression?
+        val numberType: NumberType?
 
-        if (leftType.getClassDesc().equals(ConstantDescs.CD_String) && rightNumberType != null && rightNumberType.isInt() && !rightType.isNullable()) {
-            string = left;
-            number = right;
-            numberType = rightNumberType;
+        if (leftType.classDesc == ConstantDescs.CD_String && rightNumberType != null && rightNumberType.isInt && !rightType.isNullable) {
+            string = left
+            number = right
+            numberType = rightNumberType
         }
-        else if (rightType.getClassDesc().equals(ConstantDescs.CD_String) && leftNumberType != null && leftNumberType.isInt() && !leftType.isNullable()) {
-            string = right;
-            number = left;
-            numberType = leftNumberType;
+        else if (rightType.classDesc == ConstantDescs.CD_String && leftNumberType != null && leftNumberType.isInt && !leftType.isNullable) {
+            string = right
+            number = left
+            numberType = leftNumberType
         }
-        else throw new RuntimeException("Can't multiply " + leftType.getClassDesc() + " and " + rightType.getClassDesc() + " TODO"); //TODO
+        else error("Can't multiply " + leftType.classDesc + " and " + rightType.classDesc + " TODO") //TODO
 
-        string.emit(instructions, environment, operatorExpression);
-        number.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(numberType, numberType.unbox());
+
+        string.emit(instructions, environment, operatorExpression)
+        number.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(numberType, numberType.unbox())
 
         instructions.invokeMethod(
-                ConstantDescs.CD_String,
-                "repeat",
-                MethodTypeDesc.of(ConstantDescs.CD_String, ConstantDescs.CD_int),
-                InvokeType.VIRTUAL,
-                _ -> Unit.INSTANCE
-        );
+            ConstantDescs.CD_String,
+            "repeat",
+            MethodTypeDesc.of(ConstantDescs.CD_String, ConstantDescs.CD_int),
+            InvokeType.VIRTUAL
+        )
     }
 
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-        if (leftType.getClassDesc().equals(ConstantDescs.CD_String) || rightType.getClassDesc().equals(ConstantDescs.CD_String)) {
-            return DataType.Companion.of(ConstantDescs.CD_String, leftType.isNullable() || rightType.isNullable());
+        if (leftType.classDesc == ConstantDescs.CD_String || rightType.classDesc == ConstantDescs.CD_String) {
+            return of(ConstantDescs.CD_String, leftType.isNullable || rightType.isNullable)
         }
 
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType != null && rightNumberType != null) {
-            if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't multiply nullable numbers");
-            return DataType.Companion.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
+            if (leftType.isNullable || rightType.isNullable) error("Can't multiply nullable numbers")
+            return ofNonNull(getCommonUnboxed(leftNumberType, rightNumberType).classDesc)
         }
 
-        if (leftType.equals(rightType)) return leftType;
-        throw new RuntimeException("Can't get type to multiply " + leftType + " and " + rightType + " TODO"); //TODO
+        if (leftType == rightType) return leftType
+        error("Can't get type to multiply $leftType and $rightType TODO") //TODO
     }
 }

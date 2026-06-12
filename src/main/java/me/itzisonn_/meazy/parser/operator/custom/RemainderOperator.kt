@@ -1,67 +1,55 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
+import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
 
-import java.lang.constant.ClassDesc;
+class RemainderOperator : Operator("remainder", "%", OperatorType.INFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-@NullMarked
-public class RemainderOperator extends Operator {
-    public RemainderOperator() {
-        super("remainder", "%", OperatorType.INFIX);
-    }
+        val leftType = left.getType(environment, operatorExpression).classDesc
+        val rightType = right.getType(environment, operatorExpression).classDesc
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
-
-        ClassDesc leftType = left.getType(environment, operatorExpression).getClassDesc();
-        ClassDesc rightType = right.getType(environment, operatorExpression).getClassDesc();
-
-        NumberType leftNumberType = NumberType.valueOf(leftType);
-        NumberType rightNumberType = NumberType.valueOf(rightType);
+        val leftNumberType = valueOf(leftType)
+        val rightNumberType = valueOf(rightType)
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't get remainder of " + leftType + " and " + rightType); //TODO
+            error("Can't get remainder of $leftType and $rightType") //TODO
         }
 
-        NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
+        val commonNumberType = getCommonUnboxed(leftNumberType, rightNumberType)
 
-        left.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(leftNumberType, commonNumberType);
+        left.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(leftNumberType, commonNumberType)
 
-        right.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(rightNumberType, commonNumberType);
+        right.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(rightNumberType, commonNumberType)
 
-        instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.REMAINDER);
+        instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.REMAINDER)
     }
 
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't get type to get remainder of " + leftType + " and " + rightType); //TODO
+            error("Can't get type to get remainder of $leftType and $rightType") //TODO
         }
 
-        return DataType.Companion.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
+        return DataType.ofNonNull(getCommonUnboxed(leftNumberType, rightNumberType).classDesc)
     }
 }

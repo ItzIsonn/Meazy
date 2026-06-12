@@ -24,7 +24,7 @@ public class NegationExpressionParsingFunction extends AbstractParsingFunction<E
         if (parser.getCurrent().getType().equals(TokenTypes.MINUS())) {
             parser.next();
             Expression expression = parser.parseAfter(MeazyMain.getDefaultIdentifier("negation_expression"), Expression.class);
-            return new OperatorExpression(expression, null, Operators.NEGATION());
+            return new OperatorExpression(expression, null, Operators.INSTANCE.getNegation());
         }
 
         return parser.parseAfter(MeazyMain.getDefaultIdentifier("negation_expression"), Expression.class);

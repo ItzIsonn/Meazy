@@ -316,6 +316,6 @@ object TokenTypes {
     }
     
     private fun get(id: String): TokenType {
-        return Registries.TOKEN_TYPES.getEntry(getDefaultIdentifier(id)).value!!
+        return Registries.TOKEN_TYPES.getEntry(getDefaultIdentifier(id))?.value!!
     }
 }

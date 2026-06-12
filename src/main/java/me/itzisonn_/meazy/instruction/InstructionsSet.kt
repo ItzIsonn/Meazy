@@ -64,33 +64,23 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
     fun withMethod(
-        id: String,
-        methodTypeDesc: MethodTypeDesc,
-        flags: Set<AccessFlag>,
-        bodyInstructions: InstructionsSet.() -> Unit
+        id: String, methodTypeDesc: MethodTypeDesc,
+        flags: Set<AccessFlag>, bodyInstructions: InstructionsSet.() -> Unit
     ) {
         with(WithMethodInstruction(
             id, methodTypeDesc, toIntFlags(flags), bodyInstructions
         ))
     }
 
-    fun withConstructor(
-        methodTypeDesc: MethodTypeDesc,
-        flags: Set<AccessFlag>,
-        bodyInstructions: InstructionsSet.() -> Unit
-    ) {
+    fun withConstructor(methodTypeDesc: MethodTypeDesc, flags: Set<AccessFlag>, bodyInstructions: InstructionsSet.() -> Unit) {
         with(WithConstructorInstruction(
             methodTypeDesc, toIntFlags(flags), bodyInstructions
         ))
     }
 
     fun withClass(
-        classDesc: ClassDesc,
-        superClass: ClassDesc?,
-        interfaceClasses: Set<ClassDesc>,
-        flags: Set<AccessFlag>,
-        attributes: List<InnerClassesAttribute>,
-        classInstructions: InstructionsSet.() -> Unit
+        classDesc: ClassDesc, superClass: ClassDesc?, interfaceClasses: Set<ClassDesc>,
+        flags: Set<AccessFlag>, attributes: List<InnerClassesAttribute>, classInstructions: InstructionsSet.() -> Unit
     ) {
         with(WithClassInstruction(
             classDesc, superClass, interfaceClasses,
@@ -101,11 +91,8 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
     fun invokeMethod(
-        owner: ClassDesc,
-        id: String,
-        methodTypeDesc: MethodTypeDesc,
-        invokeType: InvokeType,
-        argsInstructions: InstructionsSet.() -> Unit = {}
+        owner: ClassDesc, id: String, methodTypeDesc: MethodTypeDesc,
+        invokeType: InvokeType, argsInstructions: InstructionsSet.() -> Unit = {}
     ) {
         with(InvokeMethodInstruction(
             owner, id, methodTypeDesc, argsInstructions, invokeType
@@ -113,10 +100,8 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
     fun invokeDynamicMethod(
-        bootstrapMethod: DirectMethodHandleDesc,
-        id: String,
-        methodTypeDesc: MethodTypeDesc,
-        vararg args: ConstantDesc
+        bootstrapMethod: DirectMethodHandleDesc, id: String,
+        methodTypeDesc: MethodTypeDesc, vararg args: ConstantDesc
     ) {
         with(InvokeDynamicMethodInstruction(
             bootstrapMethod, id, methodTypeDesc, listOf(*args)
@@ -124,8 +109,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
     fun invokeConstructor(
-        owner: ClassDesc,
-        constructorTypeDesc: MethodTypeDesc,
+        owner: ClassDesc, constructorTypeDesc: MethodTypeDesc,
         argsInstructions: InstructionsSet.() -> Unit = {}
     ) {
         with(InvokeConstructorInstruction(
@@ -134,8 +118,7 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
     }
 
     fun invokeSuperClass(
-        owner: ClassDesc,
-        constructorTypeDesc: MethodTypeDesc,
+        owner: ClassDesc, constructorTypeDesc: MethodTypeDesc,
         argsInstructions: InstructionsSet.() -> Unit = {}
     ) {
         with(InvokeConstructorInstruction(

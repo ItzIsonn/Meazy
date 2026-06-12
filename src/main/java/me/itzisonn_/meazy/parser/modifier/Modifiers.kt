@@ -70,6 +70,6 @@ object Modifiers {
     }
 
     private fun get(id: String): Modifier {
-        return Registries.MODIFIERS.getEntry(getDefaultIdentifier(id)).value!!
+        return Registries.MODIFIERS.getEntry(getDefaultIdentifier(id))?.value!!
     }
 }

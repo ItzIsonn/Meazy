@@ -135,7 +135,7 @@ object Registries {
         Commands.register()
         TokenTypes.register()
         Modifiers.register()
-        Operators.REGISTER()
+        Operators.register()
         ParsingFunctions.REGISTER()
 
         tokenizationFunction = { lines ->

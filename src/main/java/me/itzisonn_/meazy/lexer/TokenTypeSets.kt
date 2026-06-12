@@ -13,6 +13,6 @@ object TokenTypeSets {
     val addition get() = get("addition")
 
     private fun get(id: String): TokenTypeSet {
-        return Registries.TOKEN_TYPE_SETS.getEntry(getDefaultIdentifier(id)).value!!
+        return Registries.TOKEN_TYPE_SETS.getEntry(getDefaultIdentifier(id))?.value!!
     }
 }
