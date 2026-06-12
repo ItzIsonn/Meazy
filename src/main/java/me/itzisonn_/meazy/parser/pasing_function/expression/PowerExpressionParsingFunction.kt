@@ -1,33 +1,24 @@
-package me.itzisonn_.meazy.parser.pasing_function.expression;
+package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.operator.Operators;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.power
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-@NullMarked
-public class PowerExpressionParsingFunction extends AbstractParsingFunction<Expression> {
-    public PowerExpressionParsingFunction() {
-        super("power_expression");
-    }
+class PowerExpressionParsingFunction : AbstractParsingFunction<Expression>("power_expression") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
+        val parser = context.parser
+        var left = parser.parseAfter<Expression>(getDefaultIdentifier("power_expression"))
 
-    @Override
-    public Expression parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Expression left = parser.parseAfter(MeazyMain.getDefaultIdentifier("power_expression"), Expression.class);
-
-        while (parser.getCurrent().getType().equals(TokenTypes.POWER())) {
-            parser.next();
-            Expression right = parser.parseAfter(MeazyMain.getDefaultIdentifier("power_expression"), Expression.class);
-            left = new OperatorExpression(left, right, Operators.INSTANCE.getPower());
+        while (parser.current.type == power) {
+            parser.next()
+            val right = parser.parseAfter<Expression>(getDefaultIdentifier("power_expression"))
+            left = OperatorExpression(left, right, Operators.power)
         }
 
-        return left;
+        return left
     }
 }

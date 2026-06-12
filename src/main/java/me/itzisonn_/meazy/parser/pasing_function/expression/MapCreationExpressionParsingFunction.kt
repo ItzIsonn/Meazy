@@ -1,49 +1,46 @@
-package me.itzisonn_.meazy.parser.pasing_function.expression;
+package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.collection_creation.MapCreationExpression;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.assign
+import me.itzisonn_.meazy.lexer.TokenTypes.comma
+import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
+import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.collection_creation.MapCreationExpression
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.HashMap;
-import java.util.Map;
+class MapCreationExpressionParsingFunction : AbstractParsingFunction<Expression>("map_creation_expression") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
+        val parser = context.parser
 
-@NullMarked
-public class MapCreationExpressionParsingFunction extends AbstractParsingFunction<Expression> {
-    public MapCreationExpressionParsingFunction() {
-        super("map_creation_expression");
-    }
+        if (parser.current.type == leftBrace) {
+            parser.consume()
+            val map = mutableMapOf<Expression, Expression>()
 
-    @Override
-    public Expression parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
+            while (parser.current.type != rightBrace) {
+                val key = parser.parse<Expression>(getDefaultIdentifier("list_creation_expression"))
+                parser.consume(assign, translatable("meazy:parser.expected.separator_expression", "assign", "map_creation"))
 
-        if (parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
-            parser.consume();
-            Map<Expression, Expression> map = new HashMap<>();
+                val value = parser.parse<Expression>(getDefaultIdentifier("expression"))
+                map[key] = value
 
-            while (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                Expression key = parser.parse(MeazyMain.getDefaultIdentifier("list_creation_expression"), Expression.class);
-                parser.consume(TokenTypes.ASSIGN(), TextKt.literal("Expected assign TODO")); //TODO
-
-                Expression value = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-                map.put(key, value);
-
-                if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                    parser.consume(TokenTypes.COMMA(), TextKt.translatable("meazy:parser.expected.separator_expression", "comma", "map_creation"));
+                if (parser.current.type != rightBrace) {
+                    parser.consume(
+                        comma,
+                        translatable("meazy:parser.expected.separator_expression", "comma", "map_creation")
+                    )
                 }
             }
 
-            parser.consume(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end_expression", "right_brace", "map_creation"));
-            return new MapCreationExpression(map);
+            parser.consume(
+                rightBrace,
+                translatable("meazy:parser.expected.end_expression", "right_brace", "map_creation")
+            )
+            return MapCreationExpression(map)
         }
 
-        return parser.parseAfter(MeazyMain.getDefaultIdentifier("map_creation_expression"), Expression.class);
+        return parser.parseAfter<Expression>(getDefaultIdentifier("map_creation_expression"))
     }
 }

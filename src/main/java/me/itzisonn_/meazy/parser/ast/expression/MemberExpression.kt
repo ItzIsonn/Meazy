@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.runtime.environment.Environment
 
 class MemberExpression(
-    var receiver: Expression,
+    val receiver: Expression,
     val member: Expression,
     val isNullSafe: Boolean
 ) : Expression, LocalStatement {

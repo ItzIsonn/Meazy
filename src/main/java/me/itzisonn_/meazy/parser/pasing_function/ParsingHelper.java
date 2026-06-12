@@ -146,7 +146,7 @@ public final class ParsingHelper {
         Parser parser = context.getParser();
         Token token = parser.getCurrent();
 
-        String value = parser.consume(TokenTypes.STRING(), TextKt.translatable("meazy:parser.expected", "string")).getValue();
+        String value = parser.consume(TokenTypes.INSTANCE.getString(), TextKt.translatable("meazy:parser.expected", "string")).getValue();
         if (!value.endsWith("\"")) throw new InvalidStatementException(token.getLine(), TextKt.translatable("meazy:parser.exception.string_quote_not_closed", value.substring(1)));
         return value.substring(1, value.length() - 1);
     }
