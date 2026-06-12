@@ -25,15 +25,15 @@ public class WhileStatementParsingFunction extends AbstractParsingFunction<While
     public WhileStatement parse(ParsingContext context, @Nullable Object... extra) {
         Parser parser = context.getParser();
 
-        parser.getCurrentAndNext(TokenTypes.WHILE(), TextKt.translatable("meazy:parser.expected.keyword", "while"));
+        parser.consume(TokenTypes.WHILE(), TextKt.translatable("meazy:parser.expected.keyword", "while"));
 
-        parser.getCurrentAndNext(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start", "left_parenthesis", "while_condition"));
+        parser.consume(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start", "left_parenthesis", "while_condition"));
         Expression condition = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-        parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.end", "right_parenthesis", "while_condition"));
+        parser.consume(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.end", "right_parenthesis", "while_condition"));
 
-        parser.getCurrentAndNext(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "while_body"));
+        parser.consume(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "while_body"));
         List<LocalStatement> body = ParsingHelper.parseBody(context);
-        parser.getCurrentAndNext(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "while_body"));
+        parser.consume(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "while_body"));
 
         return new WhileStatement(condition, body);
     }

@@ -32,8 +32,8 @@ public class VariableDeclarationStatementParsingFunction extends AbstractParsing
         if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
         if (!(extra[1] instanceof Boolean canBeConstantWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
 
-        boolean isConstant = parser.getCurrentAndNext(TokenTypes.VARIABLE(), TextKt.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
+        boolean isConstant = parser.consume(TokenTypes.VARIABLE(), TextKt.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
+        String id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
         DataType dataType = ParsingHelper.parseDataType(context);
 
         if (!parser.getCurrent().getType().equals(TokenTypes.ASSIGN())) {

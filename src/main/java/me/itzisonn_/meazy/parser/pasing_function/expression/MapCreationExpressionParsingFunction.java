@@ -25,22 +25,22 @@ public class MapCreationExpressionParsingFunction extends AbstractParsingFunctio
         Parser parser = context.getParser();
 
         if (parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
-            parser.getCurrentAndNext();
+            parser.consume();
             Map<Expression, Expression> map = new HashMap<>();
 
             while (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
                 Expression key = parser.parse(MeazyMain.getDefaultIdentifier("list_creation_expression"), Expression.class);
-                parser.getCurrentAndNext(TokenTypes.ASSIGN(), TextKt.literal("Expected assign TODO")); //TODO
+                parser.consume(TokenTypes.ASSIGN(), TextKt.literal("Expected assign TODO")); //TODO
 
                 Expression value = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
                 map.put(key, value);
 
                 if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-                    parser.getCurrentAndNext(TokenTypes.COMMA(), TextKt.translatable("meazy:parser.expected.separator_expression", "comma", "map_creation"));
+                    parser.consume(TokenTypes.COMMA(), TextKt.translatable("meazy:parser.expected.separator_expression", "comma", "map_creation"));
                 }
             }
 
-            parser.getCurrentAndNext(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end_expression", "right_brace", "map_creation"));
+            parser.consume(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end_expression", "right_brace", "map_creation"));
             return new MapCreationExpression(map);
         }
 

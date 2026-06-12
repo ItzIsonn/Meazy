@@ -25,7 +25,7 @@ public class LogicalExpressionParsingFunction extends AbstractParsingFunction<Ex
 
         TokenType current = parser.getCurrent().getType();
         while (current.equals(TokenTypes.AND()) || current.equals(TokenTypes.OR())) {
-            String operator = parser.getCurrentAndNext().getValue();
+            String operator = parser.consume().getValue();
             Expression right = parser.parseAfter(MeazyMain.getDefaultIdentifier("logical_expression"), Expression.class);
             left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
 

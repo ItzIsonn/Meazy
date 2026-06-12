@@ -39,11 +39,11 @@ public class FunctionDeclarationStatementParsingFunction extends AbstractParsing
         parser.next(TokenTypes.FUNCTION(), TextKt.translatable("meazy:parser.expected.keyword", "function"));
 
         String classId = null;
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "function")).getValue();
+        String id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "function")).getValue();
         if (parser.getCurrent().getType().equals(TokenTypes.DOT())) {
             parser.next();
             classId = id;
-            id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
+            id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
         }
 
         List<Parameter> parameters = ParsingHelper.parseParameters(context);

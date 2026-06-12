@@ -30,7 +30,7 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
         else throw new IllegalArgumentException("Expected file as extra argument");
 
         Parser parser = context.getParser();
-        parser.moveOverOptionalNewLines();
+        parser.skipNewLines();
 
         List<Statement> body = new ArrayList<>();
 
@@ -45,19 +45,19 @@ public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
             }
 
             parser.next(TokenTypes.NEW_LINE(),  TextKt.translatable("meazy:parser.expected", "new_line"));
-            parser.moveOverOptionalNewLines();
+            parser.skipNewLines();
 
             body.add(headerStatement);
         }
 
-        parser.moveOverOptionalNewLines();
+        parser.skipNewLines();
 
         while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
             body.add(parser.parse(MeazyMain.getDefaultIdentifier("global_statement"), Statement.class));
 
             if (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
                 parser.next(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
-                parser.moveOverOptionalNewLines();
+                parser.skipNewLines();
             }
         }
 

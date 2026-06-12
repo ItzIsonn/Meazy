@@ -32,34 +32,34 @@ public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Ex
 
         if (tokenType.equals(TokenTypes.ID())) {
             if (parser.getSize() > parser.getPos() + 1 && parser.get(parser.getPos() + 1).getType().equals(TokenTypes.LEFT_PARENTHESIS())) {
-                String id = parser.getCurrentAndNext().getValue();
+                String id = parser.consume().getValue();
                 if (Character.isUpperCase(id.charAt(0))) return new ClassIdentifier(id);
                 else return new FunctionIdentifier(id);
             }
 
             if (parser.getPos() > 0 && parser.get(parser.getPos() - 1).getType().equals(TokenTypes.DOT())) {
-                return new VariableIdentifier(parser.getCurrentAndNext().getValue());
+                return new VariableIdentifier(parser.consume().getValue());
             }
 
-            String id = parser.getCurrentAndNext().getValue();
+            String id = parser.consume().getValue();
             if (Character.isUpperCase(id.charAt(0))) return new ClassIdentifier(id);
             else return new VariableIdentifier(id);
         }
         if (tokenType.equals(TokenTypes.NULL())) {
-            parser.getCurrentAndNext();
+            parser.consume();
             return new NullLiteral();
         }
-        if (tokenType.equals(TokenTypes.NUMBER())) return new NumberLiteral(parser.getCurrentAndNext().getValue());
+        if (tokenType.equals(TokenTypes.NUMBER())) return new NumberLiteral(parser.consume().getValue());
         if (tokenType.equals(TokenTypes.STRING())) return new StringLiteral(ParsingHelper.parseString(context));
-        if (tokenType.equals(TokenTypes.BOOLEAN())) return new BooleanLiteral(Boolean.parseBoolean(parser.getCurrentAndNext().getValue()));
+        if (tokenType.equals(TokenTypes.BOOLEAN())) return new BooleanLiteral(Boolean.parseBoolean(parser.consume().getValue()));
         if (tokenType.equals(TokenTypes.THIS())) {
-            parser.getCurrentAndNext();
+            parser.consume();
             return new ThisLiteral();
         }
         if (tokenType.equals(TokenTypes.LEFT_PARENTHESIS())) {
-            parser.getCurrentAndNext();
+            parser.consume();
             Expression value = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-            parser.getCurrentAndNext(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected", "right_parenthesis"));
+            parser.consume(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected", "right_parenthesis"));
             return value;
         }
 
