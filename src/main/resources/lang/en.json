@@ -53,6 +53,7 @@
   "parser.expected.end_statement": "Expected '{0}' at the end of the '{1}' statement",
   "parser.expected.end_expression": "Expected '{0}' at the end of the '{1}' expression",
   "parser.expected.separator": "Expected '{0}' as a separator between parts of '{1}'",
+  "parser.expected.separator_statement": "Expected '{0}' as a separator between parts of '{1}' statement",
   "parser.expected.separator_expression": "Expected '{0}' as a separator between parts of '{1}' expression",
 
   "parser.modifier.doesnt_exist": "Modifier with id '{0}' doesn't exist",

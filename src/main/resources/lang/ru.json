@@ -53,6 +53,7 @@
   "parser.expected.end_statement": "Ожидалось '{0}' в конце инструкции '{1}'",
   "parser.expected.end_expression": "Ожидалось '{0}' в начале выражения '{1}'",
   "parser.expected.separator": "Ожидалось '{0}' как разделитель между частями '{1}'",
+  "parser.expected.separator_statement": "Ожидалось '{0}' как разделитель между частями инструкции '{1}'",
   "parser.expected.separator_expression": "Ожидалось '{0}' как разделитель между частями выражения '{1}'",
 
   "parser.modifier.doesnt_exist": "Модификатора с айди '{0}' не существует",

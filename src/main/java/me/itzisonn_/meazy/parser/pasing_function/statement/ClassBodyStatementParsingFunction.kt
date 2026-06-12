@@ -1,44 +1,48 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.parser.InvalidStatementException;
-import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
-import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.constructor
+import me.itzisonn_.meazy.lexer.TokenTypes.function
+import me.itzisonn_.meazy.lexer.TokenTypes.variable
+import me.itzisonn_.meazy.parser.InvalidStatementException
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement
+import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
+import me.itzisonn_.meazy.parser.ast.statement.Statement
+import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.Set;
+class ClassBodyStatementParsingFunction : AbstractParsingFunction<Statement>("class_body_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Statement {
+        val parser = context.parser
+        val modifiers = ParsingHelper.parseModifiers(context)
 
-@NullMarked
-public class ClassBodyStatementParsingFunction extends AbstractParsingFunction<Statement> {
-    public ClassBodyStatementParsingFunction() {
-        super("class_body_statement");
-    }
-
-    @Override
-    public Statement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Set<Modifier> modifiers = ParsingHelper.parseModifiers(context);
-
-        if (parser.getCurrent().getType().equals(TokenTypes.FUNCTION())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("function_declaration_statement"), FunctionDeclarationStatement.class, modifiers, false);
+        if (parser.current.type == function) {
+            return parser.parse<FunctionDeclarationStatement>(
+                getDefaultIdentifier("function_declaration_statement"),
+                modifiers,
+                false
+            )
         }
-        if (parser.getCurrent().getType().equals(TokenTypes.VARIABLE())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, true);
+        if (parser.current.type == variable) {
+            return parser.parse<VariableDeclarationStatement>(
+                getDefaultIdentifier("variable_declaration_statement"),
+                modifiers,
+                true
+            )
         }
-        if (parser.getCurrent().getType().equals(TokenTypes.CONSTRUCTOR())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("constructor_declaration_statement"), ConstructorDeclarationStatement.class, modifiers);
+        if (parser.current.type == constructor) {
+            return parser.parse<ConstructorDeclarationStatement>(
+                getDefaultIdentifier("constructor_declaration_statement"),
+                modifiers
+            )
         }
 
-        throw new InvalidStatementException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.expected.statement", "class_body"));
+        throw InvalidStatementException(
+            parser.current.line,
+            translatable("meazy:parser.expected.statement", "class_body")
+        )
     }
 }
