@@ -181,11 +181,6 @@ object TokenTypes {
         return get("break")
     }
     
-    @JvmStatic
-    fun IS(): TokenType {
-        return get("is")
-    }
-    
 
     @JvmStatic
     fun LEFT_PARENTHESIS(): TokenType {
@@ -208,16 +203,6 @@ object TokenTypes {
     }
     
     @JvmStatic
-    fun LEFT_BRACKET(): TokenType {
-        return get("left_bracket")
-    }
-    
-    @JvmStatic
-    fun RIGHT_BRACKET(): TokenType {
-        return get("right_bracket")
-    }
-    
-    @JvmStatic
     fun COLON(): TokenType {
         return get("colon")
     }
@@ -237,77 +222,10 @@ object TokenTypes {
         return get("question")
     }
     
-    @JvmStatic
-    fun QUESTION_DOT(): TokenType {
-        return get("question_dot")
-    }
-    
-    @JvmStatic
-    fun QUESTION_COLON(): TokenType {
-        return get("question_colon")
-    }
-
-    @JvmStatic
-    fun ARROW(): TokenType {
-        return get("arrow")
-    }
-    
 
     @JvmStatic
     fun ASSIGN(): TokenType {
         return get("assign")
-    }
-    
-    @JvmStatic
-    fun MINUS(): TokenType {
-        return get("minus")
-    }
-    
-    @JvmStatic
-    fun POWER(): TokenType {
-        return get("power")
-    }
-    
-
-    @JvmStatic
-    fun AND(): TokenType {
-        return get("and")
-    }
-    
-    @JvmStatic
-    fun OR(): TokenType {
-        return get("or")
-    }
-    
-    @JvmStatic
-    fun INVERSION(): TokenType {
-        return get("inversion")
-    }
-    
-
-    @JvmStatic
-    fun NULL(): TokenType {
-        return get("null")
-    }
-    
-    @JvmStatic
-    fun NUMBER(): TokenType {
-        return get("number")
-    }
-    
-    @JvmStatic
-    fun STRING(): TokenType {
-        return get("string")
-    }
-    
-    @JvmStatic
-    fun BOOLEAN(): TokenType {
-        return get("boolean")
-    }
-    
-    @JvmStatic
-    fun THIS(): TokenType {
-        return get("this")
     }
     
     @JvmStatic

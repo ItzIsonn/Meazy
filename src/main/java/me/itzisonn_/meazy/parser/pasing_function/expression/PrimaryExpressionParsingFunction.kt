@@ -1,68 +1,64 @@
-package me.itzisonn_.meazy.parser.pasing_function.expression;
+package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.lexer.TokenType;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.literal.*;
-import me.itzisonn_.meazy.parser.InvalidStatementException;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.boolean
+import me.itzisonn_.meazy.lexer.TokenTypes.dot
+import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
+import me.itzisonn_.meazy.lexer.TokenTypes.`null`
+import me.itzisonn_.meazy.lexer.TokenTypes.number
+import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
+import me.itzisonn_.meazy.lexer.TokenTypes.string
+import me.itzisonn_.meazy.lexer.TokenTypes.`this`
+import me.itzisonn_.meazy.parser.InvalidStatementException
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.literal.*
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-@NullMarked
-public class PrimaryExpressionParsingFunction extends AbstractParsingFunction<Expression> {
-    public PrimaryExpressionParsingFunction() {
-        super("primary_expression");
-    }
+class PrimaryExpressionParsingFunction : AbstractParsingFunction<Expression>("primary_expression") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
+        val parser = context.parser
+        val token = parser.current
+        val tokenType = token.type
 
-    @Override
-    public Expression parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Token token = parser.getCurrent();
-        TokenType tokenType = token.getType();
-
-        if (tokenType.equals(TokenTypes.ID())) {
-            if (parser.getSize() > parser.getPos() + 1 && parser.get(parser.getPos() + 1).getType().equals(TokenTypes.LEFT_PARENTHESIS())) {
-                String id = parser.consume().getValue();
-                if (Character.isUpperCase(id.charAt(0))) return new ClassIdentifier(id);
-                else return new FunctionIdentifier(id);
+        if (tokenType == TokenTypes.id) {
+            if (parser.size > parser.pos + 1 && parser[parser.pos + 1].type == leftParenthesis) {
+                val id = parser.consume().value
+                return if (Character.isUpperCase(id[0])) ClassIdentifier(id)
+                else FunctionIdentifier(id)
             }
 
-            if (parser.getPos() > 0 && parser.get(parser.getPos() - 1).getType().equals(TokenTypes.DOT())) {
-                return new VariableIdentifier(parser.consume().getValue());
+            if (parser.pos > 0 && parser[parser.pos - 1].type == dot) {
+                return VariableIdentifier(parser.consume().value)
             }
 
-            String id = parser.consume().getValue();
-            if (Character.isUpperCase(id.charAt(0))) return new ClassIdentifier(id);
-            else return new VariableIdentifier(id);
+            val id = parser.consume().value
+            return if (Character.isUpperCase(id[0])) ClassIdentifier(id) else VariableIdentifier(id)
         }
-        if (tokenType.equals(TokenTypes.NULL())) {
-            parser.consume();
-            return new NullLiteral();
+        if (tokenType == `null`) {
+            parser.consume()
+            return NullLiteral()
         }
-        if (tokenType.equals(TokenTypes.NUMBER())) return new NumberLiteral(parser.consume().getValue());
-        if (tokenType.equals(TokenTypes.STRING())) return new StringLiteral(ParsingHelper.parseString(context));
-        if (tokenType.equals(TokenTypes.BOOLEAN())) return new BooleanLiteral(Boolean.parseBoolean(parser.consume().getValue()));
-        if (tokenType.equals(TokenTypes.THIS())) {
-            parser.consume();
-            return new ThisLiteral();
+        if (tokenType == number) return NumberLiteral(parser.consume().value)
+        if (tokenType == string) return StringLiteral(ParsingHelper.parseString(context))
+        if (tokenType == boolean) return BooleanLiteral(parser.consume().value.toBoolean())
+        if (tokenType == `this`) {
+            parser.consume()
+            return ThisLiteral()
         }
-        if (tokenType.equals(TokenTypes.LEFT_PARENTHESIS())) {
-            parser.consume();
-            Expression value = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-            parser.consume(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected", "right_parenthesis"));
-            return value;
+        if (tokenType == leftParenthesis) {
+            parser.consume()
+            val value = parser.parse<Expression>(getDefaultIdentifier("expression"))
+            parser.consume(rightParenthesis, translatable("meazy:parser.expected", "right_parenthesis"))
+            return value
         }
 
-        throw new InvalidStatementException(token.getLine(), TextKt.translatable("meazy:parser.exception.cant_parse", tokenType.getId()));
+        throw InvalidStatementException(token.line, translatable("meazy:parser.exception.cant_parse", tokenType.id))
     }
 }
