@@ -32,11 +32,11 @@ public class ListCreationExpressionParsingFunction extends AbstractParsingFuncti
                 list.add(parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class));
 
                 if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) {
-                    parser.getCurrentAndNext(TokenTypes.COMMA(), TextKt.translatable("meazy:parser.expected.separator_expression", "comma", "list_creation"));
+                    parser.consume(TokenTypes.COMMA(), TextKt.translatable("meazy:parser.expected.separator_expression", "comma", "list_creation"));
                 }
             }
 
-            parser.getCurrentAndNext(TokenTypes.RIGHT_BRACKET(), TextKt.translatable("meazy:parser.expected.end_expression", "right_bracket", "list_creation"));
+            parser.consume(TokenTypes.RIGHT_BRACKET(), TextKt.translatable("meazy:parser.expected.end_expression", "right_bracket", "list_creation"));
 
             return new ListCreationExpression(list);
         }

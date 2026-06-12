@@ -23,7 +23,7 @@ public class ComparisonExpressionParsingFunction extends AbstractParsingFunction
         Expression left = parser.parseAfter(MeazyMain.getDefaultIdentifier("comparison_expression"), Expression.class);
 
         while (TokenTypeSets.INSTANCE.getComparison().contains(parser.getCurrent().getType())) {
-            String operator = parser.getCurrentAndNext().getValue();
+            String operator = parser.consume().getValue();
             Expression right = parser.parseAfter(MeazyMain.getDefaultIdentifier("comparison_expression"), Expression.class);
             left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
         }

@@ -1,33 +1,24 @@
-package me.itzisonn_.meazy.parser.pasing_function.expression;
+package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypeSets;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypeSets.addition
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-@NullMarked
-public class AdditionExpressionParsingFunction extends AbstractParsingFunction<Expression> {
-    public AdditionExpressionParsingFunction() {
-        super("addition_expression");
-    }
+class AdditionExpressionParsingFunction : AbstractParsingFunction<Expression>("addition_expression") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
+        val parser = context.parser
+        var left = parser.parseAfter<Expression>(getDefaultIdentifier("addition_expression"))
 
-    @Override
-    public Expression parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Expression left = parser.parseAfter(MeazyMain.getDefaultIdentifier("addition_expression"), Expression.class);
-
-        while (TokenTypeSets.INSTANCE.getAddition().contains(parser.getCurrent().getType())) {
-            String operator = parser.getCurrentAndNext().getValue();
-            Expression right = parser.parse(MeazyMain.getDefaultIdentifier("addition_expression"), Expression.class);
-            left = new OperatorExpression(left, right, operator, OperatorType.INFIX);
+        while (parser.current.type in addition) {
+            val operator = parser.consume().value
+            val right = parser.parse<Expression>(getDefaultIdentifier("addition_expression"))
+            left = OperatorExpression(left, right, operator, OperatorType.INFIX)
         }
 
-        return left;
+        return left
     }
 }

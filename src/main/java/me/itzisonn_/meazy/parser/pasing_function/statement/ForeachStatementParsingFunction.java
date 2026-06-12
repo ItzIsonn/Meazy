@@ -31,8 +31,8 @@ public class ForeachStatementParsingFunction extends AbstractParsingFunction<Sta
         parser.next(TokenTypes.FOR(), TextKt.translatable("meazy:parser.expected.keyword", "for"));
         parser.next(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start", "left_parenthesis", "for_condition"));
 
-        boolean isConstant = parser.getCurrentAndNext(TokenTypes.VARIABLE(), TextKt.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
+        boolean isConstant = parser.consume(TokenTypes.VARIABLE(), TextKt.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
+        String id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
 
         int lineNumber = parser.getCurrent().getLine();
         DataType dataType = ParsingHelper.parseDataType(context);

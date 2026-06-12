@@ -20,14 +20,14 @@ public class ImportStatementParsingFunction extends AbstractParsingFunction<Impo
         Parser parser = context.getParser();
         parser.next(TokenTypes.IMPORT(), TextKt.translatable("meazy:parser.expected.keyword", "import"));
 
-        StringBuilder name = new StringBuilder(parser.getCurrentAndNext(
+        StringBuilder name = new StringBuilder(parser.consume(
                 TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "import")).getValue()
         );
 
         while (parser.getCurrent().getType().equals(TokenTypes.DOT())) {
             parser.next();
             name.append(".");
-            name.append(parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue());
+            name.append(parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue());
         }
 
         return new ImportStatement(name.toString());

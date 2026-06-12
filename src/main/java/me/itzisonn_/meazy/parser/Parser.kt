@@ -91,7 +91,7 @@ class Parser(
      * Returns token at current position and increments position by 1\
      * @return Token at [pos] in tokens
      */
-    fun getCurrentAndNext(): Token {
+    fun consume(): Token {
         val token = current
         pos++
         return token
@@ -106,12 +106,12 @@ class Parser(
      *
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
-    fun getCurrentAndNext(tokenType: TokenType, text: Text): Token {
+    fun consume(tokenType: TokenType, text: Text): Token {
         if (current.type != tokenType) {
             throw UnexpectedTokenException(current.line, text)
         }
 
-        return getCurrentAndNext()
+        return consume()
     }
 
     /**
@@ -123,18 +123,18 @@ class Parser(
      *
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
-    fun getCurrentAndNext(tokenTypeSet: TokenTypeSet, text: Text): Token {
+    fun consume(tokenTypeSet: TokenTypeSet, text: Text): Token {
         if (current.type !in tokenTypeSet.getTokenTypes()) {
             throw UnexpectedTokenException(current.line, text)
         }
 
-        return getCurrentAndNext()
+        return consume()
     }
 
     /**
      * Skips all [TokenTypes.newLine] tokens
      */
-    fun moveOverOptionalNewLines() {
+    fun skipNewLines() {
         while (current.type == TokenTypes.newLine) pos++
     }
 
@@ -176,21 +176,6 @@ class Parser(
      * Executes ParsingFunction with given id
      * 
      * @param id    Id of ParsingFunction
-     * @param extra Extra info
-     * @return Parsed program unit
-     *
-     * @throws IllegalArgumentException When can't find ParsingFunction with given id
-     */
-    fun parse(id: RegistryIdentifier, vararg extra: Any?): ProgramUnit {
-        val parsingFunction = getParsingFunctionOrNull(id)
-        requireNotNull(parsingFunction) { "Can't find ParsingFunction with id $id" }
-        return parsingFunction.parse(context, *extra)
-    }
-
-    /**
-     * Executes ParsingFunction with given id
-     * 
-     * @param id    Id of ParsingFunction
      * @param cls   Required program unit's class
      * @param extra Extra info
      * @param T     Returned program unit's type
@@ -200,7 +185,9 @@ class Parser(
      * or return type of ParsingFunction doesn't match requested
      */
     fun <T : ProgramUnit> parse(id: RegistryIdentifier, cls: Class<T>, vararg extra: Any?): T {
-        val programUnit = parse(id, *extra)
+        val parsingFunction = getParsingFunctionOrNull(id)
+        requireNotNull(parsingFunction) { "Can't find ParsingFunction with id $id" }
+        val programUnit = parsingFunction.parse(context, *extra)
 
         require(cls.isInstance(programUnit)) {
             "Return type of ParsingFunction with id $id doesn't match requested (${cls.getName()})"
@@ -210,18 +197,18 @@ class Parser(
     }
 
     /**
-     * Executes ParsingFunction after ParsingFunction with given id
-     * 
+     * Executes ParsingFunction with given id
+     *
      * @param id    Id of ParsingFunction
      * @param extra Extra info
+     * @param T     Returned program unit's type
      * @return Parsed program unit
      *
      * @throws IllegalArgumentException When can't find ParsingFunction with given id
+     * or return type of ParsingFunction doesn't match requested
      */
-    fun parseAfter(id: RegistryIdentifier, vararg extra: Any?): ProgramUnit {
-        val parsingFunction = getParsingFunctionAfterOrNull(id)
-        requireNotNull(parsingFunction) { "Can't find ParsingFunction with id $id" }
-        return parsingFunction.parse(context, *extra)
+    inline fun <reified T : ProgramUnit> parse(id: RegistryIdentifier, vararg extra: Any?): T {
+        return parse(id, T::class.java, *extra)
     }
 
     /**
@@ -237,13 +224,30 @@ class Parser(
      * or return type of ParsingFunction doesn't match requested
      */
     fun <T : ProgramUnit> parseAfter(id: RegistryIdentifier, cls: Class<T>, vararg extra: Any?): T {
-        val programUnit = parseAfter(id, *extra)
+        val parsingFunction = getParsingFunctionAfterOrNull(id)
+        requireNotNull(parsingFunction) { "Can't find ParsingFunction with id $id" }
+        val programUnit = parsingFunction.parse(context, *extra)
 
         require(cls.isInstance(programUnit)) {
             "Return type of ParsingFunction with id $id doesn't match requested (${cls.getName()})"
         }
 
         return cls.cast(programUnit)
+    }
+
+    /**
+     * Executes ParsingFunction after ParsingFunction with given id
+     *
+     * @param id    Id of ParsingFunction
+     * @param extra Extra info
+     * @param T     Returned program unit's type
+     * @return Parsed program unit
+     *
+     * @throws IllegalArgumentException When can't find ParsingFunction with given id
+     * or return type of ParsingFunction doesn't match requested
+     */
+    inline fun <reified T : ProgramUnit> parseAfter(id: RegistryIdentifier, vararg extra: Any?): T {
+        return parseAfter(id, T::class.java, *extra)
     }
 
 

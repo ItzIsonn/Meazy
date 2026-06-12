@@ -33,7 +33,7 @@ public class AssignmentStatementParsingFunction extends AbstractParsingFunction<
             return new AssignmentStatement(left, value);
         }
         else if (TokenTypeSets.INSTANCE.getOperatorAssign().contains(parser.getCurrent().getType())) {
-            Token token = parser.getCurrentAndNext();
+            Token token = parser.consume();
 
             Expression value = new OperatorExpression(
                     left,

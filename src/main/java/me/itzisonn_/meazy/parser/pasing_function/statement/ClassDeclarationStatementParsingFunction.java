@@ -45,8 +45,8 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
         Parser parser = context.getParser();
         Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
 
-        parser.getCurrentAndNext(TokenTypes.CLASS(), TextKt.translatable("meazy:parser.expected.keyword", "class"));
-        String id = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "class")).getValue();
+        parser.consume(TokenTypes.CLASS(), TextKt.translatable("meazy:parser.expected.keyword", "class"));
+        String id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "class")).getValue();
 
         List<Statement> generatedBody = new ArrayList<>();
         if (modifiers.contains(Modifiers.INSTANCE.getData())) {
@@ -61,7 +61,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             baseClassesLineNumber = parser.getCurrent().getLine();
             do {
                 parser.next();
-                baseClasses.add(parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue());
+                baseClasses.add(parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue());
             }
             while (parser.getCurrent().getType().equals(TokenTypes.COMMA()));
         }
@@ -77,14 +77,14 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
             return new ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody);
         }
 
-        parser.getCurrentAndNext(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
-        parser.moveOverOptionalNewLines();
+        parser.consume(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
+        parser.skipNewLines();
 
         LinkedHashMap<String, List<Expression>> enumIds = new LinkedHashMap<>();
         if (modifiers.contains(Modifiers.INSTANCE.getEnum())) {
             if (!baseClasses.isEmpty()) throw new InvalidSyntaxException(baseClassesLineNumber, TextKt.translatable("meazy:parser.exception.enums.base_classes"));
 
-            String enumId = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
+            String enumId = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
             List<Expression> args;
             if (parser.getCurrent().getType().equals(TokenTypes.LEFT_PARENTHESIS())) args = ParsingHelper.parseArgs(context);
             else args = new ArrayList<>();
@@ -92,10 +92,10 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
 
             while (parser.getCurrent().getType().equals(TokenTypes.COMMA())) {
                 parser.next();
-                parser.moveOverOptionalNewLines();
+                parser.skipNewLines();
 
                 int lineNumber = parser.getCurrent().getLine();
-                enumId = parser.getCurrentAndNext(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
+                enumId = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
                 if (enumIds.containsKey(enumId)) throw new InvalidSyntaxException(lineNumber, TextKt.translatable("meazy:parser.exception.enums.duplicated_entries"));
 
                 if (parser.getCurrent().getType().equals(TokenTypes.LEFT_PARENTHESIS())) args = ParsingHelper.parseArgs(context);
@@ -103,7 +103,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 enumIds.put(enumId, args);
             }
 
-            parser.moveOverOptionalNewLines();
+            parser.skipNewLines();
         }
 
         List<Statement> body = new ArrayList<>(generatedBody);
@@ -122,7 +122,7 @@ public class ClassDeclarationStatementParsingFunction extends AbstractParsingFun
                 }
             }
 
-            parser.moveOverOptionalNewLines();
+            parser.skipNewLines();
         }
 
         parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "class_body"));

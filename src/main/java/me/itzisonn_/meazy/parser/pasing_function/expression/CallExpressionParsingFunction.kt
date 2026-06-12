@@ -1,42 +1,33 @@
-package me.itzisonn_.meazy.parser.pasing_function.expression;
+package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier;
-import me.itzisonn_.meazy.parser.InvalidSyntaxException;
-import me.itzisonn_.meazy.parser.ast.expression.CallExpression;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.LEFT_PARENTHESIS
+import me.itzisonn_.meazy.parser.InvalidSyntaxException
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.CallExpression
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.List;
+class CallExpressionParsingFunction : AbstractParsingFunction<Expression>("call_expression") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
+        val parser = context.parser
+        val expression = parser.parseAfter<Expression>(getDefaultIdentifier("call_expression"))
 
-@NullMarked
-public class CallExpressionParsingFunction extends AbstractParsingFunction<Expression> {
-    public CallExpressionParsingFunction() {
-        super("call_expression");
-    }
-
-    @Override
-    public Expression parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-
-        Expression expression = parser.parseAfter(MeazyMain.getDefaultIdentifier("call_expression"), Expression.class);
-
-        if (parser.getCurrent().getType().equals(TokenTypes.LEFT_PARENTHESIS())) {
-            if (!(expression instanceof Identifier identifier)) {
-                throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.call_not_identifier"));
+        if (parser.current.type == LEFT_PARENTHESIS()) {
+            if (expression !is Identifier) {
+                throw InvalidSyntaxException(
+                    parser.current.line,
+                    translatable("meazy:parser.exception.call_not_identifier")
+                )
             }
 
-            List<Expression> args = ParsingHelper.parseArgs(context);
-            return new CallExpression(identifier, args);
+            val args = ParsingHelper.parseArgs(context)
+            return CallExpression(expression, args)
         }
 
-        return expression;
+        return expression
     }
 }
