@@ -1,67 +1,57 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
+import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
 
-@NullMarked
-public class SubtractionOperator extends Operator {
-    public SubtractionOperator() {
-        super("subtraction", "-", OperatorType.INFIX);
-    }
+class SubtractionOperator : Operator("subtraction", "-", OperatorType.INFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
-
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't subtract " + leftType + " and " + rightType); //TODO
+            error("Can't subtract $leftType and $rightType") //TODO
         }
 
-        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't subtract nullable numbers");
-        NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
+        if (leftType.isNullable || rightType.isNullable) error("Can't subtract nullable numbers")
+        val commonNumberType = getCommonUnboxed(leftNumberType, rightNumberType)
 
-        left.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(leftNumberType, commonNumberType);
+        left.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(leftNumberType, commonNumberType)
 
-        right.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(rightNumberType, commonNumberType);
+        right.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(rightNumberType, commonNumberType)
 
-        instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.SUBTRACTION);
+        instructions.arithmeticOperation(commonNumberType, ArithmeticOperation.SUBTRACTION)
     }
 
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't get type to subtract " + leftType + " and " + rightType); //TODO
+            error("Can't get type to subtract $leftType and $rightType") //TODO
         }
 
-        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't subtract nullable numbers");
-        return DataType.Companion.ofNonNull(NumberType.getCommonUnboxed(leftNumberType, rightNumberType).classDesc);
+        if (leftType.isNullable || rightType.isNullable) error("Can't subtract nullable numbers")
+        return DataType.ofNonNull(getCommonUnboxed(leftNumberType, rightNumberType).classDesc)
     }
 }

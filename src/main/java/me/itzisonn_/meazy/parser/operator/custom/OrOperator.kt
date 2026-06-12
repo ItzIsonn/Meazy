@@ -1,47 +1,36 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.number.LogicalOperationInstruction.LogicalOperation;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.util.MiscUtils;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.number.LogicalOperationInstruction.LogicalOperation
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.util.MiscUtils.isBoolean
+import java.lang.constant.ConstantDescs
 
-import java.lang.constant.ConstantDescs;
+class OrOperator : Operator("or", "||", OperatorType.INFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-@NullMarked
-public class OrOperator extends Operator {
-    public OrOperator() {
-        super("or", "||", OperatorType.INFIX);
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
+
+        if (!isBoolean(leftType.classDesc) || !isBoolean(rightType.classDesc)) error("Invalid operands TODO")
+        if (leftType.isNullable || rightType.isNullable) error("Can't get logical or of nullable booleans")
+
+        left.emit(instructions, environment, operatorExpression)
+        instructions.convertToBooleanType(leftType.classDesc == ConstantDescs.CD_Boolean, false)
+
+        right.emit(instructions, environment, operatorExpression)
+        instructions.convertToBooleanType(rightType.classDesc == ConstantDescs.CD_Boolean, false)
+
+        instructions.logicalOperation(LogicalOperation.OR)
     }
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
-
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
-
-        if (!MiscUtils.isBoolean(leftType.getClassDesc()) || !MiscUtils.isBoolean(rightType.getClassDesc())) throw new RuntimeException("Invalid operands TODO");
-        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't get logical or of nullable booleans");
-
-        left.emit(instructions, environment, operatorExpression);
-        instructions.convertToBooleanType(leftType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
-
-        right.emit(instructions, environment, operatorExpression);
-        instructions.convertToBooleanType(rightType.getClassDesc().equals(ConstantDescs.CD_Boolean), false);
-
-        instructions.logicalOperation(LogicalOperation.OR);
-    }
-
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        return DataType.Companion.ofNonNull(ConstantDescs.CD_boolean);
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        return DataType.ofNonNull(ConstantDescs.CD_boolean)
     }
 }

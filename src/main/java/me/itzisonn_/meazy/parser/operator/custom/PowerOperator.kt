@@ -1,59 +1,49 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import kotlin.Unit;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
-
-import java.lang.constant.ClassDesc;
-import java.lang.constant.ConstantDescs;
-import java.lang.constant.MethodTypeDesc;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.NumberType
+import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
+import org.jspecify.annotations.NullMarked
+import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
 
 @NullMarked
-public class PowerOperator extends Operator {
-    public PowerOperator() {
-        super("power", "^", OperatorType.INFIX);
-    }
+class PowerOperator : Operator("power", "^", OperatorType.INFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
-
-        if (leftNumberType == null || rightNumberType == null) throw new RuntimeException("Can't raise to a power types " + leftType + " and " + rightType); //TODO
-        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't rais to a power nullable numbers");
-
-        left.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(leftNumberType, NumberType.DOUBLE);
-
-        right.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(rightNumberType, NumberType.DOUBLE);
+        if (leftNumberType == null || rightNumberType == null) error("Can't raise to a power types $leftType and $rightType") //TODO
+        if (leftType.isNullable || rightType.isNullable) error("Can't rais to a power nullable numbers")
 
         instructions.invokeMethod(
-                ClassDesc.of("java.lang.Math"),
-                "pow",
-                MethodTypeDesc.of(ConstantDescs.CD_double, ConstantDescs.CD_double, ConstantDescs.CD_double),
-                InvokeType.STATIC,
-                _ -> Unit.INSTANCE
-        );
+            ClassDesc.of("java.lang.Math"),
+            "pow",
+            MethodTypeDesc.of(ConstantDescs.CD_double, ConstantDescs.CD_double, ConstantDescs.CD_double),
+            InvokeType.STATIC
+        ) {
+            left.emit(this, environment, operatorExpression)
+            convertToNumberType(leftNumberType, NumberType.DOUBLE)
+
+            right.emit(this, environment, operatorExpression)
+            convertToNumberType(rightNumberType, NumberType.DOUBLE)
+        }
     }
 
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        return DataType.Companion.ofNonNull(ConstantDescs.CD_double);
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        return DataType.ofNonNull(ConstantDescs.CD_double)
     }
 }

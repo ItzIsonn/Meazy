@@ -1,149 +1,133 @@
-package me.itzisonn_.meazy.parser.operator;
+package me.itzisonn_.meazy.parser.operator
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.registry.Registries;
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.operator.custom.*;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.registry.RegistryEntry;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
-import java.util.UUID;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
+import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.custom.*
+import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.runtime.environment.Environment
 
 /**
  * Operators registrar
- * @see Registries#OPERATORS
+ * @see Registries.OPERATORS
  */
-public final class Operators {
-    private static boolean hasRegistered = false;
+object Operators {
+    private var hasRegistered = false
 
-    private Operators() {}
-
-
-
-    public static Operator POWER() {
-        return parseById("power");
-    }
-
-    public static Operator NEGATION() {
-        return parseById("negation");
-    }
-
-    public static Operator INVERSION() {
-        return parseById("inversion");
-    }
+    val power get() = parseById("power")!!
+    val negation get() = parseById("negation")!!
+    val inversion get() = parseById("inversion")!!
 
 
 
     /**
      * Finds registered Operator with given symbol and given type
-     *
+     * 
      * @param symbol Operator's symbol
      * @param operatorType Operator's type or null if any
      * @return Operator with given symbol or null
      */
-    @Nullable
-    public static Operator parse(@NonNull String symbol, @Nullable OperatorType operatorType) {
-        for (RegistryEntry<Operator> entry : Registries.OPERATORS.getEntries()) {
-            Operator operator = entry.getValue();
-            if (symbol.equals(operator.getSymbol()) && (operatorType == null || operator.getOperatorType() == operatorType)) return operator;
+    fun parse(symbol: String, operatorType: OperatorType?): Operator? {
+        for (entry in Registries.OPERATORS.entries) {
+            val operator = entry.getValue()
+            if (symbol == operator.symbol && (operatorType == null || operator.operatorType == operatorType)) return operator
         }
 
-        return null;
+        return null
     }
 
     /**
      * Finds registered Operator with given id
-     *
+     * 
      * @param id Operator's id
      * @return Operator with given id or null
      */
-    @Nullable
-    public static Operator parseById(@NonNull String id) {
-        for (RegistryEntry<Operator> entry : Registries.OPERATORS.getEntries()) {
-            Operator operator = entry.getValue();
-            if (operator.getId().equals(id)) return operator;
+    fun parseById(id: String): Operator? {
+        for (entry in Registries.OPERATORS.entries) {
+            val operator = entry.getValue()
+            if (operator.id == id) return operator
         }
 
-        return null;
+        return null
     }
 
 
 
     /**
-     * Initializes {@link Registries#OPERATORS} registry
-     * <p>
-     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
+     * Initializes [Registries.OPERATORS] registry
      *
-     * @throws IllegalStateException If {@link Registries#OPERATORS} registry has already been initialized
+     * *Don't use this method because it's called once at [Registries] initialization*
+     * 
+     * @throws IllegalStateException If [Registries.OPERATORS] registry has already been initialized
      */
-    public static void REGISTER() {
-        if (hasRegistered) throw new IllegalStateException("Operators have already been initialized");
-        hasRegistered = true;
+    fun register() {
+        check(!hasRegistered) { "Operators have already been initialized" }
+        hasRegistered = true
 
-        register(new AdditionOperator());
-        register(new SubtractionOperator());
-        register(new MultiplicationOperator());
-        register(new DivisionOperator());
-        register(new RemainderOperator());
-        register(new PowerOperator());
-        register(new NegationOperator());
+        register(AdditionOperator())
+        register(SubtractionOperator())
+        register(MultiplicationOperator())
+        register(DivisionOperator())
+        register(RemainderOperator())
+        register(PowerOperator())
+        register(NegationOperator())
 
-        register(new AndOperator());
-        register(new OrOperator());
-        register(new InversionOperator());
-        register(new EqualsOperator());
-        register(new NotEqualsOperator());
-        register(new GreaterOperator());
-        register(new GreaterOrEqualsOperator());
-        register(new LessOperator());
-        register(new LessOrEqualsOperator());
+        register(AndOperator())
+        register(OrOperator())
+        register(InversionOperator())
+        register(EqualsOperator())
+        register(NotEqualsOperator())
+        register(GreaterOperator())
+        register(GreaterOrEqualsOperator())
+        register(LessOperator())
+        register(LessOrEqualsOperator())
     }
 
-    private static void register(Operator operator) {
-        Registries.OPERATORS.register(MeazyMain.getDefaultIdentifier(operator.getId()), operator);
+    private fun register(operator: Operator) {
+        Registries.OPERATORS.register(getDefaultIdentifier(operator.id), operator)
     }
 
-    public static void produceCompare(InstructionsSet instructionsSet, Environment environment, OperatorExpression operatorExpression, ComparisonOperation operation) {
-        Expression left = operatorExpression.getLeft();
-        Expression right = operatorExpression.getRight();
-        if (right == null) throw new NullPointerException("Right side of operator expression is null");
 
-        DataType leftType = left.getType(environment, operatorExpression);
-        DataType rightType = right.getType(environment, operatorExpression);
 
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        NumberType rightNumberType = NumberType.valueOf(rightType.getClassDesc());
+    fun produceCompare(
+        instructionsSet: InstructionsSet, environment: Environment,
+        operatorExpression: OperatorExpression, operation: ComparisonOperation
+    ) {
+        val left = operatorExpression.left
+        val right = operatorExpression.right ?: error("Right side of operator expression is null")
+
+        val leftType = left.getType(environment, operatorExpression)
+        val rightType = right.getType(environment, operatorExpression)
+
+        val leftNumberType = valueOf(leftType.classDesc)
+        val rightNumberType = valueOf(rightType.classDesc)
 
         if (leftNumberType == null || rightNumberType == null) {
-            throw new RuntimeException("Can't compare values " + leftType + " and " + rightType); //TODO
+            error("Can't compare values $leftType and $rightType") //TODO
         }
 
-        if (leftType.isNullable() || rightType.isNullable()) throw new RuntimeException("Can't compare nullable numbers");
-        NumberType commonNumberType = NumberType.getCommonUnboxed(leftNumberType, rightNumberType);
+        if (leftType.isNullable || rightType.isNullable) error("Can't compare nullable numbers")
+        val commonNumberType = getCommonUnboxed(leftNumberType, rightNumberType)
 
-        var trueLabel = instructionsSet.createAndInitLabel();
-        var endLabel = instructionsSet.createAndInitLabel();
+        val trueLabel = instructionsSet.createAndInitLabel()
+        val endLabel = instructionsSet.createAndInitLabel()
 
-        left.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(leftNumberType, commonNumberType);
+        left.emit(instructionsSet, environment, operatorExpression)
+        instructionsSet.convertToNumberType(leftNumberType, commonNumberType)
 
-        right.emit(instructionsSet, environment, operatorExpression);
-        instructionsSet.convertToNumberType(rightNumberType, commonNumberType);
+        right.emit(instructionsSet, environment, operatorExpression)
+        instructionsSet.convertToNumberType(rightNumberType, commonNumberType)
 
-        instructionsSet.gotoLabelIfComparisonTrue(commonNumberType, operation, trueLabel);
-        instructionsSet.loadConstant(0);
-        instructionsSet.gotoLabel(endLabel);
+        instructionsSet.gotoLabelIfComparisonTrue(commonNumberType, operation, trueLabel)
+        instructionsSet.loadConstant(0)
+        instructionsSet.gotoLabel(endLabel)
 
-        instructionsSet.bindLabel(trueLabel);
-        instructionsSet.loadConstant(1);
+        instructionsSet.bindLabel(trueLabel)
+        instructionsSet.loadConstant(1)
 
-        instructionsSet.bindLabel(endLabel);
+        instructionsSet.bindLabel(endLabel)
     }
 }

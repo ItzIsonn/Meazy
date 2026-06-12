@@ -24,7 +24,7 @@ public class InversionExpressionParsingFunction extends AbstractParsingFunction<
         if (parser.getCurrent().getType().equals(TokenTypes.INVERSION())) {
             parser.next();
             Expression expression = parser.parseAfter(MeazyMain.getDefaultIdentifier("inversion_expression"), Expression.class);
-            return new OperatorExpression(expression, null, Operators.INVERSION());
+            return new OperatorExpression(expression, null, Operators.INSTANCE.getInversion());
         }
 
         return parser.parseAfter(MeazyMain.getDefaultIdentifier("inversion_expression"), Expression.class);

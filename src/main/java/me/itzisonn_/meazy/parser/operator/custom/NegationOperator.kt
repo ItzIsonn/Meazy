@@ -1,44 +1,34 @@
-package me.itzisonn_.meazy.parser.operator.custom;
+package me.itzisonn_.meazy.parser.operator.custom
 
-import me.itzisonn_.meazy.instruction.InstructionsSet;
-import me.itzisonn_.meazy.instruction.NumberType;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.operator.Operator;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.runtime.environment.Environment;
-import org.jspecify.annotations.NullMarked;
+import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.parser.DataType.Companion.ofNonNull
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.operator.Operator
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.environment.Environment
 
-@NullMarked
-public class NegationOperator extends Operator {
-    public NegationOperator() {
-        super("negation", "-", OperatorType.PREFIX);
+class NegationOperator : Operator("negation", "-", OperatorType.PREFIX) {
+    override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
+        val left = operatorExpression.left
+        val leftType = left.getType(environment, operatorExpression)
+
+        val leftNumberType = valueOf(leftType.classDesc) ?: error("Can't negate non-number value")
+        if (leftType.isNullable) error("Can't negate nullable number")
+
+        left.emit(instructions, environment, operatorExpression)
+        instructions.convertToNumberType(leftNumberType, leftNumberType.unbox())
+        instructions.negateNumber(leftNumberType)
     }
 
-    @Override
-    public void emit(InstructionsSet instructions, Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        DataType leftType = left.getType(environment, operatorExpression);
+    override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
+        val left = operatorExpression.left
+        val leftType = left.getType(environment, operatorExpression)
 
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        if (leftNumberType == null) throw new RuntimeException("Can't negate non-number value");
-        if (leftType.isNullable()) throw new RuntimeException("Can't negate nullable number");
+        val leftNumberType = valueOf(leftType.classDesc) ?: error("Can't negate non-number value")
+        if (leftType.isNullable) error("Can't negate nullable number")
 
-        left.emit(instructions, environment, operatorExpression);
-        instructions.convertToNumberType(leftNumberType, leftNumberType.unbox());
-        instructions.negateNumber(leftNumberType);
-    }
-
-    @Override
-    public DataType getType(Environment environment, OperatorExpression operatorExpression) {
-        Expression left = operatorExpression.getLeft();
-        DataType leftType = left.getType(environment, operatorExpression);
-
-        NumberType leftNumberType = NumberType.valueOf(leftType.getClassDesc());
-        if (leftNumberType == null) throw new RuntimeException("Can't negate non-number value");
-        if (leftType.isNullable()) throw new RuntimeException("Can't negate nullable number");
-
-        return DataType.Companion.ofNonNull(leftNumberType.unbox().classDesc);
+        return ofNonNull(leftNumberType.unbox().classDesc)
     }
 }
