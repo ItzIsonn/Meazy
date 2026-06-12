@@ -12,6 +12,7 @@ import me.itzisonn_.meazy.parser.ast.statement.Program
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions
 import me.itzisonn_.meazy.registry.Registries.PARSING_FUNCTIONS
 import me.itzisonn_.meazy.registry.Registries.TOKEN_TYPES
@@ -86,7 +87,7 @@ object Registries {
     /**
      * Registry for all ParsingFunctions
      * 
-     * @see ParsingFunction
+     * @see me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
      * @see Parser
      */
     @JvmField
@@ -136,7 +137,7 @@ object Registries {
         TokenTypes.register()
         Modifiers.register()
         Operators.register()
-        ParsingFunctions.REGISTER()
+        ParsingFunctions.register()
 
         tokenizationFunction = { lines ->
             val tokens = mutableListOf<Token>()

@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.lexer.TokenTypeSet
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.NEW_LINE
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.text.Text
 import me.itzisonn_.registry.RegistryIdentifier

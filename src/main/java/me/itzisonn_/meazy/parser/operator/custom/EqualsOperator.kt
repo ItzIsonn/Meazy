@@ -6,13 +6,13 @@ import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operator
 import me.itzisonn_.meazy.parser.operator.OperatorType
-import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.parser.operator.compare
 import me.itzisonn_.meazy.runtime.environment.Environment
 import java.lang.constant.ConstantDescs
 
 class EqualsOperator : Operator("equals", "==", OperatorType.INFIX) {
     override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
-        Operators.produceCompare(instructions, environment, operatorExpression, ComparisonOperation.EQUALS)
+        instructions.compare(environment, operatorExpression, ComparisonOperation.EQUALS)
     }
 
     override fun getType(environment: Environment, operatorExpression: OperatorExpression): DataType {
