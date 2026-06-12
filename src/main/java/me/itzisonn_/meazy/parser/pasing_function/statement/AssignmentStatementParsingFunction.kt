@@ -1,49 +1,39 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypeSets;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.UnexpectedTokenException;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorAssign
+import me.itzisonn_.meazy.lexer.TokenTypes.assign
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.UnexpectedTokenException
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.text.translatable
 
-@NullMarked
-public class AssignmentStatementParsingFunction extends AbstractParsingFunction<AssignmentStatement> {
-    public AssignmentStatementParsingFunction() {
-        super("assignment_statement");
-    }
+class AssignmentStatementParsingFunction : AbstractParsingFunction<AssignmentStatement>("assignment_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): AssignmentStatement {
+        val parser = context.parser
+        val left = parser.parse<Expression>(getDefaultIdentifier("expression"))
 
-    @Override
-    public AssignmentStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Expression left = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-
-        if (parser.getCurrent().getType().equals(TokenTypes.ASSIGN())) {
-            parser.next();
-            Expression value = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-            return new AssignmentStatement(left, value);
+        if (parser.current.type == assign) {
+            parser.next()
+            val value = parser.parse<Expression>(getDefaultIdentifier("expression"))
+            return AssignmentStatement(left, value)
         }
-        else if (TokenTypeSets.INSTANCE.getOperatorAssign().contains(parser.getCurrent().getType())) {
-            Token token = parser.consume();
+        else if (parser.current.type in operatorAssign) {
+            val token = parser.consume()
 
-            Expression value = new OperatorExpression(
-                    left,
-                    parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class),
-                    token.getValue().replaceAll("=$", ""), OperatorType.INFIX
-            );
+            val value: Expression = OperatorExpression(
+                left,
+                parser.parse<Expression>(getDefaultIdentifier("expression")),
+                token.value.replace("=$".toRegex(), ""), OperatorType.INFIX
+            )
 
-            return new AssignmentStatement(left, value);
+            return AssignmentStatement(left, value)
         }
 
-        throw new UnexpectedTokenException(parser.getCurrent().getLine(), TextKt.literal("Expected assign operators")); //TODO
+        throw UnexpectedTokenException(parser.current.line, translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
     }
 }
