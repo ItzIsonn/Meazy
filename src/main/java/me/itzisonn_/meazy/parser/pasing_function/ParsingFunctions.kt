@@ -1,77 +1,72 @@
-package me.itzisonn_.meazy.parser.pasing_function;
+package me.itzisonn_.meazy.parser.pasing_function
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.parser.ast.ProgramUnit;
-import me.itzisonn_.meazy.parser.pasing_function.expression.*;
-import me.itzisonn_.meazy.parser.pasing_function.statement.*;
-import me.itzisonn_.meazy.registry.Registries;
-import org.jspecify.annotations.NonNull;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.pasing_function.expression.*
+import me.itzisonn_.meazy.parser.pasing_function.statement.*
+import me.itzisonn_.meazy.registry.Registries
 
 /**
  * Parsing functions registrar
- *
- * @see Registries#PARSING_FUNCTIONS
+ * 
+ * @see Registries.PARSING_FUNCTIONS
  */
-public final class ParsingFunctions {
-    private static boolean hasRegistered = false;
-
-    private ParsingFunctions() {}
-
-
+object ParsingFunctions {
+    private var hasRegistered = false
 
     /**
-     * Initializes {@link Registries#PARSING_FUNCTIONS} registry
-     * <p>
-     * <i>Don't use this method because it's called once at {@link Registries} initialization</i>
+     * Initializes [Registries.PARSING_FUNCTIONS] registry
      *
-     * @throws IllegalStateException If {@link Registries#PARSING_FUNCTIONS} registry has already been initialized
+     * *Don't use this method because it's called once at [Registries] initialization*
+     * 
+     * @throws IllegalStateException If [Registries.PARSING_FUNCTIONS] registry has already been initialized
      */
-    public static void REGISTER() {
-        if (hasRegistered) throw new IllegalStateException("ParsingFunctions have already been initialized");
-        hasRegistered = true;
+    fun register() {
+        check(!hasRegistered) { "ParsingFunctions have already been initialized" }
+        hasRegistered = true
 
-        register(new ProgramParsingFunction());
+        register(ProgramParsingFunction())
 
-        register(new HeaderStatementParsingFunction());
-        register(new ImportStatementParsingFunction());
+        register(HeaderStatementParsingFunction())
+        register(ImportStatementParsingFunction())
 
-        register(new GlobalStatementParsingFunction());
-        register(new ClassDeclarationStatementParsingFunction());
-        register(new ClassBodyStatementParsingFunction());
-        register(new InterfaceDeclarationStatementParsingFunction());
-        register(new InterfaceBodyStatementParsingFunction());
-        register(new FunctionDeclarationStatementParsingFunction());
-        register(new VariableDeclarationStatementParsingFunction());
-        register(new ConstructorDeclarationStatementParsingFunction());
-        register(new BaseCallStatementParsingFunction());
-        register(new LocalStatementParsingFunction());
-        register(new IfStatementParsingFunction());
-        register(new ForeachStatementParsingFunction());
-        register(new WhileStatementParsingFunction());
-        register(new ReturnStatementParsingFunction());
-        register(new ContinueStatementParsingFunction());
-        register(new BreakStatementParsingFunction());
-        register(new AssignmentStatementParsingFunction());
-        register(new PostfixStatementParsingFunction());
+        register(GlobalStatementParsingFunction())
+        register(ClassDeclarationStatementParsingFunction())
+        register(ClassBodyStatementParsingFunction())
+        register(InterfaceDeclarationStatementParsingFunction())
+        register(InterfaceBodyStatementParsingFunction())
+        register(FunctionDeclarationStatementParsingFunction())
+        register(VariableDeclarationStatementParsingFunction())
+        register(ConstructorDeclarationStatementParsingFunction())
+        register(BaseCallStatementParsingFunction())
+        register(LocalStatementParsingFunction())
+        register(IfStatementParsingFunction())
+        register(ForeachStatementParsingFunction())
+        register(WhileStatementParsingFunction())
+        register(ReturnStatementParsingFunction())
+        register(ContinueStatementParsingFunction())
+        register(BreakStatementParsingFunction())
+        register(AssignmentStatementParsingFunction())
+        register(PostfixStatementParsingFunction())
 
-        register(new ExpressionParsingFunction());
-        register(new ListCreationExpressionParsingFunction());
-        register(new MapCreationExpressionParsingFunction());
-        register(new NullCheckExpressionParsingFunction());
-        register(new LogicalExpressionParsingFunction());
-        register(new ComparisonExpressionParsingFunction());
-        register(new AdditionExpressionParsingFunction());
-        register(new MultiplicationExpressionParsingFunction());
-        register(new PowerExpressionParsingFunction());
-        register(new InversionExpressionParsingFunction());
-        register(new IsExpressionParsingFunction());
-        register(new NegationExpressionParsingFunction());
-        register(new MemberExpressionParsingFunction());
-        register(new CallExpressionParsingFunction());
-        register(new PrimaryExpressionParsingFunction());
+        register(ExpressionParsingFunction())
+        register(ListCreationExpressionParsingFunction())
+        register(MapCreationExpressionParsingFunction())
+        register(NullCheckExpressionParsingFunction())
+        register(LogicalExpressionParsingFunction())
+        register(ComparisonExpressionParsingFunction())
+        register(AdditionExpressionParsingFunction())
+        register(MultiplicationExpressionParsingFunction())
+        register(PowerExpressionParsingFunction())
+        register(InversionExpressionParsingFunction())
+        register(IsExpressionParsingFunction())
+        register(NegationExpressionParsingFunction())
+        register(MemberExpressionParsingFunction())
+        register(CallExpressionParsingFunction())
+        register(PrimaryExpressionParsingFunction())
     }
 
-    private static void register(AbstractParsingFunction<? extends @NonNull ProgramUnit> parsingFunction) {
-        Registries.PARSING_FUNCTIONS.register(MeazyMain.getDefaultIdentifier(parsingFunction.getId()), parsingFunction);
+    private fun register(parsingFunction: AbstractParsingFunction<out ProgramUnit>) {
+        Registries.PARSING_FUNCTIONS.register(getDefaultIdentifier(parsingFunction.id), parsingFunction)
     }
 }

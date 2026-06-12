@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.text.TextException
 import me.itzisonn_.meazy.text.translatable
 
 /**
- * Is thrown when [ParsingFunction] meets unexpected token
+ * Is thrown when [me.itzisonn_.meazy.parser.pasing_function.ParsingFunction] meets unexpected token
  *
  * @param lineNumber Line number
  * @param text Text

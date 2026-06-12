@@ -89,45 +89,44 @@ object Operators {
     private fun register(operator: Operator) {
         Registries.OPERATORS.register(getDefaultIdentifier(operator.id), operator)
     }
+}
 
 
 
-    fun produceCompare(
-        instructionsSet: InstructionsSet, environment: Environment,
-        operatorExpression: OperatorExpression, operation: ComparisonOperation
-    ) {
-        val left = operatorExpression.left
-        val right = operatorExpression.right ?: error("Right side of operator expression is null")
+fun InstructionsSet.compare(
+    environment: Environment, operatorExpression: OperatorExpression, operation: ComparisonOperation
+) {
+    val left = operatorExpression.left
+    val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-        val leftType = left.getType(environment, operatorExpression)
-        val rightType = right.getType(environment, operatorExpression)
+    val leftType = left.getType(environment, operatorExpression)
+    val rightType = right.getType(environment, operatorExpression)
 
-        val leftNumberType = valueOf(leftType.classDesc)
-        val rightNumberType = valueOf(rightType.classDesc)
+    val leftNumberType = valueOf(leftType.classDesc)
+    val rightNumberType = valueOf(rightType.classDesc)
 
-        if (leftNumberType == null || rightNumberType == null) {
-            error("Can't compare values $leftType and $rightType") //TODO
-        }
-
-        if (leftType.isNullable || rightType.isNullable) error("Can't compare nullable numbers")
-        val commonNumberType = getCommonUnboxed(leftNumberType, rightNumberType)
-
-        val trueLabel = instructionsSet.createAndInitLabel()
-        val endLabel = instructionsSet.createAndInitLabel()
-
-        left.emit(instructionsSet, environment, operatorExpression)
-        instructionsSet.convertToNumberType(leftNumberType, commonNumberType)
-
-        right.emit(instructionsSet, environment, operatorExpression)
-        instructionsSet.convertToNumberType(rightNumberType, commonNumberType)
-
-        instructionsSet.gotoLabelIfComparisonTrue(commonNumberType, operation, trueLabel)
-        instructionsSet.loadConstant(0)
-        instructionsSet.gotoLabel(endLabel)
-
-        instructionsSet.bindLabel(trueLabel)
-        instructionsSet.loadConstant(1)
-
-        instructionsSet.bindLabel(endLabel)
+    if (leftNumberType == null || rightNumberType == null) {
+        error("Can't compare values $leftType and $rightType") //TODO
     }
+
+    if (leftType.isNullable || rightType.isNullable) error("Can't compare nullable numbers")
+    val commonNumberType = getCommonUnboxed(leftNumberType, rightNumberType)
+
+    val trueLabel = createAndInitLabel()
+    val endLabel = createAndInitLabel()
+
+    left.emit(this, environment, operatorExpression)
+    convertToNumberType(leftNumberType, commonNumberType)
+
+    right.emit(this, environment, operatorExpression)
+    convertToNumberType(rightNumberType, commonNumberType)
+
+    gotoLabelIfComparisonTrue(commonNumberType, operation, trueLabel)
+    loadConstant(0)
+    gotoLabel(endLabel)
+
+    bindLabel(trueLabel)
+    loadConstant(1)
+
+    bindLabel(endLabel)
 }
