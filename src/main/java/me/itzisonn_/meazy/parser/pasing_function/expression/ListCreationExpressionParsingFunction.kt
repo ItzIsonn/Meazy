@@ -1,46 +1,42 @@
-package me.itzisonn_.meazy.parser.pasing_function.expression;
+package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreationExpression;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.comma
+import me.itzisonn_.meazy.lexer.TokenTypes.leftBracket
+import me.itzisonn_.meazy.lexer.TokenTypes.rightBracket
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreationExpression
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.ArrayList;
-import java.util.List;
+class ListCreationExpressionParsingFunction : AbstractParsingFunction<Expression>("list_creation_expression") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
+        val parser = context.parser
 
-@NullMarked
-public class ListCreationExpressionParsingFunction extends AbstractParsingFunction<Expression> {
-    public ListCreationExpressionParsingFunction() {
-        super("list_creation_expression");
-    }
+        if (parser.current.type == leftBracket) {
+            parser.next()
+            val list = mutableListOf<Expression>()
 
-    @Override
-    public Expression parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
+            while (parser.current.type != rightBracket) {
+                list.add(parser.parse<Expression>(getDefaultIdentifier("expression")))
 
-        if (parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACKET())) {
-            parser.next();
-            List<Expression> list = new ArrayList<>();
-
-            while (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) {
-                list.add(parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class));
-
-                if (!parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACKET())) {
-                    parser.consume(TokenTypes.COMMA(), TextKt.translatable("meazy:parser.expected.separator_expression", "comma", "list_creation"));
+                if (parser.current.type != rightBracket) {
+                    parser.consume(
+                        comma,
+                        translatable("meazy:parser.expected.separator_expression", "comma", "list_creation")
+                    )
                 }
             }
 
-            parser.consume(TokenTypes.RIGHT_BRACKET(), TextKt.translatable("meazy:parser.expected.end_expression", "right_bracket", "list_creation"));
+            parser.consume(
+                rightBracket,
+                translatable("meazy:parser.expected.end_expression", "right_bracket", "list_creation")
+            )
 
-            return new ListCreationExpression(list);
+            return ListCreationExpression(list)
         }
 
-        return parser.parseAfter(MeazyMain.getDefaultIdentifier("list_creation_expression"), Expression.class);
+        return parser.parseAfter<Expression>(getDefaultIdentifier("list_creation_expression"))
     }
 }

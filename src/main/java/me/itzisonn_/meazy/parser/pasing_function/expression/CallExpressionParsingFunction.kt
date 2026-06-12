@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
 import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
-import me.itzisonn_.meazy.lexer.TokenTypes.LEFT_PARENTHESIS
+import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.ParsingContext
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression
@@ -16,7 +16,7 @@ class CallExpressionParsingFunction : AbstractParsingFunction<Expression>("call_
         val parser = context.parser
         val expression = parser.parseAfter<Expression>(getDefaultIdentifier("call_expression"))
 
-        if (parser.current.type == LEFT_PARENTHESIS()) {
+        if (parser.current.type == leftParenthesis) {
             if (expression !is Identifier) {
                 throw InvalidSyntaxException(
                     parser.current.line,
