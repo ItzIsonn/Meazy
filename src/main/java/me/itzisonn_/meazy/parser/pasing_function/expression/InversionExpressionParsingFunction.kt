@@ -1,32 +1,23 @@
-package me.itzisonn_.meazy.parser.pasing_function.expression;
+package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.operator.Operators;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.lexer.TokenTypes.inversion
+import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-@NullMarked
-public class InversionExpressionParsingFunction extends AbstractParsingFunction<Expression> {
-    public InversionExpressionParsingFunction() {
-        super("inversion_expression");
-    }
+class InversionExpressionParsingFunction : AbstractParsingFunction<Expression>("inversion_expression") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
+        val parser = context.parser
 
-    @Override
-    public Expression parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-
-        if (parser.getCurrent().getType().equals(TokenTypes.INVERSION())) {
-            parser.next();
-            Expression expression = parser.parseAfter(MeazyMain.getDefaultIdentifier("inversion_expression"), Expression.class);
-            return new OperatorExpression(expression, null, Operators.INSTANCE.getInversion());
+        if (parser.current.type == inversion) {
+            parser.next()
+            val expression = parser.parseAfter<Expression>(getDefaultIdentifier("inversion_expression"))
+            return OperatorExpression(expression, null, Operators.inversion)
         }
 
-        return parser.parseAfter(MeazyMain.getDefaultIdentifier("inversion_expression"), Expression.class);
+        return parser.parseAfter<Expression>(getDefaultIdentifier("inversion_expression"))
     }
 }
