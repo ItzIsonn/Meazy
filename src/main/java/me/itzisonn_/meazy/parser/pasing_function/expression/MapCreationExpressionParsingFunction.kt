@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.parser.ast.expression.collection_creation.MapCreationE
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-class MapCreationExpressionParsingFunction : AbstractParsingFunction<Expression>("map_creation_expression") {
+object MapCreationExpressionParsingFunction : AbstractParsingFunction<Expression>("map_creation_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
 
@@ -20,10 +20,10 @@ class MapCreationExpressionParsingFunction : AbstractParsingFunction<Expression>
             val map = mutableMapOf<Expression, Expression>()
 
             while (parser.current.type != rightBrace) {
-                val key = parser.parse<Expression>(getDefaultIdentifier("list_creation_expression"))
+                val key = parser.parse(ListCreationExpressionParsingFunction)
                 parser.consume(assign, translatable("meazy:parser.expected.separator_expression", "assign", "map_creation"))
 
-                val value = parser.parse<Expression>(getDefaultIdentifier("expression"))
+                val value = parser.parse(ExpressionParsingFunction)
                 map[key] = value
 
                 if (parser.current.type != rightBrace) {

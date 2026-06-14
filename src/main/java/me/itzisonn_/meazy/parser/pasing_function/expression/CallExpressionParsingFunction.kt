@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
 import me.itzisonn_.meazy.text.translatable
 
-class CallExpressionParsingFunction : AbstractParsingFunction<Expression>("call_expression") {
+object CallExpressionParsingFunction : AbstractParsingFunction<Expression>("call_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
         val expression = parser.parseAfter<Expression>(getDefaultIdentifier("call_expression"))

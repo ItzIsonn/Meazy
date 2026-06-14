@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
 import me.itzisonn_.meazy.MeazyMain.VERSION
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.parser.ParsingContext
@@ -12,7 +11,7 @@ import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.text.translatable
 import java.io.File
 
-class ProgramParsingFunction : AbstractParsingFunction<Program>("program") {
+object ProgramParsingFunction : AbstractParsingFunction<Program>("program") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Program {
         val file: File?
         require(extra.isNotEmpty()) { "Expected file as extra argument" }
@@ -27,7 +26,7 @@ class ProgramParsingFunction : AbstractParsingFunction<Program>("program") {
 
         while (true) {
             try {
-                headerStatement = parser.parse<Statement>(getDefaultIdentifier("header_statement"))
+                headerStatement = parser.parse(HeaderStatementParsingFunction)
             }
             catch (_: UnexpectedTokenException) {
                 break
@@ -42,7 +41,7 @@ class ProgramParsingFunction : AbstractParsingFunction<Program>("program") {
         parser.skipNewLines()
 
         while (parser.current.type != endOfFile) {
-            body.add(parser.parse<Statement>(getDefaultIdentifier("global_statement")))
+            body.add(parser.parse(GlobalStatementParsingFunction))
 
             if (parser.current.type != endOfFile) {
                 parser.next(newLine, translatable("meazy:parser.expected", "new_line"))

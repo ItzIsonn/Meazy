@@ -8,14 +8,14 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-class AdditionExpressionParsingFunction : AbstractParsingFunction<Expression>("addition_expression") {
+object AdditionExpressionParsingFunction : AbstractParsingFunction<Expression>("addition_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
         var left = parser.parseAfter<Expression>(getDefaultIdentifier("addition_expression"))
 
         while (parser.current.type in addition) {
             val operator = parser.consume().value
-            val right = parser.parse<Expression>(getDefaultIdentifier("addition_expression"))
+            val right = parser.parse(AdditionExpressionParsingFunction)
             left = OperatorExpression(left, right, operator, OperatorType.INFIX)
         }
 

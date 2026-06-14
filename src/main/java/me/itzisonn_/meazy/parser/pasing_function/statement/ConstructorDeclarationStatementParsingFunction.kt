@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
 import me.itzisonn_.meazy.text.translatable
 
-class ConstructorDeclarationStatementParsingFunction : AbstractParsingFunction<ConstructorDeclarationStatement>("constructor_declaration_statement") {
+object ConstructorDeclarationStatementParsingFunction : AbstractParsingFunction<ConstructorDeclarationStatement>("constructor_declaration_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): ConstructorDeclarationStatement {
         val parser = context.parser
 

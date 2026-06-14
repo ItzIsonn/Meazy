@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.boolean
 import me.itzisonn_.meazy.lexer.TokenTypes.dot
@@ -21,7 +20,7 @@ import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
 import me.itzisonn_.meazy.text.translatable
 
-class PrimaryExpressionParsingFunction : AbstractParsingFunction<Expression>("primary_expression") {
+object PrimaryExpressionParsingFunction : AbstractParsingFunction<Expression>("primary_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
         val token = parser.current
@@ -54,7 +53,7 @@ class PrimaryExpressionParsingFunction : AbstractParsingFunction<Expression>("pr
         }
         if (tokenType == leftParenthesis) {
             parser.consume()
-            val value = parser.parse<Expression>(getDefaultIdentifier("expression"))
+            val value = parser.parse(ExpressionParsingFunction)
             parser.consume(rightParenthesis, translatable("meazy:parser.expected", "right_parenthesis"))
             return value
         }
