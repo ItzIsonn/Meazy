@@ -1,31 +1,22 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.UnexpectedTokenException;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.parser.ast.statement.ImportStatement;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.`import`
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.UnexpectedTokenException
+import me.itzisonn_.meazy.parser.ast.statement.ImportStatement
+import me.itzisonn_.meazy.parser.ast.statement.Statement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.text.translatable
 
-@NullMarked
-public class HeaderStatementParsingFunction extends AbstractParsingFunction<Statement> {
-    public HeaderStatementParsingFunction() {
-        super("header_statement");
-    }
+class HeaderStatementParsingFunction : AbstractParsingFunction<Statement>("header_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Statement {
+        val parser = context.parser
 
-    @Override
-    public Statement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-
-        if (parser.getCurrent().getType().equals(TokenTypes.IMPORT())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("import_statement"), ImportStatement.class);
+        if (parser.current.type == `import`) {
+            return parser.parse<ImportStatement>(getDefaultIdentifier("import_statement"))
         }
 
-        throw new UnexpectedTokenException(parser.getCurrent().getLine(), TextKt.literal("Expected header statement")); //TODO;
+        throw UnexpectedTokenException(parser.current.line, translatable("meazy:parser.expected.statement", "header"))
     }
 }

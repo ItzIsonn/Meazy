@@ -1,75 +1,67 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
-import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.Parameter;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement;
-import me.itzisonn_.meazy.parser.modifier.Modifiers;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.assign
+import me.itzisonn_.meazy.lexer.TokenTypes.dot
+import me.itzisonn_.meazy.lexer.TokenTypes.function
+import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
+import me.itzisonn_.meazy.lexer.TokenTypes.newLine
+import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
+import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement
+import me.itzisonn_.meazy.parser.modifier.Modifiers.abstract
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+class FunctionDeclarationStatementParsingFunction :
+    AbstractParsingFunction<FunctionDeclarationStatement>("function_declaration_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): FunctionDeclarationStatement {
+        val parser = context.parser
+        val modifiers = ParsingHelper.getModifiersFromExtra(extra)
 
-@NullMarked
-public class FunctionDeclarationStatementParsingFunction extends AbstractParsingFunction<FunctionDeclarationStatement> {
-    public FunctionDeclarationStatementParsingFunction() {
-        super("function_declaration_statement");
-    }
+        require(extra.size != 1) { "Expected boolean as extra argument" }
+        require(extra[1] is Boolean) { "Expected boolean as extra argument" }
+        val canBeAbstractWithoutModifier = extra[1] as Boolean
 
-    @Override
-    public FunctionDeclarationStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
+        parser.next(function, translatable("meazy:parser.expected.keyword", "function"))
 
-        if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
-        if (!(extra[1] instanceof Boolean canBeAbstractWithoutModifier)) throw new IllegalArgumentException("Expected boolean as extra argument");
-
-        parser.next(TokenTypes.FUNCTION(), TextKt.translatable("meazy:parser.expected.keyword", "function"));
-
-        String classId = null;
-        String id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "function")).getValue();
-        if (parser.getCurrent().getType().equals(TokenTypes.DOT())) {
-            parser.next();
-            classId = id;
-            id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
+        var classId: String? = null
+        var id = parser.consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "function")).value
+        if (parser.current.type == dot) {
+            parser.next()
+            classId = id
+            id = parser.consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
         }
 
-        List<Parameter> parameters = ParsingHelper.parseParameters(context);
-        DataType dataType = ParsingHelper.parseDataType(context);
+        val parameters = ParsingHelper.parseParameters(context)
+        val dataType = ParsingHelper.parseDataType(context)
 
-        if (modifiers.contains(Modifiers.INSTANCE.getAbstract()) || (canBeAbstractWithoutModifier && parser.getCurrent().getType().equals(TokenTypes.NEW_LINE()))) {
-            modifiers.add(Modifiers.INSTANCE.getAbstract());
-            return new FunctionDeclarationStatement(modifiers, id, parameters, new ArrayList<>(), dataType);
+        if (abstract in modifiers || (canBeAbstractWithoutModifier && parser.current.type == newLine)) {
+            modifiers.add(abstract)
+            return FunctionDeclarationStatement(modifiers, id, parameters, mutableListOf(), dataType)
         }
 
-        List<LocalStatement> body;
-        Expression returnDataTypeValue;
+        val body: MutableList<LocalStatement>?
+        val returnDataTypeValue: Expression?
 
-        if (parser.getCurrent().getType().equals(TokenTypes.ASSIGN())) {
-            parser.next();
-            Expression expression = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-            body = new ArrayList<>(List.<LocalStatement>of(new ReturnStatement(expression)));
-            returnDataTypeValue = expression;
+        if (parser.current.type == assign) {
+            parser.next()
+            val expression = parser.parse<Expression>(getDefaultIdentifier("expression"))
+            body = mutableListOf(ReturnStatement(expression))
+            returnDataTypeValue = expression
         }
         else {
-            parser.next(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "function_body"));
-            body = ParsingHelper.parseBody(context);
-            parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "function_body"));
-            returnDataTypeValue = null;
+            parser.next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "function_body"))
+            body = ParsingHelper.parseBody(context)
+            parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "function_body"))
+            returnDataTypeValue = null
         }
 
-        return new FunctionDeclarationStatement(modifiers, id, classId, parameters, body, dataType, returnDataTypeValue);
+        return FunctionDeclarationStatement(modifiers, id, classId, parameters, body, dataType, returnDataTypeValue)
     }
 }

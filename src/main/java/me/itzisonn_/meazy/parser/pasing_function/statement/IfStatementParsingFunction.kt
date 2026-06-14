@@ -1,70 +1,65 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.statement.IfStatement;
-import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.`else`
+import me.itzisonn_.meazy.lexer.TokenTypes.`if`
+import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
+import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
+import me.itzisonn_.meazy.lexer.TokenTypes.newLine
+import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
+import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.statement.IfStatement
+import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.ArrayList;
-import java.util.List;
+class IfStatementParsingFunction : AbstractParsingFunction<IfStatement>("if_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): IfStatement {
+        val parser = context.parser
 
-@NullMarked
-public class IfStatementParsingFunction extends AbstractParsingFunction<IfStatement> {
-    public IfStatementParsingFunction() {
-        super("if_statement");
-    }
+        parser.next(`if`, translatable("meazy:parser.expected.keyword", "if"))
+        parser.next(leftParenthesis, translatable("meazy:parser.expected.start", "left_parenthesis", "if_condition"))
 
-    @Override
-    public IfStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
+        val condition = parser.parse<Expression>(getDefaultIdentifier("expression"))
+        parser.next(rightParenthesis, translatable("meazy:parser.expected.end", "right_parenthesis", "if_condition"))
 
-        parser.next(TokenTypes.IF(), TextKt.translatable("meazy:parser.expected.keyword", "if"));
-        parser.next(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start", "left_parenthesis", "if_condition"));
-
-        Expression condition = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-        parser.next(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.end", "right_parenthesis", "if_condition"));
-
-        List<LocalStatement> body = new ArrayList<>();
-        if (parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
-            parser.next();
-            body = ParsingHelper.parseBody(context);
-            parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "if_body"));
-
+        var body = mutableListOf<LocalStatement>()
+        if (parser.current.type == leftBrace) {
+            parser.next()
+            body = ParsingHelper.parseBody(context)
+            parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
         }
-        else body.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
+        else body.add(parser.parse<LocalStatement>(getDefaultIdentifier("local_statement")))
 
-        int elsePos = parser.getPos() + 1;
-        if (elsePos < parser.getSize() && parser.get(elsePos).getType().equals(TokenTypes.ELSE())) {
-            parser.next(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected.end_statement", "new_line"));
+        val elsePos = parser.pos + 1
+        if (elsePos < parser.size && parser[elsePos].type == `else`) {
+            parser.next(newLine, translatable("meazy:parser.expected.end_statement", "new_line"))
         }
 
-        IfStatement elseStatement = null;
-        if (parser.getCurrent().getType().equals(TokenTypes.ELSE())) {
-            parser.next();
-            if (parser.getCurrent().getType().equals(TokenTypes.IF())) {
-                elseStatement = parser.parse(MeazyMain.getDefaultIdentifier("if_statement"), IfStatement.class);
+        var elseStatement: IfStatement? = null
+        if (parser.current.type == `else`) {
+            parser.next()
+            if (parser.current.type == `if`) {
+                elseStatement = parser.parse<IfStatement>(getDefaultIdentifier("if_statement"))
             }
             else {
-                List<LocalStatement> elseBody = new ArrayList<>();
-                if (parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
-                    parser.next();
-                    elseBody = ParsingHelper.parseBody(context);
-                    parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "if_body"));
+                var elseBody = mutableListOf<LocalStatement>()
+                if (parser.current.type == leftBrace) {
+                    parser.next()
+                    elseBody = ParsingHelper.parseBody(context)
+                    parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
                 }
-                else elseBody.add(parser.parse(MeazyMain.getDefaultIdentifier("local_statement"), LocalStatement.class));
+                else elseBody.add(
+                    parser.parse<LocalStatement>(getDefaultIdentifier("local_statement"))
+                )
 
-                elseStatement = new IfStatement(null, elseBody, null);
+                elseStatement = IfStatement(null, elseBody, null)
             }
         }
 
-        return new IfStatement(condition, body, elseStatement);
+        return IfStatement(condition, body, elseStatement)
     }
 }
