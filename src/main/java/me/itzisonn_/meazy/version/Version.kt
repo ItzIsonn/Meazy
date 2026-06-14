@@ -111,8 +111,6 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
          * @return Parsed version
          * @throws IllegalArgumentException If given version is in invalid format
          */
-        @JvmStatic
-        @Throws(IllegalArgumentException::class)
         fun of(version: String): Version {
             val matcher = versionPattern.matcher(version)
             require(matcher.matches()) { "Invalid version '$version'" }

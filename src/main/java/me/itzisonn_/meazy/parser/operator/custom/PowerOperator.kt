@@ -9,12 +9,10 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operator
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.runtime.environment.Environment
-import org.jspecify.annotations.NullMarked
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
-@NullMarked
 class PowerOperator : Operator("power", "^", OperatorType.INFIX) {
     override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
         val left = operatorExpression.left

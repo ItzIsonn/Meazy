@@ -2,11 +2,9 @@ package me.itzisonn_.meazy.instruction.local
 
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
-import org.jspecify.annotations.NullMarked
 import java.lang.constant.ClassDesc
 import kotlin.uuid.Uuid
 
-@NullMarked
 class SetLocalNameInstruction(
     private val slot: Int,
     private val id: String,

@@ -16,7 +16,7 @@ import java.lang.constant.MethodTypeDesc
 import java.lang.reflect.AccessFlag
 import java.util.Optional
 
-class ClassDeclarationStatement @JvmOverloads constructor(
+class ClassDeclarationStatement(
     modifiers: Set<Modifier>,
     val id: String,
     val baseClasses: Set<String>,

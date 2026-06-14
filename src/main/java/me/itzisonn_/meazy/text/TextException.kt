@@ -5,7 +5,7 @@ package me.itzisonn_.meazy.text
  *
  * @param text Text
  */
-abstract class TextException @JvmOverloads constructor(
+abstract class TextException(
     text: Text,
     e: Throwable? = null
 ) : RuntimeException(text.toString(), e)

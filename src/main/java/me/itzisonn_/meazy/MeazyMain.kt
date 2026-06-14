@@ -108,7 +108,6 @@ object MeazyMain {
      * 
      * @throws IllegalArgumentException If id doesn't match [RegistryIdentifier.IDENTIFIER_REGEX]
      */
-    @JvmStatic
     fun getDefaultIdentifier(id: String): RegistryIdentifier {
         return RegistryIdentifier.of("meazy", id)
     }

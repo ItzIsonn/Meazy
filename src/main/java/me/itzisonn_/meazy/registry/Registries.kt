@@ -75,22 +75,19 @@ object Registries {
     /**
      * Registry for all Modifiers
      */
-    @JvmField
     val MODIFIERS = SetRegistry<Modifier>()
 
     /**
      * Registry for all Operators
      */
-    @JvmField
     val OPERATORS = OperatorRegistry()
 
     /**
      * Registry for all ParsingFunctions
      * 
-     * @see me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
+     * @see ParsingFunction
      * @see Parser
      */
-    @JvmField
     val PARSING_FUNCTIONS = OrderedRegistry<ParsingFunction<*>>()
 
     /**

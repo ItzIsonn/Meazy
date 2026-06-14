@@ -18,18 +18,15 @@ object MiscUtils {
      * @param name Name
      * @return Generated name
      */
-    @JvmStatic
     fun generatePrefixedName(prefix: String, name: String): String {
         if (name == name.uppercase(Locale.getDefault())) return prefix.uppercase(Locale.getDefault()) + "_" + name
         return prefix + name.substring(0, 1).uppercase(Locale.getDefault()) + name.substring(1)
     }
 
-    @JvmStatic
     fun isBoolean(classDesc: ClassDesc): Boolean {
         return classDesc == ConstantDescs.CD_boolean || classDesc == ConstantDescs.CD_Boolean
     }
 
-    @JvmStatic
     fun getBoxedType(classDesc: ClassDesc): ClassDesc {
         if (!classDesc.isPrimitive) return classDesc
 
@@ -43,7 +40,6 @@ object MiscUtils {
         }
     }
 
-    @JvmStatic
     fun boxPrimitive(instructionsSet: InstructionsSet, classDesc: ClassDesc) {
         val boxedClassDesc = getBoxedType(classDesc)
         if (boxedClassDesc == ConstantDescs.CD_void) return
@@ -56,7 +52,6 @@ object MiscUtils {
         )
     }
 
-    @JvmStatic
     fun convertPrimitiveOrBoxed(instructionsSet: InstructionsSet, from: ClassDesc, to: ClassDesc): Boolean {
         val fromNumberType = NumberType.valueOf(from)
         val toNumberType = NumberType.valueOf(to)

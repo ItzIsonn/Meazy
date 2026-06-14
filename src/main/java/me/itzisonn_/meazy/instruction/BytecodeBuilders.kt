@@ -9,8 +9,8 @@ import java.util.Optional
 import kotlin.uuid.Uuid
 
 class BytecodeBuilders private constructor(
-    @JvmField val classBuilder: ClassBuilder?,
-    @JvmField val codeBuilder: CodeBuilder?,
+    val classBuilder: ClassBuilder?,
+    val codeBuilder: CodeBuilder?,
     private val classes: LinkedHashMap<ClassDesc, ByteArray>,
     private val labels: MutableMap<Uuid, Optional<Label>>
 ) {
@@ -45,7 +45,7 @@ class BytecodeBuilders private constructor(
     }
 
 
-    @JvmOverloads
+
     fun copy(classBuilder: ClassBuilder?, codeBuilder: CodeBuilder? = null): BytecodeBuilders {
         return BytecodeBuilders(classBuilder, codeBuilder, classes, labels)
     }
@@ -55,7 +55,6 @@ class BytecodeBuilders private constructor(
     }
 
     companion object {
-        @JvmStatic
         fun of(classBuilder: ClassBuilder?, codeBuilder: CodeBuilder?): BytecodeBuilders {
             return BytecodeBuilders(
                 classBuilder, codeBuilder,

@@ -3,9 +3,7 @@ package me.itzisonn_.meazy.instruction.number
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.NumberType
-import org.jspecify.annotations.NullMarked
 
-@NullMarked
 class ArithmeticOperationInstruction(
     private val type: NumberType,
     private val operation: ArithmeticOperation

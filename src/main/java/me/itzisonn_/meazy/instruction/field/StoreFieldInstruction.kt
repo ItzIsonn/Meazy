@@ -2,10 +2,8 @@ package me.itzisonn_.meazy.instruction.field
 
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
-import org.jspecify.annotations.NullMarked
 import java.lang.constant.ClassDesc
 
-@NullMarked
 class StoreFieldInstruction(
     private val owner: ClassDesc,
     private val id: String,

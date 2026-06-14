@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.instruction
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
-enum class NumberType(@JvmField val classDesc: ClassDesc, val isBoxed: Boolean) {
+enum class NumberType(val classDesc: ClassDesc, val isBoxed: Boolean) {
     INT(ConstantDescs.CD_int, false),
     LONG(ConstantDescs.CD_long, false),
     FLOAT(ConstantDescs.CD_float, false),
@@ -41,7 +41,6 @@ enum class NumberType(@JvmField val classDesc: ClassDesc, val isBoxed: Boolean) 
 
 
     companion object {
-        @JvmStatic
         fun valueOf(classDesc: ClassDesc): NumberType? {
             for (numberType in entries) {
                 if (numberType.classDesc == classDesc) return numberType
@@ -54,7 +53,6 @@ enum class NumberType(@JvmField val classDesc: ClassDesc, val isBoxed: Boolean) 
             return valueOf(classDesc) != null
         }
 
-        @JvmStatic
         fun getCommonUnboxed(a: NumberType, b: NumberType): NumberType {
             if (a.isDouble || b.isDouble) return DOUBLE
             if (a.isFloat && b.isLong) return DOUBLE
