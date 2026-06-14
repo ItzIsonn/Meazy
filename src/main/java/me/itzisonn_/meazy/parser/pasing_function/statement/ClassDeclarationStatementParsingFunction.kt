@@ -44,7 +44,7 @@ class ClassDeclarationStatementParsingFunction :
     AbstractParsingFunction<ClassDeclarationStatement>("class_declaration_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): ClassDeclarationStatement {
         val parser = context.parser
-        val modifiers = ParsingHelper.getModifiersFromExtra(extra)
+        val modifiers = ParsingHelper.getModifiersFromExtra(extra).toMutableSet()
 
         parser.consume(`class`, translatable("meazy:parser.expected.keyword", "class"))
         val id = parser.consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "class")).value
@@ -135,7 +135,7 @@ class ClassDeclarationStatementParsingFunction :
 
 
     companion object {
-        private fun generateDataBody(id: String, dataVariables: MutableList<Parameter>): MutableList<Statement> {
+        private fun generateDataBody(id: String, dataVariables: List<Parameter>): MutableList<Statement> {
             val body: MutableList<Statement> = ArrayList<Statement>()
 
             for (dataVariable in dataVariables) {
@@ -263,7 +263,7 @@ class ClassDeclarationStatementParsingFunction :
             return body
         }
 
-        private fun getToStringExpression(id: String, dataVariables: MutableList<Parameter>): Expression {
+        private fun getToStringExpression(id: String, dataVariables: List<Parameter>): Expression {
             var toStringExpression: Expression = StringLiteral(id + "(" + (if (dataVariables.isEmpty()) ")" else ""))
             for (i in dataVariables.indices) {
                 val dataVariable = dataVariables.get(i)

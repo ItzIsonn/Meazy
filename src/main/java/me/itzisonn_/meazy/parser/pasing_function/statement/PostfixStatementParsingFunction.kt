@@ -1,40 +1,33 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypeSets;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.lexer.Token;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral;
-import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorPostfix
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral
+import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
+import me.itzisonn_.meazy.parser.ast.statement.Statement
+import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.text.translatable
 
-@NullMarked
-public class PostfixStatementParsingFunction extends AbstractParsingFunction<Statement> {
-    public PostfixStatementParsingFunction() {
-        super("postfix_statement");
-    }
+class PostfixStatementParsingFunction : AbstractParsingFunction<Statement>("postfix_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Statement {
+        val parser = context.parser
 
-    @Override
-    public Statement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
+        val left = parser.parse<Expression>(getDefaultIdentifier("expression"))
+        val token = parser.consume(
+            operatorPostfix,
+            translatable("meazy:parser.expected.end_statement", "operator_postfix", "postfix_statement")
+        )
 
-        Expression left = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-        Token token = parser.consume(TokenTypeSets.INSTANCE.getOperatorPostfix(), TextKt.translatable("meazy:parser.expected.end_statement", "operator_postfix", "postfix_statement"));
+        val value = OperatorExpression(
+            left,
+            NumberLiteral("1"),
+            token.value.substring(0, 1), OperatorType.INFIX
+        )
 
-        Expression value = new OperatorExpression(
-                left,
-                new NumberLiteral("1"),
-                token.getValue().substring(0, 1), OperatorType.INFIX
-        );
-
-        return new AssignmentStatement(left, value);
+        return AssignmentStatement(left, value)
     }
 }

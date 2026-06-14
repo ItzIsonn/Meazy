@@ -1,51 +1,60 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.DataType;
-import me.itzisonn_.meazy.parser.InvalidSyntaxException;
-import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral;
-import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.assign
+import me.itzisonn_.meazy.lexer.TokenTypes.variable
+import me.itzisonn_.meazy.parser.InvalidSyntaxException
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
+import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.Set;
+class VariableDeclarationStatementParsingFunction :
+    AbstractParsingFunction<VariableDeclarationStatement>("variable_declaration_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): VariableDeclarationStatement {
+        val parser = context.parser
+        val modifiers = ParsingHelper.getModifiersFromExtra(extra)
 
-@NullMarked
-public class VariableDeclarationStatementParsingFunction extends AbstractParsingFunction<VariableDeclarationStatement> {
-    public VariableDeclarationStatementParsingFunction() {
-        super("variable_declaration_statement");
-    }
+        require(extra.size != 1) { "Expected boolean as extra argument" }
+        require(extra[1] is Boolean) { "Expected boolean as extra argument" }
+        val canBeConstantWithoutValue = extra[1] as Boolean
 
-    @Override
-    public VariableDeclarationStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
+        val isConstant = parser.consume(variable, translatable("meazy:parser.expected.keyword", "variable")).value == "val"
+        val id = parser.consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
+        val dataType = ParsingHelper.parseDataType(context)
 
-        if (extra.length == 1) throw new IllegalArgumentException("Expected boolean as extra argument");
-        if (!(extra[1] instanceof Boolean canBeConstantWithoutValue)) throw new IllegalArgumentException("Expected boolean as extra argument");
+        if (parser.current.type != assign) {
+            if (dataType == null) throw InvalidSyntaxException(
+                parser.current.line,
+                translatable("meazy:parser.exception.variable_without_datatype_and_value")
+            )
 
-        boolean isConstant = parser.consume(TokenTypes.VARIABLE(), TextKt.translatable("meazy:parser.expected.keyword", "variable")).getValue().equals("val");
-        String id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue();
-        DataType dataType = ParsingHelper.parseDataType(context);
-
-        if (!parser.getCurrent().getType().equals(TokenTypes.ASSIGN())) {
-            if (dataType == null) throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.variable_without_datatype_and_value"));
-
-            if (canBeConstantWithoutValue) return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, null);
-            if (isConstant) throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.constant_without_value"));
-            return new VariableDeclarationStatement(modifiers, false, id, dataType, new NullLiteral());
+            if (canBeConstantWithoutValue) return VariableDeclarationStatement(
+                modifiers,
+                isConstant,
+                id,
+                dataType,
+                null
+            )
+            if (isConstant) throw InvalidSyntaxException(
+                parser.current.line,
+                translatable("meazy:parser.exception.constant_without_value")
+            )
+            return VariableDeclarationStatement(modifiers, false, id, dataType, NullLiteral())
         }
 
-        parser.next(TokenTypes.ASSIGN(), TextKt.translatable("meazy:parser.expected.after", "assign", "id"));
+        parser.next(assign, translatable("meazy:parser.expected.after", "assign", "id"))
 
-        return new VariableDeclarationStatement(modifiers, isConstant, id, dataType, parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class));
+        return VariableDeclarationStatement(
+            modifiers,
+            isConstant,
+            id,
+            dataType,
+            parser.parse<Expression>(getDefaultIdentifier("expression"))
+        )
     }
 }

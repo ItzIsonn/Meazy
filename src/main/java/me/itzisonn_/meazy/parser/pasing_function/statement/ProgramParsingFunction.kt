@@ -1,66 +1,55 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.UnexpectedTokenException;
-import me.itzisonn_.meazy.parser.ast.statement.Program;
-import me.itzisonn_.meazy.parser.ast.statement.Statement;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.VERSION
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
+import me.itzisonn_.meazy.lexer.TokenTypes.newLine
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.UnexpectedTokenException
+import me.itzisonn_.meazy.parser.ast.statement.Program
+import me.itzisonn_.meazy.parser.ast.statement.Statement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.text.translatable
+import java.io.File
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+class ProgramParsingFunction : AbstractParsingFunction<Program>("program") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): Program {
+        val file: File?
+        require(extra.isNotEmpty()) { "Expected file as extra argument" }
+        if (extra[0] is File) file = extra[0] as File
+        else throw IllegalArgumentException("Expected file as extra argument")
 
-@NullMarked
-public class ProgramParsingFunction extends AbstractParsingFunction<Program> {
-    public ProgramParsingFunction() {
-        super("program");
-    }
+        val parser = context.parser
+        parser.skipNewLines()
 
-    @Override
-    public Program parse(ParsingContext context, @Nullable Object... extra) {
-        File file;
-        if (extra.length == 0) throw new IllegalArgumentException("Expected file as extra argument");
-        else if (extra[0] instanceof File fileArg) file = fileArg;
-        else throw new IllegalArgumentException("Expected file as extra argument");
-
-        Parser parser = context.getParser();
-        parser.skipNewLines();
-
-        List<Statement> body = new ArrayList<>();
-
-        Statement headerStatement;
+        val body = mutableListOf<Statement>()
+        var headerStatement: Statement?
 
         while (true) {
             try {
-                headerStatement = parser.parse(MeazyMain.getDefaultIdentifier("header_statement"), Statement.class);
+                headerStatement = parser.parse<Statement>(getDefaultIdentifier("header_statement"))
             }
-            catch (UnexpectedTokenException e) {
-                break;
+            catch (_: UnexpectedTokenException) {
+                break
             }
 
-            parser.next(TokenTypes.NEW_LINE(),  TextKt.translatable("meazy:parser.expected", "new_line"));
-            parser.skipNewLines();
+            parser.next(newLine, translatable("meazy:parser.expected", "new_line"))
+            parser.skipNewLines()
 
-            body.add(headerStatement);
+            body.add(headerStatement)
         }
 
-        parser.skipNewLines();
+        parser.skipNewLines()
 
-        while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-            body.add(parser.parse(MeazyMain.getDefaultIdentifier("global_statement"), Statement.class));
+        while (parser.current.type != endOfFile) {
+            body.add(parser.parse<Statement>(getDefaultIdentifier("global_statement")))
 
-            if (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE())) {
-                parser.next(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
-                parser.skipNewLines();
+            if (parser.current.type != endOfFile) {
+                parser.next(newLine, translatable("meazy:parser.expected", "new_line"))
+                parser.skipNewLines()
             }
         }
 
-        return new Program(file, MeazyMain.INSTANCE.getVERSION(), body);
+        return Program(file, VERSION, body)
     }
 }
