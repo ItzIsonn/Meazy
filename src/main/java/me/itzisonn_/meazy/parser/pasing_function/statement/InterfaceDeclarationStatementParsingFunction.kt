@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
@@ -16,7 +15,7 @@ import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
 import me.itzisonn_.meazy.text.translatable
 
-class InterfaceDeclarationStatementParsingFunction :
+object InterfaceDeclarationStatementParsingFunction :
     AbstractParsingFunction<InterfaceDeclarationStatement>("interface_declaration_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): InterfaceDeclarationStatement {
         val parser = context.parser
@@ -51,7 +50,7 @@ class InterfaceDeclarationStatementParsingFunction :
 
         val body = mutableListOf<Statement>()
         while (parser.current.type != endOfFile && parser.current.type != rightBrace) {
-            val statement = parser.parse<Statement>(getDefaultIdentifier("interface_body_statement"))
+            val statement = parser.parse(InterfaceBodyStatementParsingFunction)
             body.add(statement)
             parser.skipNewLines()
         }

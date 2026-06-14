@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
@@ -19,6 +18,8 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers.parse
+import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.statement.LocalStatementParsingFunction
 import me.itzisonn_.meazy.text.translatable
 import java.lang.constant.ClassDesc
 
@@ -116,11 +117,11 @@ object ParsingHelper {
         val args = mutableListOf<Expression>()
 
         if (parser.current.type != rightParenthesis) {
-            args.add(parser.parse<Expression>(getDefaultIdentifier("expression")))
+            args.add(parser.parse(ExpressionParsingFunction))
 
             while (parser.current.type == comma) {
                 parser.next()
-                args.add(parser.parse<Expression>(getDefaultIdentifier("expression")))
+                args.add(parser.parse(ExpressionParsingFunction))
             }
         }
 
@@ -157,7 +158,7 @@ object ParsingHelper {
         parser.skipNewLines()
 
         while (parser.current.type != endOfFile && parser.current.type != rightBrace) {
-            body.add(parser.parse<LocalStatement>(getDefaultIdentifier("local_statement")))
+            body.add(parser.parse(LocalStatementParsingFunction))
             parser.consume(newLine, translatable("meazy:parser.expected", "new_line"))
             parser.skipNewLines()
         }

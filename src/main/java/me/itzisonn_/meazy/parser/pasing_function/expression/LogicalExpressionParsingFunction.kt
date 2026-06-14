@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-class LogicalExpressionParsingFunction : AbstractParsingFunction<Expression>("logical_expression") {
+object LogicalExpressionParsingFunction : AbstractParsingFunction<Expression>("logical_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
         var left = parser.parseAfter<Expression>(getDefaultIdentifier("logical_expression"))

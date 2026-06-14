@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreation
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-class ListCreationExpressionParsingFunction : AbstractParsingFunction<Expression>("list_creation_expression") {
+object ListCreationExpressionParsingFunction : AbstractParsingFunction<Expression>("list_creation_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
 
@@ -19,7 +19,7 @@ class ListCreationExpressionParsingFunction : AbstractParsingFunction<Expression
             val list = mutableListOf<Expression>()
 
             while (parser.current.type != rightBracket) {
-                list.add(parser.parse<Expression>(getDefaultIdentifier("expression")))
+                list.add(parser.parse(ExpressionParsingFunction))
 
                 if (parser.current.type != rightBracket) {
                     parser.consume(

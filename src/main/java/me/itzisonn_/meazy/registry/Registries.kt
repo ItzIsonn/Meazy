@@ -14,6 +14,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions
+import me.itzisonn_.meazy.parser.pasing_function.statement.ProgramParsingFunction
 import me.itzisonn_.meazy.registry.Registries.PARSING_FUNCTIONS
 import me.itzisonn_.meazy.registry.Registries.TOKEN_TYPES
 import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
@@ -183,7 +184,7 @@ object Registries {
             val parsingContext = ParsingContext(tokens)
             val parser = parsingContext.parser
 
-            parser.parse(getDefaultIdentifier("program"), Program::class.java, file)
+            parser.parse(ProgramParsingFunction, file)
         }
 
         compileProgramFunction = { program ->

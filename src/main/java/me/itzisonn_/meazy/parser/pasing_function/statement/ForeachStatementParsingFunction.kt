@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.`for`
 import me.itzisonn_.meazy.lexer.TokenTypes.`in`
@@ -11,13 +10,13 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.ParsingContext
-import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.ForeachStatement
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-class ForeachStatementParsingFunction : AbstractParsingFunction<ForeachStatement>("foreach_statement") {
+object ForeachStatementParsingFunction : AbstractParsingFunction<ForeachStatement>("foreach_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): ForeachStatement {
         val parser = context.parser
 
@@ -37,7 +36,7 @@ class ForeachStatementParsingFunction : AbstractParsingFunction<ForeachStatement
         )
 
         parser.next(`in`, translatable("meazy:parser.expected.after_statement", "in", "variable_declaration"))
-        val collection = parser.parse<Expression>(getDefaultIdentifier("expression"))
+        val collection = parser.parse(ExpressionParsingFunction)
 
         parser.next(
             rightParenthesis,

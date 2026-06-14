@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.inversion
 import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-class InversionExpressionParsingFunction : AbstractParsingFunction<Expression>("inversion_expression") {
+object InversionExpressionParsingFunction : AbstractParsingFunction<Expression>("inversion_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
 

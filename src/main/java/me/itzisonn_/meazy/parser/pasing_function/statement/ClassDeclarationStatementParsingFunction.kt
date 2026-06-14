@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
@@ -40,7 +39,7 @@ import me.itzisonn_.meazy.util.MiscUtils.generatePrefixedName
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
-class ClassDeclarationStatementParsingFunction :
+object ClassDeclarationStatementParsingFunction :
     AbstractParsingFunction<ClassDeclarationStatement>("class_declaration_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): ClassDeclarationStatement {
         val parser = context.parser
@@ -114,7 +113,7 @@ class ClassDeclarationStatementParsingFunction :
 
         val body = generatedBody.toMutableList()
         while (parser.current.type != endOfFile && parser.current.type != rightBrace) {
-            val statement = parser.parse<Statement>(getDefaultIdentifier("class_body_statement"))
+            val statement = parser.parse(ClassBodyStatementParsingFunction)
             body.add(statement)
 
             if (statement is VariableDeclarationStatement) {
@@ -134,187 +133,186 @@ class ClassDeclarationStatementParsingFunction :
     }
 
 
-    companion object {
-        private fun generateDataBody(id: String, dataVariables: List<Parameter>): MutableList<Statement> {
-            val body: MutableList<Statement> = ArrayList<Statement>()
 
-            for (dataVariable in dataVariables) {
-                body.add(
-                    VariableDeclarationStatement(
-                        setOf(private),
-                        dataVariable.isConstant,
-                        dataVariable.id,
-                        dataVariable.dataType,
-                        null
-                    )
-                )
-            }
+    private fun generateDataBody(id: String, dataVariables: List<Parameter>): MutableList<Statement> {
+        val body: MutableList<Statement> = ArrayList<Statement>()
 
-            val constructorBody: MutableList<LocalStatement> = ArrayList<LocalStatement>()
-            for (callArgExpression in dataVariables) {
-                constructorBody.add(
-                    AssignmentStatement(
-                        MemberExpression(
-                            ThisLiteral(),
-                            VariableIdentifier(callArgExpression.id),
-                            false
-                        ), VariableIdentifier(callArgExpression.id)
-                    )
-                )
-            }
-            body.add(ConstructorDeclarationStatement(mutableSetOf<Modifier>(), dataVariables, constructorBody))
-
-            for (dataVariable in dataVariables) {
-                body.add(getGetFunction(dataVariable.id, dataVariable.dataType))
-            }
-
-            for (dataVariable in dataVariables) {
-                if (dataVariable.isConstant) continue
-                body.add(getSetFunction(dataVariable.id, dataVariable.dataType))
-            }
-
-            val toStringExpression: Expression = getToStringExpression(id, dataVariables)
+        for (dataVariable in dataVariables) {
             body.add(
-                FunctionDeclarationStatement(
-                    mutableSetOf<Modifier>(),
-                    "toString",
-                    mutableListOf<Parameter>(),
-                    mutableListOf(ReturnStatement(toStringExpression)),
-                    ofNonNull(ConstantDescs.CD_String)
+                VariableDeclarationStatement(
+                    setOf(private),
+                    dataVariable.isConstant,
+                    dataVariable.id,
+                    dataVariable.dataType,
+                    null
                 )
             )
+        }
 
-            val copyArgs: MutableList<Expression> = ArrayList<Expression>()
-            for (dataVariable in dataVariables) {
-                copyArgs.add(VariableIdentifier(dataVariable.id))
-            }
-            body.add(
-                FunctionDeclarationStatement(
-                    mutableSetOf<Modifier>(),
-                    "copy",
-                    mutableListOf<Parameter>(),
-                    mutableListOf(ReturnStatement(CallExpression(ClassIdentifier(id), copyArgs))),
-                    ofNonNull(ClassDesc.of(id))
-                )
-            )
-
-            var equalsExpression: Expression?
-            if (!dataVariables.isEmpty()) {
-                equalsExpression = OperatorExpression(
-                    VariableIdentifier(dataVariables.first().id),
+        val constructorBody: MutableList<LocalStatement> = ArrayList<LocalStatement>()
+        for (callArgExpression in dataVariables) {
+            constructorBody.add(
+                AssignmentStatement(
                     MemberExpression(
-                        VariableIdentifier("value"),
-                        CallExpression(
-                            FunctionIdentifier(generatePrefixedName("get", dataVariables.first().id)),
-                            mutableListOf<Expression>()
-                        ),
+                        ThisLiteral(),
+                        VariableIdentifier(callArgExpression.id),
                         false
-                    ),
-                    "==", OperatorType.INFIX
-                )
-                for (i in 1..<dataVariables.size) {
-                    val dataVariable = dataVariables.get(i)
-                    equalsExpression = OperatorExpression(
-                        equalsExpression!!,
-                        OperatorExpression(
-                            VariableIdentifier(dataVariable.id),
-                            MemberExpression(
-                                VariableIdentifier("value"),
-                                CallExpression(
-                                    FunctionIdentifier(generatePrefixedName("get", dataVariable.id)),
-                                    mutableListOf<Expression>()
-                                ),
-                                false
-                            ),
-                            "==", OperatorType.INFIX
-                        ),
-                        "&&", OperatorType.INFIX
-                    )
-                }
-            }
-            else equalsExpression = BooleanLiteral(true)
-            body.add(
-                FunctionDeclarationStatement(
-                    setOf(operator),
-                    "equals",
-                    listOf(Parameter("value", ofNullable(ConstantDescs.CD_Object), true)),
-                    mutableListOf(
-                        IfStatement(
-                            OperatorExpression(VariableIdentifier("value"), NullLiteral(), "==", OperatorType.INFIX),
-                            listOf(ReturnStatement(BooleanLiteral(false))),
-                            null
-                        ),
-                        IfStatement(
-                            OperatorExpression(
-                                IsExpression(VariableIdentifier("value"), id, true),
-                                null,
-                                "!",
-                                OperatorType.PREFIX
-                            ),
-                            listOf(ReturnStatement(BooleanLiteral(false))),
-                            null
-                        ),
-                        ReturnStatement(equalsExpression)
-                    ),
-                    ofNonNull(ConstantDescs.CD_boolean)
+                    ), VariableIdentifier(callArgExpression.id)
                 )
             )
+        }
+        body.add(ConstructorDeclarationStatement(mutableSetOf<Modifier>(), dataVariables, constructorBody))
 
-            return body
+        for (dataVariable in dataVariables) {
+            body.add(getGetFunction(dataVariable.id, dataVariable.dataType))
         }
 
-        private fun getToStringExpression(id: String, dataVariables: List<Parameter>): Expression {
-            var toStringExpression: Expression = StringLiteral(id + "(" + (if (dataVariables.isEmpty()) ")" else ""))
-            for (i in dataVariables.indices) {
-                val dataVariable = dataVariables.get(i)
-
-                val endingExpression: Expression?
-                if (i == dataVariables.size - 1) endingExpression = OperatorExpression(
-                    VariableIdentifier(dataVariable.id),
-                    StringLiteral(")"),
-                    "+", OperatorType.INFIX
-                )
-                else endingExpression = VariableIdentifier(dataVariable.id)
-
-                toStringExpression = OperatorExpression(
-                    toStringExpression,
-                    OperatorExpression(
-                        StringLiteral((if (i == 0) "" else ",") + dataVariable.id + "="),
-                        endingExpression,
-                        "+", OperatorType.INFIX
-                    ),
-                    "+", OperatorType.INFIX
-                )
-            }
-            return toStringExpression
+        for (dataVariable in dataVariables) {
+            if (dataVariable.isConstant) continue
+            body.add(getSetFunction(dataVariable.id, dataVariable.dataType))
         }
 
-        private fun getGetFunction(id: String, dataType: DataType): FunctionDeclarationStatement {
-            return FunctionDeclarationStatement(
+        val toStringExpression: Expression = getToStringExpression(id, dataVariables)
+        body.add(
+            FunctionDeclarationStatement(
                 mutableSetOf<Modifier>(),
-                generatePrefixedName("get", id),
+                "toString",
                 mutableListOf<Parameter>(),
-                mutableListOf(ReturnStatement(VariableIdentifier(id))),
-                dataType
+                mutableListOf(ReturnStatement(toStringExpression)),
+                ofNonNull(ConstantDescs.CD_String)
             )
-        }
+        )
 
-        private fun getSetFunction(id: String, dataType: DataType): FunctionDeclarationStatement {
-            return FunctionDeclarationStatement(
+        val copyArgs: MutableList<Expression> = ArrayList<Expression>()
+        for (dataVariable in dataVariables) {
+            copyArgs.add(VariableIdentifier(dataVariable.id))
+        }
+        body.add(
+            FunctionDeclarationStatement(
                 mutableSetOf<Modifier>(),
-                generatePrefixedName("set", id),
-                listOf(Parameter(id, dataType, true)),
-                mutableListOf(
-                    AssignmentStatement(
-                        MemberExpression(
-                            ThisLiteral(),
-                            VariableIdentifier(id),
-                            false
-                        ), VariableIdentifier(id)
-                    )
+                "copy",
+                mutableListOf<Parameter>(),
+                mutableListOf(ReturnStatement(CallExpression(ClassIdentifier(id), copyArgs))),
+                ofNonNull(ClassDesc.of(id))
+            )
+        )
+
+        var equalsExpression: Expression?
+        if (!dataVariables.isEmpty()) {
+            equalsExpression = OperatorExpression(
+                VariableIdentifier(dataVariables.first().id),
+                MemberExpression(
+                    VariableIdentifier("value"),
+                    CallExpression(
+                        FunctionIdentifier(generatePrefixedName("get", dataVariables.first().id)),
+                        mutableListOf<Expression>()
+                    ),
+                    false
                 ),
-                null
+                "==", OperatorType.INFIX
+            )
+            for (i in 1..<dataVariables.size) {
+                val dataVariable = dataVariables.get(i)
+                equalsExpression = OperatorExpression(
+                    equalsExpression!!,
+                    OperatorExpression(
+                        VariableIdentifier(dataVariable.id),
+                        MemberExpression(
+                            VariableIdentifier("value"),
+                            CallExpression(
+                                FunctionIdentifier(generatePrefixedName("get", dataVariable.id)),
+                                mutableListOf<Expression>()
+                            ),
+                            false
+                        ),
+                        "==", OperatorType.INFIX
+                    ),
+                    "&&", OperatorType.INFIX
+                )
+            }
+        }
+        else equalsExpression = BooleanLiteral(true)
+        body.add(
+            FunctionDeclarationStatement(
+                setOf(operator),
+                "equals",
+                listOf(Parameter("value", ofNullable(ConstantDescs.CD_Object), true)),
+                mutableListOf(
+                    IfStatement(
+                        OperatorExpression(VariableIdentifier("value"), NullLiteral(), "==", OperatorType.INFIX),
+                        listOf(ReturnStatement(BooleanLiteral(false))),
+                        null
+                    ),
+                    IfStatement(
+                        OperatorExpression(
+                            IsExpression(VariableIdentifier("value"), id, true),
+                            null,
+                            "!",
+                            OperatorType.PREFIX
+                        ),
+                        listOf(ReturnStatement(BooleanLiteral(false))),
+                        null
+                    ),
+                    ReturnStatement(equalsExpression)
+                ),
+                ofNonNull(ConstantDescs.CD_boolean)
+            )
+        )
+
+        return body
+    }
+
+    private fun getToStringExpression(id: String, dataVariables: List<Parameter>): Expression {
+        var toStringExpression: Expression = StringLiteral(id + "(" + (if (dataVariables.isEmpty()) ")" else ""))
+        for (i in dataVariables.indices) {
+            val dataVariable = dataVariables.get(i)
+
+            val endingExpression: Expression?
+            if (i == dataVariables.size - 1) endingExpression = OperatorExpression(
+                VariableIdentifier(dataVariable.id),
+                StringLiteral(")"),
+                "+", OperatorType.INFIX
+            )
+            else endingExpression = VariableIdentifier(dataVariable.id)
+
+            toStringExpression = OperatorExpression(
+                toStringExpression,
+                OperatorExpression(
+                    StringLiteral((if (i == 0) "" else ",") + dataVariable.id + "="),
+                    endingExpression,
+                    "+", OperatorType.INFIX
+                ),
+                "+", OperatorType.INFIX
             )
         }
+        return toStringExpression
+    }
+
+    private fun getGetFunction(id: String, dataType: DataType): FunctionDeclarationStatement {
+        return FunctionDeclarationStatement(
+            mutableSetOf<Modifier>(),
+            generatePrefixedName("get", id),
+            mutableListOf<Parameter>(),
+            mutableListOf(ReturnStatement(VariableIdentifier(id))),
+            dataType
+        )
+    }
+
+    private fun getSetFunction(id: String, dataType: DataType): FunctionDeclarationStatement {
+        return FunctionDeclarationStatement(
+            mutableSetOf<Modifier>(),
+            generatePrefixedName("set", id),
+            listOf(Parameter(id, dataType, true)),
+            mutableListOf(
+                AssignmentStatement(
+                    MemberExpression(
+                        ThisLiteral(),
+                        VariableIdentifier(id),
+                        false
+                    ), VariableIdentifier(id)
+                )
+            ),
+            null
+        )
     }
 }

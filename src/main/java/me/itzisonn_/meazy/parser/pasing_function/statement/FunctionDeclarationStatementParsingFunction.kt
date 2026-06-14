@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.lexer.TokenTypes.dot
@@ -16,9 +15,10 @@ import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement
 import me.itzisonn_.meazy.parser.modifier.Modifiers.abstract
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-class FunctionDeclarationStatementParsingFunction :
+object FunctionDeclarationStatementParsingFunction :
     AbstractParsingFunction<FunctionDeclarationStatement>("function_declaration_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): FunctionDeclarationStatement {
         val parser = context.parser
@@ -51,7 +51,7 @@ class FunctionDeclarationStatementParsingFunction :
 
         if (parser.current.type == assign) {
             parser.next()
-            val expression = parser.parse<Expression>(getDefaultIdentifier("expression"))
+            val expression = parser.parse(ExpressionParsingFunction)
             body = listOf(ReturnStatement(expression))
             returnDataTypeValue = expression
         }

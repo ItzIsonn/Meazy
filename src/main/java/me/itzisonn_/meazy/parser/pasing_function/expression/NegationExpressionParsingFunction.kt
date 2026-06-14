@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operators.negation
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-class NegationExpressionParsingFunction : AbstractParsingFunction<Expression>("negation_expression") {
+object NegationExpressionParsingFunction : AbstractParsingFunction<Expression>("negation_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
 

@@ -1,19 +1,18 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.ParsingContext
-import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-class VariableDeclarationStatementParsingFunction :
+object VariableDeclarationStatementParsingFunction :
     AbstractParsingFunction<VariableDeclarationStatement>("variable_declaration_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): VariableDeclarationStatement {
         val parser = context.parser
@@ -54,7 +53,7 @@ class VariableDeclarationStatementParsingFunction :
             isConstant,
             id,
             dataType,
-            parser.parse<Expression>(getDefaultIdentifier("expression"))
+            parser.parse(ExpressionParsingFunction)
         )
     }
 }

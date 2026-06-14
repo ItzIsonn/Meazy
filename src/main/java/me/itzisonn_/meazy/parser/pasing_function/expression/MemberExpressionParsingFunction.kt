@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-class MemberExpressionParsingFunction : AbstractParsingFunction<Expression>("member_expression") {
+object MemberExpressionParsingFunction : AbstractParsingFunction<Expression>("member_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
         var receiver = parser.parseAfter<Expression>(getDefaultIdentifier("member_expression"))

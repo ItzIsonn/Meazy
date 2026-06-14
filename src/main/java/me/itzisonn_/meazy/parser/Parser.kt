@@ -173,42 +173,16 @@ class Parser(
 
 
     /**
-     * Executes ParsingFunction with given id
-     * 
-     * @param id    Id of ParsingFunction
-     * @param cls   Required program unit's class
-     * @param extra Extra info
-     * @param T     Returned program unit's type
-     * @return Parsed program unit
+     * Executes given ParsingFunction
      *
-     * @throws IllegalArgumentException When can't find ParsingFunction with given id
-     * or return type of ParsingFunction doesn't match requested
+     * @param parsingFunction ParsingFunction to execute
+     * @param extra           Extra info
+     * @param T               Returned program unit's type
+     * @return Parsed program unit
      */
-    fun <T : ProgramUnit> parse(id: RegistryIdentifier, cls: Class<T>, vararg extra: Any?): T {
-        val parsingFunction = getParsingFunctionOrNull(id)
-        requireNotNull(parsingFunction) { "Can't find ParsingFunction with id $id" }
+    fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T>, vararg extra: Any?): T {
         val programUnit = parsingFunction.parse(context, *extra)
-
-        require(cls.isInstance(programUnit)) {
-            "Return type of ParsingFunction with id $id doesn't match requested (${cls.getName()})"
-        }
-
-        return cls.cast(programUnit)
-    }
-
-    /**
-     * Executes ParsingFunction with given id
-     *
-     * @param id    Id of ParsingFunction
-     * @param extra Extra info
-     * @param T     Returned program unit's type
-     * @return Parsed program unit
-     *
-     * @throws IllegalArgumentException When can't find ParsingFunction with given id
-     * or return type of ParsingFunction doesn't match requested
-     */
-    inline fun <reified T : ProgramUnit> parse(id: RegistryIdentifier, vararg extra: Any?): T {
-        return parse(id, T::class.java, *extra)
+        return programUnit
     }
 
     /**
@@ -251,17 +225,6 @@ class Parser(
     }
 
 
-
-    /**
-     * Finds ParsingFunction with given id
-     * 
-     * @param id Id
-     * @return ParsingFunction with given id or null
-     */
-    private fun getParsingFunctionOrNull(id: RegistryIdentifier): ParsingFunction<out ProgramUnit>? {
-        val entry = Registries.PARSING_FUNCTIONS.getEntry(id) ?: return null
-        return entry.getValue()
-    }
 
     /**
      * Finds ParsingFunction after ParsingFunction with given id

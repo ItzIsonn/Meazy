@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.IsExpression
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-class IsExpressionParsingFunction : AbstractParsingFunction<Expression>("is_expression") {
+object IsExpressionParsingFunction : AbstractParsingFunction<Expression>("is_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
         val value = parser.parseAfter<Expression>(getDefaultIdentifier("is_expression"))

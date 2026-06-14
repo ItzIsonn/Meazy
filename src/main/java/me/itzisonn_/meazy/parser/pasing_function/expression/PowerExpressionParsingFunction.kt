@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
 
-class PowerExpressionParsingFunction : AbstractParsingFunction<Expression>("power_expression") {
+object PowerExpressionParsingFunction : AbstractParsingFunction<Expression>("power_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
         var left = parser.parseAfter<Expression>(getDefaultIdentifier("power_expression"))
