@@ -1,67 +1,62 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.parser.ast.statement.*;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.comma
+import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
+import me.itzisonn_.meazy.lexer.TokenTypes.colon
+import me.itzisonn_.meazy.lexer.TokenTypes.`interface`
+import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
+import me.itzisonn_.meazy.lexer.TokenTypes.newLine
+import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.statement.InterfaceDeclarationStatement
+import me.itzisonn_.meazy.parser.ast.statement.Statement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.*;
+class InterfaceDeclarationStatementParsingFunction :
+    AbstractParsingFunction<InterfaceDeclarationStatement>("interface_declaration_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): InterfaceDeclarationStatement {
+        val parser = context.parser
+        val modifiers = ParsingHelper.getModifiersFromExtra(extra)
 
-@NullMarked
-public class InterfaceDeclarationStatementParsingFunction extends AbstractParsingFunction<InterfaceDeclarationStatement> {
-    public InterfaceDeclarationStatementParsingFunction() {
-        super("interface_declaration_statement");
-    }
+        parser.consume(`interface`, translatable("meazy:parser.expected.keyword", "interface"))
+        val id = parser.consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "interface")).value
 
-    @Override
-    public InterfaceDeclarationStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        Set<Modifier> modifiers = ParsingHelper.getModifiersFromExtra(extra);
+        val baseClasses = mutableSetOf<String>()
 
-        parser.consume(TokenTypes.INTERFACE(), TextKt.translatable("meazy:parser.expected.keyword", "interface"));
-        String id = parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "interface")).getValue();
-
-        List<Statement> generatedBody = new ArrayList<>();
-
-        Set<String> baseClasses = new HashSet<>();
-
-        if (parser.getCurrent().getType().equals(TokenTypes.COLON())) {
+        if (parser.current.type == colon) {
             do {
-                parser.next();
-                baseClasses.add(parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue());
+                parser.next()
+                baseClasses.add(parser.consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value)
             }
-            while (parser.getCurrent().getType().equals(TokenTypes.COMMA()));
+            while (parser.current.type == comma)
         }
 
-        if (!parser.getCurrent().getType().equals(TokenTypes.LEFT_BRACE())) {
-            return new InterfaceDeclarationStatement(modifiers, id, baseClasses, generatedBody);
+        if (parser.current.type != leftBrace) {
+            return InterfaceDeclarationStatement(modifiers, id, baseClasses, listOf())
         }
 
-        parser.next(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "interface_body"));
+        parser.next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "interface_body"))
 
-        if (parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-            parser.next();
-            return new InterfaceDeclarationStatement(modifiers, id, baseClasses, generatedBody);
+        if (parser.current.type == rightBrace) {
+            parser.next()
+            return InterfaceDeclarationStatement(modifiers, id, baseClasses, listOf())
         }
 
-        parser.consume(TokenTypes.NEW_LINE(), TextKt.translatable("meazy:parser.expected", "new_line"));
-        parser.skipNewLines();
+        parser.consume(newLine, translatable("meazy:parser.expected", "new_line"))
+        parser.skipNewLines()
 
-        List<Statement> body = new ArrayList<>(generatedBody);
-        while (!parser.getCurrent().getType().equals(TokenTypes.END_OF_FILE()) && !parser.getCurrent().getType().equals(TokenTypes.RIGHT_BRACE())) {
-            Statement statement = parser.parse(MeazyMain.getDefaultIdentifier("interface_body_statement"), Statement.class);
-            body.add(statement);
-            parser.skipNewLines();
+        val body = mutableListOf<Statement>()
+        while (parser.current.type != endOfFile && parser.current.type != rightBrace) {
+            val statement = parser.parse<Statement>(getDefaultIdentifier("interface_body_statement"))
+            body.add(statement)
+            parser.skipNewLines()
         }
 
-        parser.next(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "interface_body"));
-        return new InterfaceDeclarationStatement(modifiers, id, baseClasses, body);
+        parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "interface_body"))
+        return InterfaceDeclarationStatement(modifiers, id, baseClasses, body)
     }
 }

@@ -1,35 +1,30 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.parser.ast.statement.*;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.dot
+import me.itzisonn_.meazy.lexer.TokenTypes.import
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.statement.ImportStatement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.text.translatable
 
-@NullMarked
-public class ImportStatementParsingFunction extends AbstractParsingFunction<ImportStatement> {
-    public ImportStatementParsingFunction() {
-        super("import_statement");
-    }
+class ImportStatementParsingFunction : AbstractParsingFunction<ImportStatement>("import_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): ImportStatement {
+        val parser = context.parser
+        parser.next(import, translatable("meazy:parser.expected.keyword", "import"))
 
-    @Override
-    public ImportStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-        parser.next(TokenTypes.IMPORT(), TextKt.translatable("meazy:parser.expected.keyword", "import"));
+        val name = StringBuilder(
+            parser.consume(
+                TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "import")
+            ).value
+        )
 
-        StringBuilder name = new StringBuilder(parser.consume(
-                TokenTypes.ID(), TextKt.translatable("meazy:parser.expected.after_keyword", "id", "import")).getValue()
-        );
-
-        while (parser.getCurrent().getType().equals(TokenTypes.DOT())) {
-            parser.next();
-            name.append(".");
-            name.append(parser.consume(TokenTypes.ID(), TextKt.translatable("meazy:parser.expected", "id")).getValue());
+        while (parser.current.type == dot) {
+            parser.next()
+            name.append(".")
+            name.append(parser.consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value)
         }
 
-        return new ImportStatement(name.toString());
+        return ImportStatement(name.toString())
     }
 }
