@@ -22,7 +22,7 @@ class FunctionDeclarationStatementParsingFunction :
     AbstractParsingFunction<FunctionDeclarationStatement>("function_declaration_statement") {
     override fun parse(context: ParsingContext, vararg extra: Any?): FunctionDeclarationStatement {
         val parser = context.parser
-        val modifiers = ParsingHelper.getModifiersFromExtra(extra)
+        val modifiers = ParsingHelper.getModifiersFromExtra(extra).toMutableSet()
 
         require(extra.size != 1) { "Expected boolean as extra argument" }
         require(extra[1] is Boolean) { "Expected boolean as extra argument" }
@@ -46,13 +46,13 @@ class FunctionDeclarationStatementParsingFunction :
             return FunctionDeclarationStatement(modifiers, id, parameters, mutableListOf(), dataType)
         }
 
-        val body: MutableList<LocalStatement>?
+        val body: List<LocalStatement>
         val returnDataTypeValue: Expression?
 
         if (parser.current.type == assign) {
             parser.next()
             val expression = parser.parse<Expression>(getDefaultIdentifier("expression"))
-            body = mutableListOf(ReturnStatement(expression))
+            body = listOf(ReturnStatement(expression))
             returnDataTypeValue = expression
         }
         else {

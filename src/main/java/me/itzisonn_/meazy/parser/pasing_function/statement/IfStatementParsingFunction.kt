@@ -29,7 +29,7 @@ class IfStatementParsingFunction : AbstractParsingFunction<IfStatement>("if_stat
         var body = mutableListOf<LocalStatement>()
         if (parser.current.type == leftBrace) {
             parser.next()
-            body = ParsingHelper.parseBody(context)
+            body = ParsingHelper.parseBody(context).toMutableList()
             parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
         }
         else body.add(parser.parse<LocalStatement>(getDefaultIdentifier("local_statement")))
@@ -49,7 +49,7 @@ class IfStatementParsingFunction : AbstractParsingFunction<IfStatement>("if_stat
                 var elseBody = mutableListOf<LocalStatement>()
                 if (parser.current.type == leftBrace) {
                     parser.next()
-                    elseBody = ParsingHelper.parseBody(context)
+                    elseBody = ParsingHelper.parseBody(context).toMutableList()
                     parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
                 }
                 else elseBody.add(

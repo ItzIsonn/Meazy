@@ -1,40 +1,38 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.ast.statement.LocalStatement;
-import me.itzisonn_.meazy.parser.ast.statement.WhileStatement;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
+import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
+import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
+import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
+import me.itzisonn_.meazy.lexer.TokenTypes.`while`
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.statement.WhileStatement
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.List;
+class WhileStatementParsingFunction : AbstractParsingFunction<WhileStatement>("while_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): WhileStatement {
+        val parser = context.parser
 
-@NullMarked
-public class WhileStatementParsingFunction extends AbstractParsingFunction<WhileStatement> {
-    public WhileStatementParsingFunction() {
-        super("while_statement");
-    }
+        parser.consume(`while`, translatable("meazy:parser.expected.keyword", "while"))
 
-    @Override
-    public WhileStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
+        parser.consume(
+            leftParenthesis,
+            translatable("meazy:parser.expected.start", "left_parenthesis", "while_condition")
+        )
+        val condition = parser.parse<Expression>(getDefaultIdentifier("expression"))
+        parser.consume(
+            rightParenthesis,
+            translatable("meazy:parser.expected.end", "right_parenthesis", "while_condition")
+        )
 
-        parser.consume(TokenTypes.WHILE(), TextKt.translatable("meazy:parser.expected.keyword", "while"));
+        parser.consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "while_body"))
+        val body = ParsingHelper.parseBody(context)
+        parser.consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "while_body"))
 
-        parser.consume(TokenTypes.LEFT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.start", "left_parenthesis", "while_condition"));
-        Expression condition = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-        parser.consume(TokenTypes.RIGHT_PARENTHESIS(), TextKt.translatable("meazy:parser.expected.end", "right_parenthesis", "while_condition"));
-
-        parser.consume(TokenTypes.LEFT_BRACE(), TextKt.translatable("meazy:parser.expected.start", "left_brace", "while_body"));
-        List<LocalStatement> body = ParsingHelper.parseBody(context);
-        parser.consume(TokenTypes.RIGHT_BRACE(), TextKt.translatable("meazy:parser.expected.end", "right_brace", "while_body"));
-
-        return new WhileStatement(condition, body);
+        return WhileStatement(condition, body)
     }
 }

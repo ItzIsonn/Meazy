@@ -15,8 +15,9 @@ import java.lang.reflect.AccessFlag
 class ConstructorDeclarationStatement(
     modifiers: Set<Modifier>,
     val parameters: List<Parameter>,
-    val body: MutableList<LocalStatement>
+    body: List<LocalStatement>
 ) : ModifierStatement(modifiers), DeclarationStatement {
+    val body = body.toMutableList()
     private lateinit var constructorEnvironment: ConstructorEnvironment
 
     override fun declare(environment: Environment) {

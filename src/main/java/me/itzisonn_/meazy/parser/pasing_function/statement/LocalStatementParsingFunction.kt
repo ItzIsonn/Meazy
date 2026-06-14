@@ -1,66 +1,88 @@
-package me.itzisonn_.meazy.parser.pasing_function.statement;
+package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.MeazyMain;
-import me.itzisonn_.meazy.lexer.TokenTypeSets;
-import me.itzisonn_.meazy.lexer.TokenTypes;
-import me.itzisonn_.meazy.parser.ParsingContext;
-import me.itzisonn_.meazy.text.TextKt;
-import me.itzisonn_.meazy.parser.ast.statement.*;
-import me.itzisonn_.meazy.parser.modifier.Modifier;
-import me.itzisonn_.meazy.parser.Parser;
-import me.itzisonn_.meazy.parser.ast.expression.Expression;
-import me.itzisonn_.meazy.parser.InvalidStatementException;
-import me.itzisonn_.meazy.parser.InvalidSyntaxException;
-import me.itzisonn_.meazy.parser.ast.expression.MemberExpression;
-import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression;
-import me.itzisonn_.meazy.parser.ast.expression.CallExpression;
-import me.itzisonn_.meazy.parser.operator.OperatorType;
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction;
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorAssign
+import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorPostfix
+import me.itzisonn_.meazy.lexer.TokenTypes.assign
+import me.itzisonn_.meazy.lexer.TokenTypes.base
+import me.itzisonn_.meazy.lexer.TokenTypes.`break`
+import me.itzisonn_.meazy.lexer.TokenTypes.`continue`
+import me.itzisonn_.meazy.lexer.TokenTypes.`for`
+import me.itzisonn_.meazy.lexer.TokenTypes.`if`
+import me.itzisonn_.meazy.lexer.TokenTypes.`return`
+import me.itzisonn_.meazy.lexer.TokenTypes.variable
+import me.itzisonn_.meazy.lexer.TokenTypes.`while`
+import me.itzisonn_.meazy.parser.InvalidStatementException
+import me.itzisonn_.meazy.parser.InvalidSyntaxException
+import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.ast.expression.CallExpression
+import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
+import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
+import me.itzisonn_.meazy.parser.ast.statement.*
+import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.text.translatable
 
-import java.util.Set;
+class LocalStatementParsingFunction : AbstractParsingFunction<LocalStatement>("local_statement") {
+    override fun parse(context: ParsingContext, vararg extra: Any?): LocalStatement {
+        val parser = context.parser
+        val modifiers = ParsingHelper.parseModifiers(context)
 
-@NullMarked
-public class LocalStatementParsingFunction extends AbstractParsingFunction<LocalStatement> {
-    public LocalStatementParsingFunction() {
-        super("local_statement");
-    }
-
-    @Override
-    public LocalStatement parse(ParsingContext context, @Nullable Object... extra) {
-        Parser parser = context.getParser();
-
-        Set<Modifier> modifiers = ParsingHelper.parseModifiers(context);
-
-        if (parser.getCurrent().getType().equals(TokenTypes.VARIABLE())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("variable_declaration_statement"), VariableDeclarationStatement.class, modifiers, false);
+        if (parser.current.type == variable) {
+            return parser.parse<VariableDeclarationStatement>(
+                getDefaultIdentifier("variable_declaration_statement"),
+                modifiers,
+                false
+            )
         }
-        if (!modifiers.isEmpty()) throw new InvalidSyntaxException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.modifier.unexpected"));
+        if (!modifiers.isEmpty()) throw InvalidSyntaxException(
+            parser.current.line,
+            translatable("meazy:parser.modifier.unexpected")
+        )
 
-        if (parser.getCurrent().getType().equals(TokenTypes.IF())) return parser.parse(MeazyMain.getDefaultIdentifier("if_statement"), IfStatement.class);
-        if (parser.getCurrent().getType().equals(TokenTypes.FOR())) return parser.parse(MeazyMain.getDefaultIdentifier("foreach_statement"), ForeachStatement.class);
-        if (parser.getCurrent().getType().equals(TokenTypes.WHILE())) return parser.parse(MeazyMain.getDefaultIdentifier("while_statement"), WhileStatement.class);
-        if (parser.getCurrent().getType().equals(TokenTypes.RETURN())) return parser.parse(MeazyMain.getDefaultIdentifier("return_statement"), ReturnStatement.class);
-        if (parser.getCurrent().getType().equals(TokenTypes.CONTINUE())) return parser.parse(MeazyMain.getDefaultIdentifier("continue_statement"), ContinueStatement.class);
-        if (parser.getCurrent().getType().equals(TokenTypes.BREAK())) return parser.parse(MeazyMain.getDefaultIdentifier("break_statement"), BreakStatement.class);
-        if (parser.getCurrent().getType().equals(TokenTypes.BASE())) return parser.parse(MeazyMain.getDefaultIdentifier("base_call_statement"), BaseCallStatement.class);
+        if (parser.current.type == `if`) return parser.parse<IfStatement>(
+            getDefaultIdentifier("if_statement")
+        )
+        if (parser.current.type == `for`) return parser.parse<ForeachStatement>(
+            getDefaultIdentifier("foreach_statement")
+        )
+        if (parser.current.type == `while`) return parser.parse<WhileStatement>(
+            getDefaultIdentifier("while_statement")
+        )
+        if (parser.current.type == `return`) return parser.parse<ReturnStatement>(
+            getDefaultIdentifier("return_statement")
+        )
+        if (parser.current.type == `continue`) return parser.parse<ContinueStatement>(
+            getDefaultIdentifier("continue_statement")
+        )
+        if (parser.current.type == `break`) return parser.parse<BreakStatement>(
+            getDefaultIdentifier("break_statement")
+        )
+        if (parser.current.type == base) return parser.parse<BaseCallStatement>(
+            getDefaultIdentifier("base_call_statement")
+        )
 
-        if (parser.currentLineHasToken(TokenTypes.ASSIGN()) || parser.currentLineHasToken(TokenTypeSets.INSTANCE.getOperatorAssign())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("assignment_statement"), AssignmentStatement.class);
+        if (parser.currentLineHasToken(assign) || parser.currentLineHasToken(operatorAssign)) {
+            return parser.parse<AssignmentStatement>(
+                getDefaultIdentifier("assignment_statement")
+            )
         }
 
-        if (parser.currentLineHasToken(TokenTypeSets.INSTANCE.getOperatorPostfix())) {
-            return parser.parse(MeazyMain.getDefaultIdentifier("postfix_statement"), AssignmentStatement.class);
+        if (parser.currentLineHasToken(operatorPostfix)) {
+            return parser.parse<AssignmentStatement>(
+                getDefaultIdentifier("postfix_statement")
+            )
         }
 
-        Expression expression = parser.parse(MeazyMain.getDefaultIdentifier("expression"), Expression.class);
-        return switch (expression) {
-            case CallExpression callExpression -> callExpression;
-            case MemberExpression memberExpression -> memberExpression;
-            case OperatorExpression operatorExpression when operatorExpression.getOperator().getOperatorType() != OperatorType.INFIX -> operatorExpression;
-            default -> throw new InvalidStatementException(parser.getCurrent().getLine(), TextKt.translatable("meazy:parser.exception.statement"));
-        };
+        return when (val expression = parser.parse<Expression>(getDefaultIdentifier("expression"))) {
+            is CallExpression -> expression
+            is MemberExpression -> expression
+            is OperatorExpression -> expression
+            else -> throw InvalidStatementException(
+                parser.current.line,
+                translatable("meazy:parser.exception.statement")
+            )
+        }
     }
 }

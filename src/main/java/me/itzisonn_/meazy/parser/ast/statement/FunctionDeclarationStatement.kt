@@ -18,10 +18,11 @@ class FunctionDeclarationStatement(
     val id: String,
     val classId: String?,
     val parameters: List<Parameter>,
-    val body: MutableList<LocalStatement>,
+    body: List<LocalStatement>,
     val returnDataType: DataType?,
     val returnDataTypeValue: Expression?
 ) : ModifierStatement(modifiers), DeclarationStatement {
+    val body = body.toMutableList()
     private lateinit var functionEnvironment: FunctionEnvironment
 
     constructor(
