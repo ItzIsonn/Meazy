@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.parser.ParsingContext
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
@@ -14,10 +13,10 @@ object InversionExpressionParsingFunction : AbstractParsingFunction<Expression>(
 
         if (parser.current.type == inversion) {
             parser.next()
-            val expression = parser.parseAfter<Expression>(getDefaultIdentifier("inversion_expression"))
+            val expression = parser.parse(IsExpressionParsingFunction)
             return OperatorExpression(expression, null, Operators.inversion)
         }
 
-        return parser.parseAfter<Expression>(getDefaultIdentifier("inversion_expression"))
+        return parser.parse(IsExpressionParsingFunction)
     }
 }
