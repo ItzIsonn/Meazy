@@ -7,44 +7,8 @@ import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnv
 import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
-import java.util.Optional
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
-
-object EnvironmentUtils {
-    /**
-     * Searches for given environment as a parent in this environment and all parents
-     * @param environment Environment to lookup
-     * @return Whether this environment has requested parent
-     */
-    @JvmStatic
-    fun hasParent(environment: Environment, target: Environment): Boolean {
-        return environment.hasParent(target)
-    }
-
-    /**
-     * Searches for environment that matches given predicate in all parents of given environment
-     * @param predicate Predicate that matches parent environment
-     * @return Whether this environment has requested parent
-     */
-    @JvmStatic
-    fun hasParent(environment: Environment, predicate: (Environment?) -> Boolean): Boolean {
-        return environment.hasParent(predicate)
-    }
-
-    @JvmStatic
-    @Deprecated("Use function with KClass instead")
-    fun <T : Environment> getParent(environment: Environment, cls: Class<T>): Optional<T> {
-        return Optional.ofNullable(environment.getParent(cls.kotlin))
-    }
-
-    @JvmStatic
-    fun getClass(environment: Environment, id: String): Optional<ClassEnvironment> {
-        return Optional.ofNullable(environment.getClass(id))
-    }
-}
-
-
 
 /**
  * Searches for given environment as a parent in this environment and all parents

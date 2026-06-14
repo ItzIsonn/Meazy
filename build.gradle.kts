@@ -1,5 +1,4 @@
 plugins {
-    java
     kotlin("jvm") version "2.4.0"
 }
 
@@ -19,8 +18,6 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("com.google.code.gson:gson:2.14.0")
     implementation(files("libs/Registry.jar"))
-
-    implementation("org.jspecify:jspecify:1.0.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:${junitVersion}")
     testImplementation("org.junit.platform:junit-platform-suite-api:${junitVersion}")

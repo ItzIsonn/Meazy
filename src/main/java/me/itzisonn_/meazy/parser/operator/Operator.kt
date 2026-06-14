@@ -13,7 +13,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
  * @param operatorType  Operator type
  * @param isOverridable Whether this operator is overridable by operator functions
  */
-abstract class Operator @JvmOverloads constructor(
+abstract class Operator(
     val id: String,
     val symbol: String,
     val operatorType: OperatorType,

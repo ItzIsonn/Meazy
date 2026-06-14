@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.EnvironmentUtils.hasParent
+import me.itzisonn_.meazy.runtime.environment.hasParent
 
 class PrivateModifier : Modifier("private") {
     override fun canUse(modifierStatement: ModifierStatement, environment: Environment): Boolean {
@@ -31,12 +31,12 @@ class PrivateModifier : Modifier("private") {
         if (!hasModifier) return true
 
         if (identifier is ConstructorClassIdentifier) {
-            return hasParent(requestEnvironment) { env ->
+            return requestEnvironment.hasParent { env ->
                 if (env is ClassEnvironment) return@hasParent env.id == identifier.id
                 false
             }
         }
 
-        return requestEnvironment === environment || hasParent(requestEnvironment, environment)
+        return requestEnvironment === environment || requestEnvironment.hasParent(environment)
     }
 }

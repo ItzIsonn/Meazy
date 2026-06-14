@@ -3,12 +3,10 @@ package me.itzisonn_.meazy.instruction.number
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.NumberType
-import org.jspecify.annotations.NullMarked
 import java.lang.classfile.CodeBuilder
 import java.lang.classfile.TypeKind
 import java.lang.constant.MethodTypeDesc
 
-@NullMarked
 class ConvertToNumberTypeInstruction(private val from: NumberType, private val to: NumberType) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
         val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")

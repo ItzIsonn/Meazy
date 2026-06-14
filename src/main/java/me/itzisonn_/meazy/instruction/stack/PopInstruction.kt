@@ -2,9 +2,7 @@ package me.itzisonn_.meazy.instruction.stack
 
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
-import org.jspecify.annotations.NullMarked
 
-@NullMarked
 class PopInstruction : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
         val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")

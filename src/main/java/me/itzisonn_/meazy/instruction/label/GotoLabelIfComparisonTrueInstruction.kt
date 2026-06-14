@@ -3,10 +3,8 @@ package me.itzisonn_.meazy.instruction.label
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.NumberType
-import org.jspecify.annotations.NullMarked
 import kotlin.uuid.Uuid
 
-@NullMarked
 class GotoLabelIfComparisonTrueInstruction(
     private val type: NumberType,
     private val operation: ComparisonOperation,

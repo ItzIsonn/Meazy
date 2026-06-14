@@ -2,11 +2,9 @@ package me.itzisonn_.meazy.instruction.number
 
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction
-import org.jspecify.annotations.NullMarked
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
-@NullMarked
 class ConvertToBooleanTypeInstruction(private val isFromBoxed: Boolean, private val isToBoxed: Boolean) : Instruction {
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
         val codeBuilder = bytecodeBuilders.codeBuilder ?: error("Code builder is null")

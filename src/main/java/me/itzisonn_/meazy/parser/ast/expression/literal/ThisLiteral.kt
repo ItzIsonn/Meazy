@@ -7,10 +7,8 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
-import org.jspecify.annotations.NullMarked
 import java.lang.constant.ClassDesc
 
-@NullMarked
 class ThisLiteral : Expression {
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
         instructions.loadThisReference()

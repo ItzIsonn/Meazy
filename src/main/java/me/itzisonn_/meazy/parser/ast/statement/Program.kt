@@ -7,7 +7,6 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.runtime.environment.isInstanceOf
-import me.itzisonn_.meazy.util.FileUtils
 import me.itzisonn_.meazy.util.MiscUtils
 import me.itzisonn_.meazy.version.Version
 import java.io.File
@@ -33,7 +32,7 @@ class Program(
         if (environment !is GlobalEnvironment) throw RuntimeException("Environment must be global")
         val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
 
-        var id = FileUtils.getNameWithoutExtension(file)
+        var id = file.nameWithoutExtension
         id = id.substring(0, 1).uppercase() + id.substring(1)
 
         fileEnvironment = FileEnvironment(environment, path[path.size - 2], id)
@@ -62,7 +61,7 @@ class Program(
 
     fun emit(instructions: InstructionsSet, environment: Environment) {
         val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
-        var id = FileUtils.getNameWithoutExtension(file)
+        var id = file.nameWithoutExtension
         id = id.substring(0, 1).uppercase() + id.substring(1)
 
         val classDesc = ClassDesc.of(path[path.size - 2], id)

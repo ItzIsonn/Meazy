@@ -28,7 +28,7 @@ object TokenTypes {
                 "id",
                 "[a-zA-Z_][a-zA-Z0-9_]*",
                 false
-            ) { string: String ->
+            ) { string ->
                 for (tokenType in TokenTypeSets.keywords.getTokenTypes()) {
                     if (tokenType.pattern?.matcher(string)?.matches() == true) {
                         return@TokenType false
@@ -37,7 +37,6 @@ object TokenTypes {
                 true
             })
     }
-
 
 
 
@@ -90,148 +89,6 @@ object TokenTypes {
     val boolean get() = get("boolean")
     val `this` get() = get("this")
     val id get() = get("id")
-
-
-
-
-
-    @JvmStatic
-    fun NEW_LINE(): TokenType {
-        return get("new_line")
-    }
-
-    @JvmStatic
-    fun END_OF_FILE(): TokenType {
-        return get("end_of_file")
-    }
-
-
-    @JvmStatic
-    fun IMPORT(): TokenType {
-        return get("import")
-    }
-
-    @JvmStatic
-    fun VARIABLE(): TokenType {
-        return get("variable")
-    }
-    
-    @JvmStatic
-    fun FUNCTION(): TokenType {
-        return get("function")
-    }
-    
-    @JvmStatic
-    fun CLASS(): TokenType {
-        return get("class")
-    }
-    
-    @JvmStatic
-    fun INTERFACE(): TokenType {
-        return get("interface")
-    }
-    
-    @JvmStatic
-    fun CONSTRUCTOR(): TokenType {
-        return get("constructor")
-    }
-    
-    @JvmStatic
-    fun BASE(): TokenType {
-        return get("base")
-    }
-    
-    @JvmStatic
-    fun IF(): TokenType {
-        return get("if")
-    }
-    
-    @JvmStatic
-    fun ELSE(): TokenType {
-        return get("else")
-    }
-    
-    @JvmStatic
-    fun FOR(): TokenType {
-        return get("for")
-    }
-    
-    @JvmStatic
-    fun IN(): TokenType {
-        return get("in")
-    }
-    
-    @JvmStatic
-    fun WHILE(): TokenType {
-        return get("while")
-    }
-    
-    @JvmStatic
-    fun RETURN(): TokenType {
-        return get("return")
-    }
-    
-    @JvmStatic
-    fun CONTINUE(): TokenType {
-        return get("continue")
-    }
-    
-    @JvmStatic
-    fun BREAK(): TokenType {
-        return get("break")
-    }
-    
-
-    @JvmStatic
-    fun LEFT_PARENTHESIS(): TokenType {
-        return get("left_parenthesis")
-    }
-    
-    @JvmStatic
-    fun RIGHT_PARENTHESIS(): TokenType {
-        return get("right_parenthesis")
-    }
-    
-    @JvmStatic
-    fun LEFT_BRACE(): TokenType {
-        return get("left_brace")
-    }
-    
-    @JvmStatic
-    fun RIGHT_BRACE(): TokenType {
-        return get("right_brace")
-    }
-    
-    @JvmStatic
-    fun COLON(): TokenType {
-        return get("colon")
-    }
-    
-    @JvmStatic
-    fun COMMA(): TokenType {
-        return get("comma")
-    }
-    
-    @JvmStatic
-    fun DOT(): TokenType {
-        return get("dot")
-    }
-    
-    @JvmStatic
-    fun QUESTION(): TokenType {
-        return get("question")
-    }
-    
-
-    @JvmStatic
-    fun ASSIGN(): TokenType {
-        return get("assign")
-    }
-    
-    @JvmStatic
-    fun ID(): TokenType {
-        return get("id")
-    }
     
     private fun get(id: String): TokenType {
         return Registries.TOKEN_TYPES.getEntry(getDefaultIdentifier(id))?.value!!

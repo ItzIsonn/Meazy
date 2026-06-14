@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.command.AbstractCommand
 import me.itzisonn_.meazy.text.Text
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.util.FileUtils.getExtension
 import me.itzisonn_.meazy.util.FileUtils.getLines
 import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
@@ -18,7 +17,7 @@ class RunCommand : AbstractCommand("run", listOf("target_file")) {
             return null
         }
 
-        val extension = getExtension(file)
+        val extension = file.extension
         if (extension != "mea") {
             Logger.log(LogLevel.ERROR, translatable("meazy:file.unsupported_extension", extension))
             return null

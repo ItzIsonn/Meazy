@@ -20,10 +20,8 @@ import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers.parse
 import me.itzisonn_.meazy.text.translatable
-import org.jspecify.annotations.NullMarked
 import java.lang.constant.ClassDesc
 
-@NullMarked
 object ParsingHelper {
     fun parseModifiers(context: ParsingContext): Set<Modifier> {
         val parser = context.parser

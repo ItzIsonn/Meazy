@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.lexer.Token
 import me.itzisonn_.meazy.lexer.TokenType
 import me.itzisonn_.meazy.lexer.TokenTypeSet
 import me.itzisonn_.meazy.lexer.TokenTypes
-import me.itzisonn_.meazy.lexer.TokenTypes.NEW_LINE
+import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.registry.Registries
@@ -135,7 +135,7 @@ class Parser(
      * Skips all [TokenTypes.newLine] tokens
      */
     fun skipNewLines() {
-        while (current.type == TokenTypes.newLine) pos++
+        while (current.type == newLine) pos++
     }
 
     /**
@@ -147,7 +147,7 @@ class Parser(
     fun currentLineHasToken(tokenType: TokenType): Boolean {
         for (i in pos..<tokens.size) {
             val current = tokens[i].type
-            if (current == TokenTypes.newLine) return false
+            if (current == newLine) return false
             if (current == tokenType) return true
         }
 
@@ -163,7 +163,7 @@ class Parser(
     fun currentLineHasToken(tokenTypeSet: TokenTypeSet): Boolean {
         for (i in pos..<tokens.size) {
             val current = tokens[i].type
-            if (current == NEW_LINE()) return false
+            if (current == newLine) return false
             if (current in tokenTypeSet) return true
         }
 
