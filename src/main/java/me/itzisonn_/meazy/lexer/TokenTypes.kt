@@ -12,12 +12,11 @@ object TokenTypes {
     private var hasRegistered = false
 
     /**
-     * Initializes [Registries.PARSING_FUNCTIONS] registry
-     *
+     * Initializes [Registries.TOKEN_TYPES] registry
      *
      * *Don't use this method because it's called once at [Registries] initialization*
      *
-     * @throws IllegalStateException If [Registries.PARSING_FUNCTIONS] registry has already been initialized
+     * @throws IllegalStateException If [Registries.TOKEN_TYPES] registry has already been initialized
      */
     fun register() {
         check(!hasRegistered) { "ParsingFunctions have already been initialized" }

@@ -13,14 +13,10 @@ import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
-import me.itzisonn_.meazy.parser.pasing_function.ParsingFunctions
 import me.itzisonn_.meazy.parser.pasing_function.statement.ProgramParsingFunction
-import me.itzisonn_.meazy.registry.Registries.PARSING_FUNCTIONS
-import me.itzisonn_.meazy.registry.Registries.TOKEN_TYPES
 import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.text.Language
-import me.itzisonn_.registry.multiple_entry.OrderedRegistry
 import me.itzisonn_.registry.multiple_entry.SetRegistry
 import java.io.File
 import java.lang.constant.ClassDesc
@@ -84,15 +80,7 @@ object Registries {
     val OPERATORS = OperatorRegistry()
 
     /**
-     * Registry for all ParsingFunctions
-     * 
-     * @see ParsingFunction
-     * @see Parser
-     */
-    val PARSING_FUNCTIONS = OrderedRegistry<ParsingFunction<*>>()
-
-    /**
-     * Registry for function that uses [PARSING_FUNCTIONS] to parse tokens into [Program]
+     * Registry for function that parses tokens into [Program]
      * 
      * @see ParsingFunction
      * @see Parser
@@ -135,7 +123,6 @@ object Registries {
         TokenTypes.register()
         Modifiers.register()
         Operators.register()
-        ParsingFunctions.register()
 
         tokenizationFunction = { lines ->
             val tokens = mutableListOf<Token>()

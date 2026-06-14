@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes.minus
 import me.itzisonn_.meazy.parser.ParsingContext
 import me.itzisonn_.meazy.parser.ast.expression.Expression
@@ -14,10 +13,10 @@ object NegationExpressionParsingFunction : AbstractParsingFunction<Expression>("
 
         if (parser.current.type == minus) {
             parser.next()
-            val expression = parser.parseAfter<Expression>(getDefaultIdentifier("negation_expression"))
+            val expression = parser.parse(MemberExpressionParsingFunction)
             return OperatorExpression(expression, null, negation)
         }
 
-        return parser.parseAfter<Expression>(getDefaultIdentifier("negation_expression"))
+        return parser.parse(MemberExpressionParsingFunction)
     }
 }

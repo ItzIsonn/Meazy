@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.ParsingContext
@@ -14,7 +13,7 @@ import me.itzisonn_.meazy.text.translatable
 object CallExpressionParsingFunction : AbstractParsingFunction<Expression>("call_expression") {
     override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
         val parser = context.parser
-        val expression = parser.parseAfter<Expression>(getDefaultIdentifier("call_expression"))
+        val expression = parser.parse(PrimaryExpressionParsingFunction)
 
         if (parser.current.type == leftParenthesis) {
             if (expression !is Identifier) {

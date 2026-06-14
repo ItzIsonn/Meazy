@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBracket
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBracket
@@ -37,6 +36,6 @@ object ListCreationExpressionParsingFunction : AbstractParsingFunction<Expressio
             return ListCreationExpression(list)
         }
 
-        return parser.parseAfter<Expression>(getDefaultIdentifier("list_creation_expression"))
+        return parser.parse(MapCreationExpressionParsingFunction)
     }
 }
