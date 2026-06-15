@@ -15,7 +15,7 @@ import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFun
 import me.itzisonn_.meazy.parser.pasing_function.parseBody
 import me.itzisonn_.meazy.text.translatable
 
-object IfStatementParsingFunction : ParsingFunction<IfStatement>("if_statement") {
+object IfStatementParsingFunction : ParsingFunction<IfStatement> {
     override fun Parser.parse(vararg extra: Any?): IfStatement {
         next(`if`, translatable("meazy:parser.expected.keyword", "if"))
         next(leftParenthesis, translatable("meazy:parser.expected.start", "left_parenthesis", "if_condition"))

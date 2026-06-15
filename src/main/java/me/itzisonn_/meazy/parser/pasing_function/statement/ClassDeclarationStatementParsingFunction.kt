@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
@@ -41,16 +41,16 @@ import me.itzisonn_.meazy.util.MiscUtils.generatePrefixedName
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
-object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarationStatement>("class_declaration_statement") {
+object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarationStatement> {
     override fun Parser.parse(vararg extra: Any?): ClassDeclarationStatement {
         val modifiers = getModifiersFromExtra(extra).toMutableSet()
 
         consume(`class`, translatable("meazy:parser.expected.keyword", "class"))
-        val id = consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "class")).value
+        val classId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "class")).value
 
         val generatedBody = mutableListOf<Statement>()
         if (data in modifiers) {
-            generatedBody.addAll(generateDataBody(id, parseParameters()))
+            generatedBody.addAll(generateDataBody(classId, parseParameters()))
             modifiers.remove(data)
         }
 
@@ -61,20 +61,20 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             baseClassesLineNumber = current.line
             do {
                 next()
-                baseClasses.add(consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value)
+                baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
             }
             while (current.type == comma)
         }
 
         if (current.type != leftBrace) {
-            return ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody)
+            return ClassDeclarationStatement(modifiers, classId, baseClasses, generatedBody)
         }
 
         next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "class_body"))
 
         if (current.type == rightBrace) {
             next()
-            return ClassDeclarationStatement(modifiers, id, baseClasses, generatedBody)
+            return ClassDeclarationStatement(modifiers, classId, baseClasses, generatedBody)
         }
 
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
@@ -87,7 +87,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 translatable("meazy:parser.exception.enums.base_classes")
             )
 
-            var enumId = consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
+            var enumId = consume(id, translatable("meazy:parser.expected", "id")).value
             var args = if (current.type == leftParenthesis) parseArgs() else mutableListOf()
             enumIds[enumId] = args
 
@@ -96,7 +96,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 skipNewLines()
 
                 val lineNumber = current.line
-                enumId = consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
+                enumId = consume(id, translatable("meazy:parser.expected", "id")).value
                 if (enumIds.containsKey(enumId)) throw InvalidSyntaxException(
                     lineNumber,
                     translatable("meazy:parser.exception.enums.duplicated_entries")
@@ -127,7 +127,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         }
 
         next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "class_body"))
-        return ClassDeclarationStatement(modifiers, id, baseClasses, body, enumIds)
+        return ClassDeclarationStatement(modifiers, classId, baseClasses, body, enumIds)
     }
 
 

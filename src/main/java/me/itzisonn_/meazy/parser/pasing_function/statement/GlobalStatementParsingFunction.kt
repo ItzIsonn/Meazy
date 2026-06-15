@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseModifiers
 import me.itzisonn_.meazy.text.translatable
 
-object GlobalStatementParsingFunction : ParsingFunction<Statement>("global_statement") {
+object GlobalStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {
         val modifiers = parseModifiers()
 

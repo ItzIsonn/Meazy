@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
@@ -15,31 +15,31 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.getModifiersFromExtra
 import me.itzisonn_.meazy.text.translatable
 
-object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceDeclarationStatement>("interface_declaration_statement") {
+object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceDeclarationStatement> {
     override fun Parser.parse(vararg extra: Any?): InterfaceDeclarationStatement {
         val modifiers = getModifiersFromExtra(extra)
 
         consume(`interface`, translatable("meazy:parser.expected.keyword", "interface"))
-        val id = consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "interface")).value
+        val interfaceId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "interface")).value
 
         val baseClasses = mutableSetOf<String>()
         if (current.type == colon) {
             do {
                 next()
-                baseClasses.add(consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value)
+                baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
             }
             while (current.type == comma)
         }
 
         if (current.type != leftBrace) {
-            return InterfaceDeclarationStatement(modifiers, id, baseClasses, listOf())
+            return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
         }
 
         next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "interface_body"))
 
         if (current.type == rightBrace) {
             next()
-            return InterfaceDeclarationStatement(modifiers, id, baseClasses, listOf())
+            return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
         }
 
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
@@ -53,6 +53,6 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
         }
 
         next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "interface_body"))
-        return InterfaceDeclarationStatement(modifiers, id, baseClasses, body)
+        return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, body)
     }
 }

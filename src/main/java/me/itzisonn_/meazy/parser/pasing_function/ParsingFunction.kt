@@ -9,19 +9,14 @@ import me.itzisonn_.meazy.lexer.Token
  *
  * @param T Type of ProgramUnit to parse into
  */
-abstract class ParsingFunction<T : ProgramUnit>(val id: String) {
-    @JvmName("parseBridge")
-    fun parse(parser: Parser, vararg extra: Any?): T {
-        return parser.parse(*extra)
-    }
-
+interface ParsingFunction<T : ProgramUnit> {
     /**
-     * Parses tokens, which is stored in [Parser], into [T]
+     * Parses tokens, which is stored in [Parser], into program unit of type [T]
      *
      * @receiver Parser
      * @param extra Extra info
      *
      * @return Parsed [T] ProgramUnit
      */
-    abstract fun Parser.parse(vararg extra: Any?): T
+    fun Parser.parse(vararg extra: Any?): T
 }

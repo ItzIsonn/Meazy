@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.InvalidSyntaxException
@@ -13,7 +13,7 @@ import me.itzisonn_.meazy.parser.pasing_function.getModifiersFromExtra
 import me.itzisonn_.meazy.parser.pasing_function.parseDataType
 import me.itzisonn_.meazy.text.translatable
 
-object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDeclarationStatement>("variable_declaration_statement") {
+object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDeclarationStatement> {
     override fun Parser.parse(vararg extra: Any?): VariableDeclarationStatement {
         val modifiers = getModifiersFromExtra(extra)
 
@@ -22,7 +22,7 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
         val canBeConstantWithoutValue = extra[1] as Boolean
 
         val isConstant = consume(variable, translatable("meazy:parser.expected.keyword", "variable")).value == "val"
-        val id = consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
+        val variableId = consume(id, translatable("meazy:parser.expected", "id")).value
         val dataType = parseDataType()
 
         if (current.type != assign) {
@@ -34,7 +34,7 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
             if (canBeConstantWithoutValue) return VariableDeclarationStatement(
                 modifiers,
                 isConstant,
-                id,
+                variableId,
                 dataType,
                 null
             )
@@ -42,7 +42,7 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
                 current.line,
                 translatable("meazy:parser.exception.constant_without_value")
             )
-            return VariableDeclarationStatement(modifiers, false, id, dataType, NullLiteral())
+            return VariableDeclarationStatement(modifiers, false, variableId, dataType, NullLiteral())
         }
 
         next(assign, translatable("meazy:parser.expected.after", "assign", "id"))
@@ -50,7 +50,7 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
         return VariableDeclarationStatement(
             modifiers,
             isConstant,
-            id,
+            variableId,
             dataType,
             parse(ExpressionParsingFunction)
         )

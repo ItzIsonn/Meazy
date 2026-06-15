@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object PostfixStatementParsingFunction : ParsingFunction<AssignmentStatement>("postfix_statement") {
+object PostfixStatementParsingFunction : ParsingFunction<AssignmentStatement> {
     override fun Parser.parse(vararg extra: Any?): AssignmentStatement {
         val left = parse(ExpressionParsingFunction)
         val token = consume(

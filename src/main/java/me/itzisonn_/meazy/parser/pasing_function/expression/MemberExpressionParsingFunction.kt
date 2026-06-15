@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object MemberExpressionParsingFunction : ParsingFunction<Expression>("member_expression") {
+object MemberExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         var receiver = parse(CallExpressionParsingFunction)
 

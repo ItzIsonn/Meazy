@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object ReturnStatementParsingFunction : ParsingFunction<ReturnStatement>("return_statement") {
+object ReturnStatementParsingFunction : ParsingFunction<ReturnStatement> {
     override fun Parser.parse(vararg extra: Any?): ReturnStatement {
         next(`return`, translatable("meazy:parser.expected.keyword", "return"))
 

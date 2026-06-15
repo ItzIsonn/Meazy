@@ -17,7 +17,7 @@ import me.itzisonn_.meazy.parser.pasing_function.parseBody
 import me.itzisonn_.meazy.parser.pasing_function.parseDataType
 import me.itzisonn_.meazy.text.translatable
 
-object ForeachStatementParsingFunction : ParsingFunction<ForeachStatement>("foreach_statement") {
+object ForeachStatementParsingFunction : ParsingFunction<ForeachStatement> {
     override fun Parser.parse(vararg extra: Any?): ForeachStatement {
         next(`for`, translatable("meazy:parser.expected.keyword", "for"))
         next(

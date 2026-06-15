@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFun
 import me.itzisonn_.meazy.parser.pasing_function.parseBody
 import me.itzisonn_.meazy.text.translatable
 
-object WhileStatementParsingFunction : ParsingFunction<WhileStatement>("while_statement") {
+object WhileStatementParsingFunction : ParsingFunction<WhileStatement> {
     override fun Parser.parse(vararg extra: Any?): WhileStatement {
         consume(`while`, translatable("meazy:parser.expected.keyword", "while"))
 

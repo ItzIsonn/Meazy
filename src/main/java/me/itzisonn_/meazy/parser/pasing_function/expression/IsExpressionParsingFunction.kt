@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.ast.expression.IsExpression
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object IsExpressionParsingFunction : ParsingFunction<Expression>("is_expression") {
+object IsExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val value = parse(NegationExpressionParsingFunction)
 

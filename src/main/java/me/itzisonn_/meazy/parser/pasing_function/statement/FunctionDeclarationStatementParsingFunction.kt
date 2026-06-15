@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.lexer.TokenTypes.dot
 import me.itzisonn_.meazy.lexer.TokenTypes.function
@@ -21,7 +21,7 @@ import me.itzisonn_.meazy.parser.pasing_function.parseDataType
 import me.itzisonn_.meazy.parser.pasing_function.parseParameters
 import me.itzisonn_.meazy.text.translatable
 
-object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDeclarationStatement>("function_declaration_statement") {
+object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDeclarationStatement> {
     override fun Parser.parse(vararg extra: Any?): FunctionDeclarationStatement {
         val modifiers = getModifiersFromExtra(extra).toMutableSet()
 
@@ -32,11 +32,11 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
         next(function, translatable("meazy:parser.expected.keyword", "function"))
 
         var classId: String? = null
-        var id = consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "function")).value
+        var functionId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "function")).value
         if (current.type == dot) {
             next()
-            classId = id
-            id = consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
+            classId = functionId
+            functionId = consume(id, translatable("meazy:parser.expected", "id")).value
         }
 
         val parameters = parseParameters()
@@ -44,7 +44,7 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
 
         if (abstract in modifiers || (canBeAbstractWithoutModifier && current.type == newLine)) {
             modifiers.add(abstract)
-            return FunctionDeclarationStatement(modifiers, id, parameters, mutableListOf(), dataType)
+            return FunctionDeclarationStatement(modifiers, functionId, parameters, mutableListOf(), dataType)
         }
 
         val body: List<LocalStatement>
@@ -63,6 +63,6 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
             returnDataTypeValue = null
         }
 
-        return FunctionDeclarationStatement(modifiers, id, classId, parameters, body, dataType, returnDataTypeValue)
+        return FunctionDeclarationStatement(modifiers, functionId, classId, parameters, body, dataType, returnDataTypeValue)
     }
 }

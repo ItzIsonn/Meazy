@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.parser.pasing_function.parseBody
 import me.itzisonn_.meazy.parser.pasing_function.parseParameters
 import me.itzisonn_.meazy.text.translatable
 
-object ConstructorDeclarationStatementParsingFunction : ParsingFunction<ConstructorDeclarationStatement>("constructor_declaration_statement") {
+object ConstructorDeclarationStatementParsingFunction : ParsingFunction<ConstructorDeclarationStatement> {
     override fun Parser.parse(vararg extra: Any?): ConstructorDeclarationStatement {
         val modifiers = getModifiersFromExtra(extra)
         next(constructor, translatable("meazy:parser.expected.keyword", "constructor"))

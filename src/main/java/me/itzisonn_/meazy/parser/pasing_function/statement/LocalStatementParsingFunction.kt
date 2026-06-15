@@ -23,7 +23,7 @@ import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFun
 import me.itzisonn_.meazy.parser.pasing_function.parseModifiers
 import me.itzisonn_.meazy.text.translatable
 
-object LocalStatementParsingFunction : ParsingFunction<LocalStatement>("local_statement") {
+object LocalStatementParsingFunction : ParsingFunction<LocalStatement> {
     override fun Parser.parse(vararg extra: Any?): LocalStatement {
         val modifiers = parseModifiers()
 
