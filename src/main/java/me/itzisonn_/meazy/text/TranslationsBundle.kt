@@ -3,8 +3,8 @@ package me.itzisonn_.meazy.text
 import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.util.logger.LogLevel
-import me.itzisonn_.meazy.util.logger.Logger
+import me.itzisonn_.meazy.logger.LogLevel
+import me.itzisonn_.meazy.logger.Logger
 
 /**
  * Represents translations bundle

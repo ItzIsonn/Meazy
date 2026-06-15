@@ -10,8 +10,8 @@ import me.itzisonn_.meazy.settings.SettingsManager.settings
 import me.itzisonn_.meazy.text.TranslationsBundle
 import me.itzisonn_.meazy.text.literal
 import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.util.logger.LogLevel
-import me.itzisonn_.meazy.util.logger.Logger
+import me.itzisonn_.meazy.logger.LogLevel
+import me.itzisonn_.meazy.logger.Logger
 import me.itzisonn_.meazy.version.Version
 
 object MeazyMain {

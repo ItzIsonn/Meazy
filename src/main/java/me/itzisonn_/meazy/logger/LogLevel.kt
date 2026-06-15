@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.util.logger
+package me.itzisonn_.meazy.logger
 
 /**
  * Level of logging. Shows how important a message is

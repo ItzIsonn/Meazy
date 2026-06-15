@@ -36,7 +36,6 @@ import me.itzisonn_.meazy.parser.pasing_function.getModifiersFromExtra
 import me.itzisonn_.meazy.parser.pasing_function.parseArgs
 import me.itzisonn_.meazy.parser.pasing_function.parseParameters
 import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.util.MiscUtils.generatePrefixedName
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
@@ -311,4 +310,9 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             null
         )
     }
+}
+
+fun generatePrefixedName(prefix: String, name: String): String {
+    if (name == name.uppercase()) return prefix.uppercase() + "_" + name
+    return prefix + name.substring(0, 1).uppercase() + name.substring(1)
 }

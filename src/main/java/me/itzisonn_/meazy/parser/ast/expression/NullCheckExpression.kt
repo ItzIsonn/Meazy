@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.instruction.boxPrimitive
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.util.boxed
+import me.itzisonn_.meazy.instruction.boxed
 
 class NullCheckExpression(
     val checkExpression: Expression,

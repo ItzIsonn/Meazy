@@ -4,8 +4,8 @@ import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.command.AbstractCommand
 import me.itzisonn_.meazy.text.Text
 import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.util.logger.LogLevel
-import me.itzisonn_.meazy.util.logger.Logger
+import me.itzisonn_.meazy.logger.LogLevel
+import me.itzisonn_.meazy.logger.Logger
 
 class VersionCommand : AbstractCommand("version", listOf()) {
     override fun execute(vararg args: String): Text? {

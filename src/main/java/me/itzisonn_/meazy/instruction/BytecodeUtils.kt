@@ -1,8 +1,6 @@
 package me.itzisonn_.meazy.instruction
 
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
-import me.itzisonn_.meazy.util.boxed
-import me.itzisonn_.meazy.util.isBoolean
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
@@ -33,4 +31,24 @@ fun InstructionsSet.convertPrimitiveOrBoxed(from: ClassDesc, to: ClassDesc): Boo
     }
 
     return false
+}
+
+
+
+val ClassDesc.boxed: ClassDesc get() {
+    if (!isPrimitive) return this
+
+    return when (this) {
+        ConstantDescs.CD_int -> ConstantDescs.CD_Integer
+        ConstantDescs.CD_long -> ConstantDescs.CD_Long
+        ConstantDescs.CD_float -> ConstantDescs.CD_Float
+        ConstantDescs.CD_double -> ConstantDescs.CD_Double
+        ConstantDescs.CD_boolean -> ConstantDescs.CD_Boolean
+        ConstantDescs.CD_void -> ConstantDescs.CD_Void
+        else -> this
+    }
+}
+
+val ClassDesc.isBoolean: Boolean get() {
+    return this == ConstantDescs.CD_boolean || this == ConstantDescs.CD_Boolean
 }

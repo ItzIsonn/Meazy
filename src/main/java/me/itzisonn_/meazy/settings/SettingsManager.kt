@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.settings
 import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.util.FileUtils.getLines
 import java.io.File
 import java.io.IOException
 import java.net.URISyntaxException
@@ -36,7 +35,7 @@ object SettingsManager {
             throw RuntimeException(translatable("meazy:settings.cant_load_file").toString(), e)
         }
 
-        settings = Json.decodeFromString(SettingsDeserializer, getLines(settingsFile))
+        settings = Json.decodeFromString(SettingsDeserializer, settingsFile.readText())
     }
 
     private fun saveDefaultSettings(settingsFile: File) {
