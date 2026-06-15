@@ -7,51 +7,49 @@ import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.statement.IfStatement
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.parseBody
 import me.itzisonn_.meazy.text.translatable
 
-object IfStatementParsingFunction : AbstractParsingFunction<IfStatement>("if_statement") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): IfStatement {
-        val parser = context.parser
+object IfStatementParsingFunction : ParsingFunction<IfStatement>("if_statement") {
+    override fun Parser.parse(vararg extra: Any?): IfStatement {
+        next(`if`, translatable("meazy:parser.expected.keyword", "if"))
+        next(leftParenthesis, translatable("meazy:parser.expected.start", "left_parenthesis", "if_condition"))
 
-        parser.next(`if`, translatable("meazy:parser.expected.keyword", "if"))
-        parser.next(leftParenthesis, translatable("meazy:parser.expected.start", "left_parenthesis", "if_condition"))
-
-        val condition = parser.parse(ExpressionParsingFunction)
-        parser.next(rightParenthesis, translatable("meazy:parser.expected.end", "right_parenthesis", "if_condition"))
+        val condition = parse(ExpressionParsingFunction)
+        next(rightParenthesis, translatable("meazy:parser.expected.end", "right_parenthesis", "if_condition"))
 
         var body: List<LocalStatement>
-        if (parser.current.type == leftBrace) {
-            parser.next()
-            body = ParsingHelper.parseBody(context)
-            parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
+        if (current.type == leftBrace) {
+            next()
+            body = parseBody()
+            next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
         }
-        else body = listOf(parser.parse(LocalStatementParsingFunction))
+        else body = listOf(parse(LocalStatementParsingFunction))
 
-        val elsePos = parser.pos + 1
-        if (elsePos < parser.size && parser[elsePos].type == `else`) {
-            parser.next(newLine, translatable("meazy:parser.expected.end_statement", "new_line"))
+        val elsePos = pos + 1
+        if (elsePos < size && this[elsePos].type == `else`) {
+            next(newLine, translatable("meazy:parser.expected.end_statement", "new_line"))
         }
 
         var elseStatement: IfStatement? = null
-        if (parser.current.type == `else`) {
-            parser.next()
-            if (parser.current.type == `if`) {
-                elseStatement = parser.parse(IfStatementParsingFunction)
+        if (current.type == `else`) {
+            next()
+            if (current.type == `if`) {
+                elseStatement = parse(IfStatementParsingFunction)
             }
             else {
                 var elseBody: List<LocalStatement>
-                if (parser.current.type == leftBrace) {
-                    parser.next()
-                    elseBody = ParsingHelper.parseBody(context)
-                    parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
+                if (current.type == leftBrace) {
+                    next()
+                    elseBody = parseBody()
+                    next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
                 }
-                else elseBody = listOf(parser.parse(LocalStatementParsingFunction))
+                else elseBody = listOf(parse(LocalStatementParsingFunction))
 
                 elseStatement = IfStatement(null, elseBody, null)
             }

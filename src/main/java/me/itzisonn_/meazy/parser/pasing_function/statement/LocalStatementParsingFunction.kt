@@ -13,55 +13,54 @@ import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.lexer.TokenTypes.`while`
 import me.itzisonn_.meazy.parser.InvalidStatementException
 import me.itzisonn_.meazy.parser.InvalidSyntaxException
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.ast.statement.*
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.parseModifiers
 import me.itzisonn_.meazy.text.translatable
 
-object LocalStatementParsingFunction : AbstractParsingFunction<LocalStatement>("local_statement") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): LocalStatement {
-        val parser = context.parser
-        val modifiers = ParsingHelper.parseModifiers(context)
+object LocalStatementParsingFunction : ParsingFunction<LocalStatement>("local_statement") {
+    override fun Parser.parse(vararg extra: Any?): LocalStatement {
+        val modifiers = parseModifiers()
 
-        if (parser.current.type == variable) {
-            return parser.parse(
+        if (current.type == variable) {
+            return parse(
                 VariableDeclarationStatementParsingFunction,
                 modifiers,
                 false
             )
         }
         if (!modifiers.isEmpty()) throw InvalidSyntaxException(
-            parser.current.line,
+            current.line,
             translatable("meazy:parser.modifier.unexpected")
         )
 
-        if (parser.current.type == `if`) return parser.parse(IfStatementParsingFunction)
-        if (parser.current.type == `for`) return parser.parse(ForeachStatementParsingFunction)
-        if (parser.current.type == `while`) return parser.parse(WhileStatementParsingFunction)
-        if (parser.current.type == `return`) return parser.parse(ReturnStatementParsingFunction)
-        if (parser.current.type == `continue`) return parser.parse(ContinueStatementParsingFunction)
-        if (parser.current.type == `break`) return parser.parse(BreakStatementParsingFunction)
-        if (parser.current.type == base) return parser.parse(BaseCallStatementParsingFunction)
+        if (current.type == `if`) return parse(IfStatementParsingFunction)
+        if (current.type == `for`) return parse(ForeachStatementParsingFunction)
+        if (current.type == `while`) return parse(WhileStatementParsingFunction)
+        if (current.type == `return`) return parse(ReturnStatementParsingFunction)
+        if (current.type == `continue`) return parse(ContinueStatementParsingFunction)
+        if (current.type == `break`) return parse(BreakStatementParsingFunction)
+        if (current.type == base) return parse(BaseCallStatementParsingFunction)
 
-        if (parser.currentLineHasToken(assign) || parser.currentLineHasToken(operatorAssign)) {
-            return parser.parse(AssignmentStatementParsingFunction)
+        if (currentLineHasToken(assign) || currentLineHasToken(operatorAssign)) {
+            return parse(AssignmentStatementParsingFunction)
         }
 
-        if (parser.currentLineHasToken(operatorPostfix)) {
-            return parser.parse(PostfixStatementParsingFunction)
+        if (currentLineHasToken(operatorPostfix)) {
+            return parse(PostfixStatementParsingFunction)
         }
 
-        return when (val expression = parser.parse(ExpressionParsingFunction)) {
+        return when (val expression = parse(ExpressionParsingFunction)) {
             is CallExpression -> expression
             is MemberExpression -> expression
             is OperatorExpression -> expression
             else -> throw InvalidStatementException(
-                parser.current.line,
+                current.line,
                 translatable("meazy:parser.exception.statement")
             )
         }

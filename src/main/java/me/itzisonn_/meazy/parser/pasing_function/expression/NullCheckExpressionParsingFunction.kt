@@ -1,19 +1,18 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
 import me.itzisonn_.meazy.lexer.TokenTypes.questionColon
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.NullCheckExpression
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object NullCheckExpressionParsingFunction : AbstractParsingFunction<Expression>("null_check_expression") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
-        val parser = context.parser
-        val checkExpression = parser.parse(LogicalExpressionParsingFunction)
+object NullCheckExpressionParsingFunction : ParsingFunction<Expression>("null_check_expression") {
+    override fun Parser.parse(vararg extra: Any?): Expression {
+        val checkExpression = parse(LogicalExpressionParsingFunction)
 
-        if (parser.current.type == questionColon) {
-            parser.next()
-            val nullExpression = parser.parse(ExpressionParsingFunction)
+        if (current.type == questionColon) {
+            next()
+            val nullExpression = parse(ExpressionParsingFunction)
             return NullCheckExpression(checkExpression, nullExpression)
         }
 
