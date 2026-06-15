@@ -2,13 +2,12 @@ package me.itzisonn_.meazy.lexer
 
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.registry.Registries
-import java.util.regex.Pattern
 
 /**
  * Represents type of token
  *
  * @param id         Id
- * @param pattern    Pattern that is used to match this token type
+ * @param regex      Regex that is used to match this token type
  * @param shouldSkip Should [Token]s with this type be skipped (not added in list
  * @param canMatch   Function that checks whether given string can match this token type
  *
@@ -18,31 +17,31 @@ import java.util.regex.Pattern
  */
 class TokenType(
     val id: String,
-    pattern: Pattern?,
+    regex: Regex?,
     val shouldSkip: Boolean,
     val canMatch: (String) -> Boolean = { true }
 ) {
     /**
-     * Pattern that is used to match this token type
+     * Regex that is used to match this token type
      */
-    val pattern: Pattern?
+    val regex: Regex?
 
     init {
-        var pattern = pattern
+        var regex = regex
         require(id.matches(MeazyMain.IDENTIFIER_REGEX.toRegex())) { "Invalid id" }
 
-        if (pattern != null && !pattern.pattern().startsWith("^")) {
-            pattern = Pattern.compile("^(${pattern.pattern()})", pattern.flags())
+        if (regex != null && !regex.pattern.startsWith("^")) {
+            regex = Regex("^(${regex.pattern})", regex.options)
         }
 
-        this.pattern = pattern
+        this.regex = regex
     }
 
     /**
-     * Constructor with regex that is compiled into pattern
+     * Constructor with regex string that is compiled into [Regex]
      * 
      * @param id         Id
-     * @param regex      Regex that is compiled into [Pattern]
+     * @param regex      Regex string that is compiled into [Regex]
      * @param shouldSkip Should [Token]s with this type be skipped (not added in list)
      * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
      */
@@ -53,7 +52,7 @@ class TokenType(
         canMatch: (String) -> Boolean = { true }
     ) : this(
         id,
-        if (regex == null) null else Pattern.compile(regex, Pattern.DOTALL),
+        if (regex == null) null else Regex(regex, RegexOption.DOT_MATCHES_ALL),
         shouldSkip,
         canMatch
     )

@@ -135,13 +135,13 @@ object Registries {
 
                 for (entry in TOKEN_TYPES.getEntries()) {
                     val tokenType = entry.getValue()!!
-                    if (tokenType.pattern == null) continue
+                    if (tokenType.regex == null) continue
 
-                    val matcher = tokenType.pattern.matcher(string)
-                    if (matcher.find()) {
-                        val end = matcher.end()
-                        val matched = string.substring(0, end)
-                        if (!tokenType.canMatch.invoke(matched)) continue
+                    val result = tokenType.regex.matchAt(string, 0)
+                    if (result != null) {
+                        val end = result.range.last + 1
+                        val matched = result.value
+                        if (!tokenType.canMatch(matched)) continue
 
                         if (token == null || token.value.length < matched.length) {
                             token = Token(lineNumber, i, end, tokenType, matched)
