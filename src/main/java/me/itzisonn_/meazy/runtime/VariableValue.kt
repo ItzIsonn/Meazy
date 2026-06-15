@@ -40,7 +40,7 @@ interface VariableValue {
      * @param modifier Target modifier
      * @return Whether this variable value has given modifier
      */
-    fun hasModifier(modifier: Modifier) = modifiers.contains(modifier)
+    fun hasModifier(modifier: Modifier) = modifier in modifiers
 
     /**
      * @param id Modifier's id

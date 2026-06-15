@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
@@ -9,7 +10,6 @@ import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
 import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
 import me.itzisonn_.meazy.runtime.environment.isInstanceOf
-import me.itzisonn_.meazy.util.MiscUtils.convertPrimitiveOrBoxed
 
 class ReturnStatement(val value: Expression?) : LocalStatement {
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
@@ -42,7 +42,7 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
         val returnTypeClassDesc = returnDataType.classDesc
 
         if (!functionEnvironment.isInstanceOf(valueClassDesc, returnTypeClassDesc)) {
-            if (!convertPrimitiveOrBoxed(instructions, valueClassDesc, returnTypeClassDesc)) {
+            if (!instructions.convertPrimitiveOrBoxed(valueClassDesc, returnTypeClassDesc)) {
                 throw RuntimeException("Function's return value not matches its return data type TODO")
             }
         }

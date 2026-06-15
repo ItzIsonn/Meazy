@@ -1,13 +1,13 @@
 package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.runtime.environment.isInstanceOf
-import me.itzisonn_.meazy.util.MiscUtils
 import me.itzisonn_.meazy.version.Version
 import java.io.File
 import java.lang.classfile.attribute.InnerClassesAttribute
@@ -107,7 +107,7 @@ class Program(
                     val variableType = variableValue.dataType.classDesc
 
                     if (!fileEnvironment.isInstanceOf(valueType, variableType)) {
-                        if (!MiscUtils.convertPrimitiveOrBoxed(this, valueType, variableType)) {
+                        if (!convertPrimitiveOrBoxed(valueType, variableType)) {
                             throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                         }
                     }

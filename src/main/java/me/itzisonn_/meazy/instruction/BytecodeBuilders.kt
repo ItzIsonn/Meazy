@@ -5,60 +5,53 @@ import java.lang.classfile.ClassFile
 import java.lang.classfile.CodeBuilder
 import java.lang.classfile.Label
 import java.lang.constant.ClassDesc
-import java.util.Optional
 import kotlin.uuid.Uuid
 
 class BytecodeBuilders private constructor(
     val classBuilder: ClassBuilder?,
     val codeBuilder: CodeBuilder?,
-    private val classes: LinkedHashMap<ClassDesc, ByteArray>,
-    private val labels: MutableMap<Uuid, Optional<Label>>
+    private val _classes: MutableMap<ClassDesc, ByteArray>,
+    private val labels: MutableMap<Uuid, Label>,
+    private val uninitializedLabels: MutableSet<Uuid>
 ) {
+    val classes get() = _classes.toMap()
+
     fun withClass(classDesc: ClassDesc, classBuilder: ClassBuilder.() -> Unit) {
         val classFile = ClassFile.of().build(classDesc, classBuilder)
-        classes[classDesc] = classFile
+        _classes[classDesc] = classFile
     }
 
-    fun getClasses(): Map<ClassDesc, ByteArray> {
-        return classes.toMap()
-    }
+
 
     fun getLabel(uuid: Uuid): Label {
-        return labels.getOrDefault(uuid, Optional.empty<Label>()).orElseThrow()
-    }
-
-    fun hasLabel(uuid: Uuid): Boolean {
-        return labels.containsKey(uuid)
-    }
-
-    fun hasInitializedLabel(uuid: Uuid): Boolean {
-        return labels.getOrDefault(uuid, Optional.empty<Label>()).isPresent
+        return labels[uuid] ?: error("There's no label with id $uuid")
     }
 
     fun setLabel(uuid: Uuid, label: Label) {
-        require(labels.containsKey(uuid)) { "Label with Uuid $uuid does not exist" }
-        labels[uuid] = Optional.of<Label>(label)
+        require(uuid in uninitializedLabels) { "Label with id $uuid does not exist" }
+        uninitializedLabels -= uuid
+        labels[uuid] = label
     }
 
     fun addLabel(uuid: Uuid) {
-        labels[uuid] = Optional.empty<Label>()
+        uninitializedLabels += uuid
     }
 
 
 
-    fun copy(classBuilder: ClassBuilder?, codeBuilder: CodeBuilder? = null): BytecodeBuilders {
-        return BytecodeBuilders(classBuilder, codeBuilder, classes, labels)
+    fun copy(classBuilder: ClassBuilder, codeBuilder: CodeBuilder? = null): BytecodeBuilders {
+        return BytecodeBuilders(classBuilder, codeBuilder, _classes, labels, uninitializedLabels)
     }
 
-    fun copy(codeBuilder: CodeBuilder?): BytecodeBuilders {
-        return copy(classBuilder, codeBuilder)
+    fun copy(codeBuilder: CodeBuilder): BytecodeBuilders {
+        return BytecodeBuilders(classBuilder, codeBuilder, _classes, labels, uninitializedLabels)
     }
 
     companion object {
         fun of(classBuilder: ClassBuilder?, codeBuilder: CodeBuilder?): BytecodeBuilders {
             return BytecodeBuilders(
                 classBuilder, codeBuilder,
-                LinkedHashMap(), HashMap()
+                mutableMapOf(), mutableMapOf(), mutableSetOf()
             )
         }
     }

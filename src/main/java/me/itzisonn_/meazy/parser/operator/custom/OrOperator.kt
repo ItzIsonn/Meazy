@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operator
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.util.MiscUtils.isBoolean
+import me.itzisonn_.meazy.util.isBoolean
 import java.lang.constant.ConstantDescs
 
 class OrOperator : Operator("or", "||", OperatorType.INFIX) {
@@ -18,7 +18,7 @@ class OrOperator : Operator("or", "||", OperatorType.INFIX) {
         val leftType = left.getType(environment, operatorExpression)
         val rightType = right.getType(environment, operatorExpression)
 
-        if (!isBoolean(leftType.classDesc) || !isBoolean(rightType.classDesc)) error("Invalid operands TODO")
+        if (!leftType.classDesc.isBoolean || !rightType.classDesc.isBoolean) error("Invalid operands TODO")
         if (leftType.isNullable || rightType.isNullable) error("Can't get logical or of nullable booleans")
 
         left.emit(instructions, environment, operatorExpression)

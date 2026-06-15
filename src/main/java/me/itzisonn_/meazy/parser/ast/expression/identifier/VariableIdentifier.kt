@@ -93,7 +93,7 @@ class VariableIdentifier(id: String) : Identifier(id) {
             val classDesc = dataType.classDesc
 
             val classEnvironment = environment.getClass(classDesc) ?: return null
-            return classEnvironment.getVariable(id).orElse(null)
+            return classEnvironment.getVariable(id)
         }
 
         return environment.getVariable(id)

@@ -67,10 +67,7 @@ class TokenType(
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
         if (other !is TokenType) return false
-
-        val thisId = this.id
-        val otherId = other.id
-        return thisId == otherId
+        return id == other.id
     }
 
     override fun hashCode(): Int {

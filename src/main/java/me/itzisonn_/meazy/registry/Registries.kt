@@ -184,7 +184,7 @@ object Registries {
             for (instruction in instructionsSet.instructions) {
                 instruction.emit(bytecodeBuilders)
             }
-            bytecodeBuilders.getClasses()
+            bytecodeBuilders.classes
         }
 
         runProgramFunction = { classes ->

@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.util.logger
 import me.itzisonn_.meazy.text.Text
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 /**
  * Logger for [Text] messages
@@ -19,7 +18,7 @@ object Logger {
      */
     fun log(level: LogLevel, text: Text) {
         val time = LocalDateTime.now().format(DATE_TIME_FORMATTER)
-        val levelString = level.id.uppercase(Locale.getDefault())
+        val levelString = level.id.uppercase()
         println("$time $levelString: $text")
     }
 }

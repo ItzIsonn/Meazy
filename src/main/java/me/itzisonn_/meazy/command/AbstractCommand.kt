@@ -30,7 +30,7 @@ abstract class AbstractCommand(name: String, args: List<String>) {
         require(args.all { it.matches(MeazyMain.IDENTIFIER_REGEX.toRegex()) }) { "Invalid arg's name" }
 
         this.name = name
-        this._args = args
+        _args = args
     }
 
     /**

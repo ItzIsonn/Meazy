@@ -29,8 +29,8 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
         val parts2 = version.parts
 
         for (i in 0..<max(parts1.size, parts2.size)) {
-            val part1 = if (i < parts1.size) parts1.get(i) else 0
-            val part2 = if (i < parts2.size) parts2.get(i) else 0
+            val part1 = if (i < parts1.size) parts1[i] else 0
+            val part2 = if (i < parts2.size) parts2[i] else 0
 
             if (part1 < part2) return true
             if (part1 > part2) return false

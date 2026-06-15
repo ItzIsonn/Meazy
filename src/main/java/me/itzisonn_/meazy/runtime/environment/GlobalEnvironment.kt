@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.parser.Parameter
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import java.lang.constant.ClassDesc
-import java.util.Optional
 
 /**
  * Represents global environment
@@ -33,7 +32,7 @@ sealed interface GlobalEnvironment : Environment {
     val fileEnvironments: Set<FileEnvironment>
 
 
-    fun resolveJavaClass(classDesc: ClassDesc): Optional<ClassEnvironment>
+    fun resolveJavaClass(classDesc: ClassDesc): ClassEnvironment?
 }
 
 
@@ -51,8 +50,8 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
 
 
 
-    override fun resolveJavaClass(classDesc: ClassDesc): Optional<ClassEnvironment> {
-        if (classDesc.isPrimitive || classDesc.isArray) return Optional.empty<ClassEnvironment>()
+    override fun resolveJavaClass(classDesc: ClassDesc): ClassEnvironment? {
+        if (classDesc.isPrimitive || classDesc.isArray) return null
 
         try {
             val cls = Class.forName(classDesc.packageName() + "." + classDesc.displayName())
@@ -60,7 +59,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
 
             for (fileEnvironment in getFileEnvironments(packageName)) {
                 val classEnvironment = fileEnvironment.getClass(classDesc.displayName())
-                if (classEnvironment.isPresent) return classEnvironment
+                if (classEnvironment != null) return classEnvironment
             }
 
             val fileEnvironment = FileEnvironment(
@@ -173,10 +172,10 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 )
             }
 
-            return Optional.of(classEnvironment)
+            return classEnvironment
         }
         catch (_: ClassNotFoundException) {
-            return Optional.empty()
+            return null
         }
         catch (e: IllegalAccessException) {
             throw RuntimeException(e)

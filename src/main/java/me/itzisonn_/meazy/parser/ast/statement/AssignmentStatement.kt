@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
@@ -15,7 +16,6 @@ import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getVariable
 import me.itzisonn_.meazy.runtime.environment.isInstanceOf
-import me.itzisonn_.meazy.util.MiscUtils.convertPrimitiveOrBoxed
 import java.lang.constant.ClassDesc
 
 class AssignmentStatement(val id: Expression, val value: Expression) : LocalStatement {
@@ -33,7 +33,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
         value.emit(instructions, environment, this)
 
         if (!environment.isInstanceOf(valueType, variableType)) {
-            if (!convertPrimitiveOrBoxed(instructions, valueType, variableType)) {
+            if (!instructions.convertPrimitiveOrBoxed(valueType, variableType)) {
                 throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
             }
         }
@@ -91,7 +91,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
             val classDesc: ClassDesc = id.receiver.getType(environment, this).classDesc
             val classEnvironment = environment.getClass(classDesc) ?: return null
 
-            return classEnvironment.getVariable(id.member.id).orElse(null)
+            return classEnvironment.getVariable(id.member.id)
         }
 
         if (id !is VariableIdentifier) {

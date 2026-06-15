@@ -24,7 +24,7 @@ object DatagenDeserializers {
             val id = jsonObject.get("id").asString
 
             if (jsonObject.get("token_types") == null) throw InvalidDatagenJsonException("TokenTypeSet doesn't have field token_types")
-            val tokenTypes: MutableSet<TokenType> = HashSet()
+            val tokenTypes = mutableSetOf<TokenType>()
 
             for (element in jsonObject.get("token_types").getAsJsonArray()) {
                 val tokenTypeId = element.asString

@@ -7,7 +7,6 @@ import me.itzisonn_.meazy.runtime.VariableValue
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.text.translatable
-import java.util.Optional
 
 /**
  * Adds to Environment ability to declare variables
@@ -23,7 +22,7 @@ interface VariableDeclarationEnvironment : Environment {
      * @param id Variable's id
      * @return Declared variable with given id
      */
-    fun getVariable(id: String) = Optional.ofNullable(variables.find { it.id == id })
+    fun getVariable(id: String) = variables.find { it.id == id }
 
     /**
      * @return All declared variables
@@ -35,11 +34,10 @@ interface VariableDeclarationEnvironment : Environment {
 
 open class VariableDeclarationEnvironmentImpl(parent: Environment) : EnvironmentImpl(parent), VariableDeclarationEnvironment {
     protected val _variables = mutableListOf<VariableValue>()
-    override val variables
-        get() = _variables.toList()
+    override val variables get() = _variables.toList()
 
     override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue {
-        if (getVariable(id).isPresent) {
+        if (getVariable(id) != null) {
             throw EvaluationException(translatable("meazy:runtime.variable.already_exists", id))
         }
 

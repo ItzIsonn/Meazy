@@ -62,7 +62,7 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
         val baseClassEnvironment = environment.getClass(baseClassDesc) ?: return null
 
         val args = args.map { it.getType(environment, this) }
-        return baseClassEnvironment.getConstructor(args).orElse(null)
+        return baseClassEnvironment.getConstructor(args)
     }
 
 
