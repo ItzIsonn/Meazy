@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.parser.modifier
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.parser.modifier.custom.*
 import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.registry.defaultIdentifier
 
 /**
  * Modifiers registrar
@@ -66,10 +66,10 @@ object Modifiers {
     }
 
     private fun register(modifier: Modifier) {
-        Registries.MODIFIERS.register(getDefaultIdentifier(modifier.id), modifier)
+        Registries.MODIFIERS.register(defaultIdentifier(modifier.id), modifier)
     }
 
     private fun get(id: String): Modifier {
-        return Registries.MODIFIERS.getEntry(getDefaultIdentifier(id))?.value!!
+        return Registries.MODIFIERS.getEntry(defaultIdentifier(id))?.value!!
     }
 }

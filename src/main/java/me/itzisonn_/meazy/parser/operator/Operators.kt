@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.operator
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
 import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
@@ -8,6 +7,7 @@ import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.custom.*
 import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.registry.defaultIdentifier
 import me.itzisonn_.meazy.runtime.environment.Environment
 
 /**
@@ -87,7 +87,7 @@ object Operators {
     }
 
     private fun register(operator: Operator) {
-        Registries.OPERATORS.register(getDefaultIdentifier(operator.id), operator)
+        Registries.OPERATORS.register(defaultIdentifier(operator.id), operator)
     }
 }
 
