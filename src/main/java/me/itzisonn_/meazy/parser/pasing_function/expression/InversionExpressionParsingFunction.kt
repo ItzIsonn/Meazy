@@ -1,22 +1,20 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.parser.ParsingContext
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.lexer.TokenTypes.inversion
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.operator.Operators
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object InversionExpressionParsingFunction : AbstractParsingFunction<Expression>("inversion_expression") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
-        val parser = context.parser
-
-        if (parser.current.type == inversion) {
-            parser.next()
-            val expression = parser.parse(IsExpressionParsingFunction)
+object InversionExpressionParsingFunction : ParsingFunction<Expression>("inversion_expression") {
+    override fun Parser.parse(vararg extra: Any?): Expression {
+        if (current.type == inversion) {
+            next()
+            val expression = parse(IsExpressionParsingFunction)
             return OperatorExpression(expression, null, Operators.inversion)
         }
 
-        return parser.parse(IsExpressionParsingFunction)
+        return parse(IsExpressionParsingFunction)
     }
 }

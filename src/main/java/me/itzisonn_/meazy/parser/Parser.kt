@@ -12,13 +12,9 @@ import me.itzisonn_.meazy.text.Text
 /**
  * Is used to store and parse tokens
  *
- * @param context Parsing context
  * @param tokens  List of tokens
  */
-class Parser(
-    private val context: ParsingContext,
-    tokens: List<Token>
-) {
+class Parser(tokens: List<Token>) {
     private val tokens = tokens.toList()
 
     /**
@@ -177,7 +173,7 @@ class Parser(
      * @return Parsed program unit
      */
     fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T>, vararg extra: Any?): T {
-        val programUnit = parsingFunction.parse(context, *extra)
+        val programUnit = parsingFunction.parse(this, *extra)
         return programUnit
     }
 }

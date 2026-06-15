@@ -2,19 +2,18 @@ package me.itzisonn_.meazy.parser.pasing_function.statement
 
 import me.itzisonn_.meazy.lexer.TokenTypes.function
 import me.itzisonn_.meazy.parser.InvalidStatementException
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.statement.Statement
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.parseModifiers
 import me.itzisonn_.meazy.text.translatable
 
-object InterfaceBodyStatementParsingFunction : AbstractParsingFunction<Statement>("interface_body_statement") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): Statement {
-        val parser = context.parser
-        val modifiers = ParsingHelper.parseModifiers(context)
+object InterfaceBodyStatementParsingFunction : ParsingFunction<Statement>("interface_body_statement") {
+    override fun Parser.parse(vararg extra: Any?): Statement {
+        val modifiers = parseModifiers()
 
-        if (parser.current.type == function) {
-            return parser.parse(
+        if (current.type == function) {
+            return parse(
                 FunctionDeclarationStatementParsingFunction,
                 modifiers,
                 true
@@ -22,7 +21,7 @@ object InterfaceBodyStatementParsingFunction : AbstractParsingFunction<Statement
         }
 
         throw InvalidStatementException(
-            parser.current.line,
+            current.line,
             translatable("meazy:parser.expected.statement", "interface_body")
         )
     }

@@ -1,20 +1,19 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
 import me.itzisonn_.meazy.lexer.TokenTypeSets.multiplication
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.OperatorType
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object MultiplicationExpressionParsingFunction : AbstractParsingFunction<Expression>("multiplication_expression") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
-        val parser = context.parser
-        var left = parser.parse(PowerExpressionParsingFunction)
+object MultiplicationExpressionParsingFunction : ParsingFunction<Expression>("multiplication_expression") {
+    override fun Parser.parse(vararg extra: Any?): Expression {
+        var left = parse(PowerExpressionParsingFunction)
 
-        while (parser.current.type in multiplication) {
-            val operator = parser.consume().value
-            val right = parser.parse(PowerExpressionParsingFunction)
+        while (current.type in multiplication) {
+            val operator = consume().value
+            val right = parse(PowerExpressionParsingFunction)
             left = OperatorExpression(left, right, operator, OperatorType.INFIX)
         }
 

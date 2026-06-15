@@ -168,9 +168,7 @@ object Registries {
         }
 
         parseTokensFunction = { file, tokens ->
-            val parsingContext = ParsingContext(tokens)
-            val parser = parsingContext.parser
-
+            val parser = Parser(tokens)
             parser.parse(ProgramParsingFunction, file)
         }
 

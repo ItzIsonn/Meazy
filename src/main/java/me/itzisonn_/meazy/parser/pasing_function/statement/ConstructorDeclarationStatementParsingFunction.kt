@@ -3,28 +3,27 @@ package me.itzisonn_.meazy.parser.pasing_function.statement
 import me.itzisonn_.meazy.lexer.TokenTypes.constructor
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
-import me.itzisonn_.meazy.parser.pasing_function.ParsingHelper
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.getModifiersFromExtra
+import me.itzisonn_.meazy.parser.pasing_function.parseBody
+import me.itzisonn_.meazy.parser.pasing_function.parseParameters
 import me.itzisonn_.meazy.text.translatable
 
-object ConstructorDeclarationStatementParsingFunction : AbstractParsingFunction<ConstructorDeclarationStatement>("constructor_declaration_statement") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): ConstructorDeclarationStatement {
-        val parser = context.parser
+object ConstructorDeclarationStatementParsingFunction : ParsingFunction<ConstructorDeclarationStatement>("constructor_declaration_statement") {
+    override fun Parser.parse(vararg extra: Any?): ConstructorDeclarationStatement {
+        val modifiers = getModifiersFromExtra(extra)
+        next(constructor, translatable("meazy:parser.expected.keyword", "constructor"))
 
-        val modifiers = ParsingHelper.getModifiersFromExtra(extra)
-        parser.next(constructor, translatable("meazy:parser.expected.keyword", "constructor"))
-
-        val parameters = ParsingHelper.parseParameters(context)
-
-        if (parser.current.type != leftBrace) {
+        val parameters = parseParameters()
+        if (current.type != leftBrace) {
             return ConstructorDeclarationStatement(modifiers, parameters, mutableListOf())
         }
 
-        parser.next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "constructor_body"))
-        val body = ParsingHelper.parseBody(context)
-        parser.next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "constructor_body"))
+        next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "constructor_body"))
+        val body = parseBody()
+        next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "constructor_body"))
 
         return ConstructorDeclarationStatement(modifiers, parameters, body)
     }

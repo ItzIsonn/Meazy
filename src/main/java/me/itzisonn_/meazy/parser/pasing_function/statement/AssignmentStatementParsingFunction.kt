@@ -2,38 +2,37 @@ package me.itzisonn_.meazy.parser.pasing_function.statement
 
 import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorAssign
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.UnexpectedTokenException
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
 import me.itzisonn_.meazy.parser.operator.OperatorType
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object AssignmentStatementParsingFunction : AbstractParsingFunction<AssignmentStatement>("assignment_statement") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): AssignmentStatement {
-        val parser = context.parser
-        val left = parser.parse(ExpressionParsingFunction)
+object AssignmentStatementParsingFunction : ParsingFunction<AssignmentStatement>("assignment_statement") {
+    override fun Parser.parse(vararg extra: Any?): AssignmentStatement {
+        val left = parse(ExpressionParsingFunction)
 
-        if (parser.current.type == assign) {
-            parser.next()
-            val value = parser.parse(ExpressionParsingFunction)
+        if (current.type == assign) {
+            next()
+            val value = parse(ExpressionParsingFunction)
             return AssignmentStatement(left, value)
         }
-        else if (parser.current.type in operatorAssign) {
-            val token = parser.consume()
+        else if (current.type in operatorAssign) {
+            val token = consume()
 
             val value: Expression = OperatorExpression(
                 left,
-                parser.parse(ExpressionParsingFunction),
+                parse(ExpressionParsingFunction),
                 token.value.replace("=$".toRegex(), ""), OperatorType.INFIX
             )
 
             return AssignmentStatement(left, value)
         }
 
-        throw UnexpectedTokenException(parser.current.line, translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
+        throw UnexpectedTokenException(current.line, translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
     }
 }

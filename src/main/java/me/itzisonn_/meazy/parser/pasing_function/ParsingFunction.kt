@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function
 
-import me.itzisonn_.meazy.parser.ParsingContext
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.lexer.Token
@@ -10,18 +9,19 @@ import me.itzisonn_.meazy.lexer.Token
  *
  * @param T Type of ProgramUnit to parse into
  */
-fun interface ParsingFunction<T : ProgramUnit> {
+abstract class ParsingFunction<T : ProgramUnit>(val id: String) {
+    @JvmName("parseBridge")
+    fun parse(parser: Parser, vararg extra: Any?): T {
+        return parser.parse(*extra)
+    }
+
     /**
      * Parses tokens, which is stored in [Parser], into [T]
      *
-     * @param context Parsing context
+     * @receiver Parser
      * @param extra Extra info
      *
      * @return Parsed [T] ProgramUnit
      */
-    fun parse(context: ParsingContext, vararg extra: Any?): T
+    abstract fun Parser.parse(vararg extra: Any?): T
 }
-
-
-
-abstract class AbstractParsingFunction<T : ProgramUnit>(val id: String) : ParsingFunction<T>

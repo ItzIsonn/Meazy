@@ -1,20 +1,19 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
 import me.itzisonn_.meazy.lexer.TokenTypes.power
-import me.itzisonn_.meazy.parser.ParsingContext
+import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operators
-import me.itzisonn_.meazy.parser.pasing_function.AbstractParsingFunction
+import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object PowerExpressionParsingFunction : AbstractParsingFunction<Expression>("power_expression") {
-    override fun parse(context: ParsingContext, vararg extra: Any?): Expression {
-        val parser = context.parser
-        var left = parser.parse(InversionExpressionParsingFunction)
+object PowerExpressionParsingFunction : ParsingFunction<Expression>("power_expression") {
+    override fun Parser.parse(vararg extra: Any?): Expression {
+        var left = parse(InversionExpressionParsingFunction)
 
-        while (parser.current.type == power) {
-            parser.next()
-            val right = parser.parse(InversionExpressionParsingFunction)
+        while (current.type == power) {
+            next()
+            val right = parse(InversionExpressionParsingFunction)
             left = OperatorExpression(left, right, Operators.power)
         }
 
