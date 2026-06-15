@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operator
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.util.isBoolean
+import me.itzisonn_.meazy.instruction.isBoolean
 import java.lang.constant.ConstantDescs
 
 class InversionOperator : Operator("inversion", "!", OperatorType.PREFIX) {

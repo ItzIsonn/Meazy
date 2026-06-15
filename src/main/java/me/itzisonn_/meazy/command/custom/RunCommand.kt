@@ -4,9 +4,8 @@ import me.itzisonn_.meazy.command.AbstractCommand
 import me.itzisonn_.meazy.text.Text
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.util.FileUtils.getLines
-import me.itzisonn_.meazy.util.logger.LogLevel
-import me.itzisonn_.meazy.util.logger.Logger
+import me.itzisonn_.meazy.logger.LogLevel
+import me.itzisonn_.meazy.logger.Logger
 import java.io.File
 
 class RunCommand : AbstractCommand("run", listOf("target_file")) {
@@ -26,7 +25,7 @@ class RunCommand : AbstractCommand("run", listOf("target_file")) {
         Logger.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
         val startMillis = System.currentTimeMillis()
 
-        val tokens = Registries.tokenizationFunction(getLines(file))
+        val tokens = Registries.tokenizationFunction(file.readText())
         val program = Registries.parseTokensFunction(file, tokens)
 
         val classes = Registries.compileProgramFunction(program)

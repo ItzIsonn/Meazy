@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.util.logger
+package me.itzisonn_.meazy.logger
 
 import me.itzisonn_.meazy.text.Text
 import java.time.LocalDateTime
