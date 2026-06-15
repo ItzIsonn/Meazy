@@ -29,7 +29,7 @@ object TokenTypes {
                 false
             ) { string ->
                 for (tokenType in TokenTypeSets.keywords.getTokenTypes()) {
-                    if (tokenType.pattern?.matcher(string)?.matches() == true) {
+                    if (tokenType.regex?.matches(string) == true) {
                         return@TokenType false
                     }
                 }

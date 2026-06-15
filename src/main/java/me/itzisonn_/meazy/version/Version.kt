@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.version
 
 import java.util.Objects
-import java.util.regex.Pattern
 import kotlin.math.max
 
 /**
@@ -97,11 +96,11 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
     }
 
     companion object {
-        private val versionPattern: Pattern
+        private val versionRegex: Regex
 
         init {
-            val possibleTypes = VersionType.VERSION_TYPES.keys.stream().sorted().toList().reversed().joinToString("|")
-            versionPattern = Pattern.compile("(\\d+(\\.\\d+)*)(-($possibleTypes)(\\d*))?", Pattern.CASE_INSENSITIVE)
+            val possibleTypes = VersionType.VERSION_TYPES.keys.sorted().reversed().joinToString("|")
+            versionRegex = Regex("(\\d+(\\.\\d+)*)(-($possibleTypes)(\\d*))?", RegexOption.IGNORE_CASE)
         }
 
         /**
@@ -112,12 +111,12 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
          * @throws IllegalArgumentException If given version is in invalid format
          */
         fun of(version: String): Version {
-            val matcher = versionPattern.matcher(version)
-            require(matcher.matches()) { "Invalid version '$version'" }
+            val result = versionRegex.matchEntire(version)
+            require(result != null) { "Invalid version '$version'" }
 
             val parts: List<Int>
             try {
-                parts = matcher.group(1).split("\\.".toRegex())
+                parts = result.groupValues[1].split("\\.".toRegex())
                     .dropLastWhile { it.isEmpty() }
                     .map { s -> s.toInt() }
                     .toList()
@@ -127,18 +126,18 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
             }
 
             val versionType: VersionType?
-            val versionTypeGroup = matcher.group(4)
-            if (versionTypeGroup == null) versionType = VersionType.RELEASE
+            val versionTypeGroup = result.groupValues[4]
+            if (versionTypeGroup.isBlank()) versionType = VersionType.RELEASE
             else {
                 versionType = VersionType.of(versionTypeGroup)
                 requireNotNull(versionType) { "Invalid version '$version'" }
             }
 
-            val ordinalGroup = matcher.group(5)
-            val ordinal = if (ordinalGroup == null || ordinalGroup.isBlank()) 0
+            val ordinalGroup = result.groupValues[5]
+            val ordinal = if (ordinalGroup.isBlank()) 0
             else {
                 try {
-                    matcher.group(5).toInt()
+                    result.groupValues[5].toInt()
                 }
                 catch (_: NumberFormatException) {
                     throw IllegalArgumentException("Invalid version '$version'")
