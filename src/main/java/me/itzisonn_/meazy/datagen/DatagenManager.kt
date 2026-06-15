@@ -5,11 +5,10 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.SetSerializer
 import kotlinx.serialization.json.Json
-import me.itzisonn_.meazy.util.FileUtils
 import java.io.IOException
 import java.net.URISyntaxException
 import java.nio.file.Files
-import java.nio.file.Path
+import kotlin.io.path.readText
 import kotlin.io.path.toPath
 import kotlin.io.path.walk
 
@@ -71,8 +70,8 @@ object DatagenManager {
 
         try {
             return path.walk()
-                .filter { path: Path -> Files.isRegularFile(path) }
-                .map { obj: Path -> FileUtils.getLines(obj) }
+                .filter { path -> Files.isRegularFile(path) }
+                .map { path -> path.readText() }
                 .toSet()
         }
         catch (e: IOException) {
