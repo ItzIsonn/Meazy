@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object PowerExpressionParsingFunction : ParsingFunction<Expression>("power_expression") {
+object PowerExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         var left = parse(InversionExpressionParsingFunction)
 

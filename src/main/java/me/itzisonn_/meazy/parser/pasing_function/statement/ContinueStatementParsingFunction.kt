@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.statement.ContinueStatement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object ContinueStatementParsingFunction : ParsingFunction<ContinueStatement>("continue_statement") {
+object ContinueStatementParsingFunction : ParsingFunction<ContinueStatement> {
     override fun Parser.parse(vararg extra: Any?): ContinueStatement {
         next(`continue`, translatable("meazy:parser.expected.keyword", "continue"))
         return ContinueStatement()

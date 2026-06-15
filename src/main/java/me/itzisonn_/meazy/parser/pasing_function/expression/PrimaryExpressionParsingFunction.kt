@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.boolean
 import me.itzisonn_.meazy.lexer.TokenTypes.dot
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
@@ -20,12 +20,12 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseString
 import me.itzisonn_.meazy.text.translatable
 
-object PrimaryExpressionParsingFunction : ParsingFunction<Expression>("primary_expression") {
+object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val token = current
         val tokenType = token.type
 
-        if (tokenType == TokenTypes.id) {
+        if (tokenType == id) {
             if (size > pos + 1 && this[pos + 1].type == leftParenthesis) {
                 val id = consume().value
                 return if (Character.isUpperCase(id[0])) ClassIdentifier(id)

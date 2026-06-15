@@ -173,7 +173,6 @@ class Parser(tokens: List<Token>) {
      * @return Parsed program unit
      */
     fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T>, vararg extra: Any?): T {
-        val programUnit = parsingFunction.parse(this, *extra)
-        return programUnit
+        return parsingFunction.run { this@Parser.parse(*extra) }
     }
 }

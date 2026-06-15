@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operators.negation
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object NegationExpressionParsingFunction : ParsingFunction<Expression>("negation_expression") {
+object NegationExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         if (current.type == minus) {
             next()

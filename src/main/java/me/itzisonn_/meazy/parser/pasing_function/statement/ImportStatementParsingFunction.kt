@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes
+import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.dot
 import me.itzisonn_.meazy.lexer.TokenTypes.import
 import me.itzisonn_.meazy.parser.Parser
@@ -8,20 +8,20 @@ import me.itzisonn_.meazy.parser.ast.statement.ImportStatement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object ImportStatementParsingFunction : ParsingFunction<ImportStatement>("import_statement") {
+object ImportStatementParsingFunction : ParsingFunction<ImportStatement> {
     override fun Parser.parse(vararg extra: Any?): ImportStatement {
         next(import, translatable("meazy:parser.expected.keyword", "import"))
 
         val name = StringBuilder(
             consume(
-                TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "import")
+                id, translatable("meazy:parser.expected.after_keyword", "id", "import")
             ).value
         )
 
         while (current.type == dot) {
             next()
             name.append(".")
-            name.append(consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value)
+            name.append(consume(id, translatable("meazy:parser.expected", "id")).value)
         }
 
         return ImportStatement(name.toString())

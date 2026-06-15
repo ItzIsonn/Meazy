@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object AssignmentStatementParsingFunction : ParsingFunction<AssignmentStatement>("assignment_statement") {
+object AssignmentStatementParsingFunction : ParsingFunction<AssignmentStatement> {
     override fun Parser.parse(vararg extra: Any?): AssignmentStatement {
         val left = parse(ExpressionParsingFunction)
 

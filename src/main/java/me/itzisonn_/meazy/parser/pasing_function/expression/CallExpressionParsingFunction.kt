@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseArgs
 import me.itzisonn_.meazy.text.translatable
 
-object CallExpressionParsingFunction : ParsingFunction<Expression>("call_expression") {
+object CallExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val expression = parse(PrimaryExpressionParsingFunction)
 

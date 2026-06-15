@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object InversionExpressionParsingFunction : ParsingFunction<Expression>("inversion_expression") {
+object InversionExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         if (current.type == inversion) {
             next()

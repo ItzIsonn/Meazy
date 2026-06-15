@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.text.translatable
 import java.io.File
 
-object ProgramParsingFunction : ParsingFunction<Program>("program") {
+object ProgramParsingFunction : ParsingFunction<Program> {
     override fun Parser.parse(vararg extra: Any?): Program {
         val file: File?
         require(extra.isNotEmpty()) { "Expected file as extra argument" }

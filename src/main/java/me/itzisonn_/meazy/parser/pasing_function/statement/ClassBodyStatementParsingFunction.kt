@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseModifiers
 import me.itzisonn_.meazy.text.translatable
 
-object ClassBodyStatementParsingFunction : ParsingFunction<Statement>("class_body_statement") {
+object ClassBodyStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {
         val modifiers = parseModifiers()
 

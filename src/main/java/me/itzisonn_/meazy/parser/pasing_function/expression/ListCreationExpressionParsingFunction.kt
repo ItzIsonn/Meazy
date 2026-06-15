@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreation
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object ListCreationExpressionParsingFunction : ParsingFunction<Expression>("list_creation_expression") {
+object ListCreationExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         if (current.type == leftBracket) {
             next()

@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.NullCheckExpression
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
-object NullCheckExpressionParsingFunction : ParsingFunction<Expression>("null_check_expression") {
+object NullCheckExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val checkExpression = parse(LogicalExpressionParsingFunction)
 

@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.statement.Statement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.text.translatable
 
-object HeaderStatementParsingFunction : ParsingFunction<Statement>("header_statement") {
+object HeaderStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {
         if (current.type == `import`) {
             return parse(ImportStatementParsingFunction)
