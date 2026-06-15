@@ -3,10 +3,8 @@ package me.itzisonn_.meazy.text
 import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.util.FileUtils
 import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
-import java.io.IOException
 
 /**
  * Represents translations bundle
@@ -37,16 +35,11 @@ object TranslationsBundle {
     private fun updateTranslations() {
         translations.clear()
 
-        try {
-            MeazyMain::class.java.classLoader.getResourceAsStream("lang/" + language.id + ".json").use { inputStream ->
-                if (inputStream != null) translations.putAll(
-                    Json.decodeFromString<Map<String, String>>(FileUtils.getLines(inputStream))
-                )
-            }
-        }
-        catch (e: IOException) {
-            throw RuntimeException("Failed to update translations", e)
-        }
+        val text = MeazyMain::class.java.classLoader.getResource("lang/${language.id}.json")
+            ?.readText()
+            ?: error("Failed to update translations")
+
+        translations.putAll(Json.decodeFromString<Map<String, String>>(text))
 
         translations.keys.removeIf { key ->
             val remove = !key.matches("[a-zA-Z_.]+".toRegex())
