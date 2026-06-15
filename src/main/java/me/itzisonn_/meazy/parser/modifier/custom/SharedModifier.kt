@@ -34,7 +34,7 @@ class SharedModifier : Modifier("shared") {
 
         if (identifier is VariableIdentifier) {
             if (environment !is VariableDeclarationEnvironment) return true
-            if (environment.getVariable(identifier.id).isEmpty) return true
+            if (environment.getVariable(identifier.id) == null) return true
 
             return !environment.isShared || environment is FileEnvironment || environment is GlobalEnvironment
         }

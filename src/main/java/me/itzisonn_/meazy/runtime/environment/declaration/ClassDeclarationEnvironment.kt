@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.text.translatable
-import java.util.Optional
 
 /**
  * Adds to Environment ability to declare classes
@@ -21,8 +20,8 @@ interface ClassDeclarationEnvironment : Environment {
      * @param id Class's id
      * @return Declared class with given id or null
      */
-    fun getClass(id: String): Optional<ClassEnvironment> {
-        return Optional.ofNullable(classes.find { it.id == id })
+    fun getClass(id: String): ClassEnvironment? {
+        return classes.find { it.id == id }
     }
 
     /**

@@ -190,7 +190,7 @@ fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean)
 
     val fileEnvironment = getParentOrSelf<FileEnvironment>() ?: return classDesc
 
-    var classEnvironment = fileEnvironment.getClass(classDesc.displayName()).orElse(null)
+    var classEnvironment = fileEnvironment.getClass(classDesc.displayName())
     if (classEnvironment != null) return classEnvironment.classDesc
 
     classEnvironment = getClass(classDesc)
@@ -269,13 +269,13 @@ fun areFromSamePackage(environment1: Environment, environment2: Environment): Bo
 fun Environment.getVariable(id: String): VariableValue? {
     if (this is VariableDeclarationEnvironment) {
         val variableValue = getVariable(id)
-        if (variableValue.isPresent) return variableValue.get()
+        if (variableValue != null) return variableValue
     }
 
     if (this is GlobalEnvironment) {
         for (fileEnvironment in fileEnvironments) {
             val variableValue = fileEnvironment.getVariable(id)
-            if (variableValue.isPresent) return variableValue.get()
+            if (variableValue != null) return variableValue
         }
 
         return null
@@ -306,13 +306,13 @@ fun Environment.getVariableDeclarationEnvironment(id: String): VariableDeclarati
 fun Environment.getFunction(id: String, args: List<DataType>): FunctionEnvironment? {
     if (this is FunctionDeclarationEnvironment) {
         val functionEnvironment = getFunction(id, args)
-        if (functionEnvironment.isPresent) return functionEnvironment.get()
+        if (functionEnvironment != null) return functionEnvironment
     }
 
     if (this is GlobalEnvironment) {
         for (fileEnvironment in fileEnvironments) {
             val functionEnvironment = fileEnvironment.getFunction(id, args)
-            if (functionEnvironment.isPresent) return functionEnvironment.get()
+            if (functionEnvironment != null) return functionEnvironment
         }
 
         return null
@@ -340,10 +340,10 @@ fun Environment.getClass(classDesc: ClassDesc): ClassEnvironment? {
 
     for (fileEnvironment in globalEnvironment.getFileEnvironments(classDesc.packageName())) {
         val classEnvironment = fileEnvironment.getClass(classDesc.displayName())
-        if (classEnvironment.isPresent) return classEnvironment.get()
+        if (classEnvironment != null) return classEnvironment
     }
 
-    return globalEnvironment.resolveJavaClass(classDesc).orElse(null)
+    return globalEnvironment.resolveJavaClass(classDesc)
 }
 
 fun Environment.getClass(id: String): ClassEnvironment? {

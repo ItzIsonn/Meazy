@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.text.translatable
-import java.util.Optional
 
 /**
  * Adds to Environment ability to declare constructors
@@ -22,21 +21,18 @@ interface ConstructorDeclarationEnvironment : Environment {
      * @param args Constructor's args TODO
      * @return Declared constructor with given args or null
      */
-    fun getConstructor(args: List<DataType>): Optional<ConstructorEnvironment> {
-        main@ for (constructorEnvironment in constructors) {
-            val parameters = constructorEnvironment.parameters
-            if (args.size != parameters.size) continue
+    fun getConstructor(args: List<DataType>): ConstructorEnvironment? {
+        return constructors.find { constructor ->
+            val parameters = constructor.parameters
+            if (args.size != parameters.size) return@find false
 
-            for (i in args.indices) {
+            args.forEachIndexed { i, arg ->
                 val parameter = parameters[i].dataType
-                val arg = args[i]
-                if (!DataType.matches(this, arg, parameter)) continue@main
+                if (!DataType.matches(this, arg, parameter)) return@find false
             }
 
-            return Optional.of(constructorEnvironment)
+            return@find true
         }
-
-        return Optional.empty()
     }
 
     /**

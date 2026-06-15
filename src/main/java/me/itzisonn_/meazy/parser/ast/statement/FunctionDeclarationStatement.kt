@@ -93,7 +93,7 @@ class FunctionDeclarationStatement(
                 cls.getFunctionRecursively(
                     functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
                 )
-                    .ifPresent { f ->
+                    ?.let { f ->
                         if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
                             throw RuntimeException("Can't override non-open function $id")
                         }
@@ -110,7 +110,7 @@ class FunctionDeclarationStatement(
                 cls.getFunctionRecursively(
                     functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
                 )
-                    .ifPresent { f ->
+                    ?.let { f ->
                         if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
                             throw RuntimeException("Can't override non-open function $id")
                         }

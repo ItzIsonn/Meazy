@@ -6,7 +6,6 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 import me.itzisonn_.meazy.text.translatable
-import java.util.Optional
 
 /**
  * Adds to Environment ability to declare functions
@@ -23,23 +22,20 @@ interface FunctionDeclarationEnvironment : Environment {
      * @param args Parameters
      * @return Declared function with given id and args or null
      */
-    fun getFunction(id: String, args: List<DataType>): Optional<FunctionEnvironment> {
-        main@ for (functionEnvironment in functions) {
-            if (functionEnvironment.id != id) continue
+    fun getFunction(id: String, args: List<DataType>): FunctionEnvironment? {
+        return functions.find { function ->
+            if (function.id != id) return@find false
 
-            val parameters = functionEnvironment.parameters
-            if (parameters.size != args.size) continue
+            val parameters = function.parameters
+            if (parameters.size != args.size) return@find false
 
-            for (i in args.indices) {
+            args.forEachIndexed { i, arg ->
                 val parameter = parameters[i].dataType
-                val arg = args[i]
-                if (!DataType.matches(this, arg, parameter)) continue@main
+                if (!DataType.matches(this, arg, parameter)) return@find false
             }
 
-            return Optional.of(functionEnvironment)
+            return@find true
         }
-
-        return Optional.empty()
     }
 
     /**

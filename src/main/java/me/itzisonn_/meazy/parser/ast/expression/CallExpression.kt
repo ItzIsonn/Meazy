@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
@@ -11,7 +12,6 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.*
-import me.itzisonn_.meazy.util.MiscUtils.convertPrimitiveOrBoxed
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
@@ -68,7 +68,7 @@ class CallExpression(
                     arg.emit(this, environment, this@CallExpression)
 
                     if (!environment.isInstanceOf(argType, parameterType)) {
-                        if (!convertPrimitiveOrBoxed(instructions, argType, parameterType)) {
+                        if (!instructions.convertPrimitiveOrBoxed(argType, parameterType)) {
                             throw RuntimeException("Can't pass argument of type $argType to parameter of type $parameterType")
                         }
                     }
@@ -91,7 +91,7 @@ class CallExpression(
                 }
             }
         }
-        else throw RuntimeException("Unknown caller TODO " + caller.javaClass.getName())
+        else throw RuntimeException("Unknown caller TODO " + caller::class.qualifiedName)
     }
 
     override fun getType(environment: Environment, parent: ProgramUnit): DataType {
@@ -149,7 +149,7 @@ class CallExpression(
         if (parent is MemberExpression) {
             val classDesc = parent.receiver.getType(environment, this).classDesc
             val classEnvironment = environment.getClass(classDesc) ?: return null
-            return classEnvironment.getFunctionRecursively(id, args).orElse(null)
+            return classEnvironment.getFunctionRecursively(id, args)
         }
 
         return environment.getFunction(id, args)
@@ -185,7 +185,7 @@ class CallExpression(
         val args = args.map { it.getType(environment, this) }
 
         val classEnvironment = environment.getClass(environment.resolveClassDesc(id, false)) ?: return null
-        return classEnvironment.getConstructor(args).orElse(null)
+        return classEnvironment.getConstructor(args)
     }
 
     override fun alwaysReturns() = false

@@ -1,11 +1,11 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.boxPrimitive
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.util.MiscUtils.boxPrimitive
-import me.itzisonn_.meazy.util.MiscUtils.getBoxedType
+import me.itzisonn_.meazy.util.boxed
 
 class NullCheckExpression(
     val checkExpression: Expression,
@@ -27,7 +27,7 @@ class NullCheckExpression(
         instructions.pop()
         nullExpression.emit(instructions, environment, this)
         val nullExpressionClassDesc = nullExpression.getType(environment, this).classDesc
-        if (nullExpressionClassDesc.isPrimitive) boxPrimitive(instructions, nullExpressionClassDesc)
+        if (nullExpressionClassDesc.isPrimitive) instructions.boxPrimitive(nullExpressionClassDesc)
         instructions.gotoLabel(endLabel)
 
         instructions.bindLabel(endLabel)
@@ -38,8 +38,7 @@ class NullCheckExpression(
         if (!checkExpressionType.isNullable) return checkExpressionType
 
         val nullExpressionType = nullExpression.getType(environment, this)
-        var nullExpressionClassDesc = nullExpressionType.classDesc
-        if (nullExpressionClassDesc.isPrimitive) nullExpressionClassDesc = getBoxedType(nullExpressionClassDesc)
+        val nullExpressionClassDesc = nullExpressionType.classDesc.boxed
 
         return DataType.commonOf(
             environment,

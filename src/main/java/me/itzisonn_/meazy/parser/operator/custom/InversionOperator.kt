@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operator
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.util.MiscUtils.isBoolean
+import me.itzisonn_.meazy.util.isBoolean
 import java.lang.constant.ConstantDescs
 
 class InversionOperator : Operator("inversion", "!", OperatorType.PREFIX) {
@@ -14,7 +14,7 @@ class InversionOperator : Operator("inversion", "!", OperatorType.PREFIX) {
         val left = operatorExpression.left
 
         val leftType = left.getType(environment, operatorExpression)
-        if (!isBoolean(leftType.classDesc)) error("Can only invert booleans TODO")
+        if (!leftType.classDesc.isBoolean) error("Can only invert booleans TODO")
 
         val trueLabel = instructions.createAndInitLabel()
         val endLabel = instructions.createAndInitLabel()

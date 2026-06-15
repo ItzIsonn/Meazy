@@ -8,5 +8,5 @@ interface ModifieredEnvironment : Environment {
      */
     val modifiers: Set<Modifier>
 
-    fun hasModifier(modifier: Modifier) = modifiers.contains(modifier)
+    fun hasModifier(modifier: Modifier) = modifier in modifiers
 }

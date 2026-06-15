@@ -1,13 +1,13 @@
 package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.*
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
-import me.itzisonn_.meazy.util.MiscUtils
 import java.lang.classfile.attribute.InnerClassInfo
 import java.lang.classfile.attribute.InnerClassesAttribute
 import java.lang.constant.ClassDesc
@@ -122,7 +122,7 @@ class ClassDeclarationStatement(
                     val variableType = variableValue.dataType.classDesc
 
                     if (!classEnvironment.isInstanceOf(valueType, variableType)) {
-                        if (!MiscUtils.convertPrimitiveOrBoxed(this, valueType, variableType)) {
+                        if (!convertPrimitiveOrBoxed(valueType, variableType)) {
                             throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                         }
                     }

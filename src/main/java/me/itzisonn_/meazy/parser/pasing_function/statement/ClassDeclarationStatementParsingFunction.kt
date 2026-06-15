@@ -24,7 +24,6 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.statement.*
-import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers.data
 import me.itzisonn_.meazy.parser.modifier.Modifiers.enum
 import me.itzisonn_.meazy.parser.modifier.Modifiers.get
@@ -80,7 +79,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
         skipNewLines()
 
-        val enumIds = LinkedHashMap<String, List<Expression>>()
+        val enumIds = mutableMapOf<String, List<Expression>>()
         if (enum in modifiers) {
             if (!baseClasses.isEmpty()) throw InvalidSyntaxException(
                 baseClassesLineNumber,
@@ -133,7 +132,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
 
 
     private fun generateDataBody(id: String, dataVariables: List<Parameter>): MutableList<Statement> {
-        val body: MutableList<Statement> = ArrayList<Statement>()
+        val body = mutableListOf<Statement>()
 
         for (dataVariable in dataVariables) {
             body.add(
@@ -147,7 +146,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             )
         }
 
-        val constructorBody: MutableList<LocalStatement> = ArrayList<LocalStatement>()
+        val constructorBody = mutableListOf<LocalStatement>()
         for (callArgExpression in dataVariables) {
             constructorBody.add(
                 AssignmentStatement(
@@ -159,7 +158,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 )
             )
         }
-        body.add(ConstructorDeclarationStatement(mutableSetOf<Modifier>(), dataVariables, constructorBody))
+        body.add(ConstructorDeclarationStatement(mutableSetOf(), dataVariables, constructorBody))
 
         for (dataVariable in dataVariables) {
             body.add(getGetFunction(dataVariable.id, dataVariable.dataType))
@@ -173,23 +172,23 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         val toStringExpression: Expression = getToStringExpression(id, dataVariables)
         body.add(
             FunctionDeclarationStatement(
-                mutableSetOf<Modifier>(),
+                mutableSetOf(),
                 "toString",
-                mutableListOf<Parameter>(),
+                mutableListOf(),
                 mutableListOf(ReturnStatement(toStringExpression)),
                 ofNonNull(ConstantDescs.CD_String)
             )
         )
 
-        val copyArgs: MutableList<Expression> = ArrayList<Expression>()
+        val copyArgs = mutableListOf<Expression>()
         for (dataVariable in dataVariables) {
             copyArgs.add(VariableIdentifier(dataVariable.id))
         }
         body.add(
             FunctionDeclarationStatement(
-                mutableSetOf<Modifier>(),
+                mutableSetOf(),
                 "copy",
-                mutableListOf<Parameter>(),
+                mutableListOf(),
                 mutableListOf(ReturnStatement(CallExpression(ClassIdentifier(id), copyArgs))),
                 ofNonNull(ClassDesc.of(id))
             )
@@ -203,14 +202,14 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                     VariableIdentifier("value"),
                     CallExpression(
                         FunctionIdentifier(generatePrefixedName("get", dataVariables.first().id)),
-                        mutableListOf<Expression>()
+                        mutableListOf()
                     ),
                     false
                 ),
                 "==", OperatorType.INFIX
             )
             for (i in 1..<dataVariables.size) {
-                val dataVariable = dataVariables.get(i)
+                val dataVariable = dataVariables[i]
                 equalsExpression = OperatorExpression(
                     equalsExpression!!,
                     OperatorExpression(
@@ -219,7 +218,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                             VariableIdentifier("value"),
                             CallExpression(
                                 FunctionIdentifier(generatePrefixedName("get", dataVariable.id)),
-                                mutableListOf<Expression>()
+                                mutableListOf()
                             ),
                             false
                         ),
@@ -263,15 +262,14 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
     private fun getToStringExpression(id: String, dataVariables: List<Parameter>): Expression {
         var toStringExpression: Expression = StringLiteral(id + "(" + (if (dataVariables.isEmpty()) ")" else ""))
         for (i in dataVariables.indices) {
-            val dataVariable = dataVariables.get(i)
+            val dataVariable = dataVariables[i]
 
-            val endingExpression: Expression?
-            if (i == dataVariables.size - 1) endingExpression = OperatorExpression(
+            val endingExpression = if (i == dataVariables.size - 1) OperatorExpression(
                 VariableIdentifier(dataVariable.id),
                 StringLiteral(")"),
                 "+", OperatorType.INFIX
             )
-            else endingExpression = VariableIdentifier(dataVariable.id)
+            else VariableIdentifier(dataVariable.id)
 
             toStringExpression = OperatorExpression(
                 toStringExpression,
@@ -288,9 +286,9 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
 
     private fun getGetFunction(id: String, dataType: DataType): FunctionDeclarationStatement {
         return FunctionDeclarationStatement(
-            mutableSetOf<Modifier>(),
+            mutableSetOf(),
             generatePrefixedName("get", id),
-            mutableListOf<Parameter>(),
+            mutableListOf(),
             mutableListOf(ReturnStatement(VariableIdentifier(id))),
             dataType
         )
@@ -298,7 +296,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
 
     private fun getSetFunction(id: String, dataType: DataType): FunctionDeclarationStatement {
         return FunctionDeclarationStatement(
-            mutableSetOf<Modifier>(),
+            mutableSetOf(),
             generatePrefixedName("set", id),
             listOf(Parameter(id, dataType, true)),
             mutableListOf(

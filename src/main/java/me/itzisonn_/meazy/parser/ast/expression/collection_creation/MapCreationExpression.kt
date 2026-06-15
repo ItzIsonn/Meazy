@@ -15,45 +15,41 @@ class MapCreationExpression(val map: Map<Expression, Expression>) : Expression {
         instructions.invokeConstructor(
             ClassDesc.of("java.util.HashMap"),
             MethodTypeDesc.of(ConstantDescs.CD_void, ClassDesc.of("java.util.Map"))
-        ) { hashMapArgsInstructions(environment) }
+        ) {
+            invokeMethod(
+                ConstantDescs.CD_Map,
+                "ofEntries",
+                MethodTypeDesc.of(ConstantDescs.CD_Map, ClassDesc.of($$"java.util.Map$Entry").arrayType()),
+                InvokeType.STATIC_INTERFACE
+            ) {
+                loadConstant(map.size)
+                newReferenceArray(ClassDesc.of($$"java.util.Map$Entry"))
+
+                map.entries.forEachIndexed { i, (key, value) ->
+                    invokeMethod(
+                        ClassDesc.of("java.util.Map"),
+                        "entry",
+                        MethodTypeDesc.of(
+                            ClassDesc.of($$"java.util.Map$Entry"),
+                            ConstantDescs.CD_Object,
+                            ConstantDescs.CD_Object
+                        ),
+                        InvokeType.STATIC_INTERFACE
+                    ) {
+                        duplicate()
+                        loadConstant(i)
+
+                        key.emit(this, environment, this@MapCreationExpression)
+                        value.emit(this, environment, this@MapCreationExpression)
+                    }
+
+                    storeReferenceIntoArray()
+                }
+            }
+        }
     }
 
     override fun getType(environment: Environment, parent: ProgramUnit): DataType {
         return DataType.ofNonNull(ClassDesc.of("java.util.HashMap"))
-    }
-
-    private fun InstructionsSet.hashMapArgsInstructions(environment: Environment) {
-        invokeMethod(
-            ConstantDescs.CD_Map,
-            "ofEntries",
-            MethodTypeDesc.of(ConstantDescs.CD_Map, ClassDesc.of($$"java.util.Map$Entry").arrayType()),
-            InvokeType.STATIC_INTERFACE
-        ) { ofEntriesArgsInstructions(environment) }
-    }
-
-    private fun InstructionsSet.ofEntriesArgsInstructions(environment: Environment) {
-        loadConstant(map.size)
-        newReferenceArray(ClassDesc.of($$"java.util.Map$Entry"))
-
-        map.entries.forEachIndexed { i, (key, value) ->
-            invokeMethod(
-                ClassDesc.of("java.util.Map"),
-                "entry",
-                MethodTypeDesc.of(
-                    ClassDesc.of($$"java.util.Map$Entry"),
-                    ConstantDescs.CD_Object,
-                    ConstantDescs.CD_Object
-                ),
-                InvokeType.STATIC_INTERFACE
-            ) {
-                duplicate()
-                loadConstant(i)
-
-                key.emit(this, environment, this@MapCreationExpression)
-                value.emit(this, environment, this@MapCreationExpression)
-            }
-
-            storeReferenceIntoArray()
-        }
     }
 }

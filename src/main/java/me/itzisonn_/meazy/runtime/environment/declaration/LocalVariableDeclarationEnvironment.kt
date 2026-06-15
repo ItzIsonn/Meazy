@@ -32,7 +32,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
     private var endLabel: Uuid?
 ) : VariableDeclarationEnvironmentImpl(parent), LocalVariableDeclarationEnvironment {
     override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue {
-        if (getVariable(id).isPresent) {
+        if (getVariable(id) != null) {
             throw EvaluationException(translatable("meazy:runtime.variable.already_exists", id))
         }
 

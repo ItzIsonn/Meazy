@@ -1,12 +1,12 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.boxPrimitive
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
-import me.itzisonn_.meazy.util.MiscUtils.boxPrimitive
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
@@ -20,7 +20,7 @@ class IsExpression(
         val valueClassDesc = value.getType(environment, this).classDesc
 
         value.emit(instructions, environment, this)
-        if (valueClassDesc.isPrimitive) boxPrimitive(instructions, valueClassDesc)
+        if (valueClassDesc.isPrimitive) instructions.boxPrimitive(valueClassDesc)
 
         if (isLike) {
             instructions.instanceOf(classDesc)

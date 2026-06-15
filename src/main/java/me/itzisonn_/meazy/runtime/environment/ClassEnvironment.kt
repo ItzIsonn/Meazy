@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnv
 import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironmentImpl
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
-import java.util.Optional
 
 /**
  * Represents environment for classes
@@ -30,26 +29,26 @@ sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDecl
 
 
 
-    fun getFunctionRecursively(id: String, args: List<DataType>): Optional<FunctionEnvironment> {
+    fun getFunctionRecursively(id: String, args: List<DataType>): FunctionEnvironment? {
         var functionEnvironment = getFunction(id, args)
-        if (functionEnvironment.isPresent) return functionEnvironment
+        if (functionEnvironment != null) return functionEnvironment
 
         val baseClass = baseClass
         if (baseClass != null) {
             val baseClass = resolveClassDesc(baseClass, false)
             val classEnvironment = getClass(baseClass)!!
             functionEnvironment = classEnvironment.getFunctionRecursively(id, args)
-            if (functionEnvironment.isPresent) return functionEnvironment
+            if (functionEnvironment != null) return functionEnvironment
         }
 
         for (interfaceClassDesc in interfaces) {
             val baseClass: ClassDesc = resolveClassDesc(interfaceClassDesc, false)
             val classEnvironment = getClass(baseClass)!!
             functionEnvironment = classEnvironment.getFunctionRecursively(id, args)
-            if (functionEnvironment.isPresent) return functionEnvironment
+            if (functionEnvironment != null) return functionEnvironment
         }
 
-        return Optional.empty<FunctionEnvironment>()
+        return null
     }
 
 
@@ -121,28 +120,28 @@ private class ClassEnvironmentImpl(
 
 
 
-    override fun getVariable(id: String): Optional<VariableValue> {
+    override fun getVariable(id: String): VariableValue? {
         val variableValue = super<VariableDeclarationEnvironmentImpl>.getVariable(id)
-        if (variableValue.isPresent) return variableValue
+        if (variableValue != null) return variableValue
 
-        val baseClass = baseClass ?: return Optional.empty()
+        val baseClass = baseClass ?: return null
         val baseClassEnvironment = getClass(baseClass.displayName())
 
         if (baseClassEnvironment != null) return baseClassEnvironment.getVariable(id)
-        return Optional.empty()
+        return null
     }
 
 
 
-    override fun getFunction(id: String, args: List<DataType>): Optional<FunctionEnvironment> {
-        val functionEnvironment: Optional<FunctionEnvironment> = super<FunctionDeclarationEnvironment>.getFunction(id, args)
-        if (functionEnvironment.isPresent) return functionEnvironment
+    override fun getFunction(id: String, args: List<DataType>): FunctionEnvironment? {
+        val functionEnvironment = super<FunctionDeclarationEnvironment>.getFunction(id, args)
+        if (functionEnvironment != null) return functionEnvironment
 
-        val baseClass = baseClass ?: return Optional.empty()
+        val baseClass = baseClass ?: return null
         val baseClassEnvironment = getClass(baseClass)
 
         if (baseClassEnvironment != null) return baseClassEnvironment.getFunction(id, args)
-        return Optional.empty()
+        return null
     }
 
 
