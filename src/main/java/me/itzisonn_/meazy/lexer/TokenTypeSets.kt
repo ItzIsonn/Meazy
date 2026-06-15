@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.registry.defaultIdentifier
 
 object TokenTypeSets {
     val keywords get() = get("keywords")
@@ -13,6 +13,6 @@ object TokenTypeSets {
     val addition get() = get("addition")
 
     private fun get(id: String): TokenTypeSet {
-        return Registries.TOKEN_TYPE_SETS.getEntry(getDefaultIdentifier(id))?.value!!
+        return Registries.TOKEN_TYPE_SETS.getEntry(defaultIdentifier(id))?.value!!
     }
 }

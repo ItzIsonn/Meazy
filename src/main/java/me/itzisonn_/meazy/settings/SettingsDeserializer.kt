@@ -1,20 +1,41 @@
 package me.itzisonn_.meazy.settings
 
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import java.lang.reflect.Type
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
+import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
 
-object SettingsDeserializer : JsonDeserializer<Settings> {
-    override fun deserialize(jsonElement: JsonElement, typeOfT: Type?, context: JsonDeserializationContext?): Settings {
-        val jsonObject = jsonElement.getAsJsonObject()
+object SettingsDeserializer : KSerializer<Settings> {
+    override val descriptor = buildClassSerialDescriptor("Settings") {
+        element<String>("language")
+        element<Boolean>("exception_absent_key")
+    }
 
-        if (jsonObject.get("language") == null) throw InvalidSettingsException("Settings doesn't have field language")
-        val language = jsonObject.get("language").asString
+    override fun serialize(encoder: Encoder, value: Settings) {
+        error("Unsupported operation")
+    }
 
-        if (jsonObject.get("exception_absent_key") == null) throw InvalidSettingsException("Settings doesn't have field exception_absent_key")
-        val exceptionAbsentKey = jsonObject.get("exception_absent_key").asBoolean
+    override fun deserialize(decoder: Decoder): Settings {
+        return decoder.decodeStructure(descriptor) {
+            var id: String? = null
+            var exceptionAbsentKey: Boolean? = null
 
-        return Settings(language, exceptionAbsentKey)
+            while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    0 -> id = decodeStringElement(descriptor, 0)
+                    1 -> exceptionAbsentKey = decodeBooleanElement(descriptor, 1)
+                    CompositeDecoder.DECODE_DONE -> break
+                    else -> error("Unexpected index: $index")
+                }
+            }
+
+            if (id == null) error("Settings don't have member id")
+            if (exceptionAbsentKey == null) error("Settings don't have member exception_absent_key")
+
+            Settings(id, exceptionAbsentKey)
+        }
     }
 }

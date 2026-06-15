@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.settings
 
-import com.google.gson.GsonBuilder
+import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.util.FileUtils.getLines
@@ -11,10 +11,6 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 object SettingsManager {
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(Settings::class.java, SettingsDeserializer)
-        .create()
-
     val settings: Settings
 
     init {
@@ -40,7 +36,7 @@ object SettingsManager {
             throw RuntimeException(translatable("meazy:settings.cant_load_file").toString(), e)
         }
 
-        settings = gson.fromJson(getLines(settingsFile), Settings::class.java)
+        settings = Json.decodeFromString(SettingsDeserializer, getLines(settingsFile))
     }
 
     private fun saveDefaultSettings(settingsFile: File) {
@@ -55,5 +51,3 @@ object SettingsManager {
         }
     }
 }
-
-class Settings(val language: String = "en", val exceptionAbsentKey: Boolean)

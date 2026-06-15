@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.registry
 
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.command.Commands
 import me.itzisonn_.meazy.command.AbstractCommand
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
@@ -17,6 +16,7 @@ import me.itzisonn_.meazy.parser.pasing_function.statement.ProgramParsingFunctio
 import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.text.Language
+import me.itzisonn_.registry.RegistryIdentifier
 import me.itzisonn_.registry.multiple_entry.SetRegistry
 import java.io.File
 import java.lang.constant.ClassDesc
@@ -116,8 +116,8 @@ object Registries {
         check(!isInitialized) { "Registries have already been initialized" }
         isInitialized = true
 
-        LANGUAGES.register(getDefaultIdentifier("english"), Language("en", "English"))
-        LANGUAGES.register(getDefaultIdentifier("russian"), Language("ru", "Русский"))
+        LANGUAGES.register(defaultIdentifier("english"), Language("en", "English"))
+        LANGUAGES.register(defaultIdentifier("russian"), Language("ru", "Русский"))
 
         Commands.register()
         TokenTypes.register()
@@ -217,3 +217,14 @@ object Registries {
         }
     }
 }
+
+/**
+ * Creates new RegistryIdentifier with 'meazy' namespace
+ *
+ * @param id Identifier's id that matches [RegistryIdentifier.IDENTIFIER_REGEX]
+ * @return New RegistryIdentifier
+ *
+ * @throws IllegalArgumentException If id doesn't match [RegistryIdentifier.IDENTIFIER_REGEX]
+ */
+fun defaultIdentifier(id: String): RegistryIdentifier =
+    RegistryIdentifier.of("meazy", id)

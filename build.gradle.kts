@@ -16,7 +16,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("reflect"))
-    implementation("com.google.code.gson:gson:2.14.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+
     implementation(files("libs/Registry.jar"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:${junitVersion}")

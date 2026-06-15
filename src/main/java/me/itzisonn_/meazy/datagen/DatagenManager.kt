@@ -1,9 +1,10 @@
 package me.itzisonn_.meazy.datagen
 
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonSyntaxException
-import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.util.FileUtils
 import java.io.IOException
 import java.net.URISyntaxException
@@ -11,58 +12,50 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.toPath
 import kotlin.io.path.walk
-import kotlin.reflect.KClass
 
 /**
  * Provides methods for working with datagen
  */
 object DatagenManager {
     /**
-     * Gets all lines inside folder with given folderPath and deserializes them using given deserializer. Accepts only single value in JSON
+     * Gets content of all files inside folder with given folderPath and deserializes them using given deserializer. Accepts only single value in JSON
      *
      * @param folderPath Path to datagen folder
-     * @param cls Class of deserialized values
-     * @param deserializer Json deserializer
-     *
-     * @return Set of all values inside folder with given folderPath
+     * @param deserializer Deserializer
      * @param T Type of deserialized values
+     *
+     * @return Set of deserialized values
      */
-    fun <T : Any> getDeserializedSingle(folderPath: String, cls: KClass<T>, deserializer: JsonDeserializer<T>): Set<T> {
+    fun <T> getDeserializedSingle(folderPath: String, deserializer: DeserializationStrategy<T>): Set<T> {
         val result = mutableSetOf<T>()
-        val gson = GsonBuilder().registerTypeAdapter(cls.java, deserializer).create()
 
-        for (lines in getDatagenFilesLines(folderPath)) {
-            val value = gson.fromJson(lines, cls.java)
-            result.add(value)
+        for (content in getDatagenFilesContent(folderPath)) {
+            val value = Json.decodeFromString(deserializer, content)
+            result += value
         }
 
         return result
     }
 
     /**
-     * Gets all lines inside folder with given folderPath and deserializes them using given deserializer. Accepts an array and single value in JSON
+     * Gets content of all files inside folder with given folderPath and deserializes them using given deserializer. Accepts an array and single value in JSON
      *
      * @param folderPath Path to datagen folder
-     * @param cls Class of deserialized values
-     * @param deserializer Json deserializer
-     *
-     * @return Set of all values inside folder with given folderPath
+     * @param deserializer Deserializer
      * @param T Type of deserialized values
+     *
+     * @return Set of deserialized values
      */
-    fun <T : Any> getDeserializedMultiple(folderPath: String, cls: KClass<T>, deserializer: JsonDeserializer<T>): Set<T> {
+    fun <T : Any> getDeserializedMultiple(folderPath: String, deserializer: KSerializer<T>): Set<T> {
         val result = mutableSetOf<T>()
 
-        val gson = GsonBuilder().registerTypeAdapter(cls.java, deserializer).create()
-        @Suppress("UNCHECKED_CAST")
-        val typeToken = TypeToken.getParameterized(MutableSet::class.java, cls.java) as TypeToken<MutableSet<T>>
-
-        for (lines in getDatagenFilesLines(folderPath)) {
+        for (content in getDatagenFilesContent(folderPath)) {
             try {
-                val value = gson.fromJson(lines, cls.java)
+                val value = Json.decodeFromString(deserializer, content)
                 result.add(value)
             }
-            catch (_: JsonSyntaxException) {
-                val values = gson.fromJson(lines, typeToken)
+            catch (_: SerializationException) {
+                val values = Json.decodeFromString(SetSerializer(deserializer), content)
                 result.addAll(values)
             }
         }
@@ -70,11 +63,9 @@ object DatagenManager {
         return result
     }
 
-    /**
-     * @param folderPath Path to datagen folder
-     * @return Set of all files' lines inside folder with given folderPath
-     */
-    fun getDatagenFilesLines(folderPath: String): Set<String> {
+
+
+    private fun getDatagenFilesContent(folderPath: String): Set<String> {
         val url = this::class.java.getResource("/data/$folderPath") ?: error("Can't find file: $folderPath")
         val path = url.toURI().toPath()
 

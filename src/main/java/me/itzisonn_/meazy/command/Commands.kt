@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.command
 
-import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.command.custom.*
 import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.registry.defaultIdentifier
 
 /**
  * Commands registrar
@@ -46,6 +46,6 @@ object Commands {
 
 
     private fun register(command: AbstractCommand) {
-        Registries.COMMANDS.register(MeazyMain.getDefaultIdentifier(command.name), command)
+        Registries.COMMANDS.register(defaultIdentifier(command.name), command)
     }
 }

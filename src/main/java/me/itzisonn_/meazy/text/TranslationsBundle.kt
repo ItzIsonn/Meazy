@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.text
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.util.FileUtils
@@ -13,21 +12,7 @@ import java.io.IOException
  * Represents translations bundle
  */
 object TranslationsBundle {
-    private var language = run {
-        val entry = Registries.LANGUAGES.getEntry("en")
-        if (entry != null) entry.getValue()
-        else Language("en", "English")
-    }
-
-    private val GSON = Gson()
-
-    @Suppress("UNCHECKED_CAST")
-    private val MAP_TYPE_TOKEN = TypeToken.getParameterized(
-        MutableMap::class.java,
-        String::class.java,
-        String::class.java
-    ) as TypeToken<MutableMap<String, String>>
-
+    private var language = Registries.LANGUAGES.getEntry("en")?.value!!
     private val translations = mutableMapOf<String, String>()
 
     init {
@@ -55,7 +40,7 @@ object TranslationsBundle {
         try {
             MeazyMain::class.java.classLoader.getResourceAsStream("lang/" + language.id + ".json").use { inputStream ->
                 if (inputStream != null) translations.putAll(
-                    GSON.fromJson(FileUtils.getLines(inputStream), MAP_TYPE_TOKEN)
+                    Json.decodeFromString<Map<String, String>>(FileUtils.getLines(inputStream))
                 )
             }
         }

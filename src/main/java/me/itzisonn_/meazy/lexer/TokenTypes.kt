@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.MeazyMain.getDefaultIdentifier
 import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.registry.defaultIdentifier
 
 /**
  * TokenTypes registrar
@@ -23,7 +23,7 @@ object TokenTypes {
         hasRegistered = true
 
         Registries.TOKEN_TYPES.register(
-            getDefaultIdentifier("id"), TokenType(
+            defaultIdentifier("id"), TokenType(
                 "id",
                 "[a-zA-Z_][a-zA-Z0-9_]*",
                 false
@@ -90,6 +90,6 @@ object TokenTypes {
     val id get() = get("id")
     
     private fun get(id: String): TokenType {
-        return Registries.TOKEN_TYPES.getEntry(getDefaultIdentifier(id))?.value!!
+        return Registries.TOKEN_TYPES.getEntry(defaultIdentifier(id))?.value!!
     }
 }

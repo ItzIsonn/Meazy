@@ -1,11 +1,11 @@
 package me.itzisonn_.meazy
 
 import me.itzisonn_.meazy.command.Commands.getByName
-import me.itzisonn_.meazy.datagen.DatagenDeserializers
 import me.itzisonn_.meazy.datagen.DatagenManager
-import me.itzisonn_.meazy.lexer.TokenType
-import me.itzisonn_.meazy.lexer.TokenTypeSet
+import me.itzisonn_.meazy.datagen.deserializer.TokenTypeDeserializer
+import me.itzisonn_.meazy.datagen.deserializer.TokenTypeSetDeserializer
 import me.itzisonn_.meazy.registry.Registries
+import me.itzisonn_.meazy.registry.defaultIdentifier
 import me.itzisonn_.meazy.settings.SettingsManager.settings
 import me.itzisonn_.meazy.text.TranslationsBundle
 import me.itzisonn_.meazy.text.literal
@@ -13,7 +13,6 @@ import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
 import me.itzisonn_.meazy.version.Version
-import me.itzisonn_.registry.RegistryIdentifier
 
 object MeazyMain {
     val VERSION = Version.of("3.0")
@@ -86,29 +85,14 @@ object MeazyMain {
         if (languagesEntry == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
         else TranslationsBundle.setLanguage(languagesEntry.getValue())
 
-        for (tokenType in DatagenManager.getDeserializedMultiple("token_type", TokenType::class, DatagenDeserializers.tokenTypeDeserializer)) {
-            val id = getDefaultIdentifier(tokenType.id)
+        for (tokenType in DatagenManager.getDeserializedMultiple("token_type", TokenTypeDeserializer)) {
+            val id = defaultIdentifier(tokenType.id)
             if (Registries.TOKEN_TYPES.getEntry(id) != null) continue
-            Registries.TOKEN_TYPES.register(getDefaultIdentifier(tokenType.id), tokenType)
+            Registries.TOKEN_TYPES.register(defaultIdentifier(tokenType.id), tokenType)
         }
 
-        for (tokenTypeSet in DatagenManager.getDeserializedSingle("token_type_set", TokenTypeSet::class, DatagenDeserializers.tokenTypeSetDeserializer)) {
-            Registries.TOKEN_TYPE_SETS.register(getDefaultIdentifier(tokenTypeSet.id), tokenTypeSet)
+        for (tokenTypeSet in DatagenManager.getDeserializedSingle("token_type_set", TokenTypeSetDeserializer)) {
+            Registries.TOKEN_TYPE_SETS.register(defaultIdentifier(tokenTypeSet.id), tokenTypeSet)
         }
-    }
-
-    /**
-     * Creates new RegistryIdentifier with 'meazy' namespace
-     * 
-     * @param id Identifier's id that matches [RegistryIdentifier.IDENTIFIER_REGEX]
-     * @return New RegistryIdentifier
-     * 
-     * @apiNote Recommended to use [RegistryIdentifier.of] or [RegistryIdentifier.of]
-     * because 'meazy' namespace belongs to core identifiers
-     * 
-     * @throws IllegalArgumentException If id doesn't match [RegistryIdentifier.IDENTIFIER_REGEX]
-     */
-    fun getDefaultIdentifier(id: String): RegistryIdentifier {
-        return RegistryIdentifier.of("meazy", id)
     }
 }
