@@ -1,6 +1,10 @@
 package me.itzisonn_.meazy
 
-import me.itzisonn_.meazy.command.Commands.getByName
+import me.itzisonn_.meazy.command.Argument
+import me.itzisonn_.meazy.command.Commands
+import me.itzisonn_.meazy.command.CommandResult
+import me.itzisonn_.meazy.command.LiteralArgument
+import me.itzisonn_.meazy.command.TypedArgument
 import me.itzisonn_.meazy.datagen.DatagenManager
 import me.itzisonn_.meazy.datagen.deserializer.TokenTypeDeserializer
 import me.itzisonn_.meazy.datagen.deserializer.TokenTypeSetDeserializer
@@ -31,34 +35,37 @@ object MeazyMain {
         initialize()
         val endLoadMillis = System.currentTimeMillis()
 
+        Logger.log(
+            LogLevel.INFO,
+            translatable(
+                "meazy:commands.loaded_info",
+                (endLoadMillis - startLoadMillis) / 1000.toDouble()
+            )
+        )
+
+        val args = args.toList()
         if (args.isEmpty()) {
             showAvailableCommandsList()
             return
         }
 
-        val command = getByName(args[0])
+        val command = Commands.findById(args[0])
         if (command == null) {
             Logger.log(LogLevel.ERROR, translatable("meazy:commands.unknown", args[0]))
             showAvailableCommandsList()
             return
         }
 
-        val commandArgs = args.copyOfRange(1, args.size)
-        if (commandArgs.size != command.args.size) {
-            Logger.log(LogLevel.ERROR, translatable("meazy:commands.invalid_args", command.args.size, commandArgs.size))
-            return
+        val commandArgs = args.subList(1, args.size)
+        val result = command.execute(commandArgs)
+
+        val text = result.text ?: return
+        val level = when (result) {
+            is CommandResult.Success -> LogLevel.INFO
+            is CommandResult.Failure -> LogLevel.ERROR
         }
 
-        val log = command.execute(*commandArgs)
-        if (log != null) {
-            Logger.log(
-                LogLevel.INFO,
-                translatable(
-                    "meazy:commands.loaded_info",
-                    (endLoadMillis.toDouble() - startLoadMillis.toDouble()) / 1000
-                ).append(literal(". ")).append(log)
-            )
-        }
+        Logger.log(level, text)
     }
 
     private fun showAvailableCommandsList() {
@@ -66,11 +73,33 @@ object MeazyMain {
 
         for (entry in Registries.COMMANDS.entries) {
             val command = entry.getValue()
+
+            var argsString = ""
+            if (command.arguments.size >= 2) argsString += "["
+            argsString += command.arguments.joinToString(" | ") { getStringRepresentation(it) }
+            if (command.arguments.size >= 2) argsString += "]"
+
             Logger.log(
                 LogLevel.INFO,
-                literal("    {0} {1}", command.name, command.args.joinToString(" ") { "<$it>" })
+                literal("  {0} {1}", command.id, argsString)
             )
         }
+    }
+
+    private fun getStringRepresentation(argument: Argument): String {
+        var string = when (argument) {
+            is LiteralArgument -> argument.id
+            is TypedArgument<*> -> "<" + argument.id + ">"
+        }
+
+        if (argument.children.isEmpty()) return string
+        string += " "
+
+        if (argument.children.size >= 2) string += "["
+        string += argument.children.joinToString(" | ") { getStringRepresentation(it) }
+        if (argument.children.size >= 2) string += "]"
+
+        return string
     }
 
 

@@ -13,18 +13,15 @@ object Commands {
     private var hasRegistered = false
 
     /**
-     * Finds registered AbstractCommand with given name
+     * Finds registered Command with given name
      * 
-     * @param name AbstractCommand's name
-     * @return AbstractCommand with given name or null
+     * @param id Command's id
+     * @return Command with given id or null
      */
-    fun getByName(name: String): AbstractCommand? {
-        for (entry in Registries.COMMANDS.entries) {
-            if (entry.getValue().name == name) return entry.getValue()
-        }
-
-        return null
+    fun findById(id: String): Command? {
+        return Registries.COMMANDS.entries.map { it.value }.find { it.id == id }
     }
+
 
 
     /**
@@ -38,14 +35,13 @@ object Commands {
         check(!hasRegistered) { "Commands have already been initialized" }
         hasRegistered = true
 
-        register(VersionCommand())
-        register(RunCommand())
-        register(CompileCommand())
-        register(CompileAndRunCommand())
+        register(versionCommand)
+        register(runCommand)
+        register(compileCommand)
+        register(compileAndRunCommand)
     }
 
-
-    private fun register(command: AbstractCommand) {
-        Registries.COMMANDS.register(defaultIdentifier(command.name), command)
+    private fun register(command: Command) {
+        Registries.COMMANDS.register(defaultIdentifier(command.id), command)
     }
 }

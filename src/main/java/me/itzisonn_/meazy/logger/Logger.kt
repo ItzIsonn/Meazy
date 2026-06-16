@@ -19,6 +19,6 @@ object Logger {
     fun log(level: LogLevel, text: Text) {
         val time = LocalDateTime.now().format(DATE_TIME_FORMATTER)
         val levelString = level.id.uppercase()
-        println("$time $levelString: $text")
+        println("$time [$levelString]: $text")
     }
 }
