@@ -1,15 +1,14 @@
 package me.itzisonn_.meazy.command.custom
 
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.command.AbstractCommand
-import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.command.Command
+import me.itzisonn_.meazy.command.CommandResult
 import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.logger.LogLevel
-import me.itzisonn_.meazy.logger.Logger
 
-class VersionCommand : AbstractCommand("version", listOf()) {
-    override fun execute(vararg args: String): Text? {
-        Logger.log(LogLevel.INFO, translatable("meazy:commands.version", MeazyMain.VERSION))
-        return null
+val versionCommand = Command("version") {
+    executes {
+        return@executes CommandResult.Success(
+            translatable("meazy:commands.version", MeazyMain.VERSION)
+        )
     }
 }

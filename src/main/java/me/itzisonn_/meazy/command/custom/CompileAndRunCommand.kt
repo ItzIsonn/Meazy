@@ -1,7 +1,8 @@
 package me.itzisonn_.meazy.command.custom
 
-import me.itzisonn_.meazy.command.AbstractCommand
-import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.command.Command
+import me.itzisonn_.meazy.command.CommandResult
+import me.itzisonn_.meazy.command.StringType
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.logger.LogLevel
@@ -10,63 +11,70 @@ import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-class CompileAndRunCommand : AbstractCommand(
-    "compile_and_run",
-    listOf("target_file", "output_directory_path")
-) {
-    override fun execute(vararg args: String): Text? {
-        val file = File(args[0])
-        if (file.isDirectory() || !file.exists()) {
-            Logger.log(LogLevel.ERROR, translatable("meazy:file.doesnt_exist", file.absolutePath))
-            return null
-        }
+val compileAndRunCommand = Command("compile_and_run") {
+    argument("target_file", StringType) { targetArg ->
+        argument("output_directory", StringType) { outputArg ->
+            executes {
+                val file = File(getArgument(targetArg))
+                if (file.isDirectory() || !file.exists()) {
+                    return@executes CommandResult.Failure(
+                        translatable("meazy:file.doesnt_exist", file.absolutePath)
+                    )
+                }
 
-        val extension = file.extension
-        if (extension != "mea") {
-            Logger.log(LogLevel.ERROR, translatable("meazy:file.unsupported_extension", extension))
-            return null
-        }
+                val extension = file.extension
+                if (extension != "mea") {
+                    return@executes CommandResult.Failure(
+                        translatable("meazy:file.unsupported_extension", extension)
+                    )
+                }
 
-        Logger.log(
-            LogLevel.INFO,
-            translatable("meazy:commands.compile.compiling", file.absolutePath)
-        )
-        val startCompileMillis = System.currentTimeMillis()
+                Logger.log(
+                    LogLevel.INFO,
+                    translatable("meazy:commands.compile.compiling", file.absolutePath)
+                )
+                val startCompileMillis = System.currentTimeMillis()
 
-        val tokens = Registries.tokenizationFunction(file.readText())
-        val program = Registries.parseTokensFunction(file, tokens)
-        val classes = Registries.compileProgramFunction(program)
+                val tokens = Registries.tokenizationFunction(file.readText())
+                val program = Registries.parseTokensFunction(file, tokens)
+                val classes = Registries.compileProgramFunction(program)
 
-        val outputDirectory = File(args[1])
-        if (!outputDirectory.exists()) {
-            if (!outputDirectory.mkdirs()) {
-                throw RuntimeException("Failed to create output directory") //TODO
+                val outputDirectory = File(getArgument(outputArg))
+                if (!outputDirectory.exists()) {
+                    if (!outputDirectory.mkdirs()) {
+                        return@executes CommandResult.Failure(
+                            translatable("meazy:file.cant_create", outputDirectory.absolutePath)
+                        )
+                    }
+                }
+                else outputDirectory.listFiles()?.forEach { it.delete() }
+
+                for ((classDesc, classFile) in classes) {
+                    val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
+
+                    try {
+                        Files.write(outputFile.toPath(), classFile)
+                    }
+                    catch (e: IOException) {
+                        throw RuntimeException(e)
+                    }
+                }
+
+                val endCompileMillis = System.currentTimeMillis()
+                Logger.log(
+                    LogLevel.INFO,
+                    translatable("meazy:commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
+                )
+
+                Logger.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
+                val startRunMillis = System.currentTimeMillis()
+                Registries.runProgramFunction(classes)
+
+                val endRunMillis = System.currentTimeMillis()
+                return@executes CommandResult.Success(
+                    translatable("meazy:commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)
+                )
             }
         }
-        else outputDirectory.listFiles()?.forEach { obj: File? -> obj!!.delete() }
-
-        for ((classDesc, classFile) in classes) {
-            val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
-
-            try {
-                Files.write(outputFile.toPath(), classFile)
-            }
-            catch (e: IOException) {
-                throw RuntimeException(e)
-            }
-        }
-
-        val endCompileMillis = System.currentTimeMillis()
-        Logger.log(
-            LogLevel.INFO,
-            translatable("meazy:commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
-        )
-
-        Logger.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
-        val startRunMillis = System.currentTimeMillis()
-        Registries.runProgramFunction(classes)
-
-        val endRunMillis = System.currentTimeMillis()
-        return translatable("meazy:commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)
     }
 }

@@ -16,8 +16,9 @@
 
 
 
-  "commands.unknown": "Unknown command with name {0}",
-  "commands.invalid_args": "Expected {0} arguments but found {1}",
+  "commands.unknown": "Unknown command with id '{0}'",
+  "commands.incorrect_args_amount": "Incorrect number of arguments for command with id '{0}'",
+  "commands.arg_doesnt_match": "Given argument '{0}' at position {1} doesn't match any available arguments",
   "commands.available": "Available commands:",
   "commands.loaded_info": "Loaded in {0}s",
 

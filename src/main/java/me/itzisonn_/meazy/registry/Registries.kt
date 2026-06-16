@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.registry
 
 import me.itzisonn_.meazy.MeazyMain
 import me.itzisonn_.meazy.command.Commands
-import me.itzisonn_.meazy.command.AbstractCommand
+import me.itzisonn_.meazy.command.Command
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.lexer.*
@@ -42,7 +42,7 @@ object Registries {
     /**
      * Registry for all Commands
      * 
-     * @see AbstractCommand
+     * @see Command
      */
     val COMMANDS = CommandRegistry()
 
