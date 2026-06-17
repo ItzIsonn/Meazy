@@ -17,6 +17,7 @@ import me.itzisonn_.meazy.text.literal
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.logger.LogLevel
 import me.itzisonn_.meazy.logger.Logger
+import me.itzisonn_.meazy.text.Languages
 import me.itzisonn_.meazy.version.Version
 
 object MeazyMain {
@@ -109,9 +110,9 @@ object MeazyMain {
         Registries.initialize()
 
         val stringLanguage = settings.language
-        val languagesEntry = Registries.LANGUAGES.getEntry(stringLanguage)
-        if (languagesEntry == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
-        else TranslationsBundle.setLanguage(languagesEntry.getValue())
+        val language = Languages.get(stringLanguage)
+        if (language == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
+        else TranslationsBundle.setLanguage(language)
 
         for (tokenType in DatagenManager.getDeserializedMultiple("token_type", TokenTypeDeserializer)) {
             if (TokenTypes.get(tokenType.id) != null) continue
