@@ -50,7 +50,7 @@ object MeazyMain {
             return
         }
 
-        val command = Commands.findById(args[0])
+        val command = Commands.get(args[0])
         if (command == null) {
             Logger.log(LogLevel.ERROR, translatable("meazy:commands.unknown", args[0]))
             showAvailableCommandsList()
@@ -72,9 +72,7 @@ object MeazyMain {
     private fun showAvailableCommandsList() {
         Logger.log(LogLevel.INFO, translatable("meazy:commands.available"))
 
-        for (entry in Registries.COMMANDS.entries) {
-            val command = entry.getValue()
-
+        for (command in Commands.getAll()) {
             var argsString = ""
             if (command.arguments.size >= 2) argsString += "["
             argsString += command.arguments.joinToString(" | ") { getStringRepresentation(it) }
