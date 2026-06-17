@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.text
 
 import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.logger.LogLevel
 import me.itzisonn_.meazy.logger.Logger
 
@@ -10,7 +9,7 @@ import me.itzisonn_.meazy.logger.Logger
  * Represents translations bundle
  */
 object TranslationsBundle {
-    private var language = Registries.LANGUAGES.getEntry("en")?.value!!
+    private var language = Languages.get("en")!!
     private val translations = mutableMapOf<String, String>()
 
     init {

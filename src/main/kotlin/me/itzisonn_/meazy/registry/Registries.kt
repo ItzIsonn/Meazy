@@ -14,7 +14,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.statement.ProgramParsingFunction
 import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
-import me.itzisonn_.meazy.text.Language
+import me.itzisonn_.meazy.text.Languages
 import me.itzisonn_.registry.RegistryIdentifier
 import me.itzisonn_.registry.multiple_entry.SetRegistry
 import java.io.File
@@ -28,15 +28,6 @@ import kotlin.reflect.typeOf
  */
 object Registries {
     private var isInitialized = false
-
-    /**
-     * Registry for all Languages
-     * 
-     * @see Language
-     */
-    val LANGUAGES = LanguageRegistry()
-
-
 
     /**
      * Registry for all Modifiers
@@ -85,9 +76,7 @@ object Registries {
         check(!isInitialized) { "Registries have already been initialized" }
         isInitialized = true
 
-        LANGUAGES.register(defaultIdentifier("english"), Language("en", "English"))
-        LANGUAGES.register(defaultIdentifier("russian"), Language("ru", "Русский"))
-
+        Languages.initialize()
         Commands.initialize()
         TokenTypes.initialize()
         Modifiers.register()
