@@ -49,27 +49,6 @@ object Registries {
 
 
     /**
-     * Registry for all TokenTypes
-     */
-    val TOKEN_TYPES = SetRegistry<TokenType>()
-
-    /**
-     * Registry for all TokenTypesSets
-     */
-    val TOKEN_TYPE_SETS = SetRegistry<TokenTypeSet>()
-
-    /**
-     * Registry for tokenization function that is used to tokenize given string
-     * 
-     * @see Token
-     * @see TOKEN_TYPES
-     */
-    lateinit var tokenizationFunction: (String) -> List<Token>
-        private set
-
-
-
-    /**
      * Registry for all Modifiers
      */
     val MODIFIERS = SetRegistry<Modifier>()
@@ -123,49 +102,6 @@ object Registries {
         TokenTypes.register()
         Modifiers.register()
         Operators.register()
-
-        tokenizationFunction = { lines ->
-            val tokens = mutableListOf<Token>()
-            var lineNumber = 1
-
-            var i = 0
-            while (i < lines.length) {
-                val string = lines.substring(i)
-                var token: Token? = null
-
-                for (entry in TOKEN_TYPES.getEntries()) {
-                    val tokenType = entry.getValue()!!
-                    if (tokenType.regex == null) continue
-
-                    val result = tokenType.regex.matchAt(string, 0)
-                    if (result != null) {
-                        val end = result.range.last + 1
-                        val matched = result.value
-                        if (!tokenType.canMatch(matched)) continue
-
-                        if (token == null || token.value.length < matched.length) {
-                            token = Token(lineNumber, i, end, tokenType, matched)
-                        }
-                    }
-                }
-
-                if (token == null) {
-                    var errorString = string.split("\n".toRegex()).dropLastWhile { it.isEmpty() }[0]
-                    if (errorString.length > 20) errorString = errorString.substring(0, 20) + "..."
-
-                    throw UnknownTokenException(lineNumber, errorString)
-                }
-
-                i += token.value.length - 1
-                if (!token.type.shouldSkip) tokens.add(token)
-
-                lineNumber += token.value.length - token.value.replace("\n", "").length
-                i++
-            }
-
-            tokens.add(Token(lineNumber, lines.length, lines.length, TokenTypes.endOfFile, ""))
-            tokens
-        }
 
         parseTokensFunction = { file, tokens ->
             val parser = Parser(tokens)

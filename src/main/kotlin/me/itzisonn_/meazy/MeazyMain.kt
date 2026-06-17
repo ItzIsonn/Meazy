@@ -8,8 +8,9 @@ import me.itzisonn_.meazy.command.TypedArgument
 import me.itzisonn_.meazy.datagen.DatagenManager
 import me.itzisonn_.meazy.datagen.deserializer.TokenTypeDeserializer
 import me.itzisonn_.meazy.datagen.deserializer.TokenTypeSetDeserializer
+import me.itzisonn_.meazy.lexer.TokenTypeSets
+import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.registry.defaultIdentifier
 import me.itzisonn_.meazy.settings.SettingsManager.settings
 import me.itzisonn_.meazy.text.TranslationsBundle
 import me.itzisonn_.meazy.text.literal
@@ -115,13 +116,12 @@ object MeazyMain {
         else TranslationsBundle.setLanguage(languagesEntry.getValue())
 
         for (tokenType in DatagenManager.getDeserializedMultiple("token_type", TokenTypeDeserializer)) {
-            val id = defaultIdentifier(tokenType.id)
-            if (Registries.TOKEN_TYPES.getEntry(id) != null) continue
-            Registries.TOKEN_TYPES.register(defaultIdentifier(tokenType.id), tokenType)
+            if (TokenTypes.get(tokenType.id) != null) continue
+            TokenTypes.add(tokenType)
         }
 
         for (tokenTypeSet in DatagenManager.getDeserializedSingle("token_type_set", TokenTypeSetDeserializer)) {
-            Registries.TOKEN_TYPE_SETS.register(defaultIdentifier(tokenTypeSet.id), tokenTypeSet)
+            TokenTypeSets.add(tokenTypeSet)
         }
     }
 }

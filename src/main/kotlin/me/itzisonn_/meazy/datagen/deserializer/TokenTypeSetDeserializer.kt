@@ -10,8 +10,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import me.itzisonn_.meazy.lexer.TokenTypeSet
-import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.registry.defaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes
 
 object TokenTypeSetDeserializer : KSerializer<TokenTypeSet> {
     override val descriptor = buildClassSerialDescriptor("TokenTypeSet") {
@@ -41,9 +40,7 @@ object TokenTypeSetDeserializer : KSerializer<TokenTypeSet> {
             if (tokenTypes == null) error("TokenTypeSet doesn't have member token_types")
 
             TokenTypeSet(id, tokenTypes
-                .map { id ->
-                    Registries.TOKEN_TYPES.getEntry(defaultIdentifier(id)).value
-                }
+                .map { id -> TokenTypes.get(id)!! }
                 .toSet()
             )
         }

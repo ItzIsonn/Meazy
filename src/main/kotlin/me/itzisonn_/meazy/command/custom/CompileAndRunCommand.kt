@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.command.custom
 import me.itzisonn_.meazy.command.Command
 import me.itzisonn_.meazy.command.CommandResult
 import me.itzisonn_.meazy.command.StringType
+import me.itzisonn_.meazy.lexer.LexerManager
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.logger.LogLevel
@@ -35,7 +36,7 @@ val compileAndRunCommand = Command("compile_and_run") {
                 )
                 val startCompileMillis = System.currentTimeMillis()
 
-                val tokens = Registries.tokenizationFunction(file.readText())
+                val tokens = LexerManager.tokenize(file.readText())
                 val program = Registries.parseTokensFunction(file, tokens)
                 val classes = Registries.compileProgramFunction(program)
 

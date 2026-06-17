@@ -1,18 +1,21 @@
 package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.registry.defaultIdentifier
-
 object TokenTypeSets {
-    val keywords get() = get("keywords")
-    val operatorAssign get() = get("operator_assign")
-    val operatorPostfix get() = get("operator_postfix")
-    val memberAccess get() = get("member_access")
-    val comparison get() = get("comparison")
-    val multiplication get() = get("multiplication")
-    val addition get() = get("addition")
+    private val _tokenTypeSets = mutableSetOf<TokenTypeSet>()
 
-    private fun get(id: String): TokenTypeSet {
-        return Registries.TOKEN_TYPE_SETS.getEntry(defaultIdentifier(id))?.value!!
+    fun add(tokenTypeSet: TokenTypeSet) { _tokenTypeSets += tokenTypeSet }
+    fun get(id: String) = _tokenTypeSets.find { it.id == id }
+    fun getAll() = _tokenTypeSets.toSet()
+
+    val keywords get() = getNonNull("keywords")
+    val operatorAssign get() = getNonNull("operator_assign")
+    val operatorPostfix get() = getNonNull("operator_postfix")
+    val memberAccess get() = getNonNull("member_access")
+    val comparison get() = getNonNull("comparison")
+    val multiplication get() = getNonNull("multiplication")
+    val addition get() = getNonNull("addition")
+
+    private fun getNonNull(id: String): TokenTypeSet {
+        return get(id)!!
     }
 }
