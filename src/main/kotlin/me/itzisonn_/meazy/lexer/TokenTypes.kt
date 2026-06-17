@@ -4,12 +4,15 @@ package me.itzisonn_.meazy.lexer
  * TokenTypes registrar
  */
 object TokenTypes {
-    private val _tokenTypes = mutableSetOf<TokenType>()
+    private val tokenTypes = mutableSetOf<TokenType>()
     private var hasInitialized = false
 
-    fun add(tokenType: TokenType) { _tokenTypes += tokenType }
-    fun get(id: String) = _tokenTypes.find { it.id == id }
-    fun getAll() = _tokenTypes.toList()
+    fun add(tokenType: TokenType) {
+        require(get(tokenType.id) == null) { "TokenType with id '${tokenType.id}' already exists" }
+        tokenTypes += tokenType
+    }
+    fun get(id: String) = tokenTypes.find { it.id == id }
+    fun getAll() = tokenTypes.toList()
 
     internal fun initialize() {
         check(!hasInitialized) { "TokenTypes have already been initialized" }
