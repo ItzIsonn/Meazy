@@ -9,7 +9,10 @@ object Commands {
     private val commands = mutableSetOf<Command>()
     private var hasInitialized = false
 
-    fun add(command: Command) { commands += command }
+    fun add(command: Command) {
+        require(get(command.id) == null) { "Command with id '${command.id}' already exists" }
+        commands += command
+    }
     fun get(id: String) = commands.find { it.id == id }
     fun getAll() = commands.toSet()
 

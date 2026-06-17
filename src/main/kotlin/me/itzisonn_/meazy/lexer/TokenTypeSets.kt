@@ -1,11 +1,14 @@
 package me.itzisonn_.meazy.lexer
 
 object TokenTypeSets {
-    private val _tokenTypeSets = mutableSetOf<TokenTypeSet>()
+    private val tokenTypeSets = mutableSetOf<TokenTypeSet>()
 
-    fun add(tokenTypeSet: TokenTypeSet) { _tokenTypeSets += tokenTypeSet }
-    fun get(id: String) = _tokenTypeSets.find { it.id == id }
-    fun getAll() = _tokenTypeSets.toSet()
+    fun add(tokenTypeSet: TokenTypeSet) {
+        require(get(tokenTypeSet.id) == null) { "TokenTypeSet with id '${tokenTypeSet.id}' already exists" }
+        tokenTypeSets += tokenTypeSet
+    }
+    fun get(id: String) = tokenTypeSets.find { it.id == id }
+    fun getAll() = tokenTypeSets.toSet()
 
     val keywords get() = getNonNull("keywords")
     val operatorAssign get() = getNonNull("operator_assign")
