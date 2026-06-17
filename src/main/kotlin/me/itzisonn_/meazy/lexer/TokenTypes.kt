@@ -1,28 +1,19 @@
 package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.registry.Registries
-
 /**
  * TokenTypes registrar
  */
 object TokenTypes {
     private val _tokenTypes = mutableSetOf<TokenType>()
-    private var hasRegistered = false
+    private var hasInitialized = false
 
     fun add(tokenType: TokenType) { _tokenTypes += tokenType }
     fun get(id: String) = _tokenTypes.find { it.id == id }
     fun getAll() = _tokenTypes.toList()
 
-    /**
-     * Registers all [TokenType]s
-     *
-     * *Don't use this method because it's called once at [Registries] initialization*
-     *
-     * @throws IllegalStateException If [TokenType]s have already been registered
-     */
-    fun register() {
-        check(!hasRegistered) { "TokenTypes have already been initialized" }
-        hasRegistered = true
+    internal fun initialize() {
+        check(!hasInitialized) { "TokenTypes have already been initialized" }
+        hasInitialized = true
 
         add(
             TokenType(
