@@ -8,8 +8,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import me.itzisonn_.meazy.lexer.TokenType
-import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.registry.defaultIdentifier
+import me.itzisonn_.meazy.lexer.TokenTypes
 
 object TokenTypeDeserializer : KSerializer<TokenType> {
     override val descriptor = buildClassSerialDescriptor("TokenType") {
@@ -48,9 +47,8 @@ object TokenTypeDeserializer : KSerializer<TokenType> {
                     "Expected token type can't have neither regex nor should_skip members"
                 }
 
-                val entry = Registries.TOKEN_TYPES.getEntry(defaultIdentifier(id))
-                    ?: error("Expected registered token type with id '$id'")
-                return@decodeStructure entry.getValue()
+                val tokenType = TokenTypes.get(id) ?: error("Expected registered token type with id '$id'")
+                return@decodeStructure tokenType
             }
 
             if (shouldSkip == null) shouldSkip = false

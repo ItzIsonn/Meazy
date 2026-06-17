@@ -1,29 +1,31 @@
 package me.itzisonn_.meazy.lexer
 
 import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.registry.defaultIdentifier
 
 /**
  * TokenTypes registrar
- *
- * @see Registries.TOKEN_TYPES
  */
 object TokenTypes {
+    private val _tokenTypes = mutableSetOf<TokenType>()
     private var hasRegistered = false
 
+    fun add(tokenType: TokenType) { _tokenTypes += tokenType }
+    fun get(id: String) = _tokenTypes.find { it.id == id }
+    fun getAll() = _tokenTypes.toList()
+
     /**
-     * Initializes [Registries.TOKEN_TYPES] registry
+     * Registers all [TokenType]s
      *
      * *Don't use this method because it's called once at [Registries] initialization*
      *
-     * @throws IllegalStateException If [Registries.TOKEN_TYPES] registry has already been initialized
+     * @throws IllegalStateException If [TokenType]s have already been registered
      */
     fun register() {
-        check(!hasRegistered) { "ParsingFunctions have already been initialized" }
+        check(!hasRegistered) { "TokenTypes have already been initialized" }
         hasRegistered = true
 
-        Registries.TOKEN_TYPES.register(
-            defaultIdentifier("id"), TokenType(
+        add(
+            TokenType(
                 "id",
                 "[a-zA-Z_][a-zA-Z0-9_]*",
                 false
@@ -39,57 +41,57 @@ object TokenTypes {
 
 
 
-    val newLine get() = get("new_line")
-    val endOfFile get() = get("end_of_file")
+    val newLine get() = getNonNull("new_line")
+    val endOfFile get() = getNonNull("end_of_file")
 
-    val import get() = get("import")
-    val variable get() = get("variable")
-    val function get() = get("function")
-    val `class` get() = get("class")
-    val `interface` get() = get("interface")
-    val `constructor` get() = get("constructor")
-    val base get() = get("base")
-    val `if` get() = get("if")
-    val `else` get() = get("else")
-    val `for` get() = get("for")
-    val `in` get() = get("in")
-    val `while` get() = get("while")
+    val import get() = getNonNull("import")
+    val variable get() = getNonNull("variable")
+    val function get() = getNonNull("function")
+    val `class` get() = getNonNull("class")
+    val `interface` get() = getNonNull("interface")
+    val `constructor` get() = getNonNull("constructor")
+    val base get() = getNonNull("base")
+    val `if` get() = getNonNull("if")
+    val `else` get() = getNonNull("else")
+    val `for` get() = getNonNull("for")
+    val `in` get() = getNonNull("in")
+    val `while` get() = getNonNull("while")
 
-    val `return` get() = get("return")
-    val `continue` get() = get("continue")
-    val `break` get() = get("break")
-    val `is` get() = get("is")
+    val `return` get() = getNonNull("return")
+    val `continue` get() = getNonNull("continue")
+    val `break` get() = getNonNull("break")
+    val `is` get() = getNonNull("is")
 
-    val leftParenthesis get() = get("left_parenthesis")
-    val rightParenthesis get() = get("right_parenthesis")
-    val leftBrace get() = get("left_brace")
-    val rightBrace get() = get("right_brace")
-    val leftBracket get() = get("left_bracket")
-    val rightBracket get() = get("right_bracket")
-    val colon get() = get("colon")
-    val comma get() = get("comma")
-    val dot get() = get("dot")
-    val question get() = get("question")
-    val questionDot get() = get("question_dot")
-    val questionColon get() = get("question_colon")
-    val arrow get() = get("arrow")
+    val leftParenthesis get() = getNonNull("left_parenthesis")
+    val rightParenthesis get() = getNonNull("right_parenthesis")
+    val leftBrace get() = getNonNull("left_brace")
+    val rightBrace get() = getNonNull("right_brace")
+    val leftBracket get() = getNonNull("left_bracket")
+    val rightBracket get() = getNonNull("right_bracket")
+    val colon get() = getNonNull("colon")
+    val comma get() = getNonNull("comma")
+    val dot get() = getNonNull("dot")
+    val question get() = getNonNull("question")
+    val questionDot get() = getNonNull("question_dot")
+    val questionColon get() = getNonNull("question_colon")
+    val arrow get() = getNonNull("arrow")
     
-    val assign get() = get("assign")
-    val minus get() = get("minus")
-    val power get() = get("power")
+    val assign get() = getNonNull("assign")
+    val minus get() = getNonNull("minus")
+    val power get() = getNonNull("power")
     
-    val and get() = get("and")
-    val or get() = get("or")
-    val inversion get() = get("inversion")
+    val and get() = getNonNull("and")
+    val or get() = getNonNull("or")
+    val inversion get() = getNonNull("inversion")
     
-    val `null` get() = get("null")
-    val number get() = get("number")
-    val string get() = get("string")
-    val boolean get() = get("boolean")
-    val `this` get() = get("this")
-    val id get() = get("id")
-    
-    private fun get(id: String): TokenType {
-        return Registries.TOKEN_TYPES.getEntry(defaultIdentifier(id))?.value!!
+    val `null` get() = getNonNull("null")
+    val number get() = getNonNull("number")
+    val string get() = getNonNull("string")
+    val boolean get() = getNonNull("boolean")
+    val `this` get() = getNonNull("this")
+    val id get() = getNonNull("id")
+
+    private fun getNonNull(id: String): TokenType {
+        return get(id)!!
     }
 }

@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.lexer
 
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.registry.Registries
 
 /**
  * Represents type of token
@@ -13,7 +12,7 @@ import me.itzisonn_.meazy.registry.Registries
  *
  * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
  * 
- * @see Registries.TOKEN_TYPES
+ * @see TokenTypes
  */
 class TokenType(
     val id: String,
