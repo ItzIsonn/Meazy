@@ -6,20 +6,54 @@ import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
 import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.custom.*
-import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.registry.defaultIdentifier
 import me.itzisonn_.meazy.runtime.environment.Environment
 
 /**
  * Operators registrar
- * @see Registries.OPERATORS
  */
 object Operators {
-    private var hasRegistered = false
+    private val operators = mutableSetOf<Operator>()
+    private var hasInitialized = false
 
-    val power get() = parseById("power")!!
-    val negation get() = parseById("negation")!!
-    val inversion get() = parseById("inversion")!!
+    fun add(operator: Operator) {
+        require(get(operator.id) == null) { "Operator with id '${operator.id}' already exists" }
+        operators += operator
+    }
+    fun get(id: String) = operators.find { it.id == id }
+    fun getAll() = operators.toSet()
+
+    internal fun initialize() {
+        check(!hasInitialized) { "Operators have already been initialized" }
+        hasInitialized = true
+
+        add(AdditionOperator())
+        add(SubtractionOperator())
+        add(MultiplicationOperator())
+        add(DivisionOperator())
+        add(RemainderOperator())
+        add(PowerOperator())
+        add(NegationOperator())
+
+        add(AndOperator())
+        add(OrOperator())
+        add(InversionOperator())
+        add(EqualsOperator())
+        add(NotEqualsOperator())
+        add(GreaterOperator())
+        add(GreaterOrEqualsOperator())
+        add(LessOperator())
+        add(LessOrEqualsOperator())
+    }
+
+
+
+    val power get() = getNonNull("power")
+    val negation get() = getNonNull("negation")
+    val inversion get() = getNonNull("inversion")
+
+    private fun getNonNull(id: String): Operator {
+        return get(id)!!
+    }
 
 
 
@@ -30,64 +64,10 @@ object Operators {
      * @param operatorType Operator's type or null if any
      * @return Operator with given symbol or null
      */
-    fun parse(symbol: String, operatorType: OperatorType?): Operator? {
-        for (entry in Registries.OPERATORS.entries) {
-            val operator = entry.getValue()
-            if (symbol == operator.symbol && (operatorType == null || operator.operatorType == operatorType)) return operator
+    fun get(symbol: String, operatorType: OperatorType?): Operator? {
+        return operators.find { operator ->
+            return@find symbol == operator.symbol && (operatorType == null || operator.operatorType == operatorType)
         }
-
-        return null
-    }
-
-    /**
-     * Finds registered Operator with given id
-     * 
-     * @param id Operator's id
-     * @return Operator with given id or null
-     */
-    fun parseById(id: String): Operator? {
-        for (entry in Registries.OPERATORS.entries) {
-            val operator = entry.getValue()
-            if (operator.id == id) return operator
-        }
-
-        return null
-    }
-
-
-
-    /**
-     * Initializes [Registries.OPERATORS] registry
-     *
-     * *Don't use this method because it's called once at [Registries] initialization*
-     * 
-     * @throws IllegalStateException If [Registries.OPERATORS] registry has already been initialized
-     */
-    fun register() {
-        check(!hasRegistered) { "Operators have already been initialized" }
-        hasRegistered = true
-
-        register(AdditionOperator())
-        register(SubtractionOperator())
-        register(MultiplicationOperator())
-        register(DivisionOperator())
-        register(RemainderOperator())
-        register(PowerOperator())
-        register(NegationOperator())
-
-        register(AndOperator())
-        register(OrOperator())
-        register(InversionOperator())
-        register(EqualsOperator())
-        register(NotEqualsOperator())
-        register(GreaterOperator())
-        register(GreaterOrEqualsOperator())
-        register(LessOperator())
-        register(LessOrEqualsOperator())
-    }
-
-    private fun register(operator: Operator) {
-        Registries.OPERATORS.register(defaultIdentifier(operator.id), operator)
     }
 }
 
