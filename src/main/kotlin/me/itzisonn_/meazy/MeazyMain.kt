@@ -10,13 +10,14 @@ import me.itzisonn_.meazy.datagen.deserializer.TokenTypeDeserializer
 import me.itzisonn_.meazy.datagen.deserializer.TokenTypeSetDeserializer
 import me.itzisonn_.meazy.lexer.TokenTypeSets
 import me.itzisonn_.meazy.lexer.TokenTypes
-import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.settings.SettingsManager.settings
 import me.itzisonn_.meazy.text.TranslationsBundle
 import me.itzisonn_.meazy.text.literal
 import me.itzisonn_.meazy.text.translatable
 import me.itzisonn_.meazy.logger.LogLevel
 import me.itzisonn_.meazy.logger.Logger
+import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.text.Languages
 import me.itzisonn_.meazy.version.Version
 
@@ -107,7 +108,11 @@ object MeazyMain {
         check(!isInitialized) { "MeazyMain have already been initialized" }
         isInitialized = true
 
-        Registries.initialize()
+        Languages.initialize()
+        Commands.initialize()
+        TokenTypes.initialize()
+        Modifiers.initialize()
+        Operators.initialize()
 
         val stringLanguage = settings.language
         val language = Languages.get(stringLanguage)

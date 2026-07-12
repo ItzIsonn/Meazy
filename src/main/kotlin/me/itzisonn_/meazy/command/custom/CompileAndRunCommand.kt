@@ -3,9 +3,8 @@ package me.itzisonn_.meazy.command.custom
 import me.itzisonn_.meazy.command.Command
 import me.itzisonn_.meazy.command.CommandResult
 import me.itzisonn_.meazy.command.StringType
-import me.itzisonn_.meazy.lexer.LexerManager
+import me.itzisonn_.meazy.runtime.RuntimeFunctions
 import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.registry.Registries
 import me.itzisonn_.meazy.logger.LogLevel
 import me.itzisonn_.meazy.logger.Logger
 import java.io.File
@@ -36,9 +35,9 @@ val compileAndRunCommand = Command("compile_and_run") {
                 )
                 val startCompileMillis = System.currentTimeMillis()
 
-                val tokens = LexerManager.tokenize(file.readText())
-                val program = Registries.parseTokensFunction(file, tokens)
-                val classes = Registries.compileProgramFunction(program)
+                val tokens = RuntimeFunctions.tokenize(file.readText())
+                val program = RuntimeFunctions.parseTokens(file, tokens)
+                val classes = RuntimeFunctions.compileProgram(program)
 
                 val outputDirectory = File(getArgument(outputArg))
                 if (!outputDirectory.exists()) {
@@ -69,7 +68,7 @@ val compileAndRunCommand = Command("compile_and_run") {
 
                 Logger.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
                 val startRunMillis = System.currentTimeMillis()
-                Registries.runProgramFunction(classes)
+                RuntimeFunctions.loadClassesAndRun(classes)
 
                 val endRunMillis = System.currentTimeMillis()
                 return@executes CommandResult.Success(
