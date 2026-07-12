@@ -17,15 +17,18 @@ import java.lang.constant.MethodTypeDesc
 import java.lang.reflect.AccessFlag
 
 class Program(
-    val file: File,
+    file: File?,
     val version: Version,
     private val _body: List<Statement>
 ) : DeclarationStatement {
     private lateinit var fileEnvironment: FileEnvironment
+    val file: File
 
     init {
-        require(file.exists()) { "File doesn't exist" }
-        require(!file.isDirectory()) { "File can't be directory" }
+        require(file?.exists() != false) { "File doesn't exist" }
+        require(file?.isDirectory() != true) { "File can't be directory" }
+
+        this.file = file ?: File("internal.mea")
     }
 
     override fun declare(environment: Environment) {
