@@ -5,10 +5,10 @@ import me.itzisonn_.meazy.MeazyMain
 /**
  * Represents type of token
  *
- * @param id         Id
- * @param regex      Regex that is used to match this token type
- * @param shouldSkip Should [Token]s with this type be skipped (not added in list
- * @param canMatch   Function that checks whether given string can match this token type
+ * @param id        Id
+ * @param regex     Regex that is used to match this token type
+ * @param behaviour Behaviour
+ * @param canMatch  Function that checks whether given string can match this token type
  *
  * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
  * 
@@ -17,7 +17,7 @@ import me.itzisonn_.meazy.MeazyMain
 class TokenType(
     val id: String,
     regex: Regex?,
-    val shouldSkip: Boolean = false,
+    val behaviour: TokenBehaviour = TokenBehaviour.DEFAULT,
     val canMatch: (String) -> Boolean = { true }
 ) {
     /**
@@ -39,20 +39,20 @@ class TokenType(
     /**
      * Constructor with regex string that is compiled into [Regex]
      * 
-     * @param id         Id
-     * @param regex      Regex string that is compiled into [Regex]
-     * @param shouldSkip Should [Token]s with this type be skipped (not added in list)
+     * @param id        Id
+     * @param regex     Regex string that is compiled into [Regex]
+     * @param behaviour Behaviour
      * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
      */
     constructor(
         id: String,
         regex: String?,
-        shouldSkip: Boolean = false,
+        behaviour: TokenBehaviour = TokenBehaviour.DEFAULT,
         canMatch: (String) -> Boolean = { true }
     ) : this(
         id,
         if (regex == null) null else Regex(regex, RegexOption.DOT_MATCHES_ALL),
-        shouldSkip,
+        behaviour,
         canMatch
     )
 

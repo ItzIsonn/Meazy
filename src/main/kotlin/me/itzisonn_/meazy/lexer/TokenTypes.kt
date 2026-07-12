@@ -18,12 +18,12 @@ object TokenTypes {
         check(!hasInitialized) { "TokenTypes have already been initialized" }
         hasInitialized = true
 
-        add(TokenType("new_line", "\n*"))
-        add(TokenType("white_space", "(?!\n)\\s", true))
+        add(TokenType("new_line", "\n*", TokenBehaviour.IGNORE))
+        add(TokenType("white_space", "(?!\n)\\s", TokenBehaviour.SKIP))
         add(TokenType("end_of_file", null as? Regex))
 
-        add(TokenType("comment", "\\/\\/[^\n]*", true))
-        add(TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", true))
+        add(TokenType("comment", "\\/\\/[^\n]*", TokenBehaviour.SKIP))
+        add(TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", TokenBehaviour.SKIP))
         
         add(TokenType("import", "import"))
         add(TokenType("variable", "var|val"))
@@ -92,7 +92,7 @@ object TokenTypes {
             TokenType(
                 "id",
                 "[a-zA-Z_][a-zA-Z0-9_]*",
-                false
+                TokenBehaviour.DEFAULT
             ) { string ->
                 for (tokenType in TokenTypeSets.keywords.getTokenTypes()) {
                     if (tokenType.regex?.matches(string) == true) {

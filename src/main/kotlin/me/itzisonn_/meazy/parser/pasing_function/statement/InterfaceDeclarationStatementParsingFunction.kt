@@ -43,13 +43,11 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
         }
 
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
-        skipNewLines()
 
         val body = mutableListOf<Statement>()
-        while (current.type != endOfFile && current.type != rightBrace) {
+        while (current.type != endOfFile && !isNext(rightBrace)) {
             val statement = parse(InterfaceBodyStatementParsingFunction)
             body.add(statement)
-            skipNewLines()
         }
 
         next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "interface_body"))

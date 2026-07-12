@@ -23,9 +23,8 @@ import me.itzisonn_.meazy.util.text.translatable
 object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val token = current
-        val tokenType = token.type
 
-        if (tokenType == id) {
+        if (isNext(id)) {
             if (size > pos + 1 && this[pos + 1].type == leftParenthesis) {
                 val id = consume().value
                 return if (Character.isUpperCase(id[0])) ClassIdentifier(id)
@@ -39,24 +38,28 @@ object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
             val id = consume().value
             return if (Character.isUpperCase(id[0])) ClassIdentifier(id) else VariableIdentifier(id)
         }
-        if (tokenType == `null`) {
+
+        if (isNext(`null`)) {
             consume()
             return NullLiteral()
         }
-        if (tokenType == number) return NumberLiteral(consume().value)
-        if (tokenType == string) return StringLiteral(parseString())
-        if (tokenType == boolean) return BooleanLiteral(consume().value.toBoolean())
-        if (tokenType == `this`) {
+
+        if (isNext(number)) return NumberLiteral(consume().value)
+        if (isNext(string)) return StringLiteral(parseString())
+        if (isNext(boolean)) return BooleanLiteral(consume().value.toBoolean())
+
+        if (isNext(`this`)) {
             consume()
             return ThisLiteral()
         }
-        if (tokenType == leftParenthesis) {
+
+        if (isNext(leftParenthesis)) {
             consume()
             val value = parse(ExpressionParsingFunction)
             consume(rightParenthesis, translatable("meazy:parser.expected", "right_parenthesis"))
             return value
         }
 
-        throw InvalidStatementException(token.line, translatable("meazy:parser.exception.cant_parse", tokenType.id))
+        throw InvalidStatementException(token.line, translatable("meazy:parser.exception.cant_parse", token.type.id))
     }
 }

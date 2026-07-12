@@ -26,7 +26,8 @@ import java.lang.constant.ClassDesc
 fun Parser.parseModifiers(): Set<Modifier> {
     val modifiers = mutableSetOf<Modifier>()
 
-    while (current.type == id) {
+    while (isNext(id)) {
+        gotoNext(id)
         val id = current.value
         val modifier = Modifiers.get(id)
 
@@ -144,12 +145,10 @@ fun Parser.parseDataType(): DataType? {
 fun Parser.parseBody(): List<LocalStatement> {
     val body = mutableListOf<LocalStatement>()
     consume(newLine, translatable("meazy:parser.expected", "new_line"))
-    skipNewLines()
 
     while (current.type != endOfFile && current.type != rightBrace) {
         body.add(parse(LocalStatementParsingFunction))
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
-        skipNewLines()
     }
 
     return body

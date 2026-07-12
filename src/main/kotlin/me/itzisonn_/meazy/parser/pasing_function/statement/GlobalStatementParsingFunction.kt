@@ -15,26 +15,29 @@ object GlobalStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {
         val modifiers = parseModifiers()
 
-        if (current.type == `class`) {
+        if (isNext(`class`)) {
             return parse(
                 ClassDeclarationStatementParsingFunction,
                 modifiers
             )
         }
-        if (current.type == `interface`) {
+
+        if (isNext(`interface`)) {
             return parse(
                 InterfaceDeclarationStatementParsingFunction,
                 modifiers
             )
         }
-        if (current.type == function) {
+
+        if (isNext(function)) {
             return parse(
                 FunctionDeclarationStatementParsingFunction,
                 modifiers,
                 false
             )
         }
-        if (current.type == variable) {
+
+        if (isNext(variable)) {
             return parse(
                 VariableDeclarationStatementParsingFunction,
                 modifiers,

@@ -76,7 +76,6 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         }
 
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
-        skipNewLines()
 
         val enumIds = mutableMapOf<String, List<Expression>>()
         if (enum in modifiers) {
@@ -91,7 +90,6 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
 
             while (current.type == comma) {
                 next()
-                skipNewLines()
 
                 val lineNumber = current.line
                 enumId = consume(id, translatable("meazy:parser.expected", "id")).value
@@ -103,12 +101,10 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 args = if (current.type == leftParenthesis) parseArgs() else mutableListOf()
                 enumIds[enumId] = args
             }
-
-            skipNewLines()
         }
 
         val body = generatedBody.toMutableList()
-        while (current.type != endOfFile && current.type != rightBrace) {
+        while (current.type != endOfFile && !isNext(rightBrace)) {
             val statement = parse(ClassBodyStatementParsingFunction)
             body.add(statement)
 
@@ -120,8 +116,6 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                     body.add(getSetFunction(statement.id, statement.dataType!!))
                 }
             }
-
-            skipNewLines()
         }
 
         next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "class_body"))
