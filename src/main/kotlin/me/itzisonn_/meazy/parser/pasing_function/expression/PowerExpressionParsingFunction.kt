@@ -11,8 +11,8 @@ object PowerExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         var left = parse(InversionExpressionParsingFunction)
 
-        while (current.type == power) {
-            consume()
+        while (isNext(power)) {
+            consume(power, null)
             val right = parse(InversionExpressionParsingFunction)
             left = OperatorExpression(left, right, Operators.power)
         }

@@ -14,8 +14,10 @@ fun testPrimitives() {
     if (a > 67) {
         val c = 52.52
         val ok = 67.67
-        System.out.println(  c
-    +    ok
+        System.out.println(
+          c
+    +
+     ok
          )
 
         if (ok == c) {

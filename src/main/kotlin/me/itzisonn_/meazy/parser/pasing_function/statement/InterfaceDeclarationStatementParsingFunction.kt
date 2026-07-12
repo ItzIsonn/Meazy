@@ -23,22 +23,25 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
         val interfaceId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "interface")).value
 
         val baseClasses = mutableSetOf<String>()
-        if (current.type == colon) {
-            do {
-                consume()
+
+        if (isNext(colon)) {
+            consume(colon, null)
+            baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
+
+            while (isNext(comma)) {
+                consume(comma, null)
                 baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
             }
-            while (current.type == comma)
         }
 
-        if (current.type != leftBrace) {
+        if (!isNext(leftBrace)) {
             return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
         }
 
         consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "interface_body"))
 
-        if (current.type == rightBrace) {
-            consume()
+        if (isNext(rightBrace)) {
+            consume(rightBrace, null)
             return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
         }
 

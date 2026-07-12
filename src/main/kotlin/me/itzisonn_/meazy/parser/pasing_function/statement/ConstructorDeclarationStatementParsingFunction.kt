@@ -17,7 +17,7 @@ object ConstructorDeclarationStatementParsingFunction : ParsingFunction<Construc
         consume(constructor, translatable("meazy:parser.expected.keyword", "constructor"))
 
         val parameters = parseParameters()
-        if (current.type != leftBrace) {
+        if (!isNext(leftBrace)) {
             return ConstructorDeclarationStatement(modifiers, parameters, mutableListOf())
         }
 

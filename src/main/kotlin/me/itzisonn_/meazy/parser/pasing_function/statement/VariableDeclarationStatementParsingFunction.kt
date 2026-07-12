@@ -25,7 +25,7 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
         val variableId = consume(id, translatable("meazy:parser.expected", "id")).value
         val dataType = parseDataType()
 
-        if (current.type != assign) {
+        if (!isNext(assign)) {
             if (dataType == null) throw InvalidSyntaxException(
                 current.line,
                 translatable("meazy:parser.exception.variable_without_datatype_and_value")

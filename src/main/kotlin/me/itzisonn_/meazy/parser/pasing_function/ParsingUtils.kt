@@ -87,11 +87,11 @@ fun Parser.parseParameters(): List<Parameter> {
     )
     val parameters = mutableListOf<Parameter>()
 
-    if (current.type != rightParenthesis) {
+    if (!isNext(rightParenthesis)) {
         parameters.add(parseParameter())
 
-        while (current.type == comma) {
-            consume()
+        while (isNext(comma)) {
+            consume(comma, null)
             parameters.add(parseParameter())
         }
     }
@@ -127,26 +127,24 @@ fun Parser.parseArgs(): List<Expression> {
 }
 
 fun Parser.parseDataType(): DataType? {
-    if (current.type == colon) {
-        consume()
-        val dataTypeId = consume(id, translatable("meazy:parser.expected.after", "id", "colon")).value
+    if (!isNext(colon)) return null
+    consume(colon, null)
 
-        if (current.type == question) {
-            consume()
-            return ofNullable(ClassDesc.of(dataTypeId))
-        }
+    val dataTypeId = consume(id, translatable("meazy:parser.expected.after", "id", "colon")).value
 
-        return ofNonNull(ClassDesc.of(dataTypeId))
+    if (isNext(question)) {
+        consume(question, null)
+        return ofNullable(ClassDesc.of(dataTypeId))
     }
 
-    return null
+    return ofNonNull(ClassDesc.of(dataTypeId))
 }
 
 fun Parser.parseBody(): List<LocalStatement> {
     val body = mutableListOf<LocalStatement>()
     consume(newLine, translatable("meazy:parser.expected", "new_line"))
 
-    while (current.type != endOfFile && current.type != rightBrace) {
+    while (current.type != endOfFile && !isNext(rightBrace)) {
         body.add(parse(LocalStatementParsingFunction))
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
     }
