@@ -55,23 +55,26 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         val baseClasses = mutableSetOf<String>()
         var baseClassesLineNumber = -1
 
-        if (current.type == colon) {
+        if (isNext(colon)) {
             baseClassesLineNumber = current.line
-            do {
-                consume()
+
+            consume(colon, null)
+            baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
+
+            while (isNext(comma)) {
+                consume(comma, null)
                 baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
             }
-            while (current.type == comma)
         }
 
-        if (current.type != leftBrace) {
+        if (!isNext(leftBrace)) {
             return ClassDeclarationStatement(modifiers, classId, baseClasses, generatedBody)
         }
 
         consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "class_body"))
 
-        if (current.type == rightBrace) {
-            consume()
+        if (isNext(rightBrace)) {
+            consume(rightBrace, null)
             return ClassDeclarationStatement(modifiers, classId, baseClasses, generatedBody)
         }
 
@@ -85,11 +88,11 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             )
 
             var enumId = consume(id, translatable("meazy:parser.expected", "id")).value
-            var args = if (current.type == leftParenthesis) parseArgs() else mutableListOf()
+            var args = if (isNext(leftParenthesis)) parseArgs() else mutableListOf()
             enumIds[enumId] = args
 
-            while (current.type == comma) {
-                consume()
+            while (isNext(comma)) {
+                consume(comma, null)
 
                 val lineNumber = current.line
                 enumId = consume(id, translatable("meazy:parser.expected", "id")).value
@@ -98,7 +101,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                     translatable("meazy:parser.exception.enums.duplicated_entries")
                 )
 
-                args = if (current.type == leftParenthesis) parseArgs() else mutableListOf()
+                args = if (isNext(leftParenthesis)) parseArgs() else mutableListOf()
                 enumIds[enumId] = args
             }
         }

@@ -25,6 +25,8 @@ object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
         val token = current
 
         if (isNext(id)) {
+            gotoNext(id)
+
             if (size > pos + 1 && this[pos + 1].type == leftParenthesis) {
                 val id = consume().value
                 return if (Character.isUpperCase(id[0])) ClassIdentifier(id)
@@ -40,21 +42,21 @@ object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
         }
 
         if (isNext(`null`)) {
-            consume()
+            consume(`null`, null)
             return NullLiteral()
         }
 
-        if (isNext(number)) return NumberLiteral(consume().value)
+        if (isNext(number)) return NumberLiteral(consume(number, null).value)
         if (isNext(string)) return StringLiteral(parseString())
-        if (isNext(boolean)) return BooleanLiteral(consume().value.toBoolean())
+        if (isNext(boolean)) return BooleanLiteral(consume(boolean, null).value.toBoolean())
 
         if (isNext(`this`)) {
-            consume()
+            consume(`this`, null)
             return ThisLiteral()
         }
 
         if (isNext(leftParenthesis)) {
-            consume()
+            consume(leftParenthesis, null)
             val value = parse(ExpressionParsingFunction)
             consume(rightParenthesis, translatable("meazy:parser.expected", "right_parenthesis"))
             return value

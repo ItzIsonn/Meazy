@@ -24,8 +24,8 @@ object IfStatementParsingFunction : ParsingFunction<IfStatement> {
         consume(rightParenthesis, translatable("meazy:parser.expected.end", "right_parenthesis", "if_condition"))
 
         var body: List<LocalStatement>
-        if (current.type == leftBrace) {
-            consume()
+        if (isNext(leftBrace)) {
+            consume(leftBrace, null)
             body = parseBody()
             consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
         }
@@ -37,15 +37,15 @@ object IfStatementParsingFunction : ParsingFunction<IfStatement> {
         }
 
         var elseStatement: IfStatement? = null
-        if (current.type == `else`) {
-            consume()
-            if (current.type == `if`) {
+        if (isNext(`else`)) {
+            consume(`else`, null)
+            if (isNext(`if`)) {
                 elseStatement = parse(IfStatementParsingFunction)
             }
             else {
                 var elseBody: List<LocalStatement>
-                if (current.type == leftBrace) {
-                    consume()
+                if (isNext(leftBrace)) {
+                    consume(leftBrace, null)
                     elseBody = parseBody()
                     consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "if_body"))
                 }
