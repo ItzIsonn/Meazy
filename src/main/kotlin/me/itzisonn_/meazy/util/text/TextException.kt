@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.text
+package me.itzisonn_.meazy.util.text
 
 /**
  * Exception that accepts [Text] instead of [String]

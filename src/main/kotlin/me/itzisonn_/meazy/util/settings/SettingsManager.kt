@@ -1,8 +1,8 @@
-package me.itzisonn_.meazy.settings
+package me.itzisonn_.meazy.util.settings
 
 import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 import java.io.File
 import java.io.IOException
 import java.net.URISyntaxException

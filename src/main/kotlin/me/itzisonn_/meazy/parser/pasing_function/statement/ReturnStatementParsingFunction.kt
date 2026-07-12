@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object ReturnStatementParsingFunction : ParsingFunction<ReturnStatement> {
     override fun Parser.parse(vararg extra: Any?): ReturnStatement {

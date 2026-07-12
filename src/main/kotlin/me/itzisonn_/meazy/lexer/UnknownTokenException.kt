@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.text.TextException
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.TextException
+import me.itzisonn_.meazy.util.text.translatable
 
 /**
  * Is thrown when lexer can't recognize token

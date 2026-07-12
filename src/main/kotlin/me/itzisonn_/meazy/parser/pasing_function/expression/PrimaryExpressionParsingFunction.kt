@@ -18,7 +18,7 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.*
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseString
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {

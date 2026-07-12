@@ -1,9 +1,9 @@
-package me.itzisonn_.meazy.text
+package me.itzisonn_.meazy.util.text
 
 import kotlinx.serialization.json.Json
 import me.itzisonn_.meazy.MeazyMain
-import me.itzisonn_.meazy.logger.LogLevel
-import me.itzisonn_.meazy.logger.Logger
+import me.itzisonn_.meazy.util.logger.LogLevel
+import me.itzisonn_.meazy.util.logger.Logger
 
 /**
  * Represents translations bundle

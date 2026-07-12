@@ -4,9 +4,9 @@ import me.itzisonn_.meazy.command.Command
 import me.itzisonn_.meazy.command.CommandResult
 import me.itzisonn_.meazy.command.StringType
 import me.itzisonn_.meazy.runtime.RuntimeFunctions
-import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.logger.LogLevel
-import me.itzisonn_.meazy.logger.Logger
+import me.itzisonn_.meazy.util.text.translatable
+import me.itzisonn_.meazy.util.logger.LogLevel
+import me.itzisonn_.meazy.util.logger.Logger
 import java.io.File
 
 val runCommand = Command("run") {

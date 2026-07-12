@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.command
 
-import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.util.text.Text
 
 sealed interface CommandResult {
     val text: Text?

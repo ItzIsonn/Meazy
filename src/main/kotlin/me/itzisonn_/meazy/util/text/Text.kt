@@ -1,8 +1,8 @@
-package me.itzisonn_.meazy.text
+package me.itzisonn_.meazy.util.text
 
-import me.itzisonn_.meazy.text.TranslationsBundle.getTranslation
-import me.itzisonn_.meazy.text.TranslationsBundle.getTranslationOrDefault
-import me.itzisonn_.meazy.settings.SettingsManager
+import me.itzisonn_.meazy.util.text.TranslationsBundle.getTranslation
+import me.itzisonn_.meazy.util.text.TranslationsBundle.getTranslationOrDefault
+import me.itzisonn_.meazy.util.settings.SettingsManager
 import java.io.PrintWriter
 import java.io.StringWriter
 

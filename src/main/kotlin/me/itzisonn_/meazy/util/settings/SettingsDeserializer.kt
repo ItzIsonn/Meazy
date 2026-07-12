@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.settings
+package me.itzisonn_.meazy.util.settings
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor

@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 /**
  * Adds to Environment ability to declare classes

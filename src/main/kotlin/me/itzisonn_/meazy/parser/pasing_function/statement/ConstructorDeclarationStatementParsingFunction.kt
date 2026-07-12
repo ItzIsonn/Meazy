@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.getModifiersFromExtra
 import me.itzisonn_.meazy.parser.pasing_function.parseBody
 import me.itzisonn_.meazy.parser.pasing_function.parseParameters
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object ConstructorDeclarationStatementParsingFunction : ParsingFunction<ConstructorDeclarationStatement> {
     override fun Parser.parse(vararg extra: Any?): ConstructorDeclarationStatement {

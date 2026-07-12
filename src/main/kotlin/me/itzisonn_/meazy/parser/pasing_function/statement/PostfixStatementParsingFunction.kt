@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object PostfixStatementParsingFunction : ParsingFunction<AssignmentStatement> {
     override fun Parser.parse(vararg extra: Any?): AssignmentStatement {

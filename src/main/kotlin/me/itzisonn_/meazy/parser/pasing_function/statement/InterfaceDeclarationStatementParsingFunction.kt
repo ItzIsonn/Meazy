@@ -13,7 +13,7 @@ import me.itzisonn_.meazy.parser.ast.statement.InterfaceDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.Statement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.getModifiersFromExtra
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceDeclarationStatement> {
     override fun Parser.parse(vararg extra: Any?): InterfaceDeclarationStatement {

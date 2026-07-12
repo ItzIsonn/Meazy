@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.datagen.deserializer
+package me.itzisonn_.meazy.util.datagen.deserializer
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.SetSerializer

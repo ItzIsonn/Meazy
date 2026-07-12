@@ -35,7 +35,7 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.getModifiersFromExtra
 import me.itzisonn_.meazy.parser.pasing_function.parseArgs
 import me.itzisonn_.meazy.parser.pasing_function.parseParameters
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 

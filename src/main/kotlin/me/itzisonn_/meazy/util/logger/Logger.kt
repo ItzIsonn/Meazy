@@ -1,6 +1,6 @@
-package me.itzisonn_.meazy.logger
+package me.itzisonn_.meazy.util.logger
 
-import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.util.text.Text
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

@@ -16,7 +16,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getParent
 import me.itzisonn_.meazy.runtime.environment.hasParent
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 class ProtectedModifier : Modifier("protected") {
     override fun canUse(modifierStatement: ModifierStatement, environment: Environment): Boolean {

@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`continue`
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ContinueStatement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object ContinueStatementParsingFunction : ParsingFunction<ContinueStatement> {
     override fun Parser.parse(vararg extra: Any?): ContinueStatement {

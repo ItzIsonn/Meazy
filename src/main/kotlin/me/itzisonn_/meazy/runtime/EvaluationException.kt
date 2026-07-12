@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime
 
-import me.itzisonn_.meazy.text.Text
-import me.itzisonn_.meazy.text.TextException
+import me.itzisonn_.meazy.util.text.Text
+import me.itzisonn_.meazy.util.text.TextException
 
 /**
  * Is thrown TODO

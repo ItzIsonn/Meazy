@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.text
+package me.itzisonn_.meazy.util.text
 
 /**
  * Languages registrar
