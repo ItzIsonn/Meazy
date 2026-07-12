@@ -16,7 +16,7 @@ object Commands {
     fun get(id: String) = commands.find { it.id == id }
     fun getAll() = commands.toSet()
 
-    fun initialize() {
+    internal fun initialize() {
         check(!hasInitialized) { "Commands have already been initialized" }
         hasInitialized = true
 

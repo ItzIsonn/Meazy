@@ -30,11 +30,6 @@ object Registries {
     private var isInitialized = false
 
     /**
-     * Registry for all Modifiers
-     */
-    val MODIFIERS = SetRegistry<Modifier>()
-
-    /**
      * Registry for all Operators
      */
     val OPERATORS = OperatorRegistry()
@@ -79,7 +74,7 @@ object Registries {
         Languages.initialize()
         Commands.initialize()
         TokenTypes.initialize()
-        Modifiers.register()
+        Modifiers.initialize()
         Operators.register()
 
         parseTokensFunction = { file, tokens ->

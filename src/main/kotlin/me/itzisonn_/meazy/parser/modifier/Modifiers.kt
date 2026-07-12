@@ -1,75 +1,53 @@
 package me.itzisonn_.meazy.parser.modifier
 
 import me.itzisonn_.meazy.parser.modifier.custom.*
-import me.itzisonn_.meazy.registry.Registries
-import me.itzisonn_.meazy.registry.defaultIdentifier
 
 /**
  * Modifiers registrar
- * 
- * @see Registries.MODIFIERS
  */
 object Modifiers {
-    private var hasRegistered = false
+    private val modifiers = mutableSetOf<Modifier>()
+    private var hasInitialized = false
 
-    val private get() = get("private")
-    val protected get() = get("protected")
-    val open get() = get("open")
-    val shared get() = get("shared")
-    val override get() = get("override")
-    val abstract get() = get("abstract")
-    val get get() = get("get")
-    val set get() = get("set")
-    val data get() = get("data")
-    val operator get() = get("operator")
-    val enum get() = get("enum")
+    fun add(modifier: Modifier) {
+        require(get(modifier.id) == null) { "Modifier with id '${modifier.id}' already exists" }
+        modifiers += modifier
+    }
+    fun get(id: String) = modifiers.find { it.id == id }
+    fun getAll() = modifiers.toSet()
 
-    /**
-     * Finds registered Modifier with given id
-     * 
-     * @param id Id of Modifier
-     * @return Modifier with given id or null
-     */
-    fun parse(id: String): Modifier? {
-        for (entry in Registries.MODIFIERS.getEntries()) {
-            if (id == entry.getValue().id) return entry.getValue()
-        }
+    internal fun initialize() {
+        check(!hasInitialized) { "Modifiers have already been initialized" }
+        hasInitialized = true
 
-        return null
+        add(PrivateModifier())
+        add(ProtectedModifier())
+        add(OpenModifier())
+        add(SharedModifier())
+        add(OverrideModifier())
+        add(AbstractModifier())
+        add(GetModifier())
+        add(SetModifier())
+        add(DataModifier())
+        add(OperatorModifier())
+        add(EnumModifier())
     }
 
-    
 
-    /**
-     * Initializes [Registries.MODIFIERS] registry
-     * 
-     * 
-     * *Don't use this method because it's called once at [Registries] initialization*
-     * 
-     * @throws IllegalStateException If [Registries.MODIFIERS] registry has already been initialized
-     */
-    fun register() {
-        check(!hasRegistered) { "Modifiers have already been initialized" }
-        hasRegistered = true
 
-        register(PrivateModifier())
-        register(ProtectedModifier())
-        register(OpenModifier())
-        register(SharedModifier())
-        register(OverrideModifier())
-        register(AbstractModifier())
-        register(GetModifier())
-        register(SetModifier())
-        register(DataModifier())
-        register(OperatorModifier())
-        register(EnumModifier())
-    }
+    val private get() = getNonNull("private")
+    val protected get() = getNonNull("protected")
+    val open get() = getNonNull("open")
+    val shared get() = getNonNull("shared")
+    val override get() = getNonNull("override")
+    val abstract get() = getNonNull("abstract")
+    val get get() = getNonNull("get")
+    val set get() = getNonNull("set")
+    val data get() = getNonNull("data")
+    val operator get() = getNonNull("operator")
+    val enum get() = getNonNull("enum")
 
-    private fun register(modifier: Modifier) {
-        Registries.MODIFIERS.register(defaultIdentifier(modifier.id), modifier)
-    }
-
-    private fun get(id: String): Modifier {
-        return Registries.MODIFIERS.getEntry(defaultIdentifier(id))?.value!!
+    private fun getNonNull(id: String): Modifier {
+        return get(id)!!
     }
 }

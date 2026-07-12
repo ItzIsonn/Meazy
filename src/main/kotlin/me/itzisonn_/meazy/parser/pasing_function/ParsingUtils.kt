@@ -17,7 +17,7 @@ import me.itzisonn_.meazy.parser.DataType.Companion.ofNullable
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.modifier.Modifier
-import me.itzisonn_.meazy.parser.modifier.Modifiers.parse
+import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.statement.LocalStatementParsingFunction
 import me.itzisonn_.meazy.text.translatable
@@ -28,7 +28,7 @@ fun Parser.parseModifiers(): Set<Modifier> {
 
     while (current.type == id) {
         val id = current.value
-        val modifier = parse(id)
+        val modifier = Modifiers.get(id)
 
         if (modifier == null) {
             if (modifiers.isEmpty()) return modifiers
