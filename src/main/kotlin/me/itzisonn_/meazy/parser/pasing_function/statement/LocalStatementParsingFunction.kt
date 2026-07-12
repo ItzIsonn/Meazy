@@ -21,7 +21,7 @@ import me.itzisonn_.meazy.parser.ast.statement.*
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseModifiers
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object LocalStatementParsingFunction : ParsingFunction<LocalStatement> {
     override fun Parser.parse(vararg extra: Any?): LocalStatement {

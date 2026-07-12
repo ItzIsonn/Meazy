@@ -5,21 +5,21 @@ import me.itzisonn_.meazy.command.Commands
 import me.itzisonn_.meazy.command.CommandResult
 import me.itzisonn_.meazy.command.LiteralArgument
 import me.itzisonn_.meazy.command.TypedArgument
-import me.itzisonn_.meazy.datagen.DatagenManager
-import me.itzisonn_.meazy.datagen.deserializer.TokenTypeDeserializer
-import me.itzisonn_.meazy.datagen.deserializer.TokenTypeSetDeserializer
+import me.itzisonn_.meazy.util.datagen.DatagenManager
+import me.itzisonn_.meazy.util.datagen.deserializer.TokenTypeDeserializer
+import me.itzisonn_.meazy.util.datagen.deserializer.TokenTypeSetDeserializer
 import me.itzisonn_.meazy.lexer.TokenTypeSets
 import me.itzisonn_.meazy.lexer.TokenTypes
-import me.itzisonn_.meazy.settings.SettingsManager.settings
-import me.itzisonn_.meazy.text.TranslationsBundle
-import me.itzisonn_.meazy.text.literal
-import me.itzisonn_.meazy.text.translatable
-import me.itzisonn_.meazy.logger.LogLevel
-import me.itzisonn_.meazy.logger.Logger
+import me.itzisonn_.meazy.util.settings.SettingsManager.settings
+import me.itzisonn_.meazy.util.text.TranslationsBundle
+import me.itzisonn_.meazy.util.text.literal
+import me.itzisonn_.meazy.util.text.translatable
+import me.itzisonn_.meazy.util.logger.LogLevel
+import me.itzisonn_.meazy.util.logger.Logger
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.operator.Operators
-import me.itzisonn_.meazy.text.Languages
-import me.itzisonn_.meazy.version.Version
+import me.itzisonn_.meazy.util.text.Languages
+import me.itzisonn_.meazy.util.version.Version
 
 object MeazyMain {
     val VERSION = Version.of("3.0")

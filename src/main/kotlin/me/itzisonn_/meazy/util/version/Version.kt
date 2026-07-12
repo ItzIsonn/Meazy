@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.version
+package me.itzisonn_.meazy.util.version
 
 import java.util.Objects
 import kotlin.math.max

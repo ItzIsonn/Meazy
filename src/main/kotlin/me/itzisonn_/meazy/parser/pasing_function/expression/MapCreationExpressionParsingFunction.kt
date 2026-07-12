@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.collection_creation.MapCreationExpression
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object MapCreationExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {

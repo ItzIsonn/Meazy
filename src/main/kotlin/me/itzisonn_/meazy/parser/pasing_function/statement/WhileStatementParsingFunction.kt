@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.parser.ast.statement.WhileStatement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseBody
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object WhileStatementParsingFunction : ParsingFunction<WhileStatement> {
     override fun Parser.parse(vararg extra: Any?): WhileStatement {

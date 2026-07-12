@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.command
 
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 private class CommandImpl(
     override val id: String,

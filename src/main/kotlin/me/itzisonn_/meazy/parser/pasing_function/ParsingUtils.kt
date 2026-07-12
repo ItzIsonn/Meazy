@@ -20,7 +20,7 @@ import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.pasing_function.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.statement.LocalStatementParsingFunction
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ClassDesc
 
 fun Parser.parseModifiers(): Set<Modifier> {

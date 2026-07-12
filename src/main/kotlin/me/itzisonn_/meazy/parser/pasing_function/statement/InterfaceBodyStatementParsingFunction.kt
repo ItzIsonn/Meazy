@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.statement.Statement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.parser.pasing_function.parseModifiers
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 
 object InterfaceBodyStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {

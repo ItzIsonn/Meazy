@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.runtime.environment.isInstanceOf
-import me.itzisonn_.meazy.version.Version
+import me.itzisonn_.meazy.util.version.Version
 import java.io.File
 import java.lang.classfile.attribute.InnerClassesAttribute
 import java.lang.constant.ClassDesc

@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
-import me.itzisonn_.meazy.text.Text
+import me.itzisonn_.meazy.util.text.Text
 
 /**
  * Is used to store and parse tokens

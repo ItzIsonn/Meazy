@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.UnexpectedTokenException
 import me.itzisonn_.meazy.parser.ast.statement.Program
 import me.itzisonn_.meazy.parser.ast.statement.Statement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
-import me.itzisonn_.meazy.text.translatable
+import me.itzisonn_.meazy.util.text.translatable
 import java.io.File
 
 object ProgramParsingFunction : ParsingFunction<Program> {
