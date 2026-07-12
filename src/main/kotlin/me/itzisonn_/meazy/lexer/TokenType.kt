@@ -17,7 +17,7 @@ import me.itzisonn_.meazy.MeazyMain
 class TokenType(
     val id: String,
     regex: Regex?,
-    val shouldSkip: Boolean,
+    val shouldSkip: Boolean = false,
     val canMatch: (String) -> Boolean = { true }
 ) {
     /**
@@ -47,7 +47,7 @@ class TokenType(
     constructor(
         id: String,
         regex: String?,
-        shouldSkip: Boolean,
+        shouldSkip: Boolean = false,
         canMatch: (String) -> Boolean = { true }
     ) : this(
         id,
