@@ -12,7 +12,7 @@ object InterfaceBodyStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {
         val modifiers = parseModifiers()
 
-        if (current.type == function) {
+        if (isNext(function)) {
             return parse(
                 FunctionDeclarationStatementParsingFunction,
                 modifiers,

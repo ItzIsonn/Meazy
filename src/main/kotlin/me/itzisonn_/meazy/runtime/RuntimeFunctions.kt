@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.runtime
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.lexer.Token
+import me.itzisonn_.meazy.lexer.TokenBehaviour
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.UnknownTokenException
 import me.itzisonn_.meazy.parser.Parser
@@ -51,7 +52,7 @@ object RuntimeFunctions {
             }
 
             i += token.value.length - 1
-            if (!token.type.shouldSkip) tokens.add(token)
+            if (token.type.behaviour != TokenBehaviour.SKIP) tokens.add(token)
 
             lineNumber += token.value.length - token.value.replace("\n", "").length
             i++

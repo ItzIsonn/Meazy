@@ -1,10 +1,9 @@
 package me.itzisonn_.meazy.parser
 
 import me.itzisonn_.meazy.lexer.Token
+import me.itzisonn_.meazy.lexer.TokenBehaviour
 import me.itzisonn_.meazy.lexer.TokenType
 import me.itzisonn_.meazy.lexer.TokenTypeSet
-import me.itzisonn_.meazy.lexer.TokenTypes
-import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.util.text.Text
@@ -54,8 +53,9 @@ class Parser(tokens: List<Token>) {
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
     fun next(tokenType: TokenType, text: Text) {
-        if (current.type != tokenType) {
-            throw UnexpectedTokenException(current.line, text)
+        while (current.type != tokenType) {
+            if (current.type.behaviour == TokenBehaviour.IGNORE) next()
+            else throw UnexpectedTokenException(current.line, text)
         }
 
         next()
@@ -70,8 +70,9 @@ class Parser(tokens: List<Token>) {
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
     fun next(tokenTypeSet: TokenTypeSet, text: Text) {
-        if (current.type !in tokenTypeSet.getTokenTypes()) {
-            throw UnexpectedTokenException(current.line, text)
+        while (current.type !in tokenTypeSet.getTokenTypes()) {
+            if (current.type.behaviour == TokenBehaviour.IGNORE) next()
+            else throw UnexpectedTokenException(current.line, text)
         }
 
         next()
@@ -99,8 +100,9 @@ class Parser(tokens: List<Token>) {
      * @throws UnexpectedTokenException If token's type doesn't match required
      */
     fun consume(tokenType: TokenType, text: Text): Token {
-        if (current.type != tokenType) {
-            throw UnexpectedTokenException(current.line, text)
+        while (current.type != tokenType) {
+            if (current.type.behaviour == TokenBehaviour.IGNORE) next()
+            else throw UnexpectedTokenException(current.line, text)
         }
 
         return consume()
@@ -116,50 +118,34 @@ class Parser(tokens: List<Token>) {
      * @throws UnexpectedTokenException If tokenTypeSet doesn't contain current token's type
      */
     fun consume(tokenTypeSet: TokenTypeSet, text: Text): Token {
-        if (current.type !in tokenTypeSet.getTokenTypes()) {
-            throw UnexpectedTokenException(current.line, text)
+        while (current.type !in tokenTypeSet.getTokenTypes()) {
+            if (current.type.behaviour == TokenBehaviour.IGNORE) next()
+            else throw UnexpectedTokenException(current.line, text)
         }
 
         return consume()
     }
 
-    /**
-     * Skips all [TokenTypes.newLine] tokens
-     */
-    fun skipNewLines() {
-        while (current.type == newLine) pos++
-    }
+    fun isNext(tokenType: TokenType): Boolean {
+        val prevPos = pos
 
-    /**
-     * Checks current line for presence of token with given tokenType
-     * 
-     * @param tokenType Required TokenType
-     * @return Whether current line has token with given tokenType
-     */
-    fun currentLineHasToken(tokenType: TokenType): Boolean {
-        for (i in pos..<tokens.size) {
-            val current = tokens[i].type
-            if (current == newLine) return false
-            if (current == tokenType) return true
+        while (current.type != tokenType) {
+            if (current.type.behaviour == TokenBehaviour.IGNORE) next()
+            else {
+                pos = prevPos
+                return false
+            }
         }
 
-        return false
+        pos = prevPos
+        return true
     }
 
-    /**
-     * Checks current line for presence of token with type inside given tokenTypeSet
-     * 
-     * @param tokenTypeSet Required TokenTypeSet
-     * @return Whether current line has token with type inside given tokenTypeSet
-     */
-    fun currentLineHasToken(tokenTypeSet: TokenTypeSet): Boolean {
-        for (i in pos..<tokens.size) {
-            val current = tokens[i].type
-            if (current == newLine) return false
-            if (current in tokenTypeSet) return true
+    fun gotoNext(tokenType: TokenType) {
+        while (current.type != tokenType) {
+            if (current.type.behaviour == TokenBehaviour.IGNORE) next()
+            else throw UnexpectedTokenException(current.line, TODO())
         }
-
-        return false
     }
 
 
@@ -174,5 +160,25 @@ class Parser(tokens: List<Token>) {
      */
     fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T>, vararg extra: Any?): T {
         return parsingFunction.run { this@Parser.parse(*extra) }
+    }
+
+    /**
+     * Executes given ParsingFunction, and if it fails, returns to position before parsing
+     *
+     * @param parsingFunction ParsingFunction to execute
+     * @param extra           Extra info
+     * @param T               Returned program unit's type
+     * @return Parsed program unit
+     */
+    fun <T : ProgramUnit> tryParse(parsingFunction: ParsingFunction<T>, vararg extra: Any?): T? {
+        val prevPos = pos
+
+        try {
+            return parse(parsingFunction, *extra)
+        }
+        catch (_: UnexpectedTokenException) {
+            pos = prevPos
+            return null
+        }
     }
 }

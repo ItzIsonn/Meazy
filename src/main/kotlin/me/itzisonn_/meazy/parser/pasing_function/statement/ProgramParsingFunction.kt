@@ -16,8 +16,6 @@ object ProgramParsingFunction : ParsingFunction<Program> {
         require(extra.isNotEmpty()) { "Expected file as extra argument" }
         val file = if (extra[0] is File) extra[0] as File else null
 
-        skipNewLines()
-
         val body = mutableListOf<Statement>()
         var headerStatement: Statement?
 
@@ -30,19 +28,14 @@ object ProgramParsingFunction : ParsingFunction<Program> {
             }
 
             next(newLine, translatable("meazy:parser.expected", "new_line"))
-            skipNewLines()
-
             body.add(headerStatement)
         }
-
-        skipNewLines()
 
         while (current.type != endOfFile) {
             body.add(parse(GlobalStatementParsingFunction))
 
             if (current.type != endOfFile) {
                 next(newLine, translatable("meazy:parser.expected", "new_line"))
-                skipNewLines()
             }
         }
 

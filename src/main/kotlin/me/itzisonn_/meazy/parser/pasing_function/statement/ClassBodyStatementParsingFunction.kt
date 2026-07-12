@@ -14,21 +14,23 @@ object ClassBodyStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {
         val modifiers = parseModifiers()
 
-        if (current.type == function) {
+        if (isNext(function)) {
             return parse(
                 FunctionDeclarationStatementParsingFunction,
                 modifiers,
                 false
             )
         }
-        if (current.type == variable) {
+
+        if (isNext(variable)) {
             return parse(
                 VariableDeclarationStatementParsingFunction,
                 modifiers,
                 true
             )
         }
-        if (current.type == constructor) {
+
+        if (isNext(constructor)) {
             return parse(
                 ConstructorDeclarationStatementParsingFunction,
                 modifiers

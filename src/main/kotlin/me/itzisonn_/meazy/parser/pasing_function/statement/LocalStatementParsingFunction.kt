@@ -1,8 +1,5 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorAssign
-import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorPostfix
-import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.lexer.TokenTypes.base
 import me.itzisonn_.meazy.lexer.TokenTypes.`break`
 import me.itzisonn_.meazy.lexer.TokenTypes.`continue`
@@ -27,7 +24,7 @@ object LocalStatementParsingFunction : ParsingFunction<LocalStatement> {
     override fun Parser.parse(vararg extra: Any?): LocalStatement {
         val modifiers = parseModifiers()
 
-        if (current.type == variable) {
+        if (isNext(variable)) {
             return parse(
                 VariableDeclarationStatementParsingFunction,
                 modifiers,
@@ -39,21 +36,16 @@ object LocalStatementParsingFunction : ParsingFunction<LocalStatement> {
             translatable("meazy:parser.modifier.unexpected")
         )
 
-        if (current.type == `if`) return parse(IfStatementParsingFunction)
-        if (current.type == `for`) return parse(ForeachStatementParsingFunction)
-        if (current.type == `while`) return parse(WhileStatementParsingFunction)
-        if (current.type == `return`) return parse(ReturnStatementParsingFunction)
-        if (current.type == `continue`) return parse(ContinueStatementParsingFunction)
-        if (current.type == `break`) return parse(BreakStatementParsingFunction)
-        if (current.type == base) return parse(BaseCallStatementParsingFunction)
+        if (isNext(`if`)) return parse(IfStatementParsingFunction)
+        if (isNext(`for`)) return parse(ForeachStatementParsingFunction)
+        if (isNext(`while`)) return parse(WhileStatementParsingFunction)
+        if (isNext(`return`)) return parse(ReturnStatementParsingFunction)
+        if (isNext(`continue`)) return parse(ContinueStatementParsingFunction)
+        if (isNext(`break`)) return parse(BreakStatementParsingFunction)
+        if (isNext(base)) return parse(BaseCallStatementParsingFunction)
 
-        if (currentLineHasToken(assign) || currentLineHasToken(operatorAssign)) {
-            return parse(AssignmentStatementParsingFunction)
-        }
-
-        if (currentLineHasToken(operatorPostfix)) {
-            return parse(PostfixStatementParsingFunction)
-        }
+        tryParse(AssignmentStatementParsingFunction)?.let { return it }
+        tryParse(PostfixStatementParsingFunction)?.let { return it }
 
         return when (val expression = parse(ExpressionParsingFunction)) {
             is CallExpression -> expression
