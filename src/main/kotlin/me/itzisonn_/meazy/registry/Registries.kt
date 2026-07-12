@@ -7,7 +7,6 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.lexer.*
 import me.itzisonn_.meazy.parser.*
 import me.itzisonn_.meazy.parser.ast.statement.Program
-import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.operator.Operators
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
@@ -15,8 +14,6 @@ import me.itzisonn_.meazy.parser.pasing_function.statement.ProgramParsingFunctio
 import me.itzisonn_.meazy.runtime.ClassLoaderWrapper
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.text.Languages
-import me.itzisonn_.registry.RegistryIdentifier
-import me.itzisonn_.registry.multiple_entry.SetRegistry
 import java.io.File
 import java.lang.constant.ClassDesc
 import kotlin.reflect.KCallable
@@ -28,11 +25,6 @@ import kotlin.reflect.typeOf
  */
 object Registries {
     private var isInitialized = false
-
-    /**
-     * Registry for all Operators
-     */
-    val OPERATORS = OperatorRegistry()
 
     /**
      * Registry for function that parses tokens into [Program]
@@ -75,7 +67,7 @@ object Registries {
         Commands.initialize()
         TokenTypes.initialize()
         Modifiers.initialize()
-        Operators.register()
+        Operators.initialize()
 
         parseTokensFunction = { file, tokens ->
             val parser = Parser(tokens)
@@ -127,14 +119,3 @@ object Registries {
         }
     }
 }
-
-/**
- * Creates new RegistryIdentifier with 'meazy' namespace
- *
- * @param id Identifier's id that matches [RegistryIdentifier.IDENTIFIER_REGEX]
- * @return New RegistryIdentifier
- *
- * @throws IllegalArgumentException If id doesn't match [RegistryIdentifier.IDENTIFIER_REGEX]
- */
-fun defaultIdentifier(id: String): RegistryIdentifier =
-    RegistryIdentifier.of("meazy", id)

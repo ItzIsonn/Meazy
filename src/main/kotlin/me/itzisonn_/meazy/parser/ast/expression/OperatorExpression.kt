@@ -29,7 +29,7 @@ class OperatorExpression : Expression, LocalStatement {
 
     constructor(left: Expression, right: Expression?, operatorSymbol: String, operatorType: OperatorType)
             : this(left, right, run {
-                val operator = Operators.parse(operatorSymbol, operatorType)
+                val operator = Operators.get(operatorSymbol, operatorType)
                 requireNotNull(operator) { "Unknown operator with symbol $operatorSymbol and type $operatorType" }
                 operator
             })
