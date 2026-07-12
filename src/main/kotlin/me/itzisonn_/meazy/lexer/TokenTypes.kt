@@ -12,7 +12,7 @@ object TokenTypes {
         tokenTypes += tokenType
     }
     fun get(id: String) = tokenTypes.find { it.id == id }
-    fun getAll() = tokenTypes.toList()
+    fun getAll() = tokenTypes.toSet()
 
     internal fun initialize() {
         check(!hasInitialized) { "TokenTypes have already been initialized" }
@@ -142,12 +142,30 @@ object TokenTypes {
     val arrow get() = getNonNull("arrow")
     
     val assign get() = getNonNull("assign")
+    val plus get() = getNonNull("plus")
     val minus get() = getNonNull("minus")
+    val multiply get() = getNonNull("multiply")
+    val divide get() = getNonNull("divide")
+    val percent get() = getNonNull("percent")
     val power get() = getNonNull("power")
+    val plusAssign get() = getNonNull("plus_assign")
+    val minusAssign get() = getNonNull("minus_assign")
+    val multiplyAssign get() = getNonNull("multiply_assign")
+    val divideAssign get() = getNonNull("divide_assign")
+    val percentAssign get() = getNonNull("percent_assign")
+    val powerAssign get() = getNonNull("power_assign")
+    val doublePlus get() = getNonNull("double_plus")
+    val doubleMinus get() = getNonNull("double_minus")
     
     val and get() = getNonNull("and")
     val or get() = getNonNull("or")
     val inversion get() = getNonNull("inversion")
+    val equals get() = getNonNull("equals")
+    val notEquals get() = getNonNull("not_equals")
+    val greater get() = getNonNull("greater")
+    val greaterOrEquals get() = getNonNull("greater_or_equals")
+    val less get() = getNonNull("less")
+    val lessOrEquals get() = getNonNull("less_or_equals")
     
     val `null` get() = getNonNull("null")
     val number get() = getNonNull("number")

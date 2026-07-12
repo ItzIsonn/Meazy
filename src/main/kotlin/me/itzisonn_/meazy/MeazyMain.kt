@@ -5,9 +5,6 @@ import me.itzisonn_.meazy.command.Commands
 import me.itzisonn_.meazy.command.CommandResult
 import me.itzisonn_.meazy.command.LiteralArgument
 import me.itzisonn_.meazy.command.TypedArgument
-import me.itzisonn_.meazy.util.datagen.DatagenManager
-import me.itzisonn_.meazy.util.datagen.deserializer.TokenTypeDeserializer
-import me.itzisonn_.meazy.util.datagen.deserializer.TokenTypeSetDeserializer
 import me.itzisonn_.meazy.lexer.TokenTypeSets
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.util.settings.SettingsManager.settings
@@ -111,6 +108,7 @@ object MeazyMain {
         Languages.initialize()
         Commands.initialize()
         TokenTypes.initialize()
+        TokenTypeSets.initialize()
         Modifiers.initialize()
         Operators.initialize()
 
@@ -118,9 +116,5 @@ object MeazyMain {
         val language = Languages.get(stringLanguage)
         if (language == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
         else TranslationsBundle.setLanguage(language)
-
-        for (tokenTypeSet in DatagenManager.getDeserializedSingle("token_type_set", TokenTypeSetDeserializer)) {
-            TokenTypeSets.add(tokenTypeSet)
-        }
     }
 }
