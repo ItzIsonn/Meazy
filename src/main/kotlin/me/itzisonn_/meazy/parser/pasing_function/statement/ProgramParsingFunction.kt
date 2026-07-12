@@ -13,10 +13,8 @@ import java.io.File
 
 object ProgramParsingFunction : ParsingFunction<Program> {
     override fun Parser.parse(vararg extra: Any?): Program {
-        val file: File?
         require(extra.isNotEmpty()) { "Expected file as extra argument" }
-        if (extra[0] is File) file = extra[0] as File
-        else throw IllegalArgumentException("Expected file as extra argument")
+        val file = if (extra[0] is File) extra[0] as File else null
 
         skipNewLines()
 
