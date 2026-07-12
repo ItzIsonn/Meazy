@@ -12,18 +12,18 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object MapCreationExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
-        if (current.type == leftBrace) {
-            consume()
+        if (isNext(leftBrace)) {
+            consume(leftBrace, null)
             val map = mutableMapOf<Expression, Expression>()
 
-            while (current.type != rightBrace) {
+            while (!isNext(rightBrace)) {
                 val key = parse(ListCreationExpressionParsingFunction)
                 consume(assign, translatable("meazy:parser.expected.separator_expression", "assign", "map_creation"))
 
                 val value = parse(ExpressionParsingFunction)
                 map[key] = value
 
-                if (current.type != rightBrace) {
+                if (!isNext(rightBrace)) {
                     consume(
                         comma,
                         translatable("meazy:parser.expected.separator_expression", "comma", "map_creation")

@@ -15,13 +15,13 @@ object MemberExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         var receiver = parse(CallExpressionParsingFunction)
 
-        while (current.type in memberAccess) {
-            val isNullSafe = consume().type == questionDot
+        while (isNext(memberAccess)) {
+            val isNullSafe = consume(memberAccess, null).type == questionDot
             val member = parse(CallExpressionParsingFunction)
 
             if (member !is Identifier && member !is CallExpression) {
                 throw UnexpectedTokenException(
-                    current.line,
+                    current,
                     translatable("meazy:parser.exception.member_expression")
                 )
             }

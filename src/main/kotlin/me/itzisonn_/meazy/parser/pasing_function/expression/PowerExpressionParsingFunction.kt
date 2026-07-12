@@ -12,7 +12,7 @@ object PowerExpressionParsingFunction : ParsingFunction<Expression> {
         var left = parse(InversionExpressionParsingFunction)
 
         while (current.type == power) {
-            next()
+            consume()
             val right = parse(InversionExpressionParsingFunction)
             left = OperatorExpression(left, right, Operators.power)
         }

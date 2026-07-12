@@ -35,6 +35,8 @@ import me.itzisonn_.meazy.lexer.TokenTypes.greater
 import me.itzisonn_.meazy.lexer.TokenTypes.greaterOrEquals
 import me.itzisonn_.meazy.lexer.TokenTypes.less
 import me.itzisonn_.meazy.lexer.TokenTypes.lessOrEquals
+import me.itzisonn_.meazy.lexer.TokenTypes.and
+import me.itzisonn_.meazy.lexer.TokenTypes.or
 import me.itzisonn_.meazy.lexer.TokenTypes.multiply
 import me.itzisonn_.meazy.lexer.TokenTypes.divide
 import me.itzisonn_.meazy.lexer.TokenTypes.percent
@@ -84,6 +86,7 @@ object TokenTypeSets {
             )
         )
 
+        add(TokenTypeSet("logical", and, or))
         add(TokenTypeSet("multiplication", multiply, divide, percent))
         add(TokenTypeSet("addition", plus, minus))
     }
@@ -95,6 +98,7 @@ object TokenTypeSets {
     val operatorPostfix get() = getNonNull("operator_postfix")
     val memberAccess get() = getNonNull("member_access")
     val comparison get() = getNonNull("comparison")
+    val logical get() = getNonNull("logical")
     val multiplication get() = getNonNull("multiplication")
     val addition get() = getNonNull("addition")
 

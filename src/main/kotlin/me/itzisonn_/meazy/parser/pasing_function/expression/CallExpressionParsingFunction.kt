@@ -14,7 +14,7 @@ object CallExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val expression = parse(PrimaryExpressionParsingFunction)
 
-        if (current.type == leftParenthesis) {
+        if (isNext(leftParenthesis)) {
             if (expression !is Identifier) {
                 throw InvalidSyntaxException(
                     current.line,

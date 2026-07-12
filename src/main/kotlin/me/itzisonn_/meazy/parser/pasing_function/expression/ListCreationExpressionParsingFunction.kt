@@ -11,14 +11,14 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object ListCreationExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
-        if (current.type == leftBracket) {
-            next()
+        if (isNext(leftBracket)) {
+            consume(leftBracket, null)
             val list = mutableListOf<Expression>()
 
-            while (current.type != rightBracket) {
+            while (!isNext(rightBracket)) {
                 list.add(parse(ExpressionParsingFunction))
 
-                if (current.type != rightBracket) {
+                if (!isNext(rightBracket)) {
                     consume(
                         comma,
                         translatable("meazy:parser.expected.separator_expression", "comma", "list_creation")

@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorAssign
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.UnexpectedTokenException
-import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
 import me.itzisonn_.meazy.parser.operator.OperatorType
@@ -16,15 +15,15 @@ object AssignmentStatementParsingFunction : ParsingFunction<AssignmentStatement>
     override fun Parser.parse(vararg extra: Any?): AssignmentStatement {
         val left = parse(ExpressionParsingFunction)
 
-        if (current.type == assign) {
-            next()
+        if (isNext(assign)) {
+            consume(assign, null)
             val value = parse(ExpressionParsingFunction)
             return AssignmentStatement(left, value)
         }
-        else if (current.type in operatorAssign) {
-            val token = consume()
+        else if (isNext(operatorAssign)) {
+            val token = consume(operatorAssign, null)
 
-            val value: Expression = OperatorExpression(
+            val value = OperatorExpression(
                 left,
                 parse(ExpressionParsingFunction),
                 token.value.replace("=$".toRegex(), ""), OperatorType.INFIX
@@ -33,6 +32,6 @@ object AssignmentStatementParsingFunction : ParsingFunction<AssignmentStatement>
             return AssignmentStatement(left, value)
         }
 
-        throw UnexpectedTokenException(current.line, translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
+        throw UnexpectedTokenException(current, translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
     }
 }

@@ -58,7 +58,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         if (current.type == colon) {
             baseClassesLineNumber = current.line
             do {
-                next()
+                consume()
                 baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
             }
             while (current.type == comma)
@@ -68,10 +68,10 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             return ClassDeclarationStatement(modifiers, classId, baseClasses, generatedBody)
         }
 
-        next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "class_body"))
+        consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "class_body"))
 
         if (current.type == rightBrace) {
-            next()
+            consume()
             return ClassDeclarationStatement(modifiers, classId, baseClasses, generatedBody)
         }
 
@@ -89,7 +89,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             enumIds[enumId] = args
 
             while (current.type == comma) {
-                next()
+                consume()
 
                 val lineNumber = current.line
                 enumId = consume(id, translatable("meazy:parser.expected", "id")).value
@@ -118,7 +118,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             }
         }
 
-        next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "class_body"))
+        consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "class_body"))
         return ClassDeclarationStatement(modifiers, classId, baseClasses, body, enumIds)
     }
 

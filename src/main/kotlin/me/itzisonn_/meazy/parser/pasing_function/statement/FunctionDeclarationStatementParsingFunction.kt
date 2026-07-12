@@ -29,12 +29,12 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
         require(extra[1] is Boolean) { "Expected boolean as extra argument" }
         val canBeAbstractWithoutModifier = extra[1] as Boolean
 
-        next(function, translatable("meazy:parser.expected.keyword", "function"))
+        consume(function, translatable("meazy:parser.expected.keyword", "function"))
 
         var classId: String? = null
         var functionId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "function")).value
         if (current.type == dot) {
-            next()
+            consume()
             classId = functionId
             functionId = consume(id, translatable("meazy:parser.expected", "id")).value
         }
@@ -51,15 +51,15 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
         val returnDataTypeValue: Expression?
 
         if (current.type == assign) {
-            next()
+            consume()
             val expression = parse(ExpressionParsingFunction)
             body = listOf(ReturnStatement(expression))
             returnDataTypeValue = expression
         }
         else {
-            next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "function_body"))
+            consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "function_body"))
             body = parseBody()
-            next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "function_body"))
+            consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "function_body"))
             returnDataTypeValue = null
         }
 

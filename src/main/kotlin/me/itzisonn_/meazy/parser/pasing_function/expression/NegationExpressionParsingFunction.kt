@@ -9,8 +9,8 @@ import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 
 object NegationExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
-        if (current.type == minus) {
-            next()
+        if (isNext(minus)) {
+            consume(minus, null)
             val expression = parse(MemberExpressionParsingFunction)
             return OperatorExpression(expression, null, negation)
         }

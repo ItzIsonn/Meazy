@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object ImportStatementParsingFunction : ParsingFunction<ImportStatement> {
     override fun Parser.parse(vararg extra: Any?): ImportStatement {
-        next(import, translatable("meazy:parser.expected.keyword", "import"))
+        consume(import, translatable("meazy:parser.expected.keyword", "import"))
 
         val name = StringBuilder(
             consume(
@@ -19,7 +19,7 @@ object ImportStatementParsingFunction : ParsingFunction<ImportStatement> {
         )
 
         while (current.type == dot) {
-            next()
+            consume()
             name.append(".")
             name.append(consume(id, translatable("meazy:parser.expected", "id")).value)
         }

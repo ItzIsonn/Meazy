@@ -39,7 +39,7 @@ fun Parser.parseModifiers(): Set<Modifier> {
             )
         }
 
-        next()
+        consume()
         modifiers.add(modifier)
     }
 
@@ -61,14 +61,14 @@ fun getModifiersFromExtra(extra: Array<out Any?>): Set<Modifier> {
 }
 
 private fun Parser.parseParameter(): Parameter {
-    if (current.type != variable) {
+    if (!isNext(variable)) {
         throw UnexpectedTokenException(
-            current.line,
+            current,
             translatable("meazy:parser.expected.start_expression", "variable", "parameter")
         )
     }
 
-    val isConstant = consume().value == "val"
+    val isConstant = consume(variable, null).value == "val"
     val id = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "variable")).value
 
     val lineNumber = current.line
@@ -91,7 +91,7 @@ fun Parser.parseParameters(): List<Parameter> {
         parameters.add(parseParameter())
 
         while (current.type == comma) {
-            next()
+            consume()
             parameters.add(parseParameter())
         }
     }
@@ -110,11 +110,11 @@ fun Parser.parseArgs(): List<Expression> {
     )
     val args = mutableListOf<Expression>()
 
-    if (current.type != rightParenthesis) {
+    if (!isNext(rightParenthesis)) {
         args.add(parse(ExpressionParsingFunction))
 
-        while (current.type == comma) {
-            next()
+        while (isNext(comma)) {
+            consume(comma, null)
             args.add(parse(ExpressionParsingFunction))
         }
     }

@@ -11,8 +11,8 @@ object MultiplicationExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         var left = parse(PowerExpressionParsingFunction)
 
-        while (current.type in multiplication) {
-            val operator = consume().value
+        while (isNext(multiplication)) {
+            val operator = consume(multiplication, null).value
             val right = parse(PowerExpressionParsingFunction)
             left = OperatorExpression(left, right, operator, OperatorType.INFIX)
         }
