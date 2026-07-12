@@ -39,7 +39,7 @@
 
 
 
-  "parser.unexpected_token": "Unexpected token at line {0}: {1}",
+  "parser.unexpected_token": "Unexpected token '{0}' at line {1}",
   "parser.expected": "Expected '{0}'",
   "parser.expected.keyword": "Expected '{0}' keyword",
   "parser.expected.statement": "Expected '{0}' statement",

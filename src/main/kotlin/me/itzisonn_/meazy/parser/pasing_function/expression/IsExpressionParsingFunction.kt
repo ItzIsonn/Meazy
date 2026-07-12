@@ -12,8 +12,8 @@ object IsExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val value = parse(NegationExpressionParsingFunction)
 
-        if (current.type == `is`) {
-            val isLike = consume().value == "islike"
+        if (isNext(`is`)) {
+            val isLike = consume(`is`, null).value == "islike"
             val id = consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "is")).value
             return IsExpression(value, id, isLike)
         }

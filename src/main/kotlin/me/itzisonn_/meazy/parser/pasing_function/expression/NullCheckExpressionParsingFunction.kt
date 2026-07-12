@@ -10,8 +10,8 @@ object NullCheckExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         val checkExpression = parse(LogicalExpressionParsingFunction)
 
-        if (current.type == questionColon) {
-            next()
+        if (isNext(questionColon)) {
+            consume(questionColon, null)
             val nullExpression = parse(ExpressionParsingFunction)
             return NullCheckExpression(checkExpression, nullExpression)
         }

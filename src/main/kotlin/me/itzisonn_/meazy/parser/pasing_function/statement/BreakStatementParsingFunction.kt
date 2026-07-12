@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object BreakStatementParsingFunction : ParsingFunction<BreakStatement> {
     override fun Parser.parse(vararg extra: Any?): BreakStatement {
-        next(`break`, translatable("meazy:parser.expected.keyword", "break"))
+        consume(`break`, translatable("meazy:parser.expected.keyword", "break"))
         return BreakStatement()
     }
 }

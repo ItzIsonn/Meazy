@@ -19,8 +19,8 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object ForeachStatementParsingFunction : ParsingFunction<ForeachStatement> {
     override fun Parser.parse(vararg extra: Any?): ForeachStatement {
-        next(`for`, translatable("meazy:parser.expected.keyword", "for"))
-        next(
+        consume(`for`, translatable("meazy:parser.expected.keyword", "for"))
+        consume(
             leftParenthesis,
             translatable("meazy:parser.expected.start", "left_parenthesis", "for_condition")
         )
@@ -34,17 +34,17 @@ object ForeachStatementParsingFunction : ParsingFunction<ForeachStatement> {
             translatable("meazy:parser.exception.foreach_variable_without_datatype")
         )
 
-        next(`in`, translatable("meazy:parser.expected.after_statement", "in", "variable_declaration"))
+        consume(`in`, translatable("meazy:parser.expected.after_statement", "in", "variable_declaration"))
         val collection = parse(ExpressionParsingFunction)
 
-        next(
+        consume(
             rightParenthesis,
             translatable("meazy:parser.expected.end", "right_parenthesis", "for_condition")
         )
 
-        next(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "for_body"))
+        consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "for_body"))
         val body = parseBody()
-        next(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "for_body"))
+        consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "for_body"))
 
         return ForeachStatement(isConstant, id, dataType, collection, body)
     }

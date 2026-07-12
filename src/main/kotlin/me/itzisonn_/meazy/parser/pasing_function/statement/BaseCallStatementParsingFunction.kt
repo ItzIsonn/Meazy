@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object BaseCallStatementParsingFunction : ParsingFunction<BaseCallStatement> {
     override fun Parser.parse(vararg extra: Any?): BaseCallStatement {
-        next(base, translatable("meazy:parser.expected.start_statement", "base", "base_call"))
+        consume(base, translatable("meazy:parser.expected.start_statement", "base", "base_call"))
         return BaseCallStatement(parseArgs())
     }
 }

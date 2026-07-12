@@ -39,7 +39,7 @@
 
 
 
-  "parser.unexpected_token": "Непредвиденный токен на строке {0}: {1}",
+  "parser.unexpected_token": "Непредвиденный токен '{0}' на строке {1}",
   "parser.expected": "Ожидалось '{0}'",
   "parser.expected.keyword": "Ожидалось ключевое слово '{0}'",
   "parser.expected.statement": "Ожидалась инструкция '{0}'",

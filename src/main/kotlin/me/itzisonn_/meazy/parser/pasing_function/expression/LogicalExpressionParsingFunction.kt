@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
-import me.itzisonn_.meazy.lexer.TokenTypes.and
-import me.itzisonn_.meazy.lexer.TokenTypes.or
+import me.itzisonn_.meazy.lexer.TokenTypeSets.logical
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
@@ -12,13 +11,10 @@ object LogicalExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         var left = parse(ComparisonExpressionParsingFunction)
 
-        var currentType = current.type
-        while (currentType == and || currentType == or) {
-            val operator = consume().value
+        while (isNext(logical)) {
+            val operator = consume(logical, null).value
             val right = parse(ComparisonExpressionParsingFunction)
             left = OperatorExpression(left, right, operator, OperatorType.INFIX)
-
-            currentType = current.type
         }
 
         return left

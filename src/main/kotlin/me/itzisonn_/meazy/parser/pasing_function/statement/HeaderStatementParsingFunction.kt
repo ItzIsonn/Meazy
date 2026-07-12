@@ -9,10 +9,10 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object HeaderStatementParsingFunction : ParsingFunction<Statement> {
     override fun Parser.parse(vararg extra: Any?): Statement {
-        if (current.type == `import`) {
+        if (isNext(`import`)) {
             return parse(ImportStatementParsingFunction)
         }
 
-        throw UnexpectedTokenException(current.line, translatable("meazy:parser.expected.statement", "header"))
+        throw UnexpectedTokenException(current, translatable("meazy:parser.expected.statement", "header"))
     }
 }

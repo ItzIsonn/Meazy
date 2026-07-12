@@ -11,8 +11,8 @@ object AdditionExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
         var left = parse(MultiplicationExpressionParsingFunction)
 
-        while (current.type in addition) {
-            val operator = consume().value
+        while (isNext(addition)) {
+            val operator = consume(addition, null).value
             val right = parse(AdditionExpressionParsingFunction)
             left = OperatorExpression(left, right, operator, OperatorType.INFIX)
         }

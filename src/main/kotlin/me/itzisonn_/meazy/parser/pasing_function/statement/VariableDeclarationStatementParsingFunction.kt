@@ -45,7 +45,7 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
             return VariableDeclarationStatement(modifiers, false, variableId, dataType, NullLiteral())
         }
 
-        next(assign, translatable("meazy:parser.expected.after", "assign", "id"))
+        consume(assign, translatable("meazy:parser.expected.after", "assign", "id"))
 
         return VariableDeclarationStatement(
             modifiers,
