@@ -1,12 +1,12 @@
-open function isGay(var name: String): Boolean {
-    Wow.a()
-    if (name == "Атаев") return true
+fun isOleg(var name: String): Boolean {
+    Wow().a()
+    if (name == "Oleg") return true
     return false
 }
 
 class Wow {
-    shared function a() {
-        println("Atamax gay")
+    fun a() {
+        println("No it's b")
     }
 
     constructor() {

@@ -119,11 +119,6 @@ object MeazyMain {
         if (language == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
         else TranslationsBundle.setLanguage(language)
 
-        for (tokenType in DatagenManager.getDeserializedMultiple("token_type", TokenTypeDeserializer)) {
-            if (TokenTypes.get(tokenType.id) != null) continue
-            TokenTypes.add(tokenType)
-        }
-
         for (tokenTypeSet in DatagenManager.getDeserializedSingle("token_type_set", TokenTypeSetDeserializer)) {
             TokenTypeSets.add(tokenTypeSet)
         }

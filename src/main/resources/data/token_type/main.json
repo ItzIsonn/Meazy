@@ -1,5 +1,0 @@
-[
-  { "id": "new_line", "regex": "\n*" },
-  { "id": "white_space", "regex": "(?!\n)\\s", "should_skip": true },
-  { "id": "end_of_file" }
-]

@@ -1,8 +1,0 @@
-[
-  { "id": "null", "regex": "null" },
-  { "id": "number", "regex": "(0|([1-9][0-9]*))(\\.[0-9]+)?" },
-  { "id": "string", "regex":"\"[^\"\n]*(\")?" },
-  { "id": "boolean", "regex": "true|false" },
-  { "id": "this", "regex": "this" },
-  { "id": "id", "expect": true }
-]
