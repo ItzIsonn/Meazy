@@ -1,8 +1,6 @@
 package me.itzisonn_.meazy.util.text
 
 import me.itzisonn_.meazy.util.text.TranslationsBundle.getTranslation
-import me.itzisonn_.meazy.util.text.TranslationsBundle.getTranslationOrDefault
-import me.itzisonn_.meazy.util.settings.SettingsManager
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -64,10 +62,7 @@ private class TranslatableText(private val key: String, args: List<String>) : Te
     }
 
     override fun toString(): String {
-        var translation = if (SettingsManager.settings.exceptionAbsentKey) {
-            getTranslation(key) ?: error("Can't find translation with key $key")
-        }
-        else getTranslationOrDefault(key, "?$key?")
+        var translation = getTranslation(key) ?: error("Can't find translation with key $key")
 
         for (i in args.indices) {
             translation = translation.replace("{$i}", args[i])

@@ -15,7 +15,7 @@ import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.operator.Operators
-import me.itzisonn_.meazy.util.text.Languages
+import me.itzisonn_.meazy.util.text.TranslationLanguages
 import me.itzisonn_.meazy.util.version.Version
 
 object MeazyMain {
@@ -105,7 +105,7 @@ object MeazyMain {
         check(!isInitialized) { "MeazyMain have already been initialized" }
         isInitialized = true
 
-        Languages.initialize()
+        TranslationLanguages.initialize()
         Commands.initialize()
         TokenTypes.initialize()
         TokenTypeSets.initialize()
@@ -113,7 +113,7 @@ object MeazyMain {
         Operators.initialize()
 
         val stringLanguage = settings.language
-        val language = Languages.get(stringLanguage)
+        val language = TranslationLanguages.get(stringLanguage)
         if (language == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
         else TranslationsBundle.setLanguage(language)
     }
