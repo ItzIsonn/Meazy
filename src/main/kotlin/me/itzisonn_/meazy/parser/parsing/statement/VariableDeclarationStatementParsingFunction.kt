@@ -6,19 +6,16 @@ import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.parser.parsing.PairParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
-import me.itzisonn_.meazy.parser.parsing.getModifiersFromExtra
 import me.itzisonn_.meazy.parser.parsing.parseDataType
 import me.itzisonn_.meazy.util.text.translatable
 
-object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDeclarationStatement> {
-    override fun Parser.parse(vararg extra: Any?): VariableDeclarationStatement {
-        val modifiers = getModifiersFromExtra(extra)
-
-        require(extra.size != 1) { "Expected boolean as extra argument" }
-        require(extra[1] is Boolean) { "Expected boolean as extra argument" }
-        val canBeConstantWithoutValue = extra[1] as Boolean
+object VariableDeclarationStatementParsingFunction : PairParsingFunction<VariableDeclarationStatement, Set<Modifier>, Boolean>() {
+    override fun Parser.parse(first: Set<Modifier>, second: Boolean): VariableDeclarationStatement {
+        val modifiers = first
+        val canBeConstantWithoutValue = second
 
         val isConstant = consume(variable, translatable("meazy:parser.expected.keyword", "variable")).value == "val"
         val variableId = consume(id, translatable("meazy:parser.expected", "id")).value

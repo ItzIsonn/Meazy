@@ -6,12 +6,12 @@ import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
 import me.itzisonn_.meazy.parser.operator.OperatorType
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
 
-object AssignmentStatementParsingFunction : ParsingFunction<AssignmentStatement> {
-    override fun Parser.parse(vararg extra: Any?): AssignmentStatement {
+object AssignmentStatementParsingFunction : EmptyParsingFunction<AssignmentStatement>() {
+    override fun Parser.parse(): AssignmentStatement {
         val left = parse(ExpressionParsingFunction)
 
         if (isNext(assign)) {

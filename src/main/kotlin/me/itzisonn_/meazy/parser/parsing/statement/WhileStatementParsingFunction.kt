@@ -7,13 +7,13 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.`while`
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.WhileStatement
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseBody
 import me.itzisonn_.meazy.util.text.translatable
 
-object WhileStatementParsingFunction : ParsingFunction<WhileStatement> {
-    override fun Parser.parse(vararg extra: Any?): WhileStatement {
+object WhileStatementParsingFunction : EmptyParsingFunction<WhileStatement>() {
+    override fun Parser.parse(): WhileStatement {
         consume(`while`, translatable("meazy:parser.expected.keyword", "while"))
 
         consume(

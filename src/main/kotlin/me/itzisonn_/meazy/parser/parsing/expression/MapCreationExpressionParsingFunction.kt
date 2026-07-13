@@ -7,11 +7,11 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.collection_creation.MapCreationExpression
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
 
-object MapCreationExpressionParsingFunction : ParsingFunction<Expression> {
-    override fun Parser.parse(vararg extra: Any?): Expression {
+object MapCreationExpressionParsingFunction : EmptyParsingFunction<Expression>() {
+    override fun Parser.parse(): Expression {
         if (isNext(leftBrace)) {
             consume(leftBrace, null)
             val map = mutableMapOf<Expression, Expression>()

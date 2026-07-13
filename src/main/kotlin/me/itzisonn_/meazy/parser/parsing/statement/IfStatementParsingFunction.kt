@@ -10,13 +10,13 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.IfStatement
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseBody
 import me.itzisonn_.meazy.util.text.translatable
 
-object IfStatementParsingFunction : ParsingFunction<IfStatement> {
-    override fun Parser.parse(vararg extra: Any?): IfStatement {
+object IfStatementParsingFunction : EmptyParsingFunction<IfStatement>() {
+    override fun Parser.parse(): IfStatement {
         consume(`if`, translatable("meazy:parser.expected.keyword", "if"))
         consume(leftParenthesis, translatable("meazy:parser.expected.start", "left_parenthesis", "if_condition"))
 

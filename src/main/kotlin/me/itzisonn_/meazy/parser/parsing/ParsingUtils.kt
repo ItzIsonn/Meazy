@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.parser.parsing
 
+import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
@@ -36,25 +37,11 @@ fun Parser.parseModifiers(): Set<Modifier> {
             )
         }
 
-        consume()
+        consume(TokenTypes.id, null)
         modifiers.add(modifier)
     }
 
     return modifiers
-}
-
-fun getModifiersFromExtra(extra: Array<out Any?>): Set<Modifier> {
-    require(extra.isNotEmpty()) { "Expected Set of Modifiers as extra argument" }
-    require(extra[0] is Set<*>) { "Expected Set of Modifiers as extra argument" }
-    val set = extra[0] as Set<*>
-
-    val result = mutableSetOf<Modifier>()
-    for (o in set) {
-        if (o is Modifier) result.add(o)
-        else throw IllegalArgumentException("Expected Set of Modifiers as extra argument")
-    }
-
-    return result
 }
 
 private fun Parser.parseParameter(): Parameter {
