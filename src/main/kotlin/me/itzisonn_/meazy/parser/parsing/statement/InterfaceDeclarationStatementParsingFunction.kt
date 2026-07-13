@@ -10,13 +10,13 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.InterfaceDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.Statement
+import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.parsing.ParsingFunction
-import me.itzisonn_.meazy.parser.parsing.getModifiersFromExtra
 import me.itzisonn_.meazy.util.text.translatable
 
-object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceDeclarationStatement> {
-    override fun Parser.parse(vararg extra: Any?): InterfaceDeclarationStatement {
-        val modifiers = getModifiersFromExtra(extra)
+object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceDeclarationStatement, Set<Modifier>> {
+    override fun Parser.parse(data: Set<Modifier>): InterfaceDeclarationStatement {
+        val modifiers = data
 
         consume(`interface`, translatable("meazy:parser.expected.keyword", "interface"))
         val interfaceId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "interface")).value

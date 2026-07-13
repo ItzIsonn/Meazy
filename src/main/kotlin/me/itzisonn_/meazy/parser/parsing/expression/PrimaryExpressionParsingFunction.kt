@@ -15,26 +15,26 @@ import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.*
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseString
 import me.itzisonn_.meazy.util.text.translatable
 
-object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
-    override fun Parser.parse(vararg extra: Any?): Expression {
+object PrimaryExpressionParsingFunction : EmptyParsingFunction<Expression>() {
+    override fun Parser.parse(): Expression {
         if (isNext(id)) {
             find(id, null)
 
             if (size > pos + 1 && this[pos + 1].type == leftParenthesis) {
-                val id = consume().value
+                val id = consume(id, null).value
                 return if (Character.isUpperCase(id[0])) ClassIdentifier(id)
                 else FunctionIdentifier(id)
             }
 
             if (pos > 0 && this[pos - 1].type == dot) {
-                return VariableIdentifier(consume().value)
+                return VariableIdentifier(consume(id, null).value)
             }
 
-            val id = consume().value
+            val id = consume(id, null).value
             return if (Character.isUpperCase(id[0])) ClassIdentifier(id) else VariableIdentifier(id)
         }
 

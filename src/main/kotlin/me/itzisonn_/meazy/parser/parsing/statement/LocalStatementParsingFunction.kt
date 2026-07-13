@@ -13,20 +13,19 @@ import me.itzisonn_.meazy.parser.ast.expression.CallExpression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.ast.statement.*
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseModifiers
 import me.itzisonn_.meazy.util.text.translatable
 
-object LocalStatementParsingFunction : ParsingFunction<LocalStatement> {
-    override fun Parser.parse(vararg extra: Any?): LocalStatement {
+object LocalStatementParsingFunction : EmptyParsingFunction<LocalStatement>() {
+    override fun Parser.parse(): LocalStatement {
         val modifiers = parseModifiers()
 
         if (isNext(variable)) {
             return parse(
                 VariableDeclarationStatementParsingFunction,
-                modifiers,
-                false
+                Pair(modifiers, false)
             )
         }
         if (!modifiers.isEmpty()) throw InvalidSyntaxException(

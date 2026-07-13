@@ -5,11 +5,11 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`is`
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.IsExpression
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
 
-object IsExpressionParsingFunction : ParsingFunction<Expression> {
-    override fun Parser.parse(vararg extra: Any?): Expression {
+object IsExpressionParsingFunction : EmptyParsingFunction<Expression>() {
+    override fun Parser.parse(): Expression {
         val value = parse(NegationExpressionParsingFunction)
 
         if (isNext(`is`)) {

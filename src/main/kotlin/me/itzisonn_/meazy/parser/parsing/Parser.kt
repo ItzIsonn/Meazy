@@ -27,11 +27,6 @@ class Parser(tokens: List<Token>) {
     val size get() = tokens.size
 
     /**
-     * @return Token at position [pos]
-     */
-    private val current get() = tokens[pos]
-
-    /**
      * @return Token at position [i]
      */
     operator fun get(i: Int) = tokens[i]
@@ -43,11 +38,10 @@ class Parser(tokens: List<Token>) {
 
 
 
-    /**
-     * Returns token at current position and increments position by 1
-     * @return Token at [pos] in tokens
-     */
-    fun consume() = current.also { pos++ }
+    private val current get() = tokens[pos]
+    private fun consume() = current.also { pos++ }
+
+
 
     /**
      * Skips all tokens with [TokenBehaviour.IGNORE] until finds token
@@ -157,34 +151,61 @@ class Parser(tokens: List<Token>) {
      * Executes given ParsingFunction
      *
      * @param parsingFunction ParsingFunction to execute
-     * @param extra           Extra info
-     * @param T               Returned program unit's type
+     * @param data            Extra data for parsing
+     * @param T               Type of returned ProgramUnit
+     * @param D               Type of [data]
      *
-     * @return Parsed program unit
+     * @return Parsed ProgramUnit
      */
-    fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T>, vararg extra: Any?): T {
-        return parsingFunction.run { this@Parser.parse(*extra) }
+    fun <T : ProgramUnit, D> parse(parsingFunction: ParsingFunction<T, D>, data: D): T {
+        return parsingFunction.run { this@Parser.parse(data) }
+    }
+
+    /**
+     * Executes given ParsingFunction without parsing data
+     *
+     * @param parsingFunction ParsingFunction to execute
+     * @param T               Type of returned ProgramUnit
+     *
+     * @return Parsed ProgramUnit
+     */
+    fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T, Unit>): T {
+        return parse(parsingFunction, Unit)
     }
 
     /**
      * Executes given ParsingFunction, and if it fails, returns to position before parsing
      *
      * @param parsingFunction ParsingFunction to execute
-     * @param extra           Extra info
-     * @param T               Returned program unit's type
+     * @param data            Extra data for parsing
+     * @param T               Type of returned ProgramUnit
+     * @param D               Type of [data]
      *
-     * @return Parsed program unit
+     * @return Parsed ProgramUnit
      */
-    fun <T : ProgramUnit> tryParse(parsingFunction: ParsingFunction<T>, vararg extra: Any?): T? {
+    fun <T : ProgramUnit, D> tryParse(parsingFunction: ParsingFunction<T, D>, data: D): T? {
         val prevPos = pos
 
         try {
-            return parse(parsingFunction, *extra)
+            return parse(parsingFunction, data)
         }
         catch (_: ParsingException) {
             pos = prevPos
             return null
         }
+    }
+
+    /**
+     * Executes given ParsingFunction without parsing data,
+     * and if it fails, returns to position before parsing
+     *
+     * @param parsingFunction ParsingFunction to execute
+     * @param T               Type of returned ProgramUnit
+     *
+     * @return Parsed ProgramUnit
+     */
+    fun <T : ProgramUnit> tryParse(parsingFunction: ParsingFunction<T, Unit>): T? {
+        return tryParse(parsingFunction, Unit)
     }
 
 

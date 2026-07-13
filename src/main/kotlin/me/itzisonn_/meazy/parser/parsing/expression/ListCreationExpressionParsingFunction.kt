@@ -6,11 +6,11 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightBracket
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.collection_creation.ListCreationExpression
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
 
-object ListCreationExpressionParsingFunction : ParsingFunction<Expression> {
-    override fun Parser.parse(vararg extra: Any?): Expression {
+object ListCreationExpressionParsingFunction : EmptyParsingFunction<Expression>() {
+    override fun Parser.parse(): Expression {
         if (isNext(leftBracket)) {
             consume(leftBracket, null)
             val list = mutableListOf<Expression>()

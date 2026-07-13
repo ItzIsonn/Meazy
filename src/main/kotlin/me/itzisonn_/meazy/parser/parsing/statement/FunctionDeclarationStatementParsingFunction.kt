@@ -12,22 +12,19 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement
+import me.itzisonn_.meazy.parser.modifier.Modifier
 import me.itzisonn_.meazy.parser.modifier.Modifiers.abstract
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.PairParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
-import me.itzisonn_.meazy.parser.parsing.getModifiersFromExtra
 import me.itzisonn_.meazy.parser.parsing.parseBody
 import me.itzisonn_.meazy.parser.parsing.parseDataType
 import me.itzisonn_.meazy.parser.parsing.parseParameters
 import me.itzisonn_.meazy.util.text.translatable
 
-object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDeclarationStatement> {
-    override fun Parser.parse(vararg extra: Any?): FunctionDeclarationStatement {
-        val modifiers = getModifiersFromExtra(extra).toMutableSet()
-
-        require(extra.size != 1) { "Expected boolean as extra argument" }
-        require(extra[1] is Boolean) { "Expected boolean as extra argument" }
-        val canBeAbstractWithoutModifier = extra[1] as Boolean
+object FunctionDeclarationStatementParsingFunction : PairParsingFunction<FunctionDeclarationStatement, Set<Modifier>, Boolean>() {
+    override fun Parser.parse(first: Set<Modifier>, second: Boolean): FunctionDeclarationStatement {
+        val modifiers = first.toMutableSet()
+        val canBeAbstractWithoutModifier = second
 
         consume(function, translatable("meazy:parser.expected.keyword", "function"))
 

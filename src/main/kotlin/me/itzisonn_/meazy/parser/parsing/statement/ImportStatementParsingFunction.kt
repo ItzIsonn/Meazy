@@ -5,11 +5,11 @@ import me.itzisonn_.meazy.lexer.TokenTypes.dot
 import me.itzisonn_.meazy.lexer.TokenTypes.import
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ImportStatement
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
 
-object ImportStatementParsingFunction : ParsingFunction<ImportStatement> {
-    override fun Parser.parse(vararg extra: Any?): ImportStatement {
+object ImportStatementParsingFunction : EmptyParsingFunction<ImportStatement>() {
+    override fun Parser.parse(): ImportStatement {
         consume(import, translatable("meazy:parser.expected.keyword", "import"))
 
         val name = StringBuilder(

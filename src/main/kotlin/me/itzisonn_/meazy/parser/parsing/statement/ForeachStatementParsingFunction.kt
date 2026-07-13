@@ -10,14 +10,14 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ForeachStatement
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseBody
 import me.itzisonn_.meazy.parser.parsing.parseDataType
 import me.itzisonn_.meazy.util.text.translatable
 
-object ForeachStatementParsingFunction : ParsingFunction<ForeachStatement> {
-    override fun Parser.parse(vararg extra: Any?): ForeachStatement {
+object ForeachStatementParsingFunction : EmptyParsingFunction<ForeachStatement>() {
+    override fun Parser.parse(): ForeachStatement {
         consume(`for`, translatable("meazy:parser.expected.keyword", "for"))
         consume(
             leftParenthesis,

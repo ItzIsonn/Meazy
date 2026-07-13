@@ -10,10 +10,9 @@ import me.itzisonn_.meazy.parser.parsing.ParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
 import java.io.File
 
-object ProgramParsingFunction : ParsingFunction<Program> {
-    override fun Parser.parse(vararg extra: Any?): Program {
-        require(extra.isNotEmpty()) { "Expected file as extra argument" }
-        val file = if (extra[0] is File) extra[0] as File else null
+object ProgramParsingFunction : ParsingFunction<Program, File?> {
+    override fun Parser.parse(data: File?): Program {
+        val file = data
 
         val body = mutableListOf<Statement>()
         var headerStatement: Statement?

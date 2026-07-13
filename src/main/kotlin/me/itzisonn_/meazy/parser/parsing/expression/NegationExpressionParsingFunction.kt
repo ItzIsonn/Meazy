@@ -5,10 +5,10 @@ import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.operator.Operators.negation
-import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 
-object NegationExpressionParsingFunction : ParsingFunction<Expression> {
-    override fun Parser.parse(vararg extra: Any?): Expression {
+object NegationExpressionParsingFunction : EmptyParsingFunction<Expression>() {
+    override fun Parser.parse(): Expression {
         if (isNext(minus)) {
             consume(minus, null)
             val expression = parse(MemberExpressionParsingFunction)

@@ -22,7 +22,8 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.statement.*
-import me.itzisonn_.meazy.parser.modifier.Modifiers.data
+import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.parser.modifier.Modifiers
 import me.itzisonn_.meazy.parser.modifier.Modifiers.enum
 import me.itzisonn_.meazy.parser.modifier.Modifiers.get
 import me.itzisonn_.meazy.parser.modifier.Modifiers.operator
@@ -30,24 +31,23 @@ import me.itzisonn_.meazy.parser.modifier.Modifiers.private
 import me.itzisonn_.meazy.parser.modifier.Modifiers.set
 import me.itzisonn_.meazy.parser.operator.OperatorType
 import me.itzisonn_.meazy.parser.parsing.ParsingFunction
-import me.itzisonn_.meazy.parser.parsing.getModifiersFromExtra
 import me.itzisonn_.meazy.parser.parsing.parseArgs
 import me.itzisonn_.meazy.parser.parsing.parseParameters
 import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
-object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarationStatement> {
-    override fun Parser.parse(vararg extra: Any?): ClassDeclarationStatement {
-        val modifiers = getModifiersFromExtra(extra).toMutableSet()
+object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarationStatement, Set<Modifier>> {
+    override fun Parser.parse(data: Set<Modifier>): ClassDeclarationStatement {
+        val modifiers = data.toMutableSet()
 
         consume(`class`, translatable("meazy:parser.expected.keyword", "class"))
         val classId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "class")).value
 
         val generatedBody = mutableListOf<Statement>()
-        if (data in modifiers) {
+        if (Modifiers.data in modifiers) {
             generatedBody.addAll(generateDataBody(classId, parseParameters()))
-            modifiers.remove(data)
+            modifiers.remove(Modifiers.data)
         }
 
         val baseClasses = mutableSetOf<String>()
