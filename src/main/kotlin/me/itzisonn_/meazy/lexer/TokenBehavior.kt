@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.lexer
 
-enum class TokenBehaviour {
+enum class TokenBehavior {
     DEFAULT,
 
     /**
