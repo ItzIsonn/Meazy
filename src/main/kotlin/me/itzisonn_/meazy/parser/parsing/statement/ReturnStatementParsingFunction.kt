@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object ReturnStatementParsingFunction : EmptyParsingFunction<ReturnStatement>() {
     override fun Parser.parse(): ReturnStatement {
-        consume(`return`, translatable("meazy:parser.expected.keyword", "return"))
+        consume(`return`, translatable("parser.expected.keyword", "return"))
 
         var expression: Expression? = null
         if (!isNext(newLine)) {

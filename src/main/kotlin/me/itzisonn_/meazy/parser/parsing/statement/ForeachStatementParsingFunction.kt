@@ -18,30 +18,30 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object ForeachStatementParsingFunction : EmptyParsingFunction<ForeachStatement>() {
     override fun Parser.parse(): ForeachStatement {
-        consume(`for`, translatable("meazy:parser.expected.keyword", "for"))
+        consume(`for`, translatable("parser.expected.keyword", "for"))
         consume(
             leftParenthesis,
-            translatable("meazy:parser.expected.start", "left_parenthesis", "for_condition")
+            translatable("parser.expected.start", "left_parenthesis", "for_condition")
         )
 
-        val isConstant = consume(variable, translatable("meazy:parser.expected.keyword", "variable")).value == "val"
-        val id = consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
+        val isConstant = consume(variable, translatable("parser.expected.keyword", "variable")).value == "val"
+        val id = consume(TokenTypes.id, translatable("parser.expected", "id")).value
 
         val dataType = parseDataType() ?: throw InvalidSyntaxException(
-            translatable("meazy:parser.exception.foreach_variable_without_datatype")
+            translatable("parser.exception.foreach_variable_without_datatype")
         )
 
-        consume(`in`, translatable("meazy:parser.expected.after_statement", "in", "variable_declaration"))
+        consume(`in`, translatable("parser.expected.after_statement", "in", "variable_declaration"))
         val collection = parse(ExpressionParsingFunction)
 
         consume(
             rightParenthesis,
-            translatable("meazy:parser.expected.end", "right_parenthesis", "for_condition")
+            translatable("parser.expected.end", "right_parenthesis", "for_condition")
         )
 
-        consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "for_body"))
+        consume(leftBrace, translatable("parser.expected.start", "left_brace", "for_body"))
         val body = parseBody()
-        consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "for_body"))
+        consume(rightBrace, translatable("parser.expected.end", "right_brace", "for_body"))
 
         return ForeachStatement(isConstant, id, dataType, collection, body)
     }

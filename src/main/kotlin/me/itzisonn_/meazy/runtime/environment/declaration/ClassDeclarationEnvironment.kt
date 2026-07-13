@@ -43,7 +43,7 @@ private class ClassDeclarationEnvironmentImpl(
     override fun declareClass(classEnvironment: ClassEnvironment) {
         for (otherEnvironment in classes) {
             if (otherEnvironment.id == classEnvironment.id) {
-                throw EvaluationException(translatable("meazy:runtime.class.already_exists", classEnvironment.id))
+                throw EvaluationException(translatable("runtime.class.already_exists", classEnvironment.id))
             }
         }
 

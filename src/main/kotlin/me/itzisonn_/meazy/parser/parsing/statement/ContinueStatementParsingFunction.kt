@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object ContinueStatementParsingFunction : EmptyParsingFunction<ContinueStatement>() {
     override fun Parser.parse(): ContinueStatement {
-        consume(`continue`, translatable("meazy:parser.expected.keyword", "continue"))
+        consume(`continue`, translatable("parser.expected.keyword", "continue"))
         return ContinueStatement()
     }
 }

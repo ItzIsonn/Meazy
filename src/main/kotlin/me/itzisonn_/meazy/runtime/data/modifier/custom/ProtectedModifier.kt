@@ -44,7 +44,7 @@ class ProtectedModifier : Modifier("protected") {
 
                             val parentClassEnvironment = environment.getClass(env.id)
                                 ?: throw EvaluationException(
-                                    translatable("meazy:runtime.class.doesnt_exist", env.id)
+                                    translatable("runtime.class.doesnt_exist", env.id)
                                 )
 
                             return@hasParent parentClassEnvironment.interfaces
@@ -65,7 +65,7 @@ class ProtectedModifier : Modifier("protected") {
                             val parentClassEnvironment =
                                 environment.getClass(parentEnv.id) ?: throw EvaluationException(
                                     translatable(
-                                        "meazy:runtime.class.doesnt_exist",
+                                        "runtime.class.doesnt_exist",
                                         parentEnv.id
                                     )
                                 )
@@ -81,7 +81,7 @@ class ProtectedModifier : Modifier("protected") {
                     if (env.id == identifier.id) return@hasParent true
 
                     val parentClassEnvironment = requestEnvironment.getClass(env.id)
-                        ?: throw EvaluationException(translatable("meazy:runtime.class.doesnt_exist", env.id))
+                        ?: throw EvaluationException(translatable("runtime.class.doesnt_exist", env.id))
 
                     return@hasParent parentClassEnvironment.interfaces.any { it.displayName() == identifier.id }
                 }

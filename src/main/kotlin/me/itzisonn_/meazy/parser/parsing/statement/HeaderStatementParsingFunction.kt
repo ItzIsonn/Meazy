@@ -12,6 +12,6 @@ object HeaderStatementParsingFunction : EmptyParsingFunction<Statement>() {
             return parse(ImportStatementParsingFunction)
         }
 
-        throw UnexpectedTokenException(translatable("meazy:parser.expected.statement", "header"))
+        throw UnexpectedTokenException(translatable("parser.expected.statement", "header"))
     }
 }

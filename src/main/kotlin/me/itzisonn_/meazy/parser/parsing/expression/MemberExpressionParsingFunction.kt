@@ -20,7 +20,7 @@ object MemberExpressionParsingFunction : EmptyParsingFunction<Expression>() {
 
             if (member !is Identifier && member !is CallExpression) {
                 throw UnexpectedTokenException(
-                    translatable("meazy:parser.exception.member_expression")
+                    translatable("parser.exception.member_expression")
                 )
             }
 

@@ -15,18 +15,18 @@ val runCommand = Command("run") {
             val file = File(getArgument(targetArg))
             if (file.isDirectory() || !file.exists()) {
                 return@executes CommandResult.Failure(
-                    translatable("meazy:file.doesnt_exist", file.absolutePath)
+                    translatable("file.doesnt_exist", file.absolutePath)
                 )
             }
 
             val extension = file.extension
             if (extension != "mea") {
                 return@executes CommandResult.Failure(
-                    translatable("meazy:file.unsupported_extension", extension)
+                    translatable("file.unsupported_extension", extension)
                 )
             }
 
-            Logger.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
+            Logger.log(LogLevel.INFO, translatable("commands.run.running", file.absolutePath))
             val startMillis = System.currentTimeMillis()
 
             val tokens = RuntimeFunctions.tokenize(file.readText())
@@ -37,7 +37,7 @@ val runCommand = Command("run") {
 
             val endMillis = System.currentTimeMillis()
             return@executes CommandResult.Success(
-                translatable("meazy:commands.run.info", (endMillis - startMillis).toDouble() / 1000)
+                translatable("commands.run.info", (endMillis - startMillis).toDouble() / 1000)
             )
         }
     }

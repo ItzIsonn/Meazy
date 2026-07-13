@@ -14,16 +14,16 @@ import me.itzisonn_.meazy.util.text.translatable
 object ConstructorDeclarationStatementParsingFunction : ParsingFunction<ConstructorDeclarationStatement, Set<Modifier>> {
     override fun Parser.parse(data: Set<Modifier>): ConstructorDeclarationStatement {
         val modifiers = data
-        consume(constructor, translatable("meazy:parser.expected.keyword", "constructor"))
+        consume(constructor, translatable("parser.expected.keyword", "constructor"))
 
         val parameters = parseParameters()
         if (!isNext(leftBrace)) {
             return ConstructorDeclarationStatement(modifiers, parameters, mutableListOf())
         }
 
-        consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "constructor_body"))
+        consume(leftBrace, translatable("parser.expected.start", "left_brace", "constructor_body"))
         val body = parseBody()
-        consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "constructor_body"))
+        consume(rightBrace, translatable("parser.expected.end", "right_brace", "constructor_body"))
 
         return ConstructorDeclarationStatement(modifiers, parameters, body)
     }

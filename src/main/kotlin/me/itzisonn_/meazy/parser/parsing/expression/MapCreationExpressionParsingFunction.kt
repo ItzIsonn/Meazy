@@ -18,7 +18,7 @@ object MapCreationExpressionParsingFunction : EmptyParsingFunction<Expression>()
 
             while (!isNext(rightBrace)) {
                 val key = parse(ListCreationExpressionParsingFunction)
-                consume(assign, translatable("meazy:parser.expected.separator_expression", "assign", "map_creation"))
+                consume(assign, translatable("parser.expected.separator_expression", "assign", "map_creation"))
 
                 val value = parse(ExpressionParsingFunction)
                 map[key] = value
@@ -26,14 +26,14 @@ object MapCreationExpressionParsingFunction : EmptyParsingFunction<Expression>()
                 if (!isNext(rightBrace)) {
                     consume(
                         comma,
-                        translatable("meazy:parser.expected.separator_expression", "comma", "map_creation")
+                        translatable("parser.expected.separator_expression", "comma", "map_creation")
                     )
                 }
             }
 
             consume(
                 rightBrace,
-                translatable("meazy:parser.expected.end_expression", "right_brace", "map_creation")
+                translatable("parser.expected.end_expression", "right_brace", "map_creation")
             )
             return MapCreationExpression(map)
         }

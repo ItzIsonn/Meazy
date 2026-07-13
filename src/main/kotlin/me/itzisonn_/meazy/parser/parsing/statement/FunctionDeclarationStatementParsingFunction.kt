@@ -26,14 +26,14 @@ object FunctionDeclarationStatementParsingFunction : PairParsingFunction<Functio
         val modifiers = first.toMutableSet()
         val canBeAbstractWithoutModifier = second
 
-        consume(function, translatable("meazy:parser.expected.keyword", "function"))
+        consume(function, translatable("parser.expected.keyword", "function"))
 
         var classId: String? = null
-        var functionId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "function")).value
+        var functionId = consume(id, translatable("parser.expected.after_keyword", "id", "function")).value
         if (isNext(dot)) {
             consume(dot, null)
             classId = functionId
-            functionId = consume(id, translatable("meazy:parser.expected", "id")).value
+            functionId = consume(id, translatable("parser.expected", "id")).value
         }
 
         val parameters = parseParameters()
@@ -54,9 +54,9 @@ object FunctionDeclarationStatementParsingFunction : PairParsingFunction<Functio
             returnDataTypeValue = expression
         }
         else {
-            consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "function_body"))
+            consume(leftBrace, translatable("parser.expected.start", "left_brace", "function_body"))
             body = parseBody()
-            consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "function_body"))
+            consume(rightBrace, translatable("parser.expected.end", "right_brace", "function_body"))
             returnDataTypeValue = null
         }
 

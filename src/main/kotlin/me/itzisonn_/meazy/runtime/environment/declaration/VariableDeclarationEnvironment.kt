@@ -38,7 +38,7 @@ open class VariableDeclarationEnvironmentImpl(parent: Environment) : Environment
 
     override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue {
         if (getVariable(id) != null) {
-            throw EvaluationException(translatable("meazy:runtime.variable.already_exists", id))
+            throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
         val variableValue = VariableValue(id, type, isConstant, setOf(), -1, value, this)

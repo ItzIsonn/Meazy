@@ -14,7 +14,7 @@ object IsExpressionParsingFunction : EmptyParsingFunction<Expression>() {
 
         if (isNext(`is`)) {
             val isLike = consume(`is`, null).value == "islike"
-            val id = consume(TokenTypes.id, translatable("meazy:parser.expected.after_keyword", "id", "is")).value
+            val id = consume(TokenTypes.id, translatable("parser.expected.after_keyword", "id", "is")).value
             return IsExpression(value, id, isLike)
         }
 

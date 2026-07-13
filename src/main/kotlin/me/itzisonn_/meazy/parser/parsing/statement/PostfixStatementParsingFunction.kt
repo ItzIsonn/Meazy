@@ -15,7 +15,7 @@ object PostfixStatementParsingFunction : EmptyParsingFunction<AssignmentStatemen
         val left = parse(ExpressionParsingFunction)
         val token = consume(
             operatorPostfix,
-            translatable("meazy:parser.expected.end_statement", "operator_postfix", "postfix_statement")
+            translatable("parser.expected.end_statement", "operator_postfix", "postfix_statement")
         )
 
         val value = OperatorExpression(

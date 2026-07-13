@@ -34,6 +34,6 @@ object ClassBodyStatementParsingFunction : EmptyParsingFunction<Statement>() {
             )
         }
 
-        throw InvalidStatementException(translatable("meazy:parser.expected.statement", "class_body"))
+        throw InvalidStatementException(translatable("parser.expected.statement", "class_body"))
     }
 }

@@ -38,7 +38,7 @@ object MeazyMain {
         Logger.log(
             LogLevel.INFO,
             translatable(
-                "meazy:commands.loaded_info",
+                "commands.loaded_info",
                 (endLoadMillis - startLoadMillis) / 1000.toDouble()
             )
         )
@@ -51,7 +51,7 @@ object MeazyMain {
 
         val command = Commands.get(args[0])
         if (command == null) {
-            Logger.log(LogLevel.ERROR, translatable("meazy:commands.unknown", args[0]))
+            Logger.log(LogLevel.ERROR, translatable("commands.unknown", args[0]))
             showAvailableCommandsList()
             return
         }
@@ -69,7 +69,7 @@ object MeazyMain {
     }
 
     private fun showAvailableCommandsList() {
-        Logger.log(LogLevel.INFO, translatable("meazy:commands.available"))
+        Logger.log(LogLevel.INFO, translatable("commands.available"))
 
         for (command in Commands.getAll()) {
             var argsString = ""
@@ -114,7 +114,7 @@ object MeazyMain {
 
         val stringLanguage = settings.language
         val language = TranslationLanguages.get(stringLanguage)
-        if (language == null) Logger.log(LogLevel.ERROR, translatable("meazy:settings.unknown_language", stringLanguage))
+        if (language == null) Logger.log(LogLevel.ERROR, translatable("settings.unknown_language", stringLanguage))
         else TranslationsBundle.setLanguage(language)
     }
 }

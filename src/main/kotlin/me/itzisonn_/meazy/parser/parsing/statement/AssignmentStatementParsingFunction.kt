@@ -31,6 +31,6 @@ object AssignmentStatementParsingFunction : EmptyParsingFunction<AssignmentState
             return AssignmentStatement(left, value)
         }
 
-        throw UnexpectedTokenException(translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
+        throw UnexpectedTokenException(translatable("parser.expected.separator_statement", "assign", "assignment"))
     }
 }

@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.util.text.translatable
 val versionCommand = Command("version") {
     executes {
         return@executes CommandResult.Success(
-            translatable("meazy:commands.version", MeazyMain.VERSION)
+            translatable("commands.version", MeazyMain.VERSION)
         )
     }
 }

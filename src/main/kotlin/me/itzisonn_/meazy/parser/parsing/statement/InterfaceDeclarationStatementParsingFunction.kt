@@ -18,18 +18,18 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
     override fun Parser.parse(data: Set<Modifier>): InterfaceDeclarationStatement {
         val modifiers = data
 
-        consume(`interface`, translatable("meazy:parser.expected.keyword", "interface"))
-        val interfaceId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "interface")).value
+        consume(`interface`, translatable("parser.expected.keyword", "interface"))
+        val interfaceId = consume(id, translatable("parser.expected.after_keyword", "id", "interface")).value
 
         val baseClasses = mutableSetOf<String>()
 
         if (isNext(colon)) {
             consume(colon, null)
-            baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
+            baseClasses.add(consume(id, translatable("parser.expected", "id")).value)
 
             while (isNext(comma)) {
                 consume(comma, null)
-                baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
+                baseClasses.add(consume(id, translatable("parser.expected", "id")).value)
             }
         }
 
@@ -37,14 +37,14 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
             return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
         }
 
-        consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "interface_body"))
+        consume(leftBrace, translatable("parser.expected.start", "left_brace", "interface_body"))
 
         if (isNext(rightBrace)) {
             consume(rightBrace, null)
             return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
         }
 
-        consume(newLine, translatable("meazy:parser.expected", "new_line"))
+        consume(newLine, translatable("parser.expected", "new_line"))
 
         val body = mutableListOf<Statement>()
         while (!isEndOfFile() && !isNext(rightBrace)) {
@@ -52,7 +52,7 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
             body.add(statement)
         }
 
-        consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "interface_body"))
+        consume(rightBrace, translatable("parser.expected.end", "right_brace", "interface_body"))
         return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, body)
     }
 }
