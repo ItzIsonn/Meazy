@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.expression
 
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
-import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression
 import me.itzisonn_.meazy.parser.ast.expression.Expression
@@ -17,7 +16,6 @@ object CallExpressionParsingFunction : ParsingFunction<Expression> {
         if (isNext(leftParenthesis)) {
             if (expression !is Identifier) {
                 throw InvalidSyntaxException(
-                    current.line,
                     translatable("meazy:parser.exception.call_not_identifier")
                 )
             }

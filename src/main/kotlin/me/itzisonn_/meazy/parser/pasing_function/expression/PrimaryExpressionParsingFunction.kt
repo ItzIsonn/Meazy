@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.number
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.string
 import me.itzisonn_.meazy.lexer.TokenTypes.`this`
-import me.itzisonn_.meazy.parser.InvalidStatementException
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
@@ -22,10 +21,8 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
     override fun Parser.parse(vararg extra: Any?): Expression {
-        val token = current
-
         if (isNext(id)) {
-            gotoNext(id)
+            find(id, null)
 
             if (size > pos + 1 && this[pos + 1].type == leftParenthesis) {
                 val id = consume().value
@@ -62,6 +59,6 @@ object PrimaryExpressionParsingFunction : ParsingFunction<Expression> {
             return value
         }
 
-        throw InvalidStatementException(token.line, translatable("meazy:parser.exception.cant_parse", token.type.id))
+        throw InvalidStatementException(translatable("meazy:parser.exception.cant_parse", this[pos].type.id))
     }
 }

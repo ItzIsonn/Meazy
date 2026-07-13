@@ -18,8 +18,8 @@ object ImportStatementParsingFunction : ParsingFunction<ImportStatement> {
             ).value
         )
 
-        while (current.type == dot) {
-            consume()
+        while (isNext(dot)) {
+            consume(dot, null)
             name.append(".")
             name.append(consume(id, translatable("meazy:parser.expected", "id")).value)
         }

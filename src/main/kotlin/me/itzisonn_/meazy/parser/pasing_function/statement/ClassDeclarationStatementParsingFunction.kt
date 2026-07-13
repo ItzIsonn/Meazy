@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.parser.pasing_function.statement
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
-import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
@@ -12,7 +11,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`class`
 import me.itzisonn_.meazy.parser.DataType
 import me.itzisonn_.meazy.parser.DataType.Companion.ofNonNull
 import me.itzisonn_.meazy.parser.DataType.Companion.ofNullable
-import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.Parameter
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.*
@@ -53,10 +51,11 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         }
 
         val baseClasses = mutableSetOf<String>()
-        var baseClassesLineNumber = -1
 
         if (isNext(colon)) {
-            baseClassesLineNumber = current.line
+            if (enum in modifiers) throw InvalidSyntaxException(
+                translatable("meazy:parser.exception.enums.base_classes")
+            )
 
             consume(colon, null)
             baseClasses.add(consume(id, translatable("meazy:parser.expected", "id")).value)
@@ -82,11 +81,6 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
 
         val enumIds = mutableMapOf<String, List<Expression>>()
         if (enum in modifiers) {
-            if (!baseClasses.isEmpty()) throw InvalidSyntaxException(
-                baseClassesLineNumber,
-                translatable("meazy:parser.exception.enums.base_classes")
-            )
-
             var enumId = consume(id, translatable("meazy:parser.expected", "id")).value
             var args = if (isNext(leftParenthesis)) parseArgs() else mutableListOf()
             enumIds[enumId] = args
@@ -94,10 +88,8 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             while (isNext(comma)) {
                 consume(comma, null)
 
-                val lineNumber = current.line
                 enumId = consume(id, translatable("meazy:parser.expected", "id")).value
                 if (enumIds.containsKey(enumId)) throw InvalidSyntaxException(
-                    lineNumber,
                     translatable("meazy:parser.exception.enums.duplicated_entries")
                 )
 
@@ -107,7 +99,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         }
 
         val body = generatedBody.toMutableList()
-        while (current.type != endOfFile && !isNext(rightBrace)) {
+        while (!isEndOfFile() && !isNext(rightBrace)) {
             val statement = parse(ClassBodyStatementParsingFunction)
             body.add(statement)
 

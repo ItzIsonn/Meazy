@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
-import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ForeachStatement
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
@@ -28,9 +27,7 @@ object ForeachStatementParsingFunction : ParsingFunction<ForeachStatement> {
         val isConstant = consume(variable, translatable("meazy:parser.expected.keyword", "variable")).value == "val"
         val id = consume(TokenTypes.id, translatable("meazy:parser.expected", "id")).value
 
-        val lineNumber = current.line
         val dataType = parseDataType() ?: throw InvalidSyntaxException(
-            lineNumber,
             translatable("meazy:parser.exception.foreach_variable_without_datatype")
         )
 

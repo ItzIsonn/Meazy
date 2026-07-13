@@ -33,8 +33,8 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
 
         var classId: String? = null
         var functionId = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "function")).value
-        if (current.type == dot) {
-            consume()
+        if (isNext(dot)) {
+            consume(dot, null)
             classId = functionId
             functionId = consume(id, translatable("meazy:parser.expected", "id")).value
         }
@@ -42,7 +42,7 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
         val parameters = parseParameters()
         val dataType = parseDataType()
 
-        if (abstract in modifiers || (canBeAbstractWithoutModifier && current.type == newLine)) {
+        if (abstract in modifiers || (canBeAbstractWithoutModifier && isNext(newLine))) {
             modifiers.add(abstract)
             return FunctionDeclarationStatement(modifiers, functionId, parameters, mutableListOf(), dataType)
         }
@@ -50,8 +50,8 @@ object FunctionDeclarationStatementParsingFunction : ParsingFunction<FunctionDec
         val body: List<LocalStatement>
         val returnDataTypeValue: Expression?
 
-        if (current.type == assign) {
-            consume()
+        if (isNext(assign)) {
+            consume(assign, null)
             val expression = parse(ExpressionParsingFunction)
             body = listOf(ReturnStatement(expression))
             returnDataTypeValue = expression

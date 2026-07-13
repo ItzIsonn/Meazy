@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.parser.pasing_function.expression
 import me.itzisonn_.meazy.lexer.TokenTypeSets.memberAccess
 import me.itzisonn_.meazy.lexer.TokenTypes.questionDot
 import me.itzisonn_.meazy.parser.Parser
-import me.itzisonn_.meazy.parser.UnexpectedTokenException
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
@@ -21,7 +20,6 @@ object MemberExpressionParsingFunction : ParsingFunction<Expression> {
 
             if (member !is Identifier && member !is CallExpression) {
                 throw UnexpectedTokenException(
-                    current,
                     translatable("meazy:parser.exception.member_expression")
                 )
             }

@@ -8,8 +8,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`if`
 import me.itzisonn_.meazy.lexer.TokenTypes.`return`
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.lexer.TokenTypes.`while`
-import me.itzisonn_.meazy.parser.InvalidStatementException
-import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
@@ -32,7 +30,6 @@ object LocalStatementParsingFunction : ParsingFunction<LocalStatement> {
             )
         }
         if (!modifiers.isEmpty()) throw InvalidSyntaxException(
-            current.line,
             translatable("meazy:parser.modifier.unexpected")
         )
 
@@ -51,10 +48,7 @@ object LocalStatementParsingFunction : ParsingFunction<LocalStatement> {
             is CallExpression -> expression
             is MemberExpression -> expression
             is OperatorExpression -> expression
-            else -> throw InvalidStatementException(
-                current.line,
-                translatable("meazy:parser.exception.statement")
-            )
+            else -> throw InvalidStatementException(translatable("meazy:parser.exception.statement"))
         }
     }
 }
