@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.parser.pasing_function.statement
 
 import me.itzisonn_.meazy.MeazyMain.VERSION
-import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.UnexpectedTokenException
@@ -31,10 +30,10 @@ object ProgramParsingFunction : ParsingFunction<Program> {
             body.add(headerStatement)
         }
 
-        while (current.type != endOfFile) {
+        while (!isEndOfFile()) {
             body.add(parse(GlobalStatementParsingFunction))
 
-            if (current.type != endOfFile) {
+            if (!isEndOfFile()) {
                 consume(newLine, translatable("meazy:parser.expected", "new_line"))
             }
         }

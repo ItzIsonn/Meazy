@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.parser.pasing_function.statement
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
-import me.itzisonn_.meazy.parser.InvalidSyntaxException
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement
@@ -27,7 +26,6 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
 
         if (!isNext(assign)) {
             if (dataType == null) throw InvalidSyntaxException(
-                current.line,
                 translatable("meazy:parser.exception.variable_without_datatype_and_value")
             )
 
@@ -39,7 +37,6 @@ object VariableDeclarationStatementParsingFunction : ParsingFunction<VariableDec
                 null
             )
             if (isConstant) throw InvalidSyntaxException(
-                current.line,
                 translatable("meazy:parser.exception.constant_without_value")
             )
             return VariableDeclarationStatement(modifiers, false, variableId, dataType, NullLiteral())

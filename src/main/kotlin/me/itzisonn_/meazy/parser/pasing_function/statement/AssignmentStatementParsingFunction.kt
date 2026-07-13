@@ -3,7 +3,6 @@ package me.itzisonn_.meazy.parser.pasing_function.statement
 import me.itzisonn_.meazy.lexer.TokenTypeSets.operatorAssign
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.parser.Parser
-import me.itzisonn_.meazy.parser.UnexpectedTokenException
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
 import me.itzisonn_.meazy.parser.operator.OperatorType
@@ -32,6 +31,6 @@ object AssignmentStatementParsingFunction : ParsingFunction<AssignmentStatement>
             return AssignmentStatement(left, value)
         }
 
-        throw UnexpectedTokenException(current, translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
+        throw UnexpectedTokenException(translatable("meazy:parser.expected.separator_statement", "assign", "assignment"))
     }
 }

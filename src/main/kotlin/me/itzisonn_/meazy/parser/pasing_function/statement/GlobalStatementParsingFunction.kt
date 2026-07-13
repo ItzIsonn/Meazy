@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`class`
 import me.itzisonn_.meazy.lexer.TokenTypes.function
 import me.itzisonn_.meazy.lexer.TokenTypes.`interface`
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
-import me.itzisonn_.meazy.parser.InvalidStatementException
 import me.itzisonn_.meazy.parser.Parser
 import me.itzisonn_.meazy.parser.ast.statement.*
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
@@ -45,6 +44,6 @@ object GlobalStatementParsingFunction : ParsingFunction<Statement> {
             )
         }
 
-        throw InvalidStatementException(current.line, translatable("meazy:parser.exception.global_statement"))
+        throw InvalidStatementException(translatable("meazy:parser.exception.global_statement"))
     }
 }

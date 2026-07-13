@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.pasing_function
 
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
-import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
@@ -27,14 +26,12 @@ fun Parser.parseModifiers(): Set<Modifier> {
     val modifiers = mutableSetOf<Modifier>()
 
     while (isNext(id)) {
-        gotoNext(id)
-        val id = current.value
+        val id = find(id, null).value
         val modifier = Modifiers.get(id)
 
         if (modifier == null) {
             if (modifiers.isEmpty()) return modifiers
             throw InvalidStatementException(
-                current.line,
                 translatable("meazy:parser.modifier.doesnt_exist", id)
             )
         }
@@ -61,19 +58,10 @@ fun getModifiersFromExtra(extra: Array<out Any?>): Set<Modifier> {
 }
 
 private fun Parser.parseParameter(): Parameter {
-    if (!isNext(variable)) {
-        throw UnexpectedTokenException(
-            current,
-            translatable("meazy:parser.expected.start_expression", "variable", "parameter")
-        )
-    }
-
-    val isConstant = consume(variable, null).value == "val"
+    val isConstant = consume(variable, translatable("meazy:parser.expected.start_expression", "variable", "parameter")).value == "val"
     val id = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "variable")).value
 
-    val lineNumber = current.line
     val dataType = parseDataType() ?: throw InvalidSyntaxException(
-        lineNumber,
         translatable("meazy:parser.exception.parameter_without_datatype")
     )
 
@@ -144,7 +132,7 @@ fun Parser.parseBody(): List<LocalStatement> {
     val body = mutableListOf<LocalStatement>()
     consume(newLine, translatable("meazy:parser.expected", "new_line"))
 
-    while (current.type != endOfFile && !isNext(rightBrace)) {
+    while (!isEndOfFile() && !isNext(rightBrace)) {
         body.add(parse(LocalStatementParsingFunction))
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
     }
@@ -153,11 +141,11 @@ fun Parser.parseBody(): List<LocalStatement> {
 }
 
 fun Parser.parseString(): String {
-    val token = current
-    val value = consume(string, translatable("meazy:parser.expected", "string")).value
+    val stringToken = consume(string, translatable("meazy:parser.expected", "string"))
+    val value = stringToken.value
 
     if (!value.endsWith("\"")) throw InvalidStatementException(
-        token.line,
+        stringToken.line,
         translatable("meazy:parser.exception.string_quote_not_closed", value.substring(1))
     )
 

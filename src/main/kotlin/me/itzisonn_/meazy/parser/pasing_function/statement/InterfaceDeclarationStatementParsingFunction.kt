@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.pasing_function.statement
 
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
-import me.itzisonn_.meazy.lexer.TokenTypes.endOfFile
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
 import me.itzisonn_.meazy.lexer.TokenTypes.`interface`
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
@@ -48,7 +47,7 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
         consume(newLine, translatable("meazy:parser.expected", "new_line"))
 
         val body = mutableListOf<Statement>()
-        while (current.type != endOfFile && !isNext(rightBrace)) {
+        while (!isEndOfFile() && !isNext(rightBrace)) {
             val statement = parse(InterfaceBodyStatementParsingFunction)
             body.add(statement)
         }

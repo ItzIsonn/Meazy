@@ -14,7 +14,7 @@ object ReturnStatementParsingFunction : ParsingFunction<ReturnStatement> {
         consume(`return`, translatable("meazy:parser.expected.keyword", "return"))
 
         var expression: Expression? = null
-        if (current.type != newLine) {
+        if (!isNext(newLine)) {
             expression = parse(ExpressionParsingFunction)
         }
 

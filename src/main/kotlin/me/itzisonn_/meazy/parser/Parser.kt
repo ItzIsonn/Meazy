@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.lexer.Token
 import me.itzisonn_.meazy.lexer.TokenBehaviour
 import me.itzisonn_.meazy.lexer.TokenType
 import me.itzisonn_.meazy.lexer.TokenTypeSet
+import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.pasing_function.ParsingFunction
 import me.itzisonn_.meazy.util.text.Text
@@ -30,24 +31,22 @@ class Parser(tokens: List<Token>) {
     /**
      * @return Token at position [pos]
      */
-    val current get() = tokens[pos]
+    private val current get() = tokens[pos]
 
     /**
      * @return Token at position [i]
      */
     operator fun get(i: Int) = tokens[i]
 
+    fun isEndOfFile() = current.type == TokenTypes.endOfFile
+
 
 
     /**
-     * Returns token at current position and increments position by 1\
+     * Returns token at current position and increments position by 1
      * @return Token at [pos] in tokens
      */
-    fun consume(): Token {
-        val token = current
-        pos++
-        return token
-    }
+    fun consume() = current.also { pos++ }
 
     /**
      * Returns token at current position increments position by 1
@@ -61,7 +60,7 @@ class Parser(tokens: List<Token>) {
     fun consume(tokenType: TokenType, text: Text?): Token {
         while (current.type != tokenType) {
             if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
-            else throw UnexpectedTokenException(current, text)
+            else throw UnexpectedTokenException(text)
         }
 
         return consume()
@@ -79,7 +78,7 @@ class Parser(tokens: List<Token>) {
     fun consume(tokenTypeSet: TokenTypeSet, text: Text?): Token {
         while (current.type !in tokenTypeSet.getTokenTypes()) {
             if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
-            else throw UnexpectedTokenException(current, text)
+            else throw UnexpectedTokenException(text)
         }
 
         return consume()
@@ -115,12 +114,27 @@ class Parser(tokens: List<Token>) {
         return true
     }
 
-    fun gotoNext(tokenType: TokenType) {
+    /** TODO
+     * Returns token at current position increments position by 1
+     *
+     * @param tokenType Required TokenType
+     * @param text      Exception's text
+     * @return Token at [pos] in tokens
+     *
+     * @throws UnexpectedTokenException If token's type doesn't match required
+     */
+    fun find(tokenType: TokenType, text: Text?): Token {
         while (current.type != tokenType) {
             if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
-            else throw UnexpectedTokenException(current, null) //TODO
+            else throw UnexpectedTokenException(text)
         }
+
+        return current
     }
+
+    fun UnexpectedTokenException(text: Text?) = UnexpectedTokenException(current, text)
+    fun InvalidStatementException(text: Text) = InvalidStatementException(current.line, text)
+    fun InvalidSyntaxException(text: Text) = InvalidSyntaxException(current.line, text)
 
 
 
