@@ -12,8 +12,8 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement
-import me.itzisonn_.meazy.parser.modifier.Modifier
-import me.itzisonn_.meazy.parser.modifier.Modifiers.abstract
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifiers.abstract
 import me.itzisonn_.meazy.parser.parsing.PairParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseBody

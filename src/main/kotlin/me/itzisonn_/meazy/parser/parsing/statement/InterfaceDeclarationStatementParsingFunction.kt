@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.InterfaceDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.Statement
-import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.parser.parsing.ParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
 

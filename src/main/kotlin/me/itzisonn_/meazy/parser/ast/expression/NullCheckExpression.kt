@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.boxPrimitive
-import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.instruction.boxed

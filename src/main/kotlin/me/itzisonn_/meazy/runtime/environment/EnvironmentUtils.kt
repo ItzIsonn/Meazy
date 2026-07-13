@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.DataType
-import me.itzisonn_.meazy.runtime.VariableValue
+import me.itzisonn_.meazy.runtime.data.DataType
+import me.itzisonn_.meazy.runtime.data.VariableValue
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment

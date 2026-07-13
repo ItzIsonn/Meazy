@@ -4,8 +4,8 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.parser.modifier.Modifier
-import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.*
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import java.lang.classfile.attribute.InnerClassInfo

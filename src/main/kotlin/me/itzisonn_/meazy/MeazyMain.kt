@@ -13,8 +13,8 @@ import me.itzisonn_.meazy.util.text.literal
 import me.itzisonn_.meazy.util.text.translatable
 import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
-import me.itzisonn_.meazy.parser.modifier.Modifiers
-import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.operator.Operators
 import me.itzisonn_.meazy.util.text.Languages
 import me.itzisonn_.meazy.util.version.Version
 

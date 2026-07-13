@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.parser.ast.expression.literal.NumberLiteral
 import me.itzisonn_.meazy.parser.ast.statement.AssignmentStatement
-import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.data.operator.OperatorType
 import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.util.text.translatable
