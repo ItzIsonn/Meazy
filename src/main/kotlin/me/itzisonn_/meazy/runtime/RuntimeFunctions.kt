@@ -6,9 +6,9 @@ import me.itzisonn_.meazy.lexer.Token
 import me.itzisonn_.meazy.lexer.TokenBehaviour
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.UnknownTokenException
-import me.itzisonn_.meazy.parser.Parser
+import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.Program
-import me.itzisonn_.meazy.parser.pasing_function.statement.ProgramParsingFunction
+import me.itzisonn_.meazy.parser.parsing.statement.ProgramParsingFunction
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import java.io.File
 import java.lang.constant.ClassDesc
