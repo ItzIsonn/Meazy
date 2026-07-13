@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.parser.parsing
 
 import me.itzisonn_.meazy.lexer.Token
-import me.itzisonn_.meazy.lexer.TokenBehaviour
+import me.itzisonn_.meazy.lexer.TokenBehavior
 import me.itzisonn_.meazy.lexer.TokenType
 import me.itzisonn_.meazy.lexer.TokenTypeSet
 import me.itzisonn_.meazy.lexer.TokenTypes
@@ -44,7 +44,7 @@ class Parser(tokens: List<Token>) {
 
 
     /**
-     * Skips all tokens with [TokenBehaviour.IGNORE] until finds token
+     * Skips all tokens with [TokenBehavior.IGNORE] until finds token
      * with [tokenType], and then increments position by 1
      *
      * @param tokenType Required TokenType
@@ -55,7 +55,7 @@ class Parser(tokens: List<Token>) {
      */
     fun consume(tokenType: TokenType, text: Text?): Token {
         while (current.type != tokenType) {
-            if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
+            if (current.type.behavior == TokenBehavior.IGNORE) pos++
             else throw UnexpectedTokenException(text)
         }
 
@@ -63,7 +63,7 @@ class Parser(tokens: List<Token>) {
     }
 
     /**
-     * Skips all tokens with [TokenBehaviour.IGNORE] until finds token
+     * Skips all tokens with [TokenBehavior.IGNORE] until finds token
      * that's in [tokenTypeSet], and then increments position by 1
      *
      * @param tokenTypeSet Required TokenTypeSet
@@ -74,7 +74,7 @@ class Parser(tokens: List<Token>) {
      */
     fun consume(tokenTypeSet: TokenTypeSet, text: Text?): Token {
         while (current.type !in tokenTypeSet.getTokenTypes()) {
-            if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
+            if (current.type.behavior == TokenBehavior.IGNORE) pos++
             else throw UnexpectedTokenException(text)
         }
 
@@ -85,7 +85,7 @@ class Parser(tokens: List<Token>) {
 
     /**
      * Checks whether type of next token is [tokenType]
-     * while skipping all tokens with [TokenBehaviour.IGNORE]
+     * while skipping all tokens with [TokenBehavior.IGNORE]
      *
      * @param tokenType Required TokenTypeSet
      * @return Whether type of next token is [tokenType]
@@ -94,7 +94,7 @@ class Parser(tokens: List<Token>) {
         val prevPos = pos
 
         while (current.type != tokenType) {
-            if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
+            if (current.type.behavior == TokenBehavior.IGNORE) pos++
             else {
                 pos = prevPos
                 return false
@@ -107,7 +107,7 @@ class Parser(tokens: List<Token>) {
 
     /**
      * Checks whether next token is in [tokenTypeSet]
-     * while skipping all tokens with [TokenBehaviour.IGNORE]
+     * while skipping all tokens with [TokenBehavior.IGNORE]
      *
      * @param tokenTypeSet Required TokenTypeSet
      * @return Whether next token is in [tokenTypeSet]
@@ -116,7 +116,7 @@ class Parser(tokens: List<Token>) {
         val prevPos = pos
 
         while (current.type !in tokenTypeSet) {
-            if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
+            if (current.type.behavior == TokenBehavior.IGNORE) pos++
             else {
                 pos = prevPos
                 return false
@@ -128,7 +128,7 @@ class Parser(tokens: List<Token>) {
     }
 
     /**
-     * Skips all tokens with [TokenBehaviour.IGNORE] until finds token with required [TokenType]
+     * Skips all tokens with [TokenBehavior.IGNORE] until finds token with required [TokenType]
      *
      * @param tokenType Required TokenType
      * @param text      Exception's text
@@ -138,7 +138,7 @@ class Parser(tokens: List<Token>) {
      */
     fun find(tokenType: TokenType, text: Text?): Token {
         while (current.type != tokenType) {
-            if (current.type.behaviour == TokenBehaviour.IGNORE) pos++
+            if (current.type.behavior == TokenBehavior.IGNORE) pos++
             else throw UnexpectedTokenException(text)
         }
 
