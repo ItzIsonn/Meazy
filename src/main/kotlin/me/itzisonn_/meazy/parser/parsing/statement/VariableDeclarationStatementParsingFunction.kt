@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement
-import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.parser.parsing.PairParsingFunction
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseDataType

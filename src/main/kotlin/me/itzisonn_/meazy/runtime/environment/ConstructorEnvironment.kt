@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.Parameter
-import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.Parameter
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironmentImpl

@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment.declaration
 
-import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment

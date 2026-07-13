@@ -1,12 +1,12 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
-import me.itzisonn_.meazy.parser.DataType
+import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
-import me.itzisonn_.meazy.parser.operator.Operator
-import me.itzisonn_.meazy.parser.operator.OperatorType
-import me.itzisonn_.meazy.parser.operator.Operators
+import me.itzisonn_.meazy.runtime.data.operator.Operator
+import me.itzisonn_.meazy.runtime.data.operator.OperatorType
+import me.itzisonn_.meazy.runtime.data.operator.Operators
 import me.itzisonn_.meazy.runtime.environment.Environment
 
 class OperatorExpression : Expression, LocalStatement {

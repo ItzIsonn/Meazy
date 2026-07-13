@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.lexer.TokenTypeSets.addition
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
-import me.itzisonn_.meazy.parser.operator.OperatorType
+import me.itzisonn_.meazy.runtime.data.operator.OperatorType
 import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 
 object AdditionExpressionParsingFunction : EmptyParsingFunction<Expression>() {

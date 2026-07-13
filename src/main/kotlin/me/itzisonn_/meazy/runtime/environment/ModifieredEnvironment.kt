@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 
 interface ModifieredEnvironment : Environment {
     /**

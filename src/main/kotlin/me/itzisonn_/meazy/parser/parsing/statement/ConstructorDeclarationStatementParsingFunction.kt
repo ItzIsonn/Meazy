@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement
-import me.itzisonn_.meazy.parser.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.parser.parsing.ParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseBody
 import me.itzisonn_.meazy.parser.parsing.parseParameters

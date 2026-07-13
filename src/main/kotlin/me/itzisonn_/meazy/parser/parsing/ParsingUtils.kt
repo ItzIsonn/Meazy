@@ -11,15 +11,16 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.lexer.TokenTypes.string
-import me.itzisonn_.meazy.parser.*
-import me.itzisonn_.meazy.parser.DataType.Companion.ofNonNull
-import me.itzisonn_.meazy.parser.DataType.Companion.ofNullable
+import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNonNull
+import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNullable
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
-import me.itzisonn_.meazy.parser.modifier.Modifier
-import me.itzisonn_.meazy.parser.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
 import me.itzisonn_.meazy.parser.parsing.statement.LocalStatementParsingFunction
+import me.itzisonn_.meazy.runtime.data.DataType
+import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ClassDesc
 

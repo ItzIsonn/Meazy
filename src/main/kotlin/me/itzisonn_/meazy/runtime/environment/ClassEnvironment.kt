@@ -1,9 +1,9 @@
 package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.parser.DataType
-import me.itzisonn_.meazy.parser.modifier.Modifier
-import me.itzisonn_.meazy.parser.modifier.Modifiers
-import me.itzisonn_.meazy.runtime.VariableValue
+import me.itzisonn_.meazy.runtime.data.DataType
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.VariableValue
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
