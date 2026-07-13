@@ -162,7 +162,7 @@ private class ClassEnvironmentImpl(
 
 
 
-/** TODO javadoc for baseclass
+/** TODO Javadoc for baseclass
  * Creates class environment
  *
  * @param parent Parent

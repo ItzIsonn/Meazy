@@ -21,7 +21,7 @@ abstract class Modifier(val id: String) {
      * @param environment        Environment that has ModifierStatement in it
      * @param identifier         Identifier
      * @param hasModifier        Whether object with given identifier has this modifier
-     * @return Whether can access object (variable, function, class, etc.) with given identifier in given environment from requestEnvironment
+     * @return Whether object (variable, function, class, etc.) with [identifier] is accessible in [environment] from [requestEnvironment]
      */
     abstract fun canAccess(
         requestEnvironment: Environment,
