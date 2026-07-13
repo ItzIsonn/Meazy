@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.util.logger.Logger
  * Represents translations bundle
  */
 object TranslationsBundle {
-    private var language = Languages.get("en")!!
+    private var language = TranslationLanguages.get("en")!!
     private val translations = mutableMapOf<String, String>()
 
     init {
@@ -23,7 +23,7 @@ object TranslationsBundle {
      *
      * @param language New language
      */
-    fun setLanguage(language: Language) {
+    fun setLanguage(language: TranslationLanguage) {
         this.language = language
         updateTranslations()
     }
@@ -61,14 +61,5 @@ object TranslationsBundle {
      */
     fun getTranslation(key: String): String? {
         return translations[key]
-    }
-
-    /**
-     * @param key Translation key
-     * @param fallback Translation fallback
-     * @return Translation that corresponds to given key or given fallback if it's null
-     */
-    fun getTranslationOrDefault(key: String, fallback: String): String {
-        return translations.getOrDefault(key, fallback)
     }
 }

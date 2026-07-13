@@ -3,11 +3,11 @@ package me.itzisonn_.meazy.util.text
 /**
  * Languages registrar
  */
-object Languages {
-    private val languages = mutableSetOf<Language>()
+object TranslationLanguages {
+    private val languages = mutableSetOf<TranslationLanguage>()
     private var hasInitialized = false
 
-    fun add(language: Language) {
+    fun add(language: TranslationLanguage) {
         require(get(language.id) == null) { "Language with id '${language.id}' already exists" }
         languages += language
     }
@@ -18,7 +18,7 @@ object Languages {
         check(!hasInitialized) { "Languages have already been initialized" }
         hasInitialized = true
 
-        add(Language("en", "English"))
-        add(Language("ru", "Русский"))
+        add(TranslationLanguage("en", "English"))
+        add(TranslationLanguage("ru", "Русский"))
     }
 }
