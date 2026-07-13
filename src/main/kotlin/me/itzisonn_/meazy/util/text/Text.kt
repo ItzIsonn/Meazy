@@ -86,12 +86,7 @@ private class TranslatableText(private val key: String, args: List<String>) : Te
  * when can't find bundle with LanguageFileProvider with given id
  */
 fun translatable(key: String, vararg args: Any): Text {
-    val parts = key.split(":".toRegex()).dropLastWhile { it.isEmpty() }
-    require(parts.size == 2) { "Invalid translation key $key" }
-
-    val translationKey = parts[1]
-
-    return TranslatableText(translationKey, convertArgs(*args))
+    return TranslatableText(key, convertArgs(*args))
 }
 
 

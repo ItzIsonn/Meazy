@@ -18,20 +18,20 @@ val compileAndRunCommand = Command("compile_and_run") {
                 val file = File(getArgument(targetArg))
                 if (file.isDirectory() || !file.exists()) {
                     return@executes CommandResult.Failure(
-                        translatable("meazy:file.doesnt_exist", file.absolutePath)
+                        translatable("file.doesnt_exist", file.absolutePath)
                     )
                 }
 
                 val extension = file.extension
                 if (extension != "mea") {
                     return@executes CommandResult.Failure(
-                        translatable("meazy:file.unsupported_extension", extension)
+                        translatable("file.unsupported_extension", extension)
                     )
                 }
 
                 Logger.log(
                     LogLevel.INFO,
-                    translatable("meazy:commands.compile.compiling", file.absolutePath)
+                    translatable("commands.compile.compiling", file.absolutePath)
                 )
                 val startCompileMillis = System.currentTimeMillis()
 
@@ -43,7 +43,7 @@ val compileAndRunCommand = Command("compile_and_run") {
                 if (!outputDirectory.exists()) {
                     if (!outputDirectory.mkdirs()) {
                         return@executes CommandResult.Failure(
-                            translatable("meazy:file.cant_create", outputDirectory.absolutePath)
+                            translatable("file.cant_create", outputDirectory.absolutePath)
                         )
                     }
                 }
@@ -63,16 +63,16 @@ val compileAndRunCommand = Command("compile_and_run") {
                 val endCompileMillis = System.currentTimeMillis()
                 Logger.log(
                     LogLevel.INFO,
-                    translatable("meazy:commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
+                    translatable("commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
                 )
 
-                Logger.log(LogLevel.INFO, translatable("meazy:commands.run.running", file.absolutePath))
+                Logger.log(LogLevel.INFO, translatable("commands.run.running", file.absolutePath))
                 val startRunMillis = System.currentTimeMillis()
                 RuntimeFunctions.loadClassesAndRun(classes)
 
                 val endRunMillis = System.currentTimeMillis()
                 return@executes CommandResult.Success(
-                    translatable("meazy:commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)
+                    translatable("commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)
                 )
             }
         }

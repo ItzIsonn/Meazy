@@ -29,7 +29,7 @@ object LocalStatementParsingFunction : EmptyParsingFunction<LocalStatement>() {
             )
         }
         if (!modifiers.isEmpty()) throw InvalidSyntaxException(
-            translatable("meazy:parser.modifier.unexpected")
+            translatable("parser.modifier.unexpected")
         )
 
         if (isNext(`if`)) return parse(IfStatementParsingFunction)
@@ -47,7 +47,7 @@ object LocalStatementParsingFunction : EmptyParsingFunction<LocalStatement>() {
             is CallExpression -> expression
             is MemberExpression -> expression
             is OperatorExpression -> expression
-            else -> throw InvalidStatementException(translatable("meazy:parser.exception.statement"))
+            else -> throw InvalidStatementException(translatable("parser.exception.statement"))
         }
     }
 }

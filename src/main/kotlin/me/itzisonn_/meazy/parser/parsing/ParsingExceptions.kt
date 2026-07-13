@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.util.text.translatable
 sealed class ParsingException(text: Text) : TextException(text)
 
 class UnexpectedTokenException(token: Token, text: Text?) : ParsingException(
-    translatable("meazy:parser.unexpected_token", token.type.id, token.line).run {
+    translatable("parser.unexpected_token", token.type.id, token.line).run {
         if (text != null) {
             return@run append(literal(": ")).append(text)
         }
@@ -19,9 +19,9 @@ class UnexpectedTokenException(token: Token, text: Text?) : ParsingException(
 )
 
 class InvalidStatementException(lineNumber: Int, text: Text) : ParsingException(
-    translatable("meazy:parser.exception.invalid_statement", lineNumber, text)
+    translatable("parser.exception.invalid_statement", lineNumber, text)
 )
 
 class InvalidSyntaxException(lineNumber: Int, text: Text) : ParsingException(
-    translatable("meazy:parser.exception.invalid_syntax", lineNumber, text)
+    translatable("parser.exception.invalid_syntax", lineNumber, text)
 )

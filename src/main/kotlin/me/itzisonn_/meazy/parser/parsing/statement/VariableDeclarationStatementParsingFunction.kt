@@ -17,13 +17,13 @@ object VariableDeclarationStatementParsingFunction : PairParsingFunction<Variabl
         val modifiers = first
         val canBeConstantWithoutValue = second
 
-        val isConstant = consume(variable, translatable("meazy:parser.expected.keyword", "variable")).value == "val"
-        val variableId = consume(id, translatable("meazy:parser.expected", "id")).value
+        val isConstant = consume(variable, translatable("parser.expected.keyword", "variable")).value == "val"
+        val variableId = consume(id, translatable("parser.expected", "id")).value
         val dataType = parseDataType()
 
         if (!isNext(assign)) {
             if (dataType == null) throw InvalidSyntaxException(
-                translatable("meazy:parser.exception.variable_without_datatype_and_value")
+                translatable("parser.exception.variable_without_datatype_and_value")
             )
 
             if (canBeConstantWithoutValue) return VariableDeclarationStatement(
@@ -34,12 +34,12 @@ object VariableDeclarationStatementParsingFunction : PairParsingFunction<Variabl
                 null
             )
             if (isConstant) throw InvalidSyntaxException(
-                translatable("meazy:parser.exception.constant_without_value")
+                translatable("parser.exception.constant_without_value")
             )
             return VariableDeclarationStatement(modifiers, false, variableId, dataType, NullLiteral())
         }
 
-        consume(assign, translatable("meazy:parser.expected.after", "assign", "id"))
+        consume(assign, translatable("parser.expected.after", "assign", "id"))
 
         return VariableDeclarationStatement(
             modifiers,

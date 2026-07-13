@@ -66,7 +66,7 @@ private class FunctionDeclarationEnvironmentImpl(
                     if (otherParameters[i].dataType != parameters[i].dataType) continue@main
                 }
 
-                throw EvaluationException(translatable("meazy:runtime.function.already_exists", functionEnvironment.id))
+                throw EvaluationException(translatable("runtime.function.already_exists", functionEnvironment.id))
             }
         }
 

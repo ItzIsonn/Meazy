@@ -23,16 +23,16 @@ object SettingsManager {
 
             if (!settingsFile.exists()) {
                 if (!settingsFile.createNewFile()) throw RuntimeException(
-                    translatable("meazy:settings.cant_load_file").toString()
+                    translatable("settings.cant_load_file").toString()
                 )
                 saveDefaultSettings(settingsFile)
             }
         }
         catch (e: URISyntaxException) {
-            throw RuntimeException(translatable("meazy:settings.cant_load_file").toString(), e)
+            throw RuntimeException(translatable("settings.cant_load_file").toString(), e)
         }
         catch (e: IOException) {
-            throw RuntimeException(translatable("meazy:settings.cant_load_file").toString(), e)
+            throw RuntimeException(translatable("settings.cant_load_file").toString(), e)
         }
 
         settings = Json.decodeFromString(SettingsDeserializer, settingsFile.readText())
@@ -40,13 +40,13 @@ object SettingsManager {
 
     private fun saveDefaultSettings(settingsFile: File) {
         val stream = MeazyMain::class.java.classLoader.getResourceAsStream("settings.json")
-            ?: throw RuntimeException(translatable("meazy:settings.cant_find_file").toString())
+            ?: throw RuntimeException(translatable("settings.cant_find_file").toString())
 
         try {
             Files.copy(stream, settingsFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
         catch (e: IOException) {
-            throw RuntimeException(translatable("meazy:settings.cant_create_file").toString(), e)
+            throw RuntimeException(translatable("settings.cant_create_file").toString(), e)
         }
     }
 }

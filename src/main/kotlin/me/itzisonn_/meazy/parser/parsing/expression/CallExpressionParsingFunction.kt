@@ -16,7 +16,7 @@ object CallExpressionParsingFunction : EmptyParsingFunction<Expression>() {
         if (isNext(leftParenthesis)) {
             if (expression !is Identifier) {
                 throw InvalidSyntaxException(
-                    translatable("meazy:parser.exception.call_not_identifier")
+                    translatable("parser.exception.call_not_identifier")
                 )
             }
 

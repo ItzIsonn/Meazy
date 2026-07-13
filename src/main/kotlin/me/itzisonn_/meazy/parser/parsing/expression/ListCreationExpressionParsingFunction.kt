@@ -21,14 +21,14 @@ object ListCreationExpressionParsingFunction : EmptyParsingFunction<Expression>(
                 if (!isNext(rightBracket)) {
                     consume(
                         comma,
-                        translatable("meazy:parser.expected.separator_expression", "comma", "list_creation")
+                        translatable("parser.expected.separator_expression", "comma", "list_creation")
                     )
                 }
             }
 
             consume(
                 rightBracket,
-                translatable("meazy:parser.expected.end_expression", "right_bracket", "list_creation")
+                translatable("parser.expected.end_expression", "right_bracket", "list_creation")
             )
 
             return ListCreationExpression(list)

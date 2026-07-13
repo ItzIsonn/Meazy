@@ -10,18 +10,18 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object ImportStatementParsingFunction : EmptyParsingFunction<ImportStatement>() {
     override fun Parser.parse(): ImportStatement {
-        consume(import, translatable("meazy:parser.expected.keyword", "import"))
+        consume(import, translatable("parser.expected.keyword", "import"))
 
         val name = StringBuilder(
             consume(
-                id, translatable("meazy:parser.expected.after_keyword", "id", "import")
+                id, translatable("parser.expected.after_keyword", "id", "import")
             ).value
         )
 
         while (isNext(dot)) {
             consume(dot, null)
             name.append(".")
-            name.append(consume(id, translatable("meazy:parser.expected", "id")).value)
+            name.append(consume(id, translatable("parser.expected", "id")).value)
         }
 
         return ImportStatement(name.toString())

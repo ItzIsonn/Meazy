@@ -14,21 +14,21 @@ import me.itzisonn_.meazy.util.text.translatable
 
 object WhileStatementParsingFunction : EmptyParsingFunction<WhileStatement>() {
     override fun Parser.parse(): WhileStatement {
-        consume(`while`, translatable("meazy:parser.expected.keyword", "while"))
+        consume(`while`, translatable("parser.expected.keyword", "while"))
 
         consume(
             leftParenthesis,
-            translatable("meazy:parser.expected.start", "left_parenthesis", "while_condition")
+            translatable("parser.expected.start", "left_parenthesis", "while_condition")
         )
         val condition = parse(ExpressionParsingFunction)
         consume(
             rightParenthesis,
-            translatable("meazy:parser.expected.end", "right_parenthesis", "while_condition")
+            translatable("parser.expected.end", "right_parenthesis", "while_condition")
         )
 
-        consume(leftBrace, translatable("meazy:parser.expected.start", "left_brace", "while_body"))
+        consume(leftBrace, translatable("parser.expected.start", "left_brace", "while_body"))
         val body = parseBody()
-        consume(rightBrace, translatable("meazy:parser.expected.end", "right_brace", "while_body"))
+        consume(rightBrace, translatable("parser.expected.end", "right_brace", "while_body"))
 
         return WhileStatement(condition, body)
     }

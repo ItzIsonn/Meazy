@@ -138,7 +138,7 @@
   "runtime.this.not_inside_class": "Can't use 'this' keyword not inside a class",
   "runtime.this.shared": "Can't use 'this' keyword inside a shared environment",
 
-  "runtime.return_value.must_return": "Function with id '{0}' must return value but haven't",
+  "runtime.return_value.must_return": "Function with id '{0}' must return value but does't",
   "runtime.return_value.must_not_return": "Function with id '{0}' must not return value but have",
   "runtime.return_value.different_data_type": "Function with id '{0}' returned value of different data type (expected {1})"
 }

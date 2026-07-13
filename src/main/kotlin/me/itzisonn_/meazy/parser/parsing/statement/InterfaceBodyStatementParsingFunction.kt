@@ -19,7 +19,7 @@ object InterfaceBodyStatementParsingFunction : EmptyParsingFunction<Statement>()
         }
 
         throw InvalidStatementException(
-            translatable("meazy:parser.expected.statement", "interface_body")
+            translatable("parser.expected.statement", "interface_body")
         )
     }
 }

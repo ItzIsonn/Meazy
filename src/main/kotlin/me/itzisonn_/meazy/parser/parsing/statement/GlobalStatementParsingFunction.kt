@@ -42,6 +42,6 @@ object GlobalStatementParsingFunction : EmptyParsingFunction<Statement>() {
             )
         }
 
-        throw InvalidStatementException(translatable("meazy:parser.exception.global_statement"))
+        throw InvalidStatementException(translatable("parser.exception.global_statement"))
     }
 }

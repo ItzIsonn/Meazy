@@ -10,5 +10,5 @@ import me.itzisonn_.meazy.util.text.translatable
  * @param errorString Error string
  */
 class UnknownTokenException(lineNumber: Int, errorString: String) : TextException(
-    translatable("meazy:lexer.unknown_token", lineNumber, errorString)
+    translatable("lexer.unknown_token", lineNumber, errorString)
 )

@@ -69,7 +69,7 @@ private class ConstructorDeclarationEnvironmentImpl(
                 if (otherParameters[i].dataType != parameters[i].dataType) continue@main
             }
 
-            throw EvaluationException(translatable("meazy:runtime.constructor.already_exists"))
+            throw EvaluationException(translatable("runtime.constructor.already_exists"))
         }
 
         _constructors.add(constructorEnvironment)

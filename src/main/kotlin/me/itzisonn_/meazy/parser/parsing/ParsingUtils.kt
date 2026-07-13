@@ -34,7 +34,7 @@ fun Parser.parseModifiers(): Set<Modifier> {
         if (modifier == null) {
             if (modifiers.isEmpty()) return modifiers
             throw InvalidStatementException(
-                translatable("meazy:parser.modifier.doesnt_exist", id)
+                translatable("parser.modifier.doesnt_exist", id)
             )
         }
 
@@ -46,11 +46,11 @@ fun Parser.parseModifiers(): Set<Modifier> {
 }
 
 private fun Parser.parseParameter(): Parameter {
-    val isConstant = consume(variable, translatable("meazy:parser.expected.start_expression", "variable", "parameter")).value == "val"
-    val id = consume(id, translatable("meazy:parser.expected.after_keyword", "id", "variable")).value
+    val isConstant = consume(variable, translatable("parser.expected.start_expression", "variable", "parameter")).value == "val"
+    val id = consume(id, translatable("parser.expected.after_keyword", "id", "variable")).value
 
     val dataType = parseDataType() ?: throw InvalidSyntaxException(
-        translatable("meazy:parser.exception.parameter_without_datatype")
+        translatable("parser.exception.parameter_without_datatype")
     )
 
     return Parameter(id, dataType, isConstant)
@@ -59,7 +59,7 @@ private fun Parser.parseParameter(): Parameter {
 fun Parser.parseParameters(): List<Parameter> {
     consume(
         leftParenthesis,
-        translatable("meazy:parser.expected.start_expression", "left_parenthesis", "parameters")
+        translatable("parser.expected.start_expression", "left_parenthesis", "parameters")
     )
     val parameters = mutableListOf<Parameter>()
 
@@ -74,7 +74,7 @@ fun Parser.parseParameters(): List<Parameter> {
 
     consume(
         rightParenthesis,
-        translatable("meazy:parser.expected.end_expression", "right_parenthesis", "parameters")
+        translatable("parser.expected.end_expression", "right_parenthesis", "parameters")
     )
     return parameters
 }
@@ -82,7 +82,7 @@ fun Parser.parseParameters(): List<Parameter> {
 fun Parser.parseArgs(): List<Expression> {
     consume(
         leftParenthesis,
-        translatable("meazy:parser.expected.start_expression", "left_parenthesis", "args")
+        translatable("parser.expected.start_expression", "left_parenthesis", "args")
     )
     val args = mutableListOf<Expression>()
 
@@ -97,7 +97,7 @@ fun Parser.parseArgs(): List<Expression> {
 
     consume(
         rightParenthesis,
-        translatable("meazy:parser.expected.end_expression", "right_parenthesis", "args")
+        translatable("parser.expected.end_expression", "right_parenthesis", "args")
     )
     return args
 }
@@ -106,7 +106,7 @@ fun Parser.parseDataType(): DataType? {
     if (!isNext(colon)) return null
     consume(colon, null)
 
-    val dataTypeId = consume(id, translatable("meazy:parser.expected.after", "id", "colon")).value
+    val dataTypeId = consume(id, translatable("parser.expected.after", "id", "colon")).value
 
     if (isNext(question)) {
         consume(question, null)
@@ -118,23 +118,23 @@ fun Parser.parseDataType(): DataType? {
 
 fun Parser.parseBody(): List<LocalStatement> {
     val body = mutableListOf<LocalStatement>()
-    consume(newLine, translatable("meazy:parser.expected", "new_line"))
+    consume(newLine, translatable("parser.expected", "new_line"))
 
     while (!isEndOfFile() && !isNext(rightBrace)) {
         body.add(parse(LocalStatementParsingFunction))
-        consume(newLine, translatable("meazy:parser.expected", "new_line"))
+        consume(newLine, translatable("parser.expected", "new_line"))
     }
 
     return body
 }
 
 fun Parser.parseString(): String {
-    val stringToken = consume(string, translatable("meazy:parser.expected", "string"))
+    val stringToken = consume(string, translatable("parser.expected", "string"))
     val value = stringToken.value
 
     if (!value.endsWith("\"")) throw InvalidStatementException(
         stringToken.line,
-        translatable("meazy:parser.exception.string_quote_not_closed", value.substring(1))
+        translatable("parser.exception.string_quote_not_closed", value.substring(1))
     )
 
     return value.substring(1, value.length - 1)

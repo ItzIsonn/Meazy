@@ -17,7 +17,7 @@ private class CommandImpl(
         args.forEachIndexed { i, arg ->
             if (arguments.isEmpty()) {
                 return CommandResult.Failure(
-                    translatable("meazy:commands.incorrect_args_amount", id)
+                    translatable("commands.incorrect_args_amount", id)
                 )
             }
 
@@ -41,12 +41,12 @@ private class CommandImpl(
                 }
 
             return CommandResult.Failure(
-                translatable("meazy:commands.arg_doesnt_match", arg, i + 1)
+                translatable("commands.arg_doesnt_match", arg, i + 1)
             )
         }
 
         if (execute == null) return CommandResult.Failure(
-            translatable("meazy:commands.incorrect_args_amount", id)
+            translatable("commands.incorrect_args_amount", id)
         )
 
         return execute(CommandContextImpl(map))

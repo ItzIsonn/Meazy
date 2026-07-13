@@ -25,7 +25,7 @@ object ProgramParsingFunction : ParsingFunction<Program, File?> {
                 break
             }
 
-            consume(newLine, translatable("meazy:parser.expected", "new_line"))
+            consume(newLine, translatable("parser.expected", "new_line"))
             body.add(headerStatement)
         }
 
@@ -33,7 +33,7 @@ object ProgramParsingFunction : ParsingFunction<Program, File?> {
             body.add(parse(GlobalStatementParsingFunction))
 
             if (!isEndOfFile()) {
-                consume(newLine, translatable("meazy:parser.expected", "new_line"))
+                consume(newLine, translatable("parser.expected", "new_line"))
             }
         }
 

@@ -18,20 +18,20 @@ val compileCommand = Command("compile") {
                 val file = File(getArgument(targetArg))
                 if (file.isDirectory() || !file.exists()) {
                     return@executes CommandResult.Failure(
-                        translatable("meazy:file.doesnt_exist", file.absolutePath)
+                        translatable("file.doesnt_exist", file.absolutePath)
                     )
                 }
 
                 val extension = file.extension
                 if (extension != "mea") {
                     return@executes CommandResult.Failure(
-                        translatable("meazy:file.unsupported_extension", extension)
+                        translatable("file.unsupported_extension", extension)
                     )
                 }
 
                 Logger.log(
                     LogLevel.INFO,
-                    translatable("meazy:commands.compile.compiling", file.absolutePath)
+                    translatable("commands.compile.compiling", file.absolutePath)
                 )
                 val startMillis = System.currentTimeMillis()
 
@@ -43,7 +43,7 @@ val compileCommand = Command("compile") {
                 if (!outputDirectory.exists()) {
                     if (!outputDirectory.mkdirs()) {
                         return@executes CommandResult.Failure(
-                            translatable("meazy:file.cant_create", outputDirectory.absolutePath)
+                            translatable("file.cant_create", outputDirectory.absolutePath)
                         )
                     }
                 }
@@ -62,7 +62,7 @@ val compileCommand = Command("compile") {
 
                 val endMillis = System.currentTimeMillis()
                 return@executes CommandResult.Success(
-                    translatable("meazy:commands.compile.info", (endMillis - startMillis).toDouble() / 1000)
+                    translatable("commands.compile.info", (endMillis - startMillis).toDouble() / 1000)
                 )
             }
         }

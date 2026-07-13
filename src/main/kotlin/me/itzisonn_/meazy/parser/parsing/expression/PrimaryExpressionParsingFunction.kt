@@ -55,10 +55,10 @@ object PrimaryExpressionParsingFunction : EmptyParsingFunction<Expression>() {
         if (isNext(leftParenthesis)) {
             consume(leftParenthesis, null)
             val value = parse(ExpressionParsingFunction)
-            consume(rightParenthesis, translatable("meazy:parser.expected", "right_parenthesis"))
+            consume(rightParenthesis, translatable("parser.expected", "right_parenthesis"))
             return value
         }
 
-        throw InvalidStatementException(translatable("meazy:parser.exception.cant_parse", this[pos].type.id))
+        throw InvalidStatementException(translatable("parser.exception.cant_parse", this[pos].type.id))
     }
 }
