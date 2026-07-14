@@ -14,7 +14,6 @@ import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNullable
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.*
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
@@ -176,7 +175,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 mutableSetOf(),
                 "copy",
                 mutableListOf(),
-                mutableListOf(ReturnStatement(CallExpression(Identifier(id), copyArgs))),
+                mutableListOf(ReturnStatement(CallExpression(id, copyArgs))),
                 ofNonNull(ClassDesc.of(id))
             )
         )
@@ -188,7 +187,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 MemberExpression(
                     VariableIdentifier("value"),
                     CallExpression(
-                        Identifier(generatePrefixedName("get", dataVariables.first().id)),
+                        generatePrefixedName("get", dataVariables.first().id),
                         mutableListOf()
                     ),
                     false
@@ -204,7 +203,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                         MemberExpression(
                             VariableIdentifier("value"),
                             CallExpression(
-                                Identifier(generatePrefixedName("get", dataVariable.id)),
+                                generatePrefixedName("get", dataVariable.id),
                                 mutableListOf()
                             ),
                             false

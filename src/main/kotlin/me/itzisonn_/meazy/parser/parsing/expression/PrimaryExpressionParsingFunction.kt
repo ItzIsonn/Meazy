@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.string
 import me.itzisonn_.meazy.lexer.TokenTypes.`this`
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.*
@@ -34,7 +33,7 @@ object PrimaryExpressionParsingFunction : EmptyParsingFunction<Expression>() {
             }
 
             val id = consume(id, null).value
-            return if (Character.isUpperCase(id[0])) ClassIdentifier(id) else VariableIdentifier(id)
+            return VariableIdentifier(id)
         }
 
         if (isNext(`null`)) {

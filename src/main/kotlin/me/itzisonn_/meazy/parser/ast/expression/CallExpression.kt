@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -16,7 +15,7 @@ import java.lang.constant.MethodTypeDesc
 import kotlin.uuid.Uuid
 
 class CallExpression(
-    val caller: Identifier,
+    val id: String,
     val args: List<Expression>
 ) : Expression, LocalStatement {
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
@@ -30,8 +29,8 @@ class CallExpression(
 
                 if (parent is MemberExpression) {
                     if (!parent.isNullSafe) {
-                        if (resolvedCallable.target.getType(environment, this).isNullable) {
-                            throw RuntimeException("Unsafe member call of function " + caller.id + " on object of type " + resolvedCallable.classDesc.descriptorString())
+                        if (resolvedCallable.target.getType(environment, parent).isNullable) {
+                            throw RuntimeException("Unsafe member call of function " + id + " on object of type " + resolvedCallable.classDesc.descriptorString())
                         }
                     }
                     else {
@@ -52,7 +51,7 @@ class CallExpression(
 
             instructions.invokeMethod(
                 resolvedCallable.classDesc,
-                caller.id,
+                id,
                 resolvedCallable.methodTypeDesc,
                 if (resolvedCallable.target == null)
                     if (resolvedCallable.isInterface) InvokeType.STATIC_INTERFACE else InvokeType.STATIC
@@ -106,7 +105,7 @@ class CallExpression(
 
     private fun resolveFunction(environment: Environment, parent: ProgramUnit): ResolvedCallable {
         val functionEnvironment = resolveMeazyFunction(environment, parent)
-            ?: error("Can't find function for " + caller.id + " and args " + args)
+            ?: error("Can't find function for " + id + " and args " + args)
 
         val className = functionEnvironment.getParent().fullClassName
             ?: error("Invalid function's parent")
@@ -136,11 +135,10 @@ class CallExpression(
     }
 
     private fun resolveMeazyFunction(environment: Environment, parent: ProgramUnit): FunctionEnvironment? {
-        val id = caller.id
-        val args = args.stream().map<DataType> { arg: Expression? -> arg!!.getType(environment, this) }.toList()
+        val args = args.map { it.getType(environment, this) }
 
-        if (parent is MemberExpression) {
-            val classDesc = parent.receiver.getType(environment, this).classDesc
+        if (parent is MemberExpression && this == parent.member) {
+            val classDesc = parent.receiver.getType(environment, parent).classDesc
             val classEnvironment = environment.getClass(classDesc) ?: return null
             return classEnvironment.getFunctionRecursively(id, args)
         }
@@ -151,7 +149,7 @@ class CallExpression(
 
     private fun resolveConstructor(environment: Environment): ResolvedCallable {
         val constructorEnvironment = resolveMeazyConstructor(environment)
-            ?: error("Can't find constructor for " + caller.id)
+            ?: error("Can't find constructor for $id")
 
         val classEnvironment = constructorEnvironment.getParent()
         if (classEnvironment !is ClassEnvironment) {
@@ -175,7 +173,6 @@ class CallExpression(
     }
 
     private fun resolveMeazyConstructor(environment: Environment): ConstructorEnvironment? {
-        val id = caller.id
         val args = args.map { it.getType(environment, this) }
 
         val classEnvironment = environment.getClass(environment.resolveClassDesc(id, false)) ?: return null
@@ -201,13 +198,14 @@ class CallExpression(
 
         if (resolvedFunction != null) {
             if (resolvedConstructor != null) {
-                error("Ambiguous call with id ${caller.id}")
+                error("Ambiguous call with id ${id}")
             }
             resolvedCallable = resolvedFunction
         }
         else {
             if (resolvedConstructor == null) {
-                error("Can't find callable with id ${caller.id}")
+                println(id)
+                error("Can't find callable with id ${id}")
             }
             resolvedCallable = resolvedConstructor
         }
