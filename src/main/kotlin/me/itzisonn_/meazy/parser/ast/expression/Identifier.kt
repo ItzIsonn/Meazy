@@ -31,7 +31,7 @@ class Identifier(val id: String) : Expression {
             if (parent is MemberExpression) {
                 if (!parent.isNullSafe) {
                     if (resolvedVariable.target.getType(environment, parent).isNullable) {
-                        throw RuntimeException("Unsafe member call of function $id on object of type ${resolvedVariable.classDesc.descriptorString()}")
+                        throw RuntimeException("Unsafe member access of variable '$id' on object of type ${resolvedVariable.classDesc.descriptorString()}")
                     }
                 }
                 else {

@@ -30,7 +30,7 @@ class CallExpression(
                 if (parent is MemberExpression) {
                     if (!parent.isNullSafe) {
                         if (resolvedCallable.target.getType(environment, parent).isNullable) {
-                            throw RuntimeException("Unsafe member call of function " + id + " on object of type " + resolvedCallable.classDesc.descriptorString())
+                            throw RuntimeException("Unsafe member access of function '$id' on object of type ${resolvedCallable.classDesc.descriptorString()}")
                         }
                     }
                     else {
