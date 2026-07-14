@@ -12,6 +12,7 @@ import me.itzisonn_.meazy.util.logger.Logger
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.operator.Operators
 import me.itzisonn_.meazy.util.version.Version
+import kotlin.system.measureTimeMillis
 
 object Meazy {
     val VERSION = Version.of("3.0")
@@ -34,16 +35,13 @@ object Meazy {
 
 
 fun main(args: Array<String>) {
-    val startLoadMillis = System.currentTimeMillis()
-    initialize()
-    val endLoadMillis = System.currentTimeMillis()
+    val initializationTime = measureTimeMillis {
+        initialize()
+    }
 
     Logger.log(
         LogLevel.INFO,
-        translatable(
-            "commands.loaded_info",
-            (endLoadMillis - startLoadMillis) / 1000.toDouble()
-        )
+        translatable("commands.initialization_time", initializationTime / 1000.0)
     )
 
     when (val executionResult = Commands.execute(args.toList())) {
