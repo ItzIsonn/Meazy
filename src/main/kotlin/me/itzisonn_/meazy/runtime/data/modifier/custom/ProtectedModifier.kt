@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.data.modifier.custom
 
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement
@@ -34,7 +33,7 @@ class ProtectedModifier : Modifier("protected") {
         if (!hasModifier) return true
 
         return when (identifier) {
-            is VariableIdentifier -> (requestEnvironment === environment || requestEnvironment.hasParent(environment) ||
+            is Identifier -> (requestEnvironment === environment || requestEnvironment.hasParent(environment) ||
                     requestEnvironment.hasParent { env ->
                         if (env is ClassEnvironment) {
                             val declarationEnvironment = environment.getParent<ClassEnvironment>() ?: return@hasParent false

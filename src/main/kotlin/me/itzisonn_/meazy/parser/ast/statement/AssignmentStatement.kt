@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.VariableValue
@@ -79,7 +79,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
 
     private fun resolveMeazyVariable(environment: Environment): VariableValue? {
         if (id is MemberExpression) {
-            if (id.member !is VariableIdentifier) {
+            if (id.member !is Identifier) {
                 throw RuntimeException("Cant assign value to not variable TODO")
             }
 
@@ -89,7 +89,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
             return classEnvironment.getVariable(id.member.id)
         }
 
-        if (id !is VariableIdentifier) {
+        if (id !is Identifier) {
             throw RuntimeException("Cant assign value to not variable TODO")
         }
 

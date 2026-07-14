@@ -14,7 +14,7 @@ import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNullable
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.*
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral
@@ -138,9 +138,9 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 AssignmentStatement(
                     MemberExpression(
                         ThisLiteral(),
-                        VariableIdentifier(callArgExpression.id),
+                        Identifier(callArgExpression.id),
                         false
-                    ), VariableIdentifier(callArgExpression.id)
+                    ), Identifier(callArgExpression.id)
                 )
             )
         }
@@ -168,7 +168,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
 
         val copyArgs = mutableListOf<Expression>()
         for (dataVariable in dataVariables) {
-            copyArgs.add(VariableIdentifier(dataVariable.id))
+            copyArgs.add(Identifier(dataVariable.id))
         }
         body.add(
             FunctionDeclarationStatement(
@@ -183,9 +183,9 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
         var equalsExpression: Expression?
         if (!dataVariables.isEmpty()) {
             equalsExpression = OperatorExpression(
-                VariableIdentifier(dataVariables.first().id),
+                Identifier(dataVariables.first().id),
                 MemberExpression(
-                    VariableIdentifier("value"),
+                    Identifier("value"),
                     CallExpression(
                         generatePrefixedName("get", dataVariables.first().id),
                         mutableListOf()
@@ -199,9 +199,9 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 equalsExpression = OperatorExpression(
                     equalsExpression!!,
                     OperatorExpression(
-                        VariableIdentifier(dataVariable.id),
+                        Identifier(dataVariable.id),
                         MemberExpression(
-                            VariableIdentifier("value"),
+                            Identifier("value"),
                             CallExpression(
                                 generatePrefixedName("get", dataVariable.id),
                                 mutableListOf()
@@ -222,13 +222,13 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 listOf(Parameter("value", ofNullable(ConstantDescs.CD_Object), true)),
                 mutableListOf(
                     IfStatement(
-                        OperatorExpression(VariableIdentifier("value"), NullLiteral(), "==", OperatorType.INFIX),
+                        OperatorExpression(Identifier("value"), NullLiteral(), "==", OperatorType.INFIX),
                         listOf(ReturnStatement(BooleanLiteral(false))),
                         null
                     ),
                     IfStatement(
                         OperatorExpression(
-                            IsExpression(VariableIdentifier("value"), id, true),
+                            IsExpression(Identifier("value"), id, true),
                             null,
                             "!",
                             OperatorType.PREFIX
@@ -251,11 +251,11 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             val dataVariable = dataVariables[i]
 
             val endingExpression = if (i == dataVariables.size - 1) OperatorExpression(
-                VariableIdentifier(dataVariable.id),
+                Identifier(dataVariable.id),
                 StringLiteral(")"),
                 "+", OperatorType.INFIX
             )
-            else VariableIdentifier(dataVariable.id)
+            else Identifier(dataVariable.id)
 
             toStringExpression = OperatorExpression(
                 toStringExpression,
@@ -275,7 +275,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             mutableSetOf(),
             generatePrefixedName("get", id),
             mutableListOf(),
-            mutableListOf(ReturnStatement(VariableIdentifier(id))),
+            mutableListOf(ReturnStatement(Identifier(id))),
             dataType
         )
     }
@@ -289,9 +289,9 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 AssignmentStatement(
                     MemberExpression(
                         ThisLiteral(),
-                        VariableIdentifier(id),
+                        Identifier(id),
                         false
-                    ), VariableIdentifier(id)
+                    ), Identifier(id)
                 )
             ),
             null

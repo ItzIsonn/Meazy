@@ -198,14 +198,14 @@ class CallExpression(
 
         if (resolvedFunction != null) {
             if (resolvedConstructor != null) {
-                error("Ambiguous call with id ${id}")
+                error("Ambiguous call with id $id")
             }
             resolvedCallable = resolvedFunction
         }
         else {
             if (resolvedConstructor == null) {
                 println(id)
-                error("Can't find callable with id ${id}")
+                error("Can't find callable with id $id")
             }
             resolvedCallable = resolvedConstructor
         }
