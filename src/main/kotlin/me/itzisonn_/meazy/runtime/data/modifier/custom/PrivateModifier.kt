@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.runtime.data.modifier.custom
 
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ConstructorClassIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
@@ -29,13 +28,6 @@ class PrivateModifier : Modifier("private") {
         identifier: Identifier, hasModifier: Boolean
     ): Boolean {
         if (!hasModifier) return true
-
-        if (identifier is ConstructorClassIdentifier) {
-            return requestEnvironment.hasParent { env ->
-                if (env is ClassEnvironment) return@hasParent env.id == identifier.id
-                false
-            }
-        }
 
         return requestEnvironment === environment || requestEnvironment.hasParent(environment)
     }

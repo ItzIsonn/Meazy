@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -62,15 +61,11 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
             else -> null
         }
 
-        val target = if (parent is MemberExpression) {
-            if (parent.receiver is ClassIdentifier) null else parent.receiver
-        }
-        else if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
+        val target = if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
             null
         }
-        else {
-            ThisLiteral()
-        }
+        else if (parent is MemberExpression) parent.receiver
+        else ThisLiteral()
 
         return ResolvedVariable(
             if (className == null) null else ClassDesc.of(className),

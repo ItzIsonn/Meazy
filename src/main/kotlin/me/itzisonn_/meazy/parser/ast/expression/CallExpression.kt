@@ -5,8 +5,6 @@ import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
@@ -22,17 +20,18 @@ class CallExpression(
     val args: List<Expression>
 ) : Expression, LocalStatement {
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
-        if (caller is FunctionIdentifier) {
-            val resolvedFunction = resolveFunction(environment, parent)
+        val resolvedCallable = resolveCallable(environment, parent)
+
+        if (resolvedCallable.isFunction) {
             var endLabel: Uuid? = null
 
-            if (resolvedFunction.target != null) {
-                resolvedFunction.target.emit(instructions, environment, this)
+            if (resolvedCallable.target != null) {
+                resolvedCallable.target.emit(instructions, environment, this)
 
                 if (parent is MemberExpression) {
                     if (!parent.isNullSafe) {
-                        if (resolvedFunction.target.getType(environment, this).isNullable) {
-                            throw RuntimeException("Unsafe member call of function " + caller.id + " on object of type " + resolvedFunction.classDesc.descriptorString())
+                        if (resolvedCallable.target.getType(environment, this).isNullable) {
+                            throw RuntimeException("Unsafe member call of function " + caller.id + " on object of type " + resolvedCallable.classDesc.descriptorString())
                         }
                     }
                     else {
@@ -52,15 +51,15 @@ class CallExpression(
             }
 
             instructions.invokeMethod(
-                resolvedFunction.classDesc,
+                resolvedCallable.classDesc,
                 caller.id,
-                resolvedFunction.methodTypeDesc,
-                if (resolvedFunction.target == null)
-                    if (resolvedFunction.isInterface) InvokeType.STATIC_INTERFACE else InvokeType.STATIC
-                    else if (resolvedFunction.isInterface) InvokeType.INTERFACE else InvokeType.VIRTUAL
+                resolvedCallable.methodTypeDesc,
+                if (resolvedCallable.target == null)
+                    if (resolvedCallable.isInterface) InvokeType.STATIC_INTERFACE else InvokeType.STATIC
+                    else if (resolvedCallable.isInterface) InvokeType.INTERFACE else InvokeType.VIRTUAL
             ) {
                 for (i in args.indices) {
-                    val parameterType = resolvedFunction.methodTypeDesc.parameterType(i)
+                    val parameterType = resolvedCallable.methodTypeDesc.parameterType(i)
 
                     val arg = args[i]
                     val argType = arg.getType(environment, this@CallExpression).classDesc
@@ -79,33 +78,30 @@ class CallExpression(
                 instructions.bindLabel(endLabel)
             }
         }
-        else if (caller is ClassIdentifier) {
-            val resolvedConstructor = resolveConstructor(environment)
 
+        else {
             instructions.invokeConstructor(
-                resolvedConstructor.classDesc,
-                resolvedConstructor.methodTypeDesc
+                resolvedCallable.classDesc,
+                resolvedCallable.methodTypeDesc
             ) {
                 for (arg in args) {
                     arg.emit(this, environment, this@CallExpression)
                 }
             }
         }
-        else throw RuntimeException("Unknown caller TODO " + caller::class.qualifiedName)
     }
 
     override fun getType(environment: Environment, parent: ProgramUnit): DataType {
-        if (caller is FunctionIdentifier) {
-            val function = resolveFunction(environment, parent)
-            val returnType = function.methodTypeDesc.returnType()
-            return DataType.of(returnType, function.isReturnTypeNullable)
+        val resolvedCallable = resolveCallable(environment, parent)
+
+        if (resolvedCallable.isFunction) {
+            val returnType = resolvedCallable.methodTypeDesc.returnType()
+            return DataType.of(returnType, resolvedCallable.isReturnTypeNullable)
         }
 
-        if (caller is ClassIdentifier) {
-            return DataType.ofNonNull(resolveConstructor(environment).classDesc)
+        else {
+            return DataType.ofNonNull(resolvedCallable.classDesc)
         }
-
-        throw RuntimeException("Unknown caller TODO" + caller::class.qualifiedName)
     }
 
     private fun resolveFunction(environment: Environment, parent: ProgramUnit): ResolvedCallable {
@@ -115,15 +111,11 @@ class CallExpression(
         val className = functionEnvironment.getParent().fullClassName
             ?: error("Invalid function's parent")
 
-        val target = if (parent is MemberExpression) {
-            if (parent.receiver is ClassIdentifier) null else parent.receiver
-        }
-        else if (Modifiers.shared in functionEnvironment.modifiers || functionEnvironment.getParent() is FileEnvironment) {
+        val target = if (Modifiers.shared in functionEnvironment.modifiers || functionEnvironment.getParent() is FileEnvironment) {
             null
         }
-        else {
-            ThisLiteral()
-        }
+        else if (parent is MemberExpression) parent.receiver
+        else ThisLiteral()
 
         val returnDataType = functionEnvironment.returnDataType
 
@@ -138,7 +130,8 @@ class CallExpression(
             target,
             functionEnvironment.getParent().run {
                 this is ClassEnvironment && isInterface
-            }
+            },
+            true
         )
     }
 
@@ -176,6 +169,7 @@ class CallExpression(
             MethodTypeDesc.of(ConstantDescs.CD_void, parameters),
             false,
             null,
+            false,
             false
         )
     }
@@ -188,7 +182,41 @@ class CallExpression(
         return classEnvironment.getConstructor(args)
     }
 
+    private fun resolveCallable(environment: Environment, parent: ProgramUnit): ResolvedCallable {
+        val resolvedFunction = try {
+            resolveFunction(environment, parent)
+        }
+        catch (_: Exception) {
+            null
+        }
+
+        val resolvedConstructor = try {
+            resolveConstructor(environment)
+        }
+        catch (_: Exception) {
+            null
+        }
+
+        val resolvedCallable: ResolvedCallable
+
+        if (resolvedFunction != null) {
+            if (resolvedConstructor != null) {
+                error("Ambiguous call with id ${caller.id}")
+            }
+            resolvedCallable = resolvedFunction
+        }
+        else {
+            if (resolvedConstructor == null) {
+                error("Can't find callable with id ${caller.id}")
+            }
+            resolvedCallable = resolvedConstructor
+        }
+
+        return resolvedCallable
+    }
+
     override fun alwaysReturns() = false
+
 
 
     private class ResolvedCallable(
@@ -196,6 +224,7 @@ class CallExpression(
         val methodTypeDesc: MethodTypeDesc,
         val isReturnTypeNullable: Boolean,
         val target: Expression?,
-        val isInterface: Boolean
+        val isInterface: Boolean,
+        val isFunction: Boolean
     )
 }

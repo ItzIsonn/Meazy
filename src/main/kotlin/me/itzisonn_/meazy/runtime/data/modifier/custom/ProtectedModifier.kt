@@ -1,7 +1,5 @@
 package me.itzisonn_.meazy.runtime.data.modifier.custom
 
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ConstructorClassIdentifier
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement
@@ -52,41 +50,6 @@ class ProtectedModifier : Modifier("protected") {
                         }
                         false
                     })
-
-            is FunctionIdentifier -> (requestEnvironment === environment || requestEnvironment.hasParent(environment) ||
-                    requestEnvironment.hasParent { parentEnv ->
-                        if (parentEnv is ClassEnvironment) {
-                            val declarationEnvironment = environment as? ClassEnvironment
-                                ?: environment.getParent<ClassEnvironment>()
-
-                            if (declarationEnvironment == null) return@hasParent false
-                            if (parentEnv.id == declarationEnvironment.id) return@hasParent true
-
-                            val parentClassEnvironment =
-                                environment.getClass(parentEnv.id) ?: throw EvaluationException(
-                                    translatable(
-                                        "runtime.class.doesnt_exist",
-                                        parentEnv.id
-                                    )
-                                )
-
-                            return@hasParent parentClassEnvironment.interfaces
-                                .any { it.displayName() == declarationEnvironment.id }
-                        }
-                        false
-                    })
-
-            is ConstructorClassIdentifier -> requestEnvironment.hasParent { env ->
-                if (env is ClassEnvironment) {
-                    if (env.id == identifier.id) return@hasParent true
-
-                    val parentClassEnvironment = requestEnvironment.getClass(env.id)
-                        ?: throw EvaluationException(translatable("runtime.class.doesnt_exist", env.id))
-
-                    return@hasParent parentClassEnvironment.interfaces.any { it.displayName() == identifier.id }
-                }
-                false
-            }
 
             else -> true
         }

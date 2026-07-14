@@ -33,7 +33,7 @@ class VariableDeclarationStatement(
         val dataType = dataType ?: value?.getType(environment, this)
             ?: error("Variable without a data type must have initializer TODO")
 
-        variableValue = environment.declareVariable(id, dataType, isConstant, value)
+        variableValue = environment.declareVariable(id, dataType, isConstant, value, modifiers)
         declared = true
     }
 
