@@ -1,6 +1,5 @@
 package me.itzisonn_.meazy.util.text
 
-import me.itzisonn_.meazy.util.text.TranslationsBundle.getTranslation
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -62,7 +61,7 @@ private class TranslatableText(private val key: String, args: List<String>) : Te
     }
 
     override fun toString(): String {
-        var translation = getTranslation(key) ?: error("Can't find translation with key $key")
+        var translation = Translations[key] ?: error("Can't find translation with key $key")
 
         for (i in args.indices) {
             translation = translation.replace("{$i}", args[i])
