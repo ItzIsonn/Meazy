@@ -7,7 +7,7 @@ object MainFunctionTest {
     @BeforeAll
     @JvmStatic
     fun setup() {
-        MeazyMain.initialize()
+        Meazy.initialize()
     }
 
     @Test

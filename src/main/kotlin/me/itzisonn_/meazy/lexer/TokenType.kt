@@ -1,7 +1,5 @@
 package me.itzisonn_.meazy.lexer
 
-import me.itzisonn_.meazy.MeazyMain
-
 /**
  * Represents type of token
  *
@@ -9,8 +7,6 @@ import me.itzisonn_.meazy.MeazyMain
  * @param regex    Regex that is used to match this token type
  * @param behavior Behavior
  * @param canMatch Function that checks whether given string can match this token type
- *
- * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
  * 
  * @see TokenTypes
  */
@@ -27,7 +23,6 @@ class TokenType(
 
     init {
         var regex = regex
-        require(id.matches(MeazyMain.IDENTIFIER_REGEX.toRegex())) { "Invalid id" }
 
         if (regex != null && !regex.pattern.startsWith("^")) {
             regex = Regex("^(${regex.pattern})", regex.options)
@@ -42,7 +37,6 @@ class TokenType(
      * @param id       Id
      * @param regex    Regex string that is compiled into [Regex]
      * @param behavior Behavior
-     * @throws IllegalArgumentException If given id doesn't match [MeazyMain.IDENTIFIER_REGEX]
      */
     constructor(
         id: String,
