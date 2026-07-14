@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.parser.parsing.statement
 
-import me.itzisonn_.meazy.MeazyMain.VERSION
+import me.itzisonn_.meazy.Meazy.VERSION
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.parsing.UnexpectedTokenException
