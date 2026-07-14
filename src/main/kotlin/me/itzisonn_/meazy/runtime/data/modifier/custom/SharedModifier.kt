@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.data.modifier.custom
 
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
-import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement
 import me.itzisonn_.meazy.parser.ast.statement.VariableDeclarationStatement
@@ -31,7 +30,7 @@ class SharedModifier : Modifier("shared") {
     ): Boolean {
         if (hasModifier) return true
 
-        if (identifier is VariableIdentifier) {
+        if (identifier is Identifier) {
             if (environment !is VariableDeclarationEnvironment) return true
             if (environment.getVariable(identifier.id) == null) return true
 

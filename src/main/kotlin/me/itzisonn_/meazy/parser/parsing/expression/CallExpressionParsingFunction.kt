@@ -4,7 +4,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression
 import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
+import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 import me.itzisonn_.meazy.parser.parsing.parseArgs
 import me.itzisonn_.meazy.util.text.translatable

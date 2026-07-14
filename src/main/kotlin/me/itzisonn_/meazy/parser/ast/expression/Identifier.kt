@@ -1,13 +1,11 @@
-package me.itzisonn_.meazy.parser.ast.expression.identifier
+package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
-import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
-import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
-import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.getClass
@@ -16,7 +14,7 @@ import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
 import java.lang.constant.ClassDesc
 import kotlin.uuid.Uuid
 
-class VariableIdentifier(id: String) : Identifier(id) {
+class Identifier(val id: String) : Expression {
     override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
         val resolvedVariable = resolveVariable(environment, parent)
 

@@ -1,6 +1,6 @@
 package me.itzisonn_.meazy.runtime.data.modifier
 
-import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
+import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.statement.ModifierStatement
 import me.itzisonn_.meazy.runtime.environment.Environment
 
