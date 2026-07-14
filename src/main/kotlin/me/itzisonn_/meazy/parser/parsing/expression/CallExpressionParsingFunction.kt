@@ -21,7 +21,7 @@ object CallExpressionParsingFunction : EmptyParsingFunction<Expression>() {
             }
 
             val args = parseArgs()
-            return CallExpression(expression, args)
+            return CallExpression(expression.id, args)
         }
 
         return expression

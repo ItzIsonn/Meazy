@@ -12,6 +12,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getVariable
+import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
 import java.lang.constant.ClassDesc
 import kotlin.uuid.Uuid
 
@@ -31,7 +32,7 @@ class VariableIdentifier(id: String) : Identifier(id) {
 
             if (parent is MemberExpression) {
                 if (!parent.isNullSafe) {
-                    if (resolvedVariable.target.getType(environment, this).isNullable) {
+                    if (resolvedVariable.target.getType(environment, parent).isNullable) {
                         throw RuntimeException("Unsafe member call of function $id on object of type ${resolvedVariable.classDesc.descriptorString()}")
                     }
                 }
@@ -59,6 +60,14 @@ class VariableIdentifier(id: String) : Identifier(id) {
     }
 
     override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+        if (parent is MemberExpression && this != parent.member) {
+            val classDesc = environment.resolveClassDesc(id, false)
+
+            if (environment.getClass(classDesc) != null) {
+                return DataType.ofNonNull(classDesc)
+            }
+        }
+
         val resolvedVariable = resolveVariable(environment, parent)
         return DataType.of(resolvedVariable.type, resolvedVariable.isNullable)
     }
@@ -84,8 +93,8 @@ class VariableIdentifier(id: String) : Identifier(id) {
     }
 
     private fun resolveMeazyVariable(environment: Environment, parent: ProgramUnit): VariableValue? {
-        if (parent is MemberExpression) {
-            val dataType = parent.receiver.getType(environment, this)
+        if (parent is MemberExpression && this == parent.member) {
+            val dataType = parent.receiver.getType(environment, parent)
             val classDesc = dataType.classDesc
 
             val classEnvironment = environment.getClass(classDesc) ?: return null
