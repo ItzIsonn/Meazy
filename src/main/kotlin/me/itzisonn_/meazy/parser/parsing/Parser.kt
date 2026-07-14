@@ -14,29 +14,7 @@ import me.itzisonn_.meazy.util.text.Text
  */
 class Parser(tokens: List<Token>) {
     private val tokens = tokens.toList()
-
-    /**
-     * Position of current element
-     */
-    var pos = 0
-        private set
-
-    /**
-     * Amount of tokens
-     */
-    val size get() = tokens.size
-
-    /**
-     * @return Token at position [i]
-     */
-    operator fun get(i: Int) = tokens[i]
-
-    /**
-     * @return Whether type of current token is [TokenTypes.endOfFile]
-     */
-    fun isEndOfFile() = current.type == TokenTypes.endOfFile
-
-
+    private var pos = 0
 
     private val current get() = tokens[pos]
     private fun consume() = current.also { pos++ }
@@ -209,6 +187,11 @@ class Parser(tokens: List<Token>) {
     }
 
 
+
+    /**
+     * @return Whether type of current token is [TokenTypes.endOfFile]
+     */
+    fun isEndOfFile() = current.type == TokenTypes.endOfFile
 
     fun UnexpectedTokenException(text: Text?) = UnexpectedTokenException(current, text)
     fun InvalidStatementException(text: Text) = InvalidStatementException(current.line, text)

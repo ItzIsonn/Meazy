@@ -40,6 +40,6 @@ object PrimaryExpressionParsingFunction : EmptyParsingFunction<Expression>() {
             return value
         }
 
-        throw InvalidStatementException(translatable("parser.exception.cant_parse", this[pos].type.id))
+        throw UnexpectedTokenException(translatable("parser.expected.expression", "primary"))
     }
 }
