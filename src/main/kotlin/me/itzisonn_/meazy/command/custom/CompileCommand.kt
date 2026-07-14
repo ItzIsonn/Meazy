@@ -10,6 +10,7 @@ import me.itzisonn_.meazy.util.logger.Logger
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
+import kotlin.system.measureTimeMillis
 
 val compileCommand = Command("compile") {
     argument("target_file", StringType) { targetArg ->
@@ -33,36 +34,36 @@ val compileCommand = Command("compile") {
                     LogLevel.INFO,
                     translatable("commands.compile.compiling", file.absolutePath)
                 )
-                val startMillis = System.currentTimeMillis()
 
-                val tokens = RuntimeFunctions.tokenize(file.readText())
-                val program = RuntimeFunctions.parseTokens(file, tokens)
-                val classes = RuntimeFunctions.compileProgram(program)
+                val compilingTime = measureTimeMillis {
+                    val tokens = RuntimeFunctions.tokenize(file.readText())
+                    val program = RuntimeFunctions.parseTokens(file, tokens)
+                    val classes = RuntimeFunctions.compileProgram(program)
 
-                val outputDirectory = File(getArgument(outputArg))
-                if (!outputDirectory.exists()) {
-                    if (!outputDirectory.mkdirs()) {
-                        return@executes CommandResult.Failure(
-                            translatable("file.cant_create", outputDirectory.absolutePath)
-                        )
+                    val outputDirectory = File(getArgument(outputArg))
+                    if (!outputDirectory.exists()) {
+                        if (!outputDirectory.mkdirs()) {
+                            return@executes CommandResult.Failure(
+                                translatable("file.cant_create", outputDirectory.absolutePath)
+                            )
+                        }
+                    }
+                    else outputDirectory.listFiles()?.forEach { it.delete() }
+
+                    for ((classDesc, classFile) in classes) {
+                        val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
+
+                        try {
+                            Files.write(outputFile.toPath(), classFile)
+                        }
+                        catch (e: IOException) {
+                            throw RuntimeException(e)
+                        }
                     }
                 }
-                else outputDirectory.listFiles()?.forEach { it.delete() }
 
-                for ((classDesc, classFile) in classes) {
-                    val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
-
-                    try {
-                        Files.write(outputFile.toPath(), classFile)
-                    }
-                    catch (e: IOException) {
-                        throw RuntimeException(e)
-                    }
-                }
-
-                val endMillis = System.currentTimeMillis()
                 return@executes CommandResult.Success(
-                    translatable("commands.compile.info", (endMillis - startMillis).toDouble() / 1000)
+                    translatable("commands.compile.info", compilingTime / 1000.0)
                 )
             }
         }

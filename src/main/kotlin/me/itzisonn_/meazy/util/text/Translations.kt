@@ -5,12 +5,6 @@ package me.itzisonn_.meazy.util.text
  */
 object Translations {
     private val translations = mapOf(
-        "settings.cant_load_file" to "Can't load settings file",
-        "settings.cant_find_file" to "Can't find default settings file",
-        "settings.cant_create_file" to "Can't create default settings file",
-        "settings.invalid_file" to "Invalid settings file. Creating default",
-        "settings.unknown_language" to "Unknown language {0}. Using default",
-
         "file.doesnt_exist" to "File '{0}' doesn't exist",
         "file.already_exists" to "File '{0}' already exists",
         "file.failed_read" to "Failed to read file '{0}'",
@@ -26,7 +20,7 @@ object Translations {
         "commands.incorrect_args_amount" to "Incorrect number of arguments for command with id '{0}'",
         "commands.arg_doesnt_match" to "Given argument '{0}' at position {1} doesn't match any available arguments",
         "commands.available" to "Available commands:",
-        "commands.loaded_info" to "Loaded in {0}s",
+        "commands.initialization_time" to "Initialized in {0}s",
 
         "commands.version" to "Meazy version {0}",
 

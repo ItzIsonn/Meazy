@@ -9,7 +9,9 @@ import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
 import java.io.File
 import java.io.IOException
+import java.lang.constant.ClassDesc
 import java.nio.file.Files
+import kotlin.system.measureTimeMillis
 
 val compileAndRunCommand = Command("compile_and_run") {
     argument("target_file", StringType) { targetArg ->
@@ -33,46 +35,49 @@ val compileAndRunCommand = Command("compile_and_run") {
                     LogLevel.INFO,
                     translatable("commands.compile.compiling", file.absolutePath)
                 )
-                val startCompileMillis = System.currentTimeMillis()
 
-                val tokens = RuntimeFunctions.tokenize(file.readText())
-                val program = RuntimeFunctions.parseTokens(file, tokens)
-                val classes = RuntimeFunctions.compileProgram(program)
+                val classes: Map<ClassDesc, ByteArray>
 
-                val outputDirectory = File(getArgument(outputArg))
-                if (!outputDirectory.exists()) {
-                    if (!outputDirectory.mkdirs()) {
-                        return@executes CommandResult.Failure(
-                            translatable("file.cant_create", outputDirectory.absolutePath)
-                        )
+                val compilingTime = measureTimeMillis {
+                    val tokens = RuntimeFunctions.tokenize(file.readText())
+                    val program = RuntimeFunctions.parseTokens(file, tokens)
+                    classes = RuntimeFunctions.compileProgram(program)
+
+                    val outputDirectory = File(getArgument(outputArg))
+                    if (!outputDirectory.exists()) {
+                        if (!outputDirectory.mkdirs()) {
+                            return@executes CommandResult.Failure(
+                                translatable("file.cant_create", outputDirectory.absolutePath)
+                            )
+                        }
+                    }
+                    else outputDirectory.listFiles()?.forEach { it.delete() }
+
+                    for ((classDesc, classFile) in classes) {
+                        val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
+
+                        try {
+                            Files.write(outputFile.toPath(), classFile)
+                        }
+                        catch (e: IOException) {
+                            throw RuntimeException(e)
+                        }
                     }
                 }
-                else outputDirectory.listFiles()?.forEach { it.delete() }
 
-                for ((classDesc, classFile) in classes) {
-                    val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
-
-                    try {
-                        Files.write(outputFile.toPath(), classFile)
-                    }
-                    catch (e: IOException) {
-                        throw RuntimeException(e)
-                    }
-                }
-
-                val endCompileMillis = System.currentTimeMillis()
                 Logger.log(
                     LogLevel.INFO,
-                    translatable("commands.compile.info", (endCompileMillis - startCompileMillis).toDouble() / 1000)
+                    translatable("commands.compile.info", compilingTime / 1000.0)
                 )
 
                 Logger.log(LogLevel.INFO, translatable("commands.run.running", file.absolutePath))
-                val startRunMillis = System.currentTimeMillis()
-                RuntimeFunctions.loadClassesAndRun(classes)
 
-                val endRunMillis = System.currentTimeMillis()
+                val runningTime = measureTimeMillis {
+                    RuntimeFunctions.loadClassesAndRun(classes)
+                }
+
                 return@executes CommandResult.Success(
-                    translatable("commands.run.info", (endRunMillis - startRunMillis).toDouble() / 1000)
+                    translatable("commands.run.info", runningTime / 1000.0)
                 )
             }
         }
