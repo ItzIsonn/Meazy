@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`else`
 import me.itzisonn_.meazy.lexer.TokenTypes.`if`
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
-import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.parser.parsing.Parser
@@ -30,11 +29,6 @@ object IfStatementParsingFunction : EmptyParsingFunction<IfStatement>() {
             consume(rightBrace, translatable("parser.expected.end", "right_brace", "if_body"))
         }
         else body = listOf(parse(LocalStatementParsingFunction))
-
-        val elsePos = pos + 1
-        if (elsePos < size && this[elsePos].type == `else`) {
-            consume(newLine, translatable("parser.expected.end_statement", "new_line"))
-        }
 
         var elseStatement: IfStatement? = null
         if (isNext(`else`)) {
