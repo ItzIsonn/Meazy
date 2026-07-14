@@ -67,7 +67,7 @@ class ForeachStatement(
         dataType.resolve(environment)
         instructions.checkCast(dataType.classDesc)
 
-        val variableValue = environment.declareVariable(id, dataType, isConstant, null)
+        val variableValue = environment.declareVariable(id, dataType, isConstant, null, setOf())
         instructions.storeLocal(variableValue.dataType.classDesc, variableValue.slot)
         instructions.setLocalName(
             variableValue.slot,

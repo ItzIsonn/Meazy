@@ -67,15 +67,11 @@ class VariableIdentifier(id: String) : Identifier(id) {
         val variableValue = resolveMeazyVariable(environment, parent) ?: error("Can't find variable $id")
 
         val className = variableValue.parentEnvironment.fullClassName
-        val target = if (parent is MemberExpression) {
-            if (parent.receiver is ClassIdentifier) null else parent.receiver
-        }
-        else if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
+        val target = if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
             null
         }
-        else {
-            ThisLiteral()
-        }
+        else if (parent is MemberExpression) parent.receiver
+        else ThisLiteral()
 
         return ResolvedVariable(
             if (className == null) null else ClassDesc.of(className),

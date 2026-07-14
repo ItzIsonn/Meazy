@@ -10,6 +10,7 @@ var test2 = testing + 1
 fun testPrimitives() {
     val a = 67
     System.out.println(a)
+    ArrayList()
 
     if (a > 67) {
         val c = 52.52

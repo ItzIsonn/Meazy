@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ConstantDescs
@@ -31,7 +32,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
     private var startLabel: Uuid?,
     private var endLabel: Uuid?
 ) : VariableDeclarationEnvironmentImpl(parent), LocalVariableDeclarationEnvironment {
-    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue {
+    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableValue {
         if (getVariable(id) != null) {
             throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
@@ -45,7 +46,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
             parentEnvironment = parentEnvironment.getParent()
         }
 
-        val variableValue = VariableValue(id, type, isConstant, setOf(), slot, value, this)
+        val variableValue = VariableValue(id, type, isConstant, modifiers, slot, value, this)
         _variables.add(variableValue)
         return variableValue
     }

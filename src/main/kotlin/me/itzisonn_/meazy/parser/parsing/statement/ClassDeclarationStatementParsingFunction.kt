@@ -14,8 +14,7 @@ import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNullable
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.*
-import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
@@ -177,7 +176,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 mutableSetOf(),
                 "copy",
                 mutableListOf(),
-                mutableListOf(ReturnStatement(CallExpression(ClassIdentifier(id), copyArgs))),
+                mutableListOf(ReturnStatement(CallExpression(Identifier(id), copyArgs))),
                 ofNonNull(ClassDesc.of(id))
             )
         )
@@ -189,7 +188,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 MemberExpression(
                     VariableIdentifier("value"),
                     CallExpression(
-                        FunctionIdentifier(generatePrefixedName("get", dataVariables.first().id)),
+                        Identifier(generatePrefixedName("get", dataVariables.first().id)),
                         mutableListOf()
                     ),
                     false
@@ -205,7 +204,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                         MemberExpression(
                             VariableIdentifier("value"),
                             CallExpression(
-                                FunctionIdentifier(generatePrefixedName("get", dataVariable.id)),
+                                Identifier(generatePrefixedName("get", dataVariable.id)),
                                 mutableListOf()
                             ),
                             false

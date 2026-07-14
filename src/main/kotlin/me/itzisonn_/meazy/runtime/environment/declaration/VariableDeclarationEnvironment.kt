@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.util.text.translatable
@@ -16,7 +17,7 @@ interface VariableDeclarationEnvironment : Environment {
      * Declares given VariableValue in this environment
      * @param id VariableValue TODO
      */
-    fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue
+    fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableValue
 
     /**
      * @param id Variable's id
@@ -36,12 +37,12 @@ open class VariableDeclarationEnvironmentImpl(parent: Environment) : Environment
     protected val _variables = mutableListOf<VariableValue>()
     override val variables get() = _variables.toList()
 
-    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?): VariableValue {
+    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableValue {
         if (getVariable(id) != null) {
             throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
-        val variableValue = VariableValue(id, type, isConstant, setOf(), -1, value, this)
+        val variableValue = VariableValue(id, type, isConstant, modifiers, -1, value, this)
         _variables.add(variableValue)
         return variableValue
     }

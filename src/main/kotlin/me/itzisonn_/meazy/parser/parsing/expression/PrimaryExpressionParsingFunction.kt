@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`this`
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.identifier.ClassIdentifier
-import me.itzisonn_.meazy.parser.ast.expression.identifier.FunctionIdentifier
+import me.itzisonn_.meazy.parser.ast.expression.identifier.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.identifier.VariableIdentifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.*
 import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
@@ -26,8 +26,7 @@ object PrimaryExpressionParsingFunction : EmptyParsingFunction<Expression>() {
 
             if (size > pos + 1 && this[pos + 1].type == leftParenthesis) {
                 val id = consume(id, null).value
-                return if (Character.isUpperCase(id[0])) ClassIdentifier(id)
-                else FunctionIdentifier(id)
+                return Identifier(id)
             }
 
             if (pos > 0 && this[pos - 1].type == dot) {

@@ -76,7 +76,8 @@ class ConstructorDeclarationStatement(
                     parameter.id,
                     parameter.dataType,
                     parameter.isConstant,
-                    null
+                    null,
+                    setOf()
                 )
 
                 setLocalName(
