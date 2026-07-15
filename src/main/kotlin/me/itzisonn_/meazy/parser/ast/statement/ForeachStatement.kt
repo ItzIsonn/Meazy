@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
@@ -19,7 +20,12 @@ class ForeachStatement(
     val collection: Expression,
     val body: List<LocalStatement>
 ) : LocalStatement {
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+    override val children = body.toMutableSet<ProgramUnit>().apply {
+        add(collection)
+    }.toSet()
+
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
         if (environment !is LocalVariableDeclarationEnvironment) {
             throw RuntimeException("Foreach statement must be inside variableDeclarationEnvironment TODO")
         }
@@ -30,7 +36,7 @@ class ForeachStatement(
             null
         )
 
-        collection.emit(instructions, environment, this)
+        collection.emit(instructions, environment)
 
         instructions.invokeMethod(
             ClassDesc.of("java.lang.Iterable"),
@@ -78,7 +84,7 @@ class ForeachStatement(
         )
 
         for (statement in body) {
-            statement.emit(instructions, loopEnvironment, this)
+            statement.emit(instructions, loopEnvironment)
         }
 
         instructions.gotoLabel(conditionLabel)

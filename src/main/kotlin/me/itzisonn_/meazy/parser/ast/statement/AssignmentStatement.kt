@@ -2,11 +2,12 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
 import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
+import me.itzisonn_.meazy.parser.ast.parent
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.VariableValue
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
@@ -18,18 +19,21 @@ import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 import java.lang.constant.ClassDesc
 
 class AssignmentStatement(val id: Expression, val value: Expression) : LocalStatement {
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
-        val resolvedVariable = resolveVariable(environment, parent)
+    override val children = setOf(id, value)
+
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val resolvedVariable = resolveVariable(environment)
         if (resolvedVariable.isConstant) throw RuntimeException("Can't reassign constant variable " + resolvedVariable.id + " TODO")
 
         val variableType = resolvedVariable.type
-        val valueType = value.getType(environment, this).classDesc
+        val valueType = value.getType(environment).classDesc
 
         if (resolvedVariable.classDesc != null && resolvedVariable.target != null) {
-            resolvedVariable.target.emit(instructions, environment, this)
+            resolvedVariable.target.emit(instructions, environment)
         }
 
-        value.emit(instructions, environment, this)
+        value.emit(instructions, environment)
 
         if (!environment.isInstanceOf(valueType, variableType)) {
             if (!instructions.convertPrimitiveOrBoxed(valueType, variableType)) {
@@ -52,7 +56,8 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
 
 
 
-    private fun resolveVariable(environment: Environment, parent: ProgramUnit): ResolvedVariable {
+    context(parents: ParentMap)
+    private fun resolveVariable(environment: Environment): ResolvedVariable {
         val variableValue = resolveMeazyVariable(environment) ?: error("Can't find variable")
 
         val className = when (val parent = variableValue.parentEnvironment) {
@@ -61,6 +66,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
             else -> null
         }
 
+        val parent = parent
         val target = if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
             null
         }
@@ -77,13 +83,14 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
         )
     }
 
+    context(parents: ParentMap)
     private fun resolveMeazyVariable(environment: Environment): VariableValue? {
         if (id is MemberExpression) {
             if (id.member !is Identifier) {
                 throw RuntimeException("Cant assign value to not variable TODO")
             }
 
-            val classDesc: ClassDesc = id.receiver.getType(environment, this).classDesc
+            val classDesc: ClassDesc = id.receiver.getType(environment).classDesc
             val classEnvironment = environment.getClass(classDesc) ?: return null
 
             return classEnvironment.getVariable(id.member.id)

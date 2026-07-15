@@ -3,8 +3,8 @@ package me.itzisonn_.meazy.parser.ast.expression
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.boxPrimitive
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
 import java.lang.constant.ConstantDescs
@@ -15,11 +15,14 @@ class IsExpression(
     val dataType: String,
     val isLike: Boolean
 ) : Expression {
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
-        val classDesc = environment.resolveClassDesc(dataType, false)
-        val valueClassDesc = value.getType(environment, this).classDesc
+    override val children = setOf(value)
 
-        value.emit(instructions, environment, this)
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val classDesc = environment.resolveClassDesc(dataType, false)
+        val valueClassDesc = value.getType(environment).classDesc
+
+        value.emit(instructions, environment)
         if (valueClassDesc.isPrimitive) instructions.boxPrimitive(valueClassDesc)
 
         if (isLike) {
@@ -42,7 +45,8 @@ class IsExpression(
         ) { loadConstant(classDesc) }
     }
 
-    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+    context(parents: ParentMap)
+    override fun getType(environment: Environment): DataType {
         return DataType.ofNonNull(ConstantDescs.CD_boolean)
     }
 }

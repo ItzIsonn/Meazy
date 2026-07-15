@@ -1,8 +1,10 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
+import me.itzisonn_.meazy.parser.ast.parent
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.VariableValue
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -15,8 +17,11 @@ import java.lang.constant.ClassDesc
 import kotlin.uuid.Uuid
 
 class Identifier(val id: String) : Expression {
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
-        val resolvedVariable = resolveVariable(environment, parent)
+    override val children = setOf<ProgramUnit>()
+
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val resolvedVariable = resolveVariable(environment)
 
         if (resolvedVariable.classDesc == null) {
             instructions.getLocal(resolvedVariable.type, resolvedVariable.slot)
@@ -25,12 +30,13 @@ class Identifier(val id: String) : Expression {
             instructions.getStaticField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
         }
         else {
-            resolvedVariable.target.emit(instructions, environment, this)
+            resolvedVariable.target.emit(instructions, environment)
             var endLabel: Uuid? = null
 
+            val parent = parent
             if (parent is MemberExpression) {
                 if (!parent.isNullSafe) {
-                    if (resolvedVariable.target.getType(environment, parent).isNullable) {
+                    if (resolvedVariable.target.getType(environment).isNullable) {
                         throw RuntimeException("Unsafe member access of variable '$id' on object of type ${resolvedVariable.classDesc.descriptorString()}")
                     }
                 }
@@ -57,7 +63,10 @@ class Identifier(val id: String) : Expression {
         }
     }
 
-    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+    context(parents: ParentMap)
+    override fun getType(environment: Environment): DataType {
+        val parent = parent
+
         if (parent is MemberExpression && this != parent.member) {
             val classDesc = environment.resolveClassDesc(id, false)
 
@@ -66,12 +75,14 @@ class Identifier(val id: String) : Expression {
             }
         }
 
-        val resolvedVariable = resolveVariable(environment, parent)
+        val resolvedVariable = resolveVariable(environment)
         return DataType.of(resolvedVariable.type, resolvedVariable.isNullable)
     }
 
-    private fun resolveVariable(environment: Environment, parent: ProgramUnit): ResolvedVariable {
-        val variableValue = resolveMeazyVariable(environment, parent) ?: error("Can't find variable $id")
+    context(parents: ParentMap)
+    private fun resolveVariable(environment: Environment): ResolvedVariable {
+        val parent = parent
+        val variableValue = resolveMeazyVariable(environment) ?: error("Can't find variable $id")
 
         val className = variableValue.parentEnvironment.fullClassName
         val target = if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
@@ -90,9 +101,12 @@ class Identifier(val id: String) : Expression {
         )
     }
 
-    private fun resolveMeazyVariable(environment: Environment, parent: ProgramUnit): VariableValue? {
+    context(parents: ParentMap)
+    private fun resolveMeazyVariable(environment: Environment): VariableValue? {
+        val parent = parent
+
         if (parent is MemberExpression && this == parent.member) {
-            val dataType = parent.receiver.getType(environment, parent)
+            val dataType = parent.receiver.getType(environment)
             val classDesc = dataType.classDesc
 
             val classEnvironment = environment.getClass(classDesc) ?: return null

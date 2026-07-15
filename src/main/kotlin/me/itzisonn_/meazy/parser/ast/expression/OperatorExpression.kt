@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
@@ -13,6 +14,7 @@ class OperatorExpression : Expression, LocalStatement {
     val left: Expression
     val right: Expression?
     val operator: Operator
+    override val children: Set<ProgramUnit>
 
     constructor(left: Expression, right: Expression?, operator: Operator) {
         this.left = left
@@ -25,6 +27,8 @@ class OperatorExpression : Expression, LocalStatement {
         else {
             require(right == null) { "Expression with non-infix operator must have only left side" }
         }
+
+        children = if (right != null) setOf(left, right) else setOf(left)
     }
 
     constructor(left: Expression, right: Expression?, operatorSymbol: String, operatorType: OperatorType)
@@ -34,11 +38,13 @@ class OperatorExpression : Expression, LocalStatement {
                 operator
             })
 
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
         operator.emit(instructions, environment, this)
     }
 
-    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
+    context(parents: ParentMap)
+    override fun getType(environment: Environment): DataType {
         return operator.getType(environment, this)
     }
 

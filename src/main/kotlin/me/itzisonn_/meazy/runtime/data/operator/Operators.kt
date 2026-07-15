@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
 import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
 import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.runtime.data.operator.custom.AdditionOperator
 import me.itzisonn_.meazy.runtime.data.operator.custom.AndOperator
@@ -88,14 +89,15 @@ object Operators {
 
 
 
+context(parents: ParentMap)
 fun InstructionsSet.compare(
     environment: Environment, operatorExpression: OperatorExpression, operation: ComparisonOperation
 ) {
     val left = operatorExpression.left
     val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
-    val leftType = left.getType(environment, operatorExpression)
-    val rightType = right.getType(environment, operatorExpression)
+    val leftType = left.getType(environment)
+    val rightType = right.getType(environment)
 
     val leftNumberType = valueOf(leftType.classDesc)
     val rightNumberType = valueOf(rightType.classDesc)
@@ -110,10 +112,10 @@ fun InstructionsSet.compare(
     val trueLabel = createAndInitLabel()
     val endLabel = createAndInitLabel()
 
-    left.emit(this, environment, operatorExpression)
+    left.emit(this, environment)
     convertToNumberType(leftNumberType, commonNumberType)
 
-    right.emit(this, environment, operatorExpression)
+    right.emit(this, environment)
     convertToNumberType(rightNumberType, commonNumberType)
 
     gotoLabelIfComparisonTrue(commonNumberType, operation, trueLabel)
