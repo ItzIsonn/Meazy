@@ -7,18 +7,45 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
 import java.lang.constant.ConstantDescs
+import kotlin.uuid.Uuid
 
 class IfStatement(
-    val condition: Expression?,
-    val body: List<LocalStatement>,
-    val elseStatement: IfStatement?
+    val cases: List<IfStatementCase>
 ) : LocalStatement {
-    override val children = body.toMutableSet<ProgramUnit>().apply {
+    override val children = cases.flatMap { it.children } .toSet()
+
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val endLabel = instructions.createAndInitLabel()
+
+        for (case in cases) {
+            case.emit(instructions, environment, endLabel)
+        }
+
+        instructions.bindLabel(endLabel)
+    }
+
+    override fun alwaysReturns(): Boolean {
+        for (case in cases) {
+            if (!case.alwaysReturns()) return false
+        }
+
+        return cases.last().condition == null
+    }
+}
+
+
+
+class IfStatementCase(
+    val condition: Expression?,
+    val body: List<LocalStatement>
+) {
+    val children = body.toMutableSet<ProgramUnit>().apply {
         if (condition != null) add(condition)
     }.toSet()
 
     context(parents: ParentMap)
-    override fun emit(instructions: InstructionsSet, environment: Environment) {
+    fun emit(instructions: InstructionsSet, environment: Environment, endLabel: Uuid) {
         val startLabel = instructions.createAndInitLabel()
         val elseLabel = instructions.createAndInitLabel()
         val ifEnvironment = LocalVariableDeclarationEnvironment(
@@ -45,7 +72,6 @@ class IfStatement(
             )
         }
 
-        val endLabel = instructions.createAndInitLabel()
         condition.emit(instructions, environment)
         instructions.convertToBooleanType(conditionType.classDesc == ConstantDescs.CD_Boolean, false)
         instructions.gotoLabelIfEqualsZero(elseLabel)
@@ -57,17 +83,13 @@ class IfStatement(
         instructions.gotoLabel(endLabel)
 
         instructions.bindLabel(elseLabel)
-        elseStatement?.emit(instructions, environment)
-        instructions.bindLabel(endLabel)
     }
 
-    override fun alwaysReturns(): Boolean {
-        if (elseStatement == null) return false
-
+    fun alwaysReturns(): Boolean {
         for (localStatement in body) {
-            if (!localStatement.alwaysReturns()) return false
+            if (localStatement.alwaysReturns()) return true
         }
 
-        return elseStatement.alwaysReturns()
+        return false
     }
 }

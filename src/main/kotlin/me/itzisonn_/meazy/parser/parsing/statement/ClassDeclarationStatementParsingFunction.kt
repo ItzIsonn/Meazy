@@ -10,13 +10,11 @@ import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.`class`
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNonNull
-import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNullable
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.*
 import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.literal.BooleanLiteral
-import me.itzisonn_.meazy.parser.ast.expression.literal.NullLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.StringLiteral
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.statement.*
@@ -24,7 +22,6 @@ import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers.enum
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers.get
-import me.itzisonn_.meazy.runtime.data.modifier.Modifiers.operator
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers.private
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers.set
 import me.itzisonn_.meazy.runtime.data.operator.OperatorType
@@ -215,7 +212,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             }
         }
         else equalsExpression = BooleanLiteral(true)
-        body.add(
+        /*body.add(
             FunctionDeclarationStatement(
                 setOf(operator),
                 "equals",
@@ -240,7 +237,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
                 ),
                 ofNonNull(ConstantDescs.CD_boolean)
             )
-        )
+        )*/
 
         return body
     }
