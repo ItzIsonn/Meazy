@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.Parameter
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
@@ -20,6 +20,9 @@ class ConstructorDeclarationStatement(
     val body = body.toMutableList()
     private lateinit var constructorEnvironment: ConstructorEnvironment
 
+    override val children = body.toSet()
+
+    context(parents: ParentMap)
     override fun declare(environment: Environment) {
         if (environment !is ConstructorDeclarationEnvironment) {
             throw RuntimeException("CANT DECLARE CONSTRUCTOR HERE TODO")
@@ -44,11 +47,13 @@ class ConstructorDeclarationStatement(
         if (!alwaysReturns) body.add(ReturnStatement(null))
     }
 
+    context(parents: ParentMap)
     override fun resolve(environment: Environment) {
         constructorEnvironment.parameters.forEach { it.dataType.resolve(environment) }
     }
 
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
         val startLabel = instructions.createLabel()
         val endLabel = instructions.createLabel()
         constructorEnvironment.setStartLabel(startLabel)
@@ -91,7 +96,7 @@ class ConstructorDeclarationStatement(
 
             bindLabel(startLabel)
             for (statement in body) {
-                statement.emit(this, constructorEnvironment, this@ConstructorDeclarationStatement)
+                statement.emit(this, constructorEnvironment)
             }
             bindLabel(endLabel)
         }

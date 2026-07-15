@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
@@ -25,6 +26,10 @@ class FunctionDeclarationStatement(
     val body = body.toMutableList()
     private lateinit var functionEnvironment: FunctionEnvironment
 
+    override val children = body.toMutableSet<ProgramUnit>().apply {
+        if (returnDataTypeValue != null) add(returnDataTypeValue)
+    }.toSet()
+
     constructor(
         modifiers: Set<Modifier>, id: String, parameters: List<Parameter>,
         body: MutableList<LocalStatement>, returnDataType: DataType?
@@ -33,6 +38,7 @@ class FunctionDeclarationStatement(
         returnDataType, null
     )
 
+    context(parents: ParentMap)
     override fun declare(environment: Environment) {
         //TODO check whether abstract function isn't overridden
         if (environment !is FunctionDeclarationEnvironment) {
@@ -63,11 +69,12 @@ class FunctionDeclarationStatement(
         throw RuntimeException("Function with id $id doesn't always return a value")
     }
 
+    context(parents: ParentMap)
     override fun resolve(environment: Environment) {
         val returnDataType: DataType?
         if (functionEnvironment.returnDataType != null) returnDataType = functionEnvironment.returnDataType
         else if (returnDataTypeValue != null) {
-            returnDataType = returnDataTypeValue.getType(environment, this)
+            returnDataType = returnDataTypeValue.getType(environment)
             functionEnvironment.returnDataType = returnDataType
         }
         else returnDataType = null
@@ -76,7 +83,8 @@ class FunctionDeclarationStatement(
         functionEnvironment.parameters.forEach { it.dataType.resolve(environment) }
     }
 
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
         val startLabel = instructions.createLabel()
         val endLabel = instructions.createLabel()
         functionEnvironment.setStartLabel(startLabel)
@@ -169,7 +177,7 @@ class FunctionDeclarationStatement(
 
             bindLabel(startLabel)
             for (statement in body) {
-                statement.emit(this, functionEnvironment, this@FunctionDeclarationStatement)
+                statement.emit(this, functionEnvironment)
             }
             bindLabel(endLabel)
         }

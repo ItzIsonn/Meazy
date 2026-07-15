@@ -1,8 +1,8 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.runtime.environment.Environment
 
@@ -11,12 +11,16 @@ class MemberExpression(
     val member: Expression,
     val isNullSafe: Boolean
 ) : Expression, LocalStatement {
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
-        member.emit(instructions, environment, this)
+    override val children = setOf(receiver, member)
+
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
+        member.emit(instructions, environment)
     }
 
-    override fun getType(environment: Environment, parent: ProgramUnit): DataType {
-        return member.getType(environment, this)
+    context(parents: ParentMap)
+    override fun getType(environment: Environment): DataType {
+        return member.getType(environment)
     }
 
     override fun alwaysReturns() = false

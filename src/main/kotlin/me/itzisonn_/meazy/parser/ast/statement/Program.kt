@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
@@ -24,6 +24,8 @@ class Program(
     private lateinit var fileEnvironment: FileEnvironment
     val file: File
 
+    override val children = _body.toSet()
+
     init {
         require(file?.exists() != false) { "File doesn't exist" }
         require(file?.isDirectory() != true) { "File can't be directory" }
@@ -31,6 +33,7 @@ class Program(
         this.file = file ?: File("internal.mea")
     }
 
+    context(parents: ParentMap)
     override fun declare(environment: Environment) {
         if (environment !is GlobalEnvironment) throw RuntimeException("Environment must be global")
         val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
@@ -54,6 +57,7 @@ class Program(
         }
     }
 
+    context(parents: ParentMap)
     override fun resolve(environment: Environment) {
         for (statement in _body) {
             if (statement is DeclarationStatement) {
@@ -62,7 +66,8 @@ class Program(
         }
     }
 
-    fun emit(instructions: InstructionsSet, environment: Environment) {
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
         val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
         var id = file.nameWithoutExtension
         id = id.substring(0, 1).uppercase() + id.substring(1)
@@ -84,7 +89,7 @@ class Program(
             attributes
         ) {
             for (statement in _body) {
-                statement.emit(this, fileEnvironment, this@Program)
+                statement.emit(this, fileEnvironment)
             }
             withConstructor(
                 MethodTypeDesc.of(ConstantDescs.CD_void),
@@ -105,8 +110,8 @@ class Program(
                 for (variableValue in fileEnvironment.variables) {
                     val value = variableValue.initializer ?: continue
 
-                    value.emit(this, fileEnvironment, this@Program)
-                    val valueType = value.getType(fileEnvironment, this@Program).classDesc
+                    value.emit(this, fileEnvironment)
+                    val valueType = value.getType(fileEnvironment).classDesc
                     val variableType = variableValue.dataType.classDesc
 
                     if (!fileEnvironment.isInstanceOf(valueType, variableType)) {
@@ -125,9 +130,5 @@ class Program(
                 returnVoid()
             }
         }
-    }
-
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
-        emit(instructions, environment)
     }
 }

@@ -2,8 +2,8 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -26,22 +26,30 @@ class VariableDeclarationStatement(
     private lateinit var variableValue: VariableValue
     private var declared = false
 
+    override val children = let {
+        if (value != null) setOf(value)
+        else setOf()
+    }
+
+    context(parents: ParentMap)
     override fun declare(environment: Environment) {
         if (environment !is VariableDeclarationEnvironment) {
             throw RuntimeException("CANT DECLARE variable HERE TODO")
         }
-        val dataType = dataType ?: value?.getType(environment, this)
+        val dataType = dataType ?: value?.getType(environment)
             ?: error("Variable without a data type must have initializer TODO")
 
         variableValue = environment.declareVariable(id, dataType, isConstant, value, modifiers)
         declared = true
     }
 
+    context(parents: ParentMap)
     override fun resolve(environment: Environment) {
         variableValue.dataType.resolve(environment)
     }
 
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
         if (!declared) {
             if (environment !is FileEnvironment && environment !is ClassEnvironment) {
                 declare(environment)
@@ -78,8 +86,8 @@ class VariableDeclarationStatement(
 
 
         if (value != null) {
-            value.emit(instructions, environment, this)
-            val valueType = value.getType(environment, this).classDesc
+            value.emit(instructions, environment)
+            val valueType = value.getType(environment).classDesc
 
             if (!environment.isInstanceOf(valueType, variableType)) {
                 if (!instructions.convertPrimitiveOrBoxed(valueType, variableType)) {

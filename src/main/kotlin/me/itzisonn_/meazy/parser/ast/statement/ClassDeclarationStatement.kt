@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -25,6 +25,9 @@ class ClassDeclarationStatement(
 ) : ModifierStatement(modifiers), DeclarationStatement {
     private lateinit var classEnvironment: ClassEnvironment
 
+    override val children = body.toSet()
+
+    context(parents: ParentMap)
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
@@ -57,6 +60,7 @@ class ClassDeclarationStatement(
         }
     }
 
+    context(parents: ParentMap)
     override fun resolve(environment: Environment) {
         classEnvironment.resolveBaseClasses()
 
@@ -67,7 +71,8 @@ class ClassDeclarationStatement(
         }
     }
 
-    override fun emit(instructions: InstructionsSet, environment: Environment, parent: ProgramUnit) {
+    context(parents: ParentMap)
+    override fun emit(instructions: InstructionsSet, environment: Environment) {
         require(environment is FileEnvironment) { "Environment must be file TODO" }
         val isInner = Modifiers.private in modifiers
 
@@ -96,7 +101,7 @@ class ClassDeclarationStatement(
             var hasConstructor = false
             for (statement in body) {
                 if (statement is ConstructorDeclarationStatement) hasConstructor = true
-                statement.emit(this, classEnvironment, this@ClassDeclarationStatement)
+                statement.emit(this, classEnvironment)
             }
 
             if (!hasConstructor) withConstructor(
@@ -116,9 +121,9 @@ class ClassDeclarationStatement(
                     val value = variableValue.initializer ?: continue
 
                     loadThisReference()
-                    value.emit(this, classEnvironment, this@ClassDeclarationStatement)
+                    value.emit(this, classEnvironment)
 
-                    val valueType = value.getType(classEnvironment, this@ClassDeclarationStatement).classDesc
+                    val valueType = value.getType(classEnvironment).classDesc
                     val variableType = variableValue.dataType.classDesc
 
                     if (!classEnvironment.isInstanceOf(valueType, variableType)) {
