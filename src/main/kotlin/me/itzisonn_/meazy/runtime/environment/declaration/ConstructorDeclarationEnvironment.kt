@@ -2,7 +2,7 @@ package me.itzisonn_.meazy.runtime.environment.declaration
 
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.EvaluationException
-import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
+import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.util.text.translatable
@@ -15,13 +15,13 @@ interface ConstructorDeclarationEnvironment : Environment {
      * Declares given constructor in this environment
      * TODO
      */
-    fun declareConstructor(constructorEnvironment: ConstructorEnvironment)
+    fun declareConstructor(constructor: ConstructorSymbol)
 
     /**
      * @param args Constructor's args TODO
      * @return Declared constructor with given args or null
      */
-    fun getConstructor(args: List<DataType>): ConstructorEnvironment? {
+    fun getConstructor(args: List<DataType>): ConstructorSymbol? {
         return constructors.find { constructor ->
             val parameters = constructor.parameters
             if (args.size != parameters.size) return@find false
@@ -45,7 +45,7 @@ interface ConstructorDeclarationEnvironment : Environment {
     /**
      * @return All declared constructors
      */
-    val constructors: Set<ConstructorEnvironment>
+    val constructors: Set<ConstructorSymbol>
 }
 
 
@@ -54,12 +54,12 @@ private class ConstructorDeclarationEnvironmentImpl(
     parent: Environment,
     override val isShared: Boolean
 ) : ConstructorDeclarationEnvironment, EnvironmentImpl(parent) {
-    private val _constructors = mutableSetOf<ConstructorEnvironment>()
+    private val _constructors = mutableSetOf<ConstructorSymbol>()
 
     override val constructors get() = _constructors.toSet()
 
-    override fun declareConstructor(constructorEnvironment: ConstructorEnvironment) {
-        val parameters = constructorEnvironment.parameters
+    override fun declareConstructor(constructor: ConstructorSymbol) {
+        val parameters = constructor.parameters
 
         main@ for (otherConstructorEnvironment in _constructors) {
             val otherParameters = otherConstructorEnvironment.parameters
@@ -72,7 +72,7 @@ private class ConstructorDeclarationEnvironmentImpl(
             throw EvaluationException(translatable("runtime.constructor.already_exists"))
         }
 
-        _constructors.add(constructorEnvironment)
+        _constructors.add(constructor)
     }
 }
 

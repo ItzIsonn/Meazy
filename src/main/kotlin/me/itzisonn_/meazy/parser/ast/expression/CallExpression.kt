@@ -9,6 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.parent
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import java.lang.constant.ClassDesc
@@ -165,7 +166,7 @@ class CallExpression(
         val constructorEnvironment = resolveMeazyConstructor(environment)
             ?: error("Can't find constructor for $id")
 
-        val classEnvironment = constructorEnvironment.getParent()
+        val classEnvironment = constructorEnvironment.environment.getParent()
         if (classEnvironment !is ClassEnvironment) {
             throw RuntimeException("Invalid constructor")
         }
@@ -187,7 +188,7 @@ class CallExpression(
     }
 
     context(parents: ParentMap)
-    private fun resolveMeazyConstructor(environment: Environment): ConstructorEnvironment? {
+    private fun resolveMeazyConstructor(environment: Environment): ConstructorSymbol? {
         val args = args.map { it.getType(environment) }
 
         val classEnvironment = environment.getClass(environment.resolveClassDesc(id, false)) ?: return null

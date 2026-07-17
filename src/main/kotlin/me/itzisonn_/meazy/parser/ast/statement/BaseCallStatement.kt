@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.statement
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
@@ -46,20 +47,20 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
         val constructorEnvironment = resolveMeazyConstructor(environment)
             ?: error("Failed to resolve constructor")
 
-        if (constructorEnvironment.getParent() !is ClassEnvironment) {
+        if (constructorEnvironment.environment.getParent() !is ClassEnvironment) {
             throw RuntimeException("Can't call super class not inside class")
         }
 
         val parameters = constructorEnvironment.parameters.map { it.dataType.classDesc }.toList()
 
         return ResolvedConstructor(
-            ClassDesc.of(constructorEnvironment.getParent().fullClassName),
+            ClassDesc.of(constructorEnvironment.environment.getParent().fullClassName),
             MethodTypeDesc.of(ConstantDescs.CD_void, parameters)
         )
     }
 
     context(parents: ParentMap)
-    private fun resolveMeazyConstructor(environment: Environment): ConstructorEnvironment? {
+    private fun resolveMeazyConstructor(environment: Environment): ConstructorSymbol? {
         val classEnvironment = environment.getParent<ClassEnvironment>()
             ?: error("Can't call super class not inside class")
 
