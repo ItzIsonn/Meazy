@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import java.lang.constant.ClassDesc
 
@@ -153,12 +154,26 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 if (java.lang.reflect.Modifier.isPrivate(constructor.modifiers)) constructorModifiers.add(Modifiers.private)
                 if (java.lang.reflect.Modifier.isProtected(constructor.modifiers)) constructorModifiers.add(Modifiers.protected)
 
+                val constructorEnvironment = ConstructorEnvironment(
+                    classEnvironment,
+                    null,
+                    null,
+                    constructorModifiers,
+                    constructor.parameters
+                        .map { p ->
+                            Parameter(
+                                p.name,
+                                DataType.of(
+                                    p.getType().describeConstable().orElseThrow(),
+                                    !p.getType().isPrimitive
+                                ),
+                                java.lang.reflect.Modifier.isFinal(p.modifiers)
+                            )
+                        }.toList()
+                )
+
                 classEnvironment.declareConstructor(
-                    ConstructorEnvironment(
-                        classEnvironment,
-                        null,
-                        null,
-                        constructorModifiers,
+                    ConstructorSymbol(
                         constructor.parameters
                             .map { p ->
                                 Parameter(
@@ -169,7 +184,9 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                                     ),
                                     java.lang.reflect.Modifier.isFinal(p.modifiers)
                                 )
-                            }.toList()
+                            }.toList(),
+                        constructorModifiers,
+                        constructorEnvironment
                     )
                 )
             }

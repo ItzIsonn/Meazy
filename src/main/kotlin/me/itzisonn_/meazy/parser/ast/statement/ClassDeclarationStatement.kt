@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import java.lang.classfile.attribute.InnerClassInfo
@@ -53,8 +54,11 @@ class ClassDeclarationStatement(
 
         if (!classEnvironment.hasConstructor()) {
             classEnvironment.declareConstructor(
-                ConstructorEnvironment(
-                    classEnvironment, null, null, setOf(), listOf()
+                ConstructorSymbol(
+                    listOf(), setOf(),
+                    ConstructorEnvironment(
+                        classEnvironment, null, null, setOf(), listOf()
+                    )
                 )
             )
         }

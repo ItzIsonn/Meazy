@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
@@ -18,7 +19,7 @@ class ConstructorDeclarationStatement(
     body: List<LocalStatement>
 ) : ModifierStatement(modifiers), DeclarationStatement {
     val body = body.toMutableList()
-    private lateinit var constructorEnvironment: ConstructorEnvironment
+    private lateinit var symbol: ConstructorSymbol
 
     override val children = body.toSet()
 
@@ -32,8 +33,8 @@ class ConstructorDeclarationStatement(
             environment, null, null, modifiers, parameters
         )
 
-        environment.declareConstructor(constructorEnvironment)
-        this.constructorEnvironment = constructorEnvironment
+        symbol = ConstructorSymbol(parameters, modifiers, constructorEnvironment)
+        environment.declareConstructor(symbol)
 
         var alwaysReturns = false
         var hasBaseCall = false
@@ -49,11 +50,13 @@ class ConstructorDeclarationStatement(
 
     context(parents: ParentMap)
     override fun resolve(environment: Environment) {
-        constructorEnvironment.parameters.forEach { it.dataType.resolve(environment) }
+        symbol.environment.parameters.forEach { it.dataType.resolve(environment) }
     }
 
     context(parents: ParentMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val constructorEnvironment = symbol.environment
+
         val startLabel = instructions.createLabel()
         val endLabel = instructions.createLabel()
         constructorEnvironment.setStartLabel(startLabel)
