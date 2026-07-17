@@ -3,7 +3,8 @@ package me.itzisonn_.meazy.runtime.environment
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
-import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
+import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
@@ -29,23 +30,23 @@ sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDecl
 
 
 
-    fun getFunctionRecursively(id: String, args: List<DataType>): FunctionEnvironment? {
-        var functionEnvironment = getFunction(id, args)
-        if (functionEnvironment != null) return functionEnvironment
+    fun getFunctionRecursively(id: String, args: List<DataType>): FunctionSymbol? {
+        var function = getFunction(id, args)
+        if (function != null) return function
 
         val baseClass = baseClass
         if (baseClass != null) {
             val baseClass = resolveClassDesc(baseClass, false)
             val classEnvironment = getClass(baseClass)!!
-            functionEnvironment = classEnvironment.getFunctionRecursively(id, args)
-            if (functionEnvironment != null) return functionEnvironment
+            function = classEnvironment.getFunctionRecursively(id, args)
+            if (function != null) return function
         }
 
         for (interfaceClassDesc in interfaces) {
             val baseClass: ClassDesc = resolveClassDesc(interfaceClassDesc, false)
             val classEnvironment = getClass(baseClass)!!
-            functionEnvironment = classEnvironment.getFunctionRecursively(id, args)
-            if (functionEnvironment != null) return functionEnvironment
+            function = classEnvironment.getFunctionRecursively(id, args)
+            if (function != null) return function
         }
 
         return null
@@ -120,7 +121,7 @@ private class ClassEnvironmentImpl(
 
 
 
-    override fun getVariable(id: String): VariableValue? {
+    override fun getVariable(id: String): VariableSymbol? {
         val variableValue = super<VariableDeclarationEnvironmentImpl>.getVariable(id)
         if (variableValue != null) return variableValue
 
@@ -133,9 +134,9 @@ private class ClassEnvironmentImpl(
 
 
 
-    override fun getFunction(id: String, args: List<DataType>): FunctionEnvironment? {
-        val functionEnvironment = super<FunctionDeclarationEnvironment>.getFunction(id, args)
-        if (functionEnvironment != null) return functionEnvironment
+    override fun getFunction(id: String, args: List<DataType>): FunctionSymbol? {
+        val function = super<FunctionDeclarationEnvironment>.getFunction(id, args)
+        if (function != null) return function
 
         val baseClass = baseClass ?: return null
         val baseClassEnvironment = getClass(baseClass)

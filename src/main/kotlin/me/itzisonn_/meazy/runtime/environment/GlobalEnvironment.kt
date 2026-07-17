@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import java.lang.constant.ClassDesc
 
 /**
@@ -107,11 +108,28 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 if (java.lang.reflect.Modifier.isStatic(method.modifiers)) functionModifiers.add(Modifiers.shared)
                 if (java.lang.reflect.Modifier.isAbstract(method.modifiers)) functionModifiers.add(Modifiers.abstract)
 
+                val functionEnvironment = FunctionEnvironment(
+                    classEnvironment,
+                    null,
+                    null,
+                    method.name,
+                    method.parameters.map { p ->
+                        Parameter(
+                            p.name,
+                            DataType.of(
+                                p.getType().describeConstable().orElseThrow(),
+                                !p.getType().isPrimitive
+                            ),
+                            java.lang.reflect.Modifier.isFinal(p.modifiers)
+                        )
+                    },
+                    returnDataType,
+                    java.lang.reflect.Modifier.isStatic(method.modifiers),
+                    functionModifiers
+                )
+
                 classEnvironment.declareFunction(
-                    FunctionEnvironment(
-                        classEnvironment,
-                        null,
-                        null,
+                    FunctionSymbol(
                         method.name,
                         method.parameters.map { p ->
                             Parameter(
@@ -124,8 +142,8 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                             )
                         },
                         returnDataType,
-                        java.lang.reflect.Modifier.isStatic(method.modifiers),
-                        functionModifiers
+                        functionModifiers,
+                        functionEnvironment
                     )
                 )
             }

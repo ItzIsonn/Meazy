@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.parent
 import me.itzisonn_.meazy.runtime.data.DataType
-import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
@@ -102,7 +102,7 @@ class Identifier(val id: String) : Expression {
     }
 
     context(parents: ParentMap)
-    private fun resolveMeazyVariable(environment: Environment): VariableValue? {
+    private fun resolveMeazyVariable(environment: Environment): VariableSymbol? {
         val parent = parent
 
         if (parent is MemberExpression && this == parent.member) {

@@ -1,7 +1,8 @@
 package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.runtime.data.DataType
-import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
+import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
@@ -266,7 +267,7 @@ fun areFromSamePackage(environment1: Environment, environment2: Environment): Bo
  * @param id Variable's id
  * @return Environment that has requested variable or null
  */
-fun Environment.getVariable(id: String): VariableValue? {
+fun Environment.getVariable(id: String): VariableSymbol? {
     if (this is VariableDeclarationEnvironment) {
         val variableValue = getVariable(id)
         if (variableValue != null) return variableValue
@@ -303,16 +304,16 @@ fun Environment.getVariableDeclarationEnvironment(id: String): VariableDeclarati
  * @param args Function's args
  * @return Environment that has requested function or null
  */
-fun Environment.getFunction(id: String, args: List<DataType>): FunctionEnvironment? {
+fun Environment.getFunction(id: String, args: List<DataType>): FunctionSymbol? {
     if (this is FunctionDeclarationEnvironment) {
-        val functionEnvironment = getFunction(id, args)
-        if (functionEnvironment != null) return functionEnvironment
+        val function = getFunction(id, args)
+        if (function != null) return function
     }
 
     if (this is GlobalEnvironment) {
         for (fileEnvironment in fileEnvironments) {
-            val functionEnvironment = fileEnvironment.getFunction(id, args)
-            if (functionEnvironment != null) return functionEnvironment
+            val function = fileEnvironment.getFunction(id, args)
+            if (function != null) return function
         }
 
         return null
@@ -329,7 +330,7 @@ fun Environment.getFunction(id: String, args: List<DataType>): FunctionEnvironme
  * @return Environment that has requested function or null
  */
 fun Environment.getFunctionDeclarationEnvironment(id: String, parameters: List<DataType>): FunctionDeclarationEnvironment? {
-    return getFunction(id, parameters)?.getParent()
+    return getFunction(id, parameters)?.environment?.getParent()
 }
 
 

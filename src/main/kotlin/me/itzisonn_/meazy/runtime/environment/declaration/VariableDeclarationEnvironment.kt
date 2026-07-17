@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime.environment.declaration
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
-import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
@@ -17,7 +17,7 @@ interface VariableDeclarationEnvironment : Environment {
      * Declares given VariableValue in this environment
      * @param id VariableValue TODO
      */
-    fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableValue
+    fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableSymbol
 
     /**
      * @param id Variable's id
@@ -28,21 +28,21 @@ interface VariableDeclarationEnvironment : Environment {
     /**
      * @return All declared variables
      */
-    val variables: List<VariableValue>
+    val variables: List<VariableSymbol>
 }
 
 
 
 open class VariableDeclarationEnvironmentImpl(parent: Environment) : EnvironmentImpl(parent), VariableDeclarationEnvironment {
-    protected val _variables = mutableListOf<VariableValue>()
+    protected val _variables = mutableListOf<VariableSymbol>()
     override val variables get() = _variables.toList()
 
-    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableValue {
+    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableSymbol {
         if (getVariable(id) != null) {
             throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
-        val variableValue = VariableValue(id, type, isConstant, modifiers, -1, value, this)
+        val variableValue = VariableSymbol(id, type, isConstant, modifiers, -1, value, this)
         _variables.add(variableValue)
         return variableValue
     }

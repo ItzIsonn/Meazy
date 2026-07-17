@@ -12,17 +12,9 @@ import kotlin.uuid.Uuid
  * Represents environment for functions
  */
 sealed interface FunctionEnvironment : LocalVariableDeclarationEnvironment, ModifieredEnvironment {
-    /**
-     * @return Id
-     */
     val id: String
-
-    /**
-     * @return Parameters
-     */
     val parameters: List<Parameter>
-
-    var returnDataType: DataType?
+    val returnDataType: DataType?
 
     override fun getParent(): FunctionDeclarationEnvironment
 }
@@ -35,7 +27,7 @@ private class FunctionEnvironmentImpl(
     endLabel: Uuid?,
     override val id: String,
     parameters: List<Parameter>,
-    override var returnDataType: DataType?,
+    override val returnDataType: DataType?,
     override val isShared: Boolean,
     modifiers: Set<Modifier>
 ) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), FunctionEnvironment {

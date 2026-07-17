@@ -44,7 +44,7 @@ fun println(val v: String?) {
     System.out.println(v)
 }
 
-fun get() = b()
+fun get(): List = b()
 
 
 
