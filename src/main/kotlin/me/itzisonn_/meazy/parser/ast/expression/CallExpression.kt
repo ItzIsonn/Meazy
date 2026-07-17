@@ -9,6 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.parent
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
@@ -113,30 +114,30 @@ class CallExpression(
     private fun resolveFunction(environment: Environment): ResolvedCallable {
         val parent = parent
 
-        val functionEnvironment = resolveMeazyFunction(environment)
+        val function = resolveMeazyFunction(environment)
             ?: error("Can't find function for " + id + " and args " + args)
 
-        val className = functionEnvironment.getParent().fullClassName
+        val className = function.environment.getParent().fullClassName
             ?: error("Invalid function's parent")
 
-        val target = if (Modifiers.shared in functionEnvironment.modifiers || functionEnvironment.getParent() is FileEnvironment) {
+        val target = if (Modifiers.shared in function.modifiers || function.environment.getParent() is FileEnvironment) {
             null
         }
         else if (parent is MemberExpression) parent.receiver
         else ThisLiteral()
 
-        val returnDataType = functionEnvironment.returnDataType
+        val returnDataType = function.returnDataType
 
         return ResolvedCallable(
             ClassDesc.of(className),
             MethodTypeDesc.of(
                 returnDataType?.classDesc ?: ConstantDescs.CD_void,
-                functionEnvironment.parameters
+                function.parameters
                     .map { it.dataType.classDesc }.toList()
             ),
             returnDataType != null && returnDataType.isNullable,
             target,
-            functionEnvironment.getParent().run {
+            function.environment.getParent().run {
                 this is ClassEnvironment && isInterface
             },
             true
@@ -144,7 +145,7 @@ class CallExpression(
     }
 
     context(parents: ParentMap)
-    private fun resolveMeazyFunction(environment: Environment): FunctionEnvironment? {
+    private fun resolveMeazyFunction(environment: Environment): FunctionSymbol? {
         val parent = parent
         val args = args.map { it.getType(environment) }
 

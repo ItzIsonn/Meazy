@@ -1,13 +1,14 @@
-package me.itzisonn_.meazy.runtime.data
+package me.itzisonn_.meazy.runtime.data.symbol
 
 import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
 
 /**
- * Represents runtime variable value
+ * Represents runtime variable symbol
  */
-interface VariableValue {
+sealed interface VariableSymbol {
     /**
      * @return Id
      */
@@ -19,7 +20,7 @@ interface VariableValue {
     val dataType: DataType
 
     /**
-     * @return Whether value is constant
+     * @return Whether variable is constant
      */
     val isConstant: Boolean
 
@@ -37,25 +38,22 @@ interface VariableValue {
 
     /**
      * @param modifier Target modifier
-     * @return Whether this variable value has given modifier
+     * @return Whether this variable has given modifier
      */
     fun hasModifier(modifier: Modifier) = modifier in modifiers
 
     /**
      * @param id Modifier's id
-     * @return Whether this variable value has modifier with given id
+     * @return Whether this variable has modifier with given id
      */
     fun hasModifier(id: String) = modifiers.find { it.id == id } != null
 
-    /**
-     * @return Modifiers
-     */
     val modifiers: Set<Modifier>
 }
 
 
 
-private data class VariableValueImpl(
+private data class VariableSymbolImpl(
     override val id: String?,
     override val dataType: DataType,
     override val isConstant: Boolean,
@@ -63,12 +61,12 @@ private data class VariableValueImpl(
     override val slot: Int,
     override val initializer: Expression?,
     override val parentEnvironment: VariableDeclarationEnvironment
-) : VariableValue
+) : VariableSymbol
 
-fun VariableValue(
+fun VariableSymbol(
     id: String?, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
     slot: Int, initializer: Expression?, parentEnvironment: VariableDeclarationEnvironment
-): VariableValue = VariableValueImpl(
+): VariableSymbol = VariableSymbolImpl(
     id, dataType, isConstant, modifiers.toSet(),
     slot, initializer, parentEnvironment
 )

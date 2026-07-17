@@ -4,10 +4,9 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
-import me.itzisonn_.meazy.parser.ast.ProgramUnit
-import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import java.lang.constant.ConstantDescs
@@ -20,22 +19,18 @@ class FunctionDeclarationStatement(
     val classId: String?,
     val parameters: List<Parameter>,
     body: List<LocalStatement>,
-    val returnDataType: DataType?,
-    val returnDataTypeValue: Expression?
+    val returnDataType: DataType?
 ) : ModifierStatement(modifiers), DeclarationStatement {
     val body = body.toMutableList()
-    private lateinit var functionEnvironment: FunctionEnvironment
+    private lateinit var symbol: FunctionSymbol
 
-    override val children = body.toMutableSet<ProgramUnit>().apply {
-        if (returnDataTypeValue != null) add(returnDataTypeValue)
-    }.toSet()
+    override val children = body.toSet()
 
     constructor(
         modifiers: Set<Modifier>, id: String, parameters: List<Parameter>,
-        body: MutableList<LocalStatement>, returnDataType: DataType?
+        body: List<LocalStatement>, returnDataType: DataType?
     ) : this(
-        modifiers, id, null, parameters, body,
-        returnDataType, null
+        modifiers, id, null, parameters, body, returnDataType
     )
 
     context(parents: ParentMap)
@@ -52,8 +47,10 @@ class FunctionDeclarationStatement(
             returnDataType, isShared, modifiers
         )
 
-        environment.declareFunction(functionEnvironment)
-        this.functionEnvironment = functionEnvironment
+        symbol = FunctionSymbol(
+            id, parameters, returnDataType, modifiers, functionEnvironment
+        )
+        environment.declareFunction(symbol)
 
         if (Modifiers.abstract in modifiers) return
 
@@ -71,20 +68,15 @@ class FunctionDeclarationStatement(
 
     context(parents: ParentMap)
     override fun resolve(environment: Environment) {
-        val returnDataType: DataType?
-        if (functionEnvironment.returnDataType != null) returnDataType = functionEnvironment.returnDataType
-        else if (returnDataTypeValue != null) {
-            returnDataType = returnDataTypeValue.getType(environment)
-            functionEnvironment.returnDataType = returnDataType
-        }
-        else returnDataType = null
-
-        returnDataType?.resolve(environment)
+        val functionEnvironment = symbol.environment
+        functionEnvironment.returnDataType?.resolve(environment)
         functionEnvironment.parameters.forEach { it.dataType.resolve(environment) }
     }
 
     context(parents: ParentMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val functionEnvironment = symbol.environment
+
         val startLabel = instructions.createLabel()
         val endLabel = instructions.createLabel()
         functionEnvironment.setStartLabel(startLabel)

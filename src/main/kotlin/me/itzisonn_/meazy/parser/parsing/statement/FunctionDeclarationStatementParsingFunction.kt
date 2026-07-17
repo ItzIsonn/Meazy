@@ -8,7 +8,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
-import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.parser.ast.statement.ReturnStatement
@@ -45,21 +44,18 @@ object FunctionDeclarationStatementParsingFunction : PairParsingFunction<Functio
         }
 
         val body: List<LocalStatement>
-        val returnDataTypeValue: Expression?
 
         if (isNext(assign)) {
             consume(assign, null)
             val expression = parse(ExpressionParsingFunction)
             body = listOf(ReturnStatement(expression))
-            returnDataTypeValue = expression
         }
         else {
             consume(leftBrace, translatable("parser.expected.start", "left_brace", "function_body"))
             body = parseBody()
             consume(rightBrace, translatable("parser.expected.end", "right_brace", "function_body"))
-            returnDataTypeValue = null
         }
 
-        return FunctionDeclarationStatement(modifiers, functionId, classId, parameters, body, dataType, returnDataTypeValue)
+        return FunctionDeclarationStatement(modifiers, functionId, classId, parameters, body, dataType)
     }
 }

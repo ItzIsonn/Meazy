@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
-import me.itzisonn_.meazy.runtime.data.VariableValue
+import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
@@ -23,7 +23,7 @@ class VariableDeclarationStatement(
     val dataType: DataType?,
     val value: Expression?
 ) : ModifierStatement(modifiers), DeclarationStatement, LocalStatement {
-    private lateinit var variableValue: VariableValue
+    private lateinit var symbol: VariableSymbol
     private var declared = false
 
     override val children = let {
@@ -39,13 +39,13 @@ class VariableDeclarationStatement(
         val dataType = dataType ?: value?.getType(environment)
             ?: error("Variable without a data type must have initializer TODO")
 
-        variableValue = environment.declareVariable(id, dataType, isConstant, value, modifiers)
+        symbol = environment.declareVariable(id, dataType, isConstant, value, modifiers)
         declared = true
     }
 
     context(parents: ParentMap)
     override fun resolve(environment: Environment) {
-        variableValue.dataType.resolve(environment)
+        symbol.dataType.resolve(environment)
     }
 
     context(parents: ParentMap)
@@ -58,7 +58,7 @@ class VariableDeclarationStatement(
             else throw RuntimeException("Declared variable is unresolved TODO")
         }
 
-        val variableType = variableValue.dataType.classDesc
+        val variableType = symbol.dataType.classDesc
 
         if (environment is FileEnvironment) {
             val accessFlags = mutableSetOf(AccessFlag.STATIC)
@@ -96,13 +96,13 @@ class VariableDeclarationStatement(
             }
         }
 
-        instructions.storeLocal(variableType, variableValue.slot)
+        instructions.storeLocal(variableType, symbol.slot)
 
         if (environment is LocalVariableDeclarationEnvironment) {
             if (environment.getStartLabel() == null || environment.getEndLabel() == null) return
 
             instructions.setLocalName(
-                variableValue.slot, id, variableType,
+                symbol.slot, id, variableType,
                 environment.getStartLabel()!!, environment.getEndLabel()!!
             )
         }

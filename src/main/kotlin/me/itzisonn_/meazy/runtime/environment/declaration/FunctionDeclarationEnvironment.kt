@@ -2,9 +2,9 @@ package me.itzisonn_.meazy.runtime.environment.declaration
 
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.EvaluationException
+import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
-import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 import me.itzisonn_.meazy.util.text.translatable
 
 /**
@@ -15,14 +15,14 @@ interface FunctionDeclarationEnvironment : Environment {
      * Declares given function in this environment
      * TODO
      */
-    fun declareFunction(functionEnvironment: FunctionEnvironment)
+    fun declareFunction(function: FunctionSymbol)
 
     /**
      * @param id Id
      * @param args Parameters
      * @return Declared function with given id and args or null
      */
-    fun getFunction(id: String, args: List<DataType>): FunctionEnvironment? {
+    fun getFunction(id: String, args: List<DataType>): FunctionSymbol? {
         return functions.find { function ->
             if (function.id != id) return@find false
 
@@ -41,7 +41,7 @@ interface FunctionDeclarationEnvironment : Environment {
     /**
      * @return All declared functions
      */
-    val functions: Set<FunctionEnvironment>
+    val functions: Set<FunctionSymbol>
 }
 
 
@@ -50,15 +50,15 @@ private class FunctionDeclarationEnvironmentImpl(
     parent: Environment,
     override val isShared: Boolean
 ) : FunctionDeclarationEnvironment, EnvironmentImpl(parent) {
-    private val _functions = mutableSetOf<FunctionEnvironment>()
+    private val _functions = mutableSetOf<FunctionSymbol>()
 
     override val functions get() = _functions.toSet()
 
-    override fun declareFunction(functionEnvironment: FunctionEnvironment) {
-        val parameters = functionEnvironment.parameters
+    override fun declareFunction(function: FunctionSymbol) {
+        val parameters = function.parameters
 
         main@ for (otherFunctionEnvironment in _functions) {
-            if (otherFunctionEnvironment.id == functionEnvironment.id) {
+            if (otherFunctionEnvironment.id == function.id) {
                 val otherParameters = otherFunctionEnvironment.parameters
                 if (parameters.size != otherParameters.size) continue
 
@@ -66,11 +66,11 @@ private class FunctionDeclarationEnvironmentImpl(
                     if (otherParameters[i].dataType != parameters[i].dataType) continue@main
                 }
 
-                throw EvaluationException(translatable("runtime.function.already_exists", functionEnvironment.id))
+                throw EvaluationException(translatable("runtime.function.already_exists", function.id))
             }
         }
 
-        _functions.add(functionEnvironment)
+        _functions.add(function)
     }
 }
 
