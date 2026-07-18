@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import java.lang.constant.ClassDesc
@@ -34,7 +35,7 @@ sealed interface GlobalEnvironment : Environment {
     val fileEnvironments: Set<FileEnvironment>
 
 
-    fun resolveJavaClass(classDesc: ClassDesc): ClassEnvironment?
+    fun resolveJavaClass(classDesc: ClassDesc): ClassSymbol?
 }
 
 
@@ -52,7 +53,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
 
 
 
-    override fun resolveJavaClass(classDesc: ClassDesc): ClassEnvironment? {
+    override fun resolveJavaClass(classDesc: ClassDesc): ClassSymbol? {
         if (classDesc.isPrimitive || classDesc.isArray) return null
 
         try {
@@ -79,11 +80,26 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 cls.isInterface,
                 classDesc.displayName(),
                 if (cls.getSuperclass() == null) null else cls.getSuperclass().describeConstable().orElseThrow(),
-                cls.interfaces.map { c -> c.describeConstable().orElseThrow() }.toSet(),
+                cls.interfaces.map { it.describeConstable().orElseThrow() }.toSet(),
                 classEnvironmentModifiers
             )
 
-            fileEnvironment.declareClass(classEnvironment)
+            val classSymbol = ClassSymbol(
+                classDesc.displayName(), cls.isInterface,
+                cls.interfaces
+                    .map { it.describeConstable().orElseThrow() }
+                    .map { it.packageName() + "." + it.displayName() }
+                    .toMutableSet().apply {
+                        if (cls.getSuperclass() != null) {
+                            val baseClass = cls.getSuperclass().describeConstable().orElseThrow()
+                            add(baseClass.packageName() + "." + baseClass.displayName())
+                        }
+                    },
+                classEnvironmentModifiers,
+                classEnvironment
+            )
+
+            fileEnvironment.declareClass(classSymbol)
             addFileEnvironment(fileEnvironment)
 
             if (classEnvironment.baseClass != null) resolveJavaClass(classEnvironment.baseClass!!)
@@ -214,7 +230,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 )
             }
 
-            return classEnvironment
+            return classSymbol
         }
         catch (_: ClassNotFoundException) {
             return null

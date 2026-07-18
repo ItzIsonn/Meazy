@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.runtime.data.DataType
+import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
@@ -141,14 +142,14 @@ inline fun <reified T : Environment> Environment.getParentOrSelf() = getParentOr
  */
 fun Environment.isInstanceOf(classDesc: ClassDesc, target: ClassDesc): Boolean {
     if (classDesc == target) return true
-    val classEnvironment = getClass(classDesc) ?: return false
+    val classSymbol = getClass(classDesc) ?: return false
 
-    val baseClass = classEnvironment.baseClass
+    val baseClass = classSymbol.environment.baseClass
     if (baseClass != null && isInstanceOf(baseClass, target)) {
         return true
     }
 
-    for (interfaceClassDesc in classEnvironment.interfaces) {
+    for (interfaceClassDesc in classSymbol.environment.interfaces) {
         if (isInstanceOf(interfaceClassDesc, target)) return true
     }
 
@@ -163,17 +164,17 @@ fun Environment.getCommonOf(classDesc1: ClassDesc, classDesc2: ClassDesc): Class
     if (isInstanceOf(classDesc1, classDesc2)) return classDesc2
     if (isInstanceOf(classDesc2, classDesc1)) return classDesc1
 
-    val classEnvironment = getClass(classDesc1) ?: return null
+    val classSymbol = getClass(classDesc1) ?: return null
     var gotObjectAsCommon = false
 
-    val baseClass = classEnvironment.baseClass
+    val baseClass = classSymbol.environment.baseClass
     if (baseClass != null) {
         val commonClassDesc = getCommonOf(baseClass, classDesc2)
         if (ConstantDescs.CD_Object == commonClassDesc) gotObjectAsCommon = true
         else if (commonClassDesc != null) return commonClassDesc
     }
 
-    for (interfaceClassDesc in classEnvironment.interfaces) {
+    for (interfaceClassDesc in classSymbol.environment.interfaces) {
         val commonClassDesc = getCommonOf(interfaceClassDesc, classDesc2)
         if (commonClassDesc != null) return commonClassDesc
     }
@@ -191,11 +192,11 @@ fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean)
 
     val fileEnvironment = getParentOrSelf<FileEnvironment>() ?: return classDesc
 
-    var classEnvironment = fileEnvironment.getClass(classDesc.displayName())
-    if (classEnvironment != null) return classEnvironment.classDesc
+    var classSymbol = fileEnvironment.getClass(classDesc.displayName())
+    if (classSymbol != null) return classSymbol.environment.classDesc
 
-    classEnvironment = getClass(classDesc)
-    if (classEnvironment != null) return classEnvironment.classDesc
+    classSymbol = getClass(classDesc)
+    if (classSymbol != null) return classSymbol.environment.classDesc
 
     val fullId: String
     val fullClassDesc = fileEnvironment.imports[classDesc.displayName()]
@@ -214,8 +215,8 @@ fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean)
         if (classDesc.displayName() == "Boolean") return ConstantDescs.CD_boolean
     }
 
-    classEnvironment = getClass(fullId)
-    if (classEnvironment != null) return classEnvironment.classDesc
+    classSymbol = getClass(fullId)
+    if (classSymbol != null) return classSymbol.environment.classDesc
 
     val resolvedClassDesc = ClassDesc.of(fullId)
     fileEnvironment.getParent().resolveJavaClass(resolvedClassDesc)
@@ -335,24 +336,24 @@ fun Environment.getFunctionDeclarationEnvironment(id: String, parameters: List<D
 
 
 
-fun Environment.getClass(classDesc: ClassDesc): ClassEnvironment? {
+fun Environment.getClass(classDesc: ClassDesc): ClassSymbol? {
     if (classDesc.isPrimitive || classDesc.isArray) return null
     val globalEnvironment = getParentOrSelf<GlobalEnvironment>() ?: return null
 
     for (fileEnvironment in globalEnvironment.getFileEnvironments(classDesc.packageName())) {
-        val classEnvironment = fileEnvironment.getClass(classDesc.displayName())
-        if (classEnvironment != null) return classEnvironment
+        val classSymbol = fileEnvironment.getClass(classDesc.displayName())
+        if (classSymbol != null) return classSymbol
     }
 
     return globalEnvironment.resolveJavaClass(classDesc)
 }
 
-fun Environment.getClass(id: String): ClassEnvironment? {
+fun Environment.getClass(id: String): ClassSymbol? {
     return getClass(ClassDesc.of(id))
 }
 
 fun Environment.getClassDeclarationEnvironment(classDesc: ClassDesc): ClassDeclarationEnvironment? {
-    return getClass(classDesc)?.getParent()
+    return getClass(classDesc)?.environment?.getParent()
 }
 
 fun Environment.getClassDeclarationEnvironment(id: String): ClassDeclarationEnvironment? {

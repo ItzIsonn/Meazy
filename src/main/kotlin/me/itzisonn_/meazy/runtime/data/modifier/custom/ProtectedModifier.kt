@@ -44,7 +44,7 @@ class ProtectedModifier : Modifier("protected") {
                                     translatable("runtime.class.doesnt_exist", env.id)
                                 )
 
-                            return@hasParent parentClassEnvironment.interfaces
+                            return@hasParent parentClassEnvironment.environment.interfaces
                                 .any { it.displayName() == declarationEnvironment.id }
                         }
                         false

@@ -37,15 +37,15 @@ sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDecl
         val baseClass = baseClass
         if (baseClass != null) {
             val baseClass = resolveClassDesc(baseClass, false)
-            val classEnvironment = getClass(baseClass)!!
-            function = classEnvironment.getFunctionRecursively(id, args)
+            val baseClassSymbol = getClass(baseClass)!!
+            function = baseClassSymbol.environment.getFunctionRecursively(id, args)
             if (function != null) return function
         }
 
         for (interfaceClassDesc in interfaces) {
-            val baseClass: ClassDesc = resolveClassDesc(interfaceClassDesc, false)
-            val classEnvironment = getClass(baseClass)!!
-            function = classEnvironment.getFunctionRecursively(id, args)
+            val baseClass = resolveClassDesc(interfaceClassDesc, false)
+            val baseClassSymbol = getClass(baseClass)!!
+            function = baseClassSymbol.environment.getFunctionRecursively(id, args)
             if (function != null) return function
         }
 
@@ -106,12 +106,12 @@ private class ClassEnvironmentImpl(
     override fun resolveBaseClasses() {
         for (unresolvedBaseClass in unresolvedBaseClasses) {
             val classDesc = getParent().resolveClassDesc(unresolvedBaseClass, false)
-            val baseClassEnvironment = getParent().getClass(classDesc)!!
+            val baseClassSymbol = getParent().getClass(classDesc)!!
 
-            if (baseClassEnvironment.isInterface) _interfaces.add(baseClassEnvironment.classDesc)
+            if (baseClassSymbol.isInterface) _interfaces.add(baseClassSymbol.environment.classDesc)
             else {
                 if (baseClass != null) throw RuntimeException("Class can't have more than one base class TODO")
-                baseClass = baseClassEnvironment.classDesc
+                baseClass = baseClassSymbol.environment.classDesc
             }
         }
 
@@ -126,9 +126,9 @@ private class ClassEnvironmentImpl(
         if (variableValue != null) return variableValue
 
         val baseClass = baseClass ?: return null
-        val baseClassEnvironment = getClass(baseClass.displayName())
+        val baseClassSymbol = getClass(baseClass.displayName())
 
-        if (baseClassEnvironment != null) return baseClassEnvironment.getVariable(id)
+        if (baseClassSymbol != null) return baseClassSymbol.environment.getVariable(id)
         return null
     }
 
@@ -139,9 +139,9 @@ private class ClassEnvironmentImpl(
         if (function != null) return function
 
         val baseClass = baseClass ?: return null
-        val baseClassEnvironment = getClass(baseClass)
+        val baseClassSymbol = getClass(baseClass)
 
-        if (baseClassEnvironment != null) return baseClassEnvironment.getFunction(id, args)
+        if (baseClassSymbol != null) return baseClassSymbol.environment.getFunction(id, args)
         return null
     }
 
