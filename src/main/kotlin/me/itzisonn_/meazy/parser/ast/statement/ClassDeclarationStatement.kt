@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
@@ -24,7 +25,7 @@ class ClassDeclarationStatement(
     val body: List<Statement>,
     val enumIds: Map<String, List<Expression>> = mapOf()
 ) : ModifierStatement(modifiers), DeclarationStatement {
-    private lateinit var classEnvironment: ClassEnvironment
+    private lateinit var symbol: ClassSymbol
 
     override val children = body.toSet()
 
@@ -43,8 +44,11 @@ class ClassDeclarationStatement(
             modifiers
         )
 
-        environment.declareClass(classEnvironment)
-        this.classEnvironment = classEnvironment
+        symbol = ClassSymbol(
+            id, false, baseClasses,
+            modifiers, classEnvironment
+        )
+        environment.declareClass(symbol)
 
         for (statement in body) {
             if (statement is DeclarationStatement) {
@@ -66,6 +70,7 @@ class ClassDeclarationStatement(
 
     context(parents: ParentMap)
     override fun resolve(environment: Environment) {
+        val classEnvironment = symbol.environment
         classEnvironment.resolveBaseClasses()
 
         for (statement in body) {
@@ -94,6 +99,8 @@ class ClassDeclarationStatement(
             if (Modifiers.abstract in modifiers) flags.add(AccessFlag.ABSTRACT)
             else if (Modifiers.open !in modifiers) flags.add(AccessFlag.FINAL)
         }
+
+        val classEnvironment = symbol.environment
 
         instructions.withClass(
             classDesc,

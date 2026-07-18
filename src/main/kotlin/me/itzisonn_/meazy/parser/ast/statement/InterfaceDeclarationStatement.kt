@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
@@ -20,7 +21,7 @@ class InterfaceDeclarationStatement(
     val baseClasses: Set<String>,
     val body: List<Statement>
 ) : ModifierStatement(modifiers), DeclarationStatement {
-    private lateinit var classEnvironment: ClassEnvironment
+    private lateinit var symbol: ClassSymbol
 
     override val children = body.toSet()
 
@@ -39,8 +40,11 @@ class InterfaceDeclarationStatement(
             modifiers
         )
 
-        environment.declareClass(classEnvironment)
-        this.classEnvironment = classEnvironment
+        symbol = ClassSymbol(
+            id, true, baseClasses,
+            modifiers, classEnvironment
+        )
+        environment.declareClass(symbol)
 
         for (statement in body) {
             if (statement is DeclarationStatement) {
@@ -51,6 +55,7 @@ class InterfaceDeclarationStatement(
 
     context(parents: ParentMap)
     override fun resolve(environment: Environment) {
+        val classEnvironment = symbol.environment
         classEnvironment.resolveBaseClasses()
 
         for (statement in body) {
@@ -78,6 +83,8 @@ class InterfaceDeclarationStatement(
             if (Modifiers.private in modifiers) flags.add(AccessFlag.PRIVATE)
             else flags.add(AccessFlag.PUBLIC)
         }
+
+        val classEnvironment = symbol.environment
 
         instructions.withClass(
             classDesc,

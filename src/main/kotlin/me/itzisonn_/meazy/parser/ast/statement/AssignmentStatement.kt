@@ -91,9 +91,9 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
             }
 
             val classDesc: ClassDesc = id.receiver.getType(environment).classDesc
-            val classEnvironment = environment.getClass(classDesc) ?: return null
+            val cls = environment.getClass(classDesc) ?: return null
 
-            return classEnvironment.getVariable(id.member.id)
+            return cls.environment.getVariable(id.member.id)
         }
 
         if (id !is Identifier) {

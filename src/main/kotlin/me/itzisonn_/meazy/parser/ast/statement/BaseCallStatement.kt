@@ -65,10 +65,10 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
             ?: error("Can't call super class not inside class")
 
         val baseClassDesc = classEnvironment.baseClass ?: return null
-        val baseClassEnvironment = environment.getClass(baseClassDesc) ?: return null
+        val baseClassSymbol = environment.getClass(baseClassDesc) ?: return null
 
         val args = args.map { it.getType(environment) }
-        return baseClassEnvironment.getConstructor(args)
+        return baseClassSymbol.environment.getConstructor(args)
     }
 
 

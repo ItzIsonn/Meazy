@@ -152,8 +152,8 @@ class CallExpression(
 
         if (parent is MemberExpression && this == parent.member) {
             val classDesc = parent.receiver.getType(environment).classDesc
-            val classEnvironment = environment.getClass(classDesc) ?: return null
-            return classEnvironment.getFunctionRecursively(id, args)
+            val cls = environment.getClass(classDesc) ?: return null
+            return cls.environment.getFunctionRecursively(id, args)
         }
 
         return environment.getFunction(id, args)
@@ -191,8 +191,8 @@ class CallExpression(
     private fun resolveMeazyConstructor(environment: Environment): ConstructorSymbol? {
         val args = args.map { it.getType(environment) }
 
-        val classEnvironment = environment.getClass(environment.resolveClassDesc(id, false)) ?: return null
-        return classEnvironment.getConstructor(args)
+        val cls = environment.getClass(environment.resolveClassDesc(id, false)) ?: return null
+        return cls.environment.getConstructor(args)
     }
 
     context(parents: ParentMap)

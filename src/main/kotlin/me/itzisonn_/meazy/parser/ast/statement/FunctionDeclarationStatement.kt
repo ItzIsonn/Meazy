@@ -90,7 +90,7 @@ class FunctionDeclarationStatement(
                 val cls = classEnvironment.getClass(baseClass)
                     ?: error("Unknown base class $baseClass")
 
-                cls.getFunctionRecursively(
+                cls.environment.getFunctionRecursively(
                     functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
                 )
                     ?.let { f ->
@@ -107,7 +107,7 @@ class FunctionDeclarationStatement(
                 val cls = classEnvironment.getClass(interfaceClassDesc)
                     ?: error("Unknown interface $interfaceClassDesc")
 
-                cls.getFunctionRecursively(
+                cls.environment.getFunctionRecursively(
                     functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
                 )
                     ?.let { f ->

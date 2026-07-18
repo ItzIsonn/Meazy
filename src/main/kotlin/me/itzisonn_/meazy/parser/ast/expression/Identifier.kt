@@ -109,8 +109,8 @@ class Identifier(val id: String) : Expression {
             val dataType = parent.receiver.getType(environment)
             val classDesc = dataType.classDesc
 
-            val classEnvironment = environment.getClass(classDesc) ?: return null
-            return classEnvironment.getVariable(id)
+            val cls = environment.getClass(classDesc) ?: return null
+            return cls.environment.getVariable(id)
         }
 
         return environment.getVariable(id)
