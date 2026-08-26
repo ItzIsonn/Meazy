@@ -11,6 +11,7 @@ import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
+import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import java.lang.classfile.attribute.InnerClassInfo
@@ -130,14 +131,15 @@ class ClassDeclarationStatement(
                     MethodTypeDesc.of(ConstantDescs.CD_void)
                 )
 
-                for (variableValue in classEnvironment.variables) {
-                    val value = variableValue.initializer ?: continue
+                for (variableSymbol in classEnvironment.variables) {
+                    if (variableSymbol !is GlobalVariableSymbol) continue
+                    val value = variableSymbol.initializer ?: continue
 
                     loadThisReference()
                     value.emit(this, classEnvironment)
 
                     val valueType = value.getType(classEnvironment).classDesc
-                    val variableType = variableValue.dataType.classDesc
+                    val variableType = variableSymbol.dataType.classDesc
 
                     if (!classEnvironment.isInstanceOf(valueType, variableType)) {
                         if (!convertPrimitiveOrBoxed(valueType, variableType)) {
@@ -147,8 +149,8 @@ class ClassDeclarationStatement(
 
                     storeField(
                         classDesc,
-                        variableValue.id!!,
-                        variableValue.dataType.classDesc
+                        variableSymbol.id,
+                        variableSymbol.dataType.classDesc
                     )
                 }
 

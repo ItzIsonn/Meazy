@@ -3,6 +3,8 @@ package me.itzisonn_.meazy.parser.ast.statement
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.ResolvedGlobalVariable
+import me.itzisonn_.meazy.parser.ast.ResolvedLocalVariable
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.SymbolResolver.resolveVariable
 import me.itzisonn_.meazy.parser.ast.expression.Expression
@@ -20,7 +22,7 @@ class AssignmentStatement(val target: Expression, val value: Expression) : Local
         val variableType = resolvedVariable.type
         val valueType = value.getType(environment).classDesc
 
-        if (resolvedVariable.classDesc != null && resolvedVariable.receiver != null) {
+        if (resolvedVariable is ResolvedGlobalVariable && resolvedVariable.receiver != null) {
             resolvedVariable.receiver.emit(instructions, environment)
         }
 
@@ -32,14 +34,19 @@ class AssignmentStatement(val target: Expression, val value: Expression) : Local
             }
         }
 
-        if (resolvedVariable.classDesc == null) {
-            instructions.storeLocal(resolvedVariable.type, resolvedVariable.slot)
-        }
-        else if (resolvedVariable.receiver == null) {
-            instructions.storeStaticField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
-        }
-        else {
-            instructions.storeField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
+        when (resolvedVariable) {
+            is ResolvedLocalVariable -> {
+                instructions.storeLocal(resolvedVariable.type, resolvedVariable.slot)
+            }
+
+            is ResolvedGlobalVariable -> {
+                if (resolvedVariable.receiver == null) {
+                    instructions.storeStaticField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
+                }
+                else {
+                    instructions.storeField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
+                }
+            }
         }
     }
 

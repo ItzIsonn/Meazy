@@ -8,6 +8,8 @@ import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
+import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
+import me.itzisonn_.meazy.runtime.data.symbol.LocalVariableSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
@@ -23,25 +25,40 @@ object SymbolResolver {
     context(parents: ParentMap)
     fun Environment.resolveVariable(target: ProgramUnit): ResolvedVariable {
         val variableSymbol = resolveVariableSymbol(target) ?: error("Can't find variable")
-        val className = variableSymbol.parentEnvironment.fullClassName
 
-        val receiver = if (Modifiers.shared in variableSymbol.modifiers || variableSymbol.parentEnvironment is FileEnvironment) {
-            null
-        }
-        else {
-            val memberExpression = getMemberExpression(target)
-            memberExpression?.receiver ?: ThisLiteral()
-        }
+        return when (variableSymbol) {
+            is LocalVariableSymbol -> {
+                ResolvedLocalVariable(
+                    variableSymbol.slot,
+                    variableSymbol.isConstant,
+                    variableSymbol.id!!,
+                    variableSymbol.dataType.classDesc,
+                    variableSymbol.dataType.isNullable
+                )
+            }
 
-        return ResolvedVariable(
-            if (className == null) null else ClassDesc.of(className),
-            if (className == null) variableSymbol.slot else -1,
-            variableSymbol.isConstant,
-            variableSymbol.id!!,
-            variableSymbol.dataType.classDesc,
-            variableSymbol.dataType.isNullable,
-            receiver
-        )
+            is GlobalVariableSymbol -> {
+                val className = variableSymbol.parentEnvironment.fullClassName
+                    ?: error("Invalid global variable symbol ${variableSymbol.id}")
+
+                val receiver = if (Modifiers.shared in variableSymbol.modifiers || variableSymbol.parentEnvironment is FileEnvironment) {
+                    null
+                }
+                else {
+                    val memberExpression = getMemberExpression(target)
+                    memberExpression?.receiver ?: ThisLiteral()
+                }
+
+                ResolvedGlobalVariable(
+                    ClassDesc.of(className),
+                    variableSymbol.isConstant,
+                    variableSymbol.id,
+                    variableSymbol.dataType.classDesc,
+                    variableSymbol.dataType.isNullable,
+                    receiver
+                )
+            }
+        }
     }
 
     context(parents: ParentMap)
@@ -156,15 +173,29 @@ object SymbolResolver {
 
 
 
-class ResolvedVariable(
-    val classDesc: ClassDesc?,
-    val slot: Int,
+sealed class ResolvedVariable(
     val isConstant: Boolean,
-    val id: String,
+    open val id: String?,
     val type: ClassDesc,
-    val isNullable: Boolean,
-    val receiver: Expression?
+    val isNullable: Boolean
 )
+
+class ResolvedLocalVariable(
+    val slot: Int,
+    isConstant: Boolean,
+    id: String?,
+    type: ClassDesc,
+    isNullable: Boolean
+) : ResolvedVariable(isConstant, id, type, isNullable)
+
+class ResolvedGlobalVariable(
+    val classDesc: ClassDesc,
+    isConstant: Boolean,
+    override val id: String,
+    type: ClassDesc,
+    isNullable: Boolean,
+    val receiver: Expression?
+) : ResolvedVariable(isConstant, id, type, isNullable)
 
 class ResolvedFunction(
     val classDesc: ClassDesc,

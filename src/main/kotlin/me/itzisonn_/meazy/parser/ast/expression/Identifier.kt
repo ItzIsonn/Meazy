@@ -3,6 +3,8 @@ package me.itzisonn_.meazy.parser.ast.expression
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.ResolvedGlobalVariable
+import me.itzisonn_.meazy.parser.ast.ResolvedLocalVariable
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.SymbolResolver.resolveVariable
 import me.itzisonn_.meazy.parser.ast.parent
@@ -19,42 +21,47 @@ class Identifier(val id: String) : Expression {
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val resolvedVariable = environment.resolveVariable(this)
 
-        if (resolvedVariable.classDesc == null) {
-            instructions.getLocal(resolvedVariable.type, resolvedVariable.slot)
-        }
-        else if (resolvedVariable.receiver == null) {
-            instructions.getStaticField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
-        }
-        else {
-            resolvedVariable.receiver.emit(instructions, environment)
-            var endLabel: Uuid? = null
-
-            val parent = parent
-            if (parent is MemberExpression) {
-                if (!parent.isNullSafe) {
-                    if (resolvedVariable.receiver.getType(environment).isNullable) {
-                        throw RuntimeException("Unsafe member access of variable '$id' on object of type ${resolvedVariable.classDesc.descriptorString()}")
-                    }
-                }
-                else {
-                    val nonnullLabel = instructions.createAndInitLabel()
-                    endLabel = instructions.createAndInitLabel()
-
-                    instructions.duplicate()
-                    instructions.gotoLabelIfNonNull(nonnullLabel)
-
-                    instructions.pop()
-                    instructions.loadNull()
-                    instructions.gotoLabel(endLabel)
-
-                    instructions.bindLabel(nonnullLabel)
-                }
+        when (resolvedVariable) {
+            is ResolvedLocalVariable -> {
+                instructions.getLocal(resolvedVariable.type, resolvedVariable.slot)
             }
 
-            instructions.getField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
+            is ResolvedGlobalVariable -> {
+                if (resolvedVariable.receiver == null) {
+                    instructions.getStaticField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
+                }
+                else {
+                    resolvedVariable.receiver.emit(instructions, environment)
+                    var endLabel: Uuid? = null
 
-            if (endLabel != null) {
-                instructions.bindLabel(endLabel)
+                    val parent = parent
+                    if (parent is MemberExpression) {
+                        if (!parent.isNullSafe) {
+                            if (resolvedVariable.receiver.getType(environment).isNullable) {
+                                throw RuntimeException("Unsafe member access of variable '$id' on object of type ${resolvedVariable.classDesc.descriptorString()}")
+                            }
+                        }
+                        else {
+                            val nonnullLabel = instructions.createAndInitLabel()
+                            endLabel = instructions.createAndInitLabel()
+
+                            instructions.duplicate()
+                            instructions.gotoLabelIfNonNull(nonnullLabel)
+
+                            instructions.pop()
+                            instructions.loadNull()
+                            instructions.gotoLabel(endLabel)
+
+                            instructions.bindLabel(nonnullLabel)
+                        }
+                    }
+
+                    instructions.getField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
+
+                    if (endLabel != null) {
+                        instructions.bindLabel(endLabel)
+                    }
+                }
             }
         }
     }

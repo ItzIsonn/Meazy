@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.parser.ast.declareSymbol
 import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.FileSymbol
+import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
@@ -117,12 +118,13 @@ class Program(
                 MethodTypeDesc.of(ConstantDescs.CD_void),
                 setOf(AccessFlag.STATIC)
             ) {
-                for (variableValue in fileEnvironment.variables) {
-                    val value = variableValue.initializer ?: continue
+                for (variableSymbol in fileEnvironment.variables) {
+                    if (variableSymbol !is GlobalVariableSymbol) continue
+                    val value = variableSymbol.initializer ?: continue
 
                     value.emit(this, fileEnvironment)
                     val valueType = value.getType(fileEnvironment).classDesc
-                    val variableType = variableValue.dataType.classDesc
+                    val variableType = variableSymbol.dataType.classDesc
 
                     if (!fileEnvironment.isInstanceOf(valueType, variableType)) {
                         if (!convertPrimitiveOrBoxed(valueType, variableType)) {
@@ -132,7 +134,7 @@ class Program(
 
                     storeStaticField(
                         classDesc,
-                        variableValue.id!!,
+                        variableSymbol.id,
                         variableType
                     )
                 }

@@ -24,11 +24,6 @@ sealed interface VariableSymbol : Symbol {
      */
     val isConstant: Boolean
 
-    //TODO
-    val slot: Int
-
-    val initializer: Expression?
-
     /**
      * @return Parent environment
      */
@@ -51,22 +46,50 @@ sealed interface VariableSymbol : Symbol {
     val modifiers: Set<Modifier>
 }
 
+sealed interface LocalVariableSymbol : VariableSymbol {
+    //TODO
+    val slot: Int
+}
+
+sealed interface GlobalVariableSymbol : VariableSymbol {
+    override val id: String
+    val initializer: Expression?
+}
 
 
-private data class VariableSymbolImpl(
+
+private data class LocalVariableSymbolImpl(
     override val id: String?,
     override val dataType: DataType,
     override val isConstant: Boolean,
     override val modifiers: Set<Modifier>,
     override val slot: Int,
+    override val parentEnvironment: VariableDeclarationEnvironment
+) : LocalVariableSymbol
+
+fun LocalVariableSymbol(
+    id: String?, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
+    slot: Int, parentEnvironment: VariableDeclarationEnvironment
+): LocalVariableSymbol = LocalVariableSymbolImpl(
+    id, dataType, isConstant, modifiers.toSet(),
+    slot, parentEnvironment
+)
+
+
+
+private data class GlobalVariableSymbolImpl(
+    override val id: String,
+    override val dataType: DataType,
+    override val isConstant: Boolean,
+    override val modifiers: Set<Modifier>,
     override val initializer: Expression?,
     override val parentEnvironment: VariableDeclarationEnvironment
-) : VariableSymbol
+) : GlobalVariableSymbol
 
-fun VariableSymbol(
-    id: String?, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
-    slot: Int, initializer: Expression?, parentEnvironment: VariableDeclarationEnvironment
-): VariableSymbol = VariableSymbolImpl(
+fun GlobalVariableSymbol(
+    id: String, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
+    initializer: Expression?, parentEnvironment: VariableDeclarationEnvironment
+): GlobalVariableSymbol = GlobalVariableSymbolImpl(
     id, dataType, isConstant, modifiers.toSet(),
-    slot, initializer, parentEnvironment
+    initializer, parentEnvironment
 )

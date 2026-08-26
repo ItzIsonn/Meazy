@@ -11,6 +11,7 @@ import me.itzisonn_.meazy.parser.ast.hasSymbol
 import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.LocalVariableSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
@@ -97,6 +98,8 @@ class VariableDeclarationStatement(
             }
         }
 
+        val symbol = symbol
+        if (symbol !is LocalVariableSymbol) error("Can't declare non-local variable symbol as local variable")
         instructions.storeLocal(variableType, symbol.slot)
 
         if (environment is LocalVariableDeclarationEnvironment) {

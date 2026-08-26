@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.symbol.LocalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ConstantDescs
@@ -14,7 +15,8 @@ import kotlin.uuid.Uuid
  * Adds to Environment ability to declare local variables
  */
 interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment {
-    fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): VariableSymbol
+    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): LocalVariableSymbol
+    fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): LocalVariableSymbol
 
     //TODO
     fun getStartLabel(): Uuid?
@@ -32,7 +34,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
     private var startLabel: Uuid?,
     private var endLabel: Uuid?
 ) : VariableDeclarationEnvironmentImpl(parent), LocalVariableDeclarationEnvironment {
-    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): VariableSymbol {
+    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): LocalVariableSymbol {
         if (getVariable(id) != null) {
             throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
@@ -46,12 +48,12 @@ open class LocalVariableDeclarationEnvironmentImpl(
             parentEnvironment = parentEnvironment.getParent()
         }
 
-        val variableValue = VariableSymbol(id, type, isConstant, modifiers, slot, value, this)
+        val variableValue = LocalVariableSymbol(id, type, isConstant, modifiers, slot, this)
         _variables.add(variableValue)
         return variableValue
     }
 
-    override fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): VariableSymbol {
+    override fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): LocalVariableSymbol {
         var slot = usedSlotsCount
         if (!isShared) slot++
 
@@ -61,7 +63,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
             parentEnvironment = parentEnvironment.getParent()
         }
 
-        val variableValue = VariableSymbol(null, type, isConstant, setOf(), slot, value, this)
+        val variableValue = LocalVariableSymbol(null, type, isConstant, setOf(), slot, this)
         _variables.add(variableValue)
         return variableValue
     }
