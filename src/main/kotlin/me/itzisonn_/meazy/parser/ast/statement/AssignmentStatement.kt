@@ -4,34 +4,24 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.SymbolResolver.resolveVariable
 import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
-import me.itzisonn_.meazy.parser.ast.expression.Identifier
-import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
-import me.itzisonn_.meazy.parser.ast.parent
-import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
-import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
-import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.FileEnvironment
-import me.itzisonn_.meazy.runtime.environment.getClass
-import me.itzisonn_.meazy.runtime.environment.getVariable
 import me.itzisonn_.meazy.runtime.environment.isInstanceOf
-import java.lang.constant.ClassDesc
 
-class AssignmentStatement(val id: Expression, val value: Expression) : LocalStatement {
-    override val children = setOf(id, value)
+class AssignmentStatement(val target: Expression, val value: Expression) : LocalStatement {
+    override val children = setOf(target, value)
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        val resolvedVariable = resolveVariable(environment)
+        val resolvedVariable = environment.resolveVariable(target)
         if (resolvedVariable.isConstant) throw RuntimeException("Can't reassign constant variable " + resolvedVariable.id + " TODO")
 
         val variableType = resolvedVariable.type
         val valueType = value.getType(environment).classDesc
 
-        if (resolvedVariable.classDesc != null && resolvedVariable.target != null) {
-            resolvedVariable.target.emit(instructions, environment)
+        if (resolvedVariable.classDesc != null && resolvedVariable.receiver != null) {
+            resolvedVariable.receiver.emit(instructions, environment)
         }
 
         value.emit(instructions, environment)
@@ -45,7 +35,7 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
         if (resolvedVariable.classDesc == null) {
             instructions.storeLocal(resolvedVariable.type, resolvedVariable.slot)
         }
-        else if (resolvedVariable.target == null) {
+        else if (resolvedVariable.receiver == null) {
             instructions.storeStaticField(resolvedVariable.classDesc, resolvedVariable.id, resolvedVariable.type)
         }
         else {
@@ -54,62 +44,4 @@ class AssignmentStatement(val id: Expression, val value: Expression) : LocalStat
     }
 
     override fun alwaysReturns() = false
-
-
-
-    context(parents: ParentMap)
-    private fun resolveVariable(environment: Environment): ResolvedVariable {
-        val variableValue = resolveMeazyVariable(environment) ?: error("Can't find variable")
-
-        val className = when (val parent = variableValue.parentEnvironment) {
-            is ClassEnvironment -> parent.id
-            is FileEnvironment -> parent.packageName
-            else -> null
-        }
-
-        val parent = parent
-        val target = if (Modifiers.shared in variableValue.modifiers || variableValue.parentEnvironment is FileEnvironment) {
-            null
-        }
-        else if (parent is MemberExpression) parent.receiver
-        else ThisLiteral()
-
-        return ResolvedVariable(
-            if (className == null) null else ClassDesc.of(className),
-            if (className == null) variableValue.slot else -1,
-            variableValue.isConstant,
-            variableValue.id!!,
-            variableValue.dataType.classDesc,
-            target
-        )
-    }
-
-    context(parents: ParentMap)
-    private fun resolveMeazyVariable(environment: Environment): VariableSymbol? {
-        if (id is MemberExpression) {
-            if (id.member !is Identifier) {
-                throw RuntimeException("Cant assign value to not variable TODO")
-            }
-
-            val classDesc: ClassDesc = id.receiver.getType(environment).classDesc
-            val cls = environment.getClass(classDesc) ?: return null
-
-            return cls.environment.getVariable(id.member.id)
-        }
-
-        if (id !is Identifier) {
-            throw RuntimeException("Cant assign value to not variable TODO")
-        }
-
-        return environment.getVariable(id.id)
-    }
-
-    private class ResolvedVariable(
-        val classDesc: ClassDesc?,
-        val slot: Int,
-        val isConstant: Boolean,
-        val id: String,
-        val type: ClassDesc,
-        val target: Expression?
-    )
 }
