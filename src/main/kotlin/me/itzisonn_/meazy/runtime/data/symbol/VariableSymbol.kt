@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnv
 /**
  * Represents runtime variable symbol
  */
-sealed interface VariableSymbol {
+sealed interface VariableSymbol : Symbol {
     /**
      * @return Id
      */

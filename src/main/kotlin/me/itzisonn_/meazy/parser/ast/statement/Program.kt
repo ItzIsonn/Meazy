@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.FileSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
@@ -21,7 +22,7 @@ class Program(
     val version: Version,
     private val _body: List<Statement>
 ) : DeclarationStatement {
-    private lateinit var fileEnvironment: FileEnvironment
+    private lateinit var symbol: FileSymbol
     val file: File
 
     override val children = _body.toSet()
@@ -41,7 +42,17 @@ class Program(
         var id = file.nameWithoutExtension
         id = id.substring(0, 1).uppercase() + id.substring(1)
 
-        fileEnvironment = FileEnvironment(environment, path[path.size - 2], id)
+        val fileEnvironment = FileEnvironment(
+            environment,
+            path[path.size - 2],
+            id
+        )
+
+        symbol = FileSymbol(
+            path[path.size - 2], id,
+            fileEnvironment
+        )
+
         environment.addFileEnvironment(fileEnvironment)
 
         for (statement in _body) {
@@ -61,18 +72,15 @@ class Program(
     override fun resolve(environment: Environment) {
         for (statement in _body) {
             if (statement is DeclarationStatement) {
-                statement.resolve(fileEnvironment)
+                statement.resolve(symbol.environment)
             }
         }
     }
 
     context(parents: ParentMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
-        var id = file.nameWithoutExtension
-        id = id.substring(0, 1).uppercase() + id.substring(1)
-
-        val classDesc = ClassDesc.of(path[path.size - 2], id)
+        val classDesc = ClassDesc.of(symbol.packageName, symbol.className)
+        val fileEnvironment = symbol.environment
 
         val attributes = mutableListOf<InnerClassesAttribute>()
         for (statement in _body) {

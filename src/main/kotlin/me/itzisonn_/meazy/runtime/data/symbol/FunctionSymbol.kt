@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 /**
  * Represents function symbol
  */
-sealed interface FunctionSymbol {
+sealed interface FunctionSymbol : Symbol {
     val id: String
     val parameters: List<Parameter>
     val returnDataType: DataType?
