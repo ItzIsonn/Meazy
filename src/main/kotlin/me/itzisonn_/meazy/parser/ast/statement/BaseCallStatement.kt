@@ -2,19 +2,16 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.ResolvedConstructor
 import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.SymbolResolver.resolveConstructor
 import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getParent
 import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
-import java.lang.constant.ClassDesc
-import java.lang.constant.ConstantDescs
-import java.lang.constant.MethodTypeDesc
-import kotlin.collections.map
 
 class BaseCallStatement(val args: List<Expression>) : LocalStatement {
     override val children = args.toSet()
@@ -26,7 +23,7 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
             "Parent environment for BASE statement must be ConstructorEnvironment TODO"
         }
 
-        val resolvedConstructor = resolveConstructor(environment)
+        val resolvedConstructor = environment.resolveConstructor()
         instructions.loadThisReference()
 
         instructions.invokeSuperClass(
@@ -44,37 +41,13 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
 
 
     context(parents: ParentMap)
-    private fun resolveConstructor(environment: Environment): ResolvedConstructor {
-        val constructorEnvironment = resolveMeazyConstructor(environment)
-            ?: error("Failed to resolve constructor")
-
-        if (constructorEnvironment.environment.getParent() !is ClassEnvironment) {
-            throw RuntimeException("Can't call super class not inside class")
-        }
-
-        val parameters = constructorEnvironment.parameters.map { it.dataType.classDesc }.toList()
-
-        return ResolvedConstructor(
-            ClassDesc.of(constructorEnvironment.environment.getParent().fullClassName),
-            MethodTypeDesc.of(ConstantDescs.CD_void, parameters)
-        )
-    }
-
-    context(parents: ParentMap)
-    private fun resolveMeazyConstructor(environment: Environment): ConstructorSymbol? {
-        val classEnvironment = environment.getParent<ClassEnvironment>()
+    private fun Environment.resolveConstructor(): ResolvedConstructor {
+        val classEnvironment = getParent<ClassEnvironment>()
             ?: error("Can't call super class not inside class")
 
-        val baseClassDesc = classEnvironment.baseClass ?: return null
-        val baseClassSymbol = environment.getClass(baseClassDesc) ?: return null
+        val baseClassDesc = classEnvironment.baseClass ?: error("Failed to resolve constructor")
+        val baseClassSymbol = getClass(baseClassDesc) ?: error("Failed to resolve constructor")
 
-        val args = args.map { it.getType(environment) }
-        return baseClassSymbol.environment.getConstructor(args)
+        return resolveConstructor(baseClassSymbol.environment, args)
     }
-
-
-    private class ResolvedConstructor(
-        val classDesc: ClassDesc,
-        val methodTypeDesc: MethodTypeDesc
-    )
 }

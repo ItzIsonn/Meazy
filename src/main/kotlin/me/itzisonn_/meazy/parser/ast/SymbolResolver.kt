@@ -5,12 +5,16 @@ import me.itzisonn_.meazy.parser.ast.expression.Identifier
 import me.itzisonn_.meazy.parser.ast.expression.MemberExpression
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getVariable
 import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
 
 object SymbolResolver {
     context(parents: ParentMap)
@@ -71,13 +75,41 @@ object SymbolResolver {
         return null
     }
 
-    class ResolvedVariable(
-        val classDesc: ClassDesc?,
-        val slot: Int,
-        val isConstant: Boolean,
-        val id: String,
-        val type: ClassDesc,
-        val isNullable: Boolean,
-        val receiver: Expression?
-    )
+
+
+    context(parents: ParentMap)
+    fun Environment.resolveConstructor(classEnvironment: ClassEnvironment, args: List<Expression>): ResolvedConstructor {
+        val constructorEnvironment = resolveConstructorSymbol(classEnvironment, args)
+            ?: error("Failed to resolve constructor")
+
+        val parameters = constructorEnvironment.parameters.map { it.dataType.classDesc }
+
+        return ResolvedConstructor(
+            ClassDesc.of(constructorEnvironment.environment.getParent().fullClassName),
+            MethodTypeDesc.of(ConstantDescs.CD_void, parameters)
+        )
+    }
+
+    context(parents: ParentMap)
+    fun Environment.resolveConstructorSymbol(classEnvironment: ClassEnvironment, args: List<Expression>): ConstructorSymbol? {
+        val args = args.map { it.getType(this) }
+        return classEnvironment.getConstructor(args)
+    }
 }
+
+
+
+class ResolvedVariable(
+    val classDesc: ClassDesc?,
+    val slot: Int,
+    val isConstant: Boolean,
+    val id: String,
+    val type: ClassDesc,
+    val isNullable: Boolean,
+    val receiver: Expression?
+)
+
+class ResolvedConstructor(
+    val classDesc: ClassDesc,
+    val methodTypeDesc: MethodTypeDesc
+)
