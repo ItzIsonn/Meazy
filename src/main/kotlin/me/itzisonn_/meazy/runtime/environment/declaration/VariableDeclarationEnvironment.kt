@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
+import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.util.text.translatable
@@ -42,7 +43,7 @@ open class VariableDeclarationEnvironmentImpl(parent: Environment) : Environment
             throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
-        val variableValue = VariableSymbol(id, type, isConstant, modifiers, -1, value, this)
+        val variableValue = GlobalVariableSymbol(id, type, isConstant, modifiers, value, this)
         _variables.add(variableValue)
         return variableValue
     }
