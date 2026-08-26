@@ -2,6 +2,9 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.declareSymbol
+import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -17,13 +20,12 @@ class ConstructorDeclarationStatement(
     modifiers: Set<Modifier>,
     val parameters: List<Parameter>,
     body: List<LocalStatement>
-) : ModifierStatement(modifiers), DeclarationStatement {
+) : ModifierStatement(modifiers), DeclarationStatement<ConstructorSymbol> {
     val body = body.toMutableList()
-    private lateinit var symbol: ConstructorSymbol
 
     override val children = body.toSet()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun declare(environment: Environment) {
         if (environment !is ConstructorDeclarationEnvironment) {
             throw RuntimeException("CANT DECLARE CONSTRUCTOR HERE TODO")
@@ -33,7 +35,8 @@ class ConstructorDeclarationStatement(
             environment, null, null, modifiers, parameters
         )
 
-        symbol = ConstructorSymbol(parameters, modifiers, constructorEnvironment)
+        val symbol = ConstructorSymbol(parameters, modifiers, constructorEnvironment)
+        declareSymbol(symbol)
         environment.declareConstructor(symbol)
 
         var alwaysReturns = false
@@ -48,12 +51,12 @@ class ConstructorDeclarationStatement(
         if (!alwaysReturns) body.add(ReturnStatement(null))
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
         symbol.environment.parameters.forEach { it.dataType.resolve(environment) }
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val constructorEnvironment = symbol.environment
 

@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
 import me.itzisonn_.meazy.instruction.java
 import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.DataType.Companion.of
 import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNonNull
@@ -16,7 +17,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import java.lang.constant.*
 
 class AdditionOperator : Operator("addition", "+", OperatorType.INFIX) {
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
         val left = operatorExpression.left
         val right = operatorExpression.right ?: error("Right side of operator expression is null")

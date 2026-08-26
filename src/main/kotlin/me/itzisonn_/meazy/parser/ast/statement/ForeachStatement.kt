@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
@@ -24,7 +25,7 @@ class ForeachStatement(
         add(collection)
     }.toSet()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         if (environment !is LocalVariableDeclarationEnvironment) {
             throw RuntimeException("Foreach statement must be inside variableDeclarationEnvironment TODO")

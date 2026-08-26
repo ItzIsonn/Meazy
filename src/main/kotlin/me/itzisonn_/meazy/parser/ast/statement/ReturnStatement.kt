@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.statement
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
@@ -17,7 +18,7 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
         else setOf(value)
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         if (environment.hasParentOrSelf<ConstructorEnvironment>()) {
             if (value != null) throw RuntimeException("Constructor can't return value TODO")

@@ -6,6 +6,6 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 interface ProgramUnit {
     val children: Set<ProgramUnit>
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     fun emit(instructions: InstructionsSet, environment: Environment)
 }

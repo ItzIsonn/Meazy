@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.expression.collection_creation
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
@@ -15,7 +16,7 @@ class MapCreationExpression(val map: Map<Expression, Expression>) : Expression {
         addAll(map.values)
     }.toSet()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         instructions.invokeConstructor(
             ClassDesc.of("java.util.HashMap"),

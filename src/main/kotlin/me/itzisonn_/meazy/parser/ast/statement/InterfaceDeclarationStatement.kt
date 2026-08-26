@@ -2,6 +2,9 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.declareSymbol
+import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
@@ -20,12 +23,10 @@ class InterfaceDeclarationStatement(
     val id: String,
     val baseClasses: Set<String>,
     val body: List<Statement>
-) : ModifierStatement(modifiers), DeclarationStatement {
-    private lateinit var symbol: ClassSymbol
-
+) : ModifierStatement(modifiers), DeclarationStatement<ClassSymbol> {
     override val children = body.toSet()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
@@ -40,32 +41,33 @@ class InterfaceDeclarationStatement(
             modifiers
         )
 
-        symbol = ClassSymbol(
+        val symbol = ClassSymbol(
             id, true, baseClasses,
             modifiers, classEnvironment
         )
+        declareSymbol(symbol)
         environment.declareClass(symbol)
 
         for (statement in body) {
-            if (statement is DeclarationStatement) {
+            if (statement is DeclarationStatement<*>) {
                 statement.declare(classEnvironment)
             }
         }
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
         val classEnvironment = symbol.environment
         classEnvironment.resolveBaseClasses()
 
         for (statement in body) {
-            if (statement is DeclarationStatement) {
+            if (statement is DeclarationStatement<*>) {
                 statement.resolve(classEnvironment)
             }
         }
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         require(environment is FileEnvironment) { "Environment must be file TODO" }
         val isInner = Modifiers.private in modifiers

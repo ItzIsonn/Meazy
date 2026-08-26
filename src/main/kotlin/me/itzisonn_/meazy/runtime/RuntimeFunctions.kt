@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.lexer.TokenBehavior
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.UnknownTokenException
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.Program
 import me.itzisonn_.meazy.parser.parsing.statement.ProgramParsingFunction
@@ -75,11 +76,12 @@ object RuntimeFunctions {
     fun compileProgram(program: Program): Map<ClassDesc, ByteArray> {
         val globalEnvironment = GlobalEnvironment()
         val parentMap = ParentMap(program)
+        val symbolMap = SymbolMap()
 
         val bytecodeBuilders = BytecodeBuilders.of(null, null)
         val instructionsSet = InstructionsSet(bytecodeBuilders)
 
-        context(parentMap) {
+        context(parentMap, symbolMap) {
             program.declare(globalEnvironment)
             program.resolve(globalEnvironment)
             program.emit(instructionsSet, globalEnvironment)

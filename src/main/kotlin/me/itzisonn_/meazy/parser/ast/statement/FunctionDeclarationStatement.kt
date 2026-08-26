@@ -2,6 +2,9 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.declareSymbol
+import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
@@ -20,9 +23,8 @@ class FunctionDeclarationStatement(
     val parameters: List<Parameter>,
     body: List<LocalStatement>,
     val returnDataType: DataType?
-) : ModifierStatement(modifiers), DeclarationStatement {
+) : ModifierStatement(modifiers), DeclarationStatement<FunctionSymbol> {
     val body = body.toMutableList()
-    private lateinit var symbol: FunctionSymbol
 
     override val children = body.toSet()
 
@@ -33,7 +35,7 @@ class FunctionDeclarationStatement(
         modifiers, id, null, parameters, body, returnDataType
     )
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun declare(environment: Environment) {
         //TODO check whether abstract function isn't overridden
         if (environment !is FunctionDeclarationEnvironment) {
@@ -47,9 +49,10 @@ class FunctionDeclarationStatement(
             returnDataType, isShared, modifiers
         )
 
-        symbol = FunctionSymbol(
+        val symbol = FunctionSymbol(
             id, parameters, returnDataType, modifiers, functionEnvironment
         )
+        declareSymbol(symbol)
         environment.declareFunction(symbol)
 
         if (Modifiers.abstract in modifiers) return
@@ -66,14 +69,14 @@ class FunctionDeclarationStatement(
         throw RuntimeException("Function with id $id doesn't always return a value")
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
         val functionEnvironment = symbol.environment
         functionEnvironment.returnDataType?.resolve(environment)
         functionEnvironment.parameters.forEach { it.dataType.resolve(environment) }
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val functionEnvironment = symbol.environment
 

@@ -2,6 +2,8 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.runtime.data.symbol.Symbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 
 /**
@@ -13,10 +15,10 @@ interface LocalStatement : Statement {
     fun alwaysReturns(): Boolean
 }
 
-interface DeclarationStatement : Statement {
-    context(parents: ParentMap)
+interface DeclarationStatement<T : Symbol> : Statement {
+    context(parents: ParentMap, symbols: SymbolMap)
     fun declare(environment: Environment)
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     fun resolve(environment: Environment)
 }

@@ -6,6 +6,7 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.instruction.boxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 
 class NullCheckExpression(
     val checkExpression: Expression,
@@ -13,7 +14,7 @@ class NullCheckExpression(
 ) : Expression {
     override val children = setOf(checkExpression, nullExpression)
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val checkExpressionType = checkExpression.getType(environment)
         if (!checkExpressionType.isNullable) {
