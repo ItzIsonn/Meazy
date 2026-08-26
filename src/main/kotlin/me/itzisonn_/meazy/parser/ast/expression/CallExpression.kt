@@ -5,12 +5,12 @@ import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.SymbolResolver.resolveConstructor
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.parent
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
-import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import java.lang.constant.ClassDesc
@@ -163,24 +163,20 @@ class CallExpression(
 
 
     context(parents: ParentMap)
-    private fun resolveConstructor(environment: Environment): ResolvedCallable {
-        val constructorEnvironment = resolveMeazyConstructor(environment)
-            ?: error("Can't find constructor for $id")
+    private fun Environment.resolveConstructor(): ResolvedCallable {
+        val classSymbol = getClass(resolveClassDesc(id, false))
+            ?: error("Failed")
+        val classEnvironment = classSymbol.environment
 
-        val classEnvironment = constructorEnvironment.environment.getParent()
-        if (classEnvironment !is ClassEnvironment) {
-            throw RuntimeException("Invalid constructor")
-        }
+        val resolvedConstructor = resolveConstructor(classEnvironment, args)
 
         if (classEnvironment.hasModifier(Modifiers.abstract)) {
             throw RuntimeException("Can't create instance of abstract class " + classEnvironment.id)
         }
 
-        val parameters = constructorEnvironment.parameters.map { it.dataType.classDesc }.toList()
-
         return ResolvedCallable(
-            ClassDesc.of(classEnvironment.fullClassName),
-            MethodTypeDesc.of(ConstantDescs.CD_void, parameters),
+            resolvedConstructor.classDesc,
+            resolvedConstructor.methodTypeDesc,
             false,
             null,
             false,
@@ -189,28 +185,16 @@ class CallExpression(
     }
 
     context(parents: ParentMap)
-    private fun resolveMeazyConstructor(environment: Environment): ConstructorSymbol? {
-        val args = args.map { it.getType(environment) }
-
-        val cls = environment.getClass(environment.resolveClassDesc(id, false)) ?: return null
-        return cls.environment.getConstructor(args)
-    }
-
-    context(parents: ParentMap)
     private fun resolveCallable(environment: Environment): ResolvedCallable {
         val resolvedFunction = try {
             resolveFunction(environment)
         }
-        catch (_: Exception) {
-            null
-        }
+        catch (_: Exception) { null }
 
         val resolvedConstructor = try {
-            resolveConstructor(environment)
+            environment.resolveConstructor()
         }
-        catch (_: Exception) {
-            null
-        }
+        catch (_: Exception) { null }
 
         val resolvedCallable: ResolvedCallable
 
