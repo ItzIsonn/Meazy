@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 /**
  * Represents constructor symbol
  */
-sealed interface ConstructorSymbol {
+sealed interface ConstructorSymbol : Symbol {
     val parameters: List<Parameter>
     val environment: ConstructorEnvironment
 
