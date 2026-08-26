@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.boxPrimitive
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
@@ -17,7 +18,7 @@ class IsExpression(
 ) : Expression {
     override val children = setOf(value)
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val classDesc = environment.resolveClassDesc(dataType, false)
         val valueClassDesc = value.getType(environment).classDesc

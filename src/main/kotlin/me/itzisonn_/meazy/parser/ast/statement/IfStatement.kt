@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.statement
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
@@ -12,9 +13,9 @@ import kotlin.uuid.Uuid
 class IfStatement(
     val cases: List<IfStatementCase>
 ) : LocalStatement {
-    override val children = cases.flatMap { it.children } .toSet()
+    override val children = cases.flatMap { it.children }.toSet()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val endLabel = instructions.createAndInitLabel()
 
@@ -44,7 +45,7 @@ class IfStatementCase(
         if (condition != null) add(condition)
     }.toSet()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     fun emit(instructions: InstructionsSet, environment: Environment, endLabel: Uuid) {
         val startLabel = instructions.createAndInitLabel()
         val elseLabel = instructions.createAndInitLabel()

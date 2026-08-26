@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
 import me.itzisonn_.meazy.runtime.data.operator.Operator
 import me.itzisonn_.meazy.runtime.data.operator.OperatorType
@@ -38,7 +39,7 @@ class OperatorExpression : Expression, LocalStatement {
                 operator
             })
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         operator.emit(instructions, environment, this)
     }

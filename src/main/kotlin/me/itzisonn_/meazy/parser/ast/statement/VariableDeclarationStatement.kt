@@ -3,8 +3,12 @@ package me.itzisonn_.meazy.parser.ast.statement
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.declareSymbol
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
+import me.itzisonn_.meazy.parser.ast.hasSymbol
+import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
@@ -22,16 +26,13 @@ class VariableDeclarationStatement(
     val id: String,
     val dataType: DataType?,
     val value: Expression?
-) : ModifierStatement(modifiers), DeclarationStatement, LocalStatement {
-    private lateinit var symbol: VariableSymbol
-    private var declared = false
-
+) : ModifierStatement(modifiers), DeclarationStatement<VariableSymbol>, LocalStatement {
     override val children = let {
         if (value != null) setOf(value)
         else setOf()
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun declare(environment: Environment) {
         if (environment !is VariableDeclarationEnvironment) {
             throw RuntimeException("CANT DECLARE variable HERE TODO")
@@ -39,18 +40,18 @@ class VariableDeclarationStatement(
         val dataType = dataType ?: value?.getType(environment)
             ?: error("Variable without a data type must have initializer TODO")
 
-        symbol = environment.declareVariable(id, dataType, isConstant, value, modifiers)
-        declared = true
+        val symbol = environment.declareVariable(id, dataType, isConstant, value, modifiers)
+        declareSymbol(symbol)
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
         symbol.dataType.resolve(environment)
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        if (!declared) {
+        if (!hasSymbol) {
             if (environment !is FileEnvironment && environment !is ClassEnvironment) {
                 declare(environment)
                 resolve(environment)

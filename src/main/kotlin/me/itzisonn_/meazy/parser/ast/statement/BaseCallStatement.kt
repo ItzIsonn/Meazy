@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
@@ -18,7 +19,7 @@ import kotlin.collections.map
 class BaseCallStatement(val args: List<Expression>) : LocalStatement {
     override val children = args.toSet()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         //TODO add support for automatic base calling before return
         require(environment.hasParentOrSelf<ConstructorEnvironment>()) {

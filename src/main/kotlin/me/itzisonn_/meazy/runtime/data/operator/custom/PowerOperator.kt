@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.instruction.NumberType
 import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.runtime.data.operator.Operator
@@ -15,7 +16,7 @@ import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
 class PowerOperator : Operator("power", "^", OperatorType.INFIX) {
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
         val left = operatorExpression.left
         val right = operatorExpression.right ?: error("Right side of operator expression is null")

@@ -3,6 +3,9 @@ package me.itzisonn_.meazy.parser.ast.statement
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
+import me.itzisonn_.meazy.parser.ast.declareSymbol
+import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.FileSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
@@ -21,8 +24,7 @@ class Program(
     file: File?,
     val version: Version,
     private val _body: List<Statement>
-) : DeclarationStatement {
-    private lateinit var symbol: FileSymbol
+) : DeclarationStatement<FileSymbol> {
     val file: File
 
     override val children = _body.toSet()
@@ -34,7 +36,7 @@ class Program(
         this.file = file ?: File("internal.mea")
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun declare(environment: Environment) {
         if (environment !is GlobalEnvironment) throw RuntimeException("Environment must be global")
         val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
@@ -48,11 +50,11 @@ class Program(
             id
         )
 
-        symbol = FileSymbol(
+        val symbol = FileSymbol(
             path[path.size - 2], id,
             fileEnvironment
         )
-
+        declareSymbol(symbol)
         environment.addFileEnvironment(fileEnvironment)
 
         for (statement in _body) {
@@ -62,22 +64,22 @@ class Program(
         }
 
         for (statement in _body) {
-            if (statement is DeclarationStatement) {
+            if (statement is DeclarationStatement<*>) {
                 statement.declare(fileEnvironment)
             }
         }
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
         for (statement in _body) {
-            if (statement is DeclarationStatement) {
+            if (statement is DeclarationStatement<*>) {
                 statement.resolve(symbol.environment)
             }
         }
     }
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val classDesc = ClassDesc.of(symbol.packageName, symbol.className)
         val fileEnvironment = symbol.environment

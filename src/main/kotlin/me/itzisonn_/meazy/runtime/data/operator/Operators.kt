@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
 import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
 import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.runtime.data.operator.custom.AdditionOperator
 import me.itzisonn_.meazy.runtime.data.operator.custom.AndOperator
@@ -89,7 +90,7 @@ object Operators {
 
 
 
-context(parents: ParentMap)
+context(parents: ParentMap, symbols: SymbolMap)
 fun InstructionsSet.compare(
     environment: Environment, operatorExpression: OperatorExpression, operation: ComparisonOperation
 ) {

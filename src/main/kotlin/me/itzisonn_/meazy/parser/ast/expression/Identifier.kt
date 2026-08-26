@@ -3,6 +3,7 @@ package me.itzisonn_.meazy.parser.ast.expression
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.literal.ThisLiteral
 import me.itzisonn_.meazy.parser.ast.parent
 import me.itzisonn_.meazy.runtime.data.DataType
@@ -19,7 +20,7 @@ import kotlin.uuid.Uuid
 class Identifier(val id: String) : Expression {
     override val children = setOf<ProgramUnit>()
 
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         val resolvedVariable = resolveVariable(environment)
 

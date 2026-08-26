@@ -5,6 +5,7 @@ import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
 import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
 import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
 import me.itzisonn_.meazy.parser.ast.ParentMap
+import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
 import me.itzisonn_.meazy.runtime.data.operator.Operator
@@ -12,7 +13,7 @@ import me.itzisonn_.meazy.runtime.data.operator.OperatorType
 import me.itzisonn_.meazy.runtime.environment.Environment
 
 class SubtractionOperator : Operator("subtraction", "-", OperatorType.INFIX) {
-    context(parents: ParentMap)
+    context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment, operatorExpression: OperatorExpression) {
         val left = operatorExpression.left
         val right = operatorExpression.right ?: error("Right side of operator expression is null")
