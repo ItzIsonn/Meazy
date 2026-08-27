@@ -1,15 +1,11 @@
 package me.itzisonn_.meazy.runtime.data.modifier
 
 import me.itzisonn_.meazy.runtime.data.modifier.custom.AbstractModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.DataModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.EnumModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.GetModifier
 import me.itzisonn_.meazy.runtime.data.modifier.custom.OpenModifier
 import me.itzisonn_.meazy.runtime.data.modifier.custom.OperatorModifier
 import me.itzisonn_.meazy.runtime.data.modifier.custom.OverrideModifier
 import me.itzisonn_.meazy.runtime.data.modifier.custom.PrivateModifier
 import me.itzisonn_.meazy.runtime.data.modifier.custom.ProtectedModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.SetModifier
 import me.itzisonn_.meazy.runtime.data.modifier.custom.SharedModifier
 
 /**
@@ -36,11 +32,7 @@ object Modifiers {
         add(SharedModifier())
         add(OverrideModifier())
         add(AbstractModifier())
-        add(GetModifier())
-        add(SetModifier())
-        add(DataModifier())
         add(OperatorModifier())
-        add(EnumModifier())
     }
 
 
@@ -51,11 +43,7 @@ object Modifiers {
     val shared get() = getNonNull("shared")
     val override get() = getNonNull("override")
     val abstract get() = getNonNull("abstract")
-    val get get() = getNonNull("get")
-    val set get() = getNonNull("set")
-    val data get() = getNonNull("data")
     val operator get() = getNonNull("operator")
-    val enum get() = getNonNull("enum")
 
     private fun getNonNull(id: String): Modifier {
         return get(id)!!
