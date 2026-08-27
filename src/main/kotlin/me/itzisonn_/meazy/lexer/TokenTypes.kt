@@ -40,7 +40,7 @@ object TokenTypes {
         add(TokenType("return", "return"))
         add(TokenType("continue", "continue"))
         add(TokenType("break", "break"))
-        add(TokenType("is", "is"))
+        add(TokenType("is", "!?is"))
 
         add(TokenType("left_parenthesis", "\\("))
         add(TokenType("right_parenthesis", "\\)"))

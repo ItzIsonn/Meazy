@@ -117,7 +117,7 @@ fun a() {
     System.out.println(abc ?: null)
 
     System.out.println("IS DOUBLE " + abc is Double)
-    System.out.println("IS NUMBER " + abc is Number)
+    System.out.println("IS NOT NUMBER " + abc !is Number)
 }
 
 class Test {
