@@ -2,15 +2,15 @@ package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironmentImpl
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironmentImpl
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
 /**
  * Represents file environment
  */
-interface FileEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment,
+interface FileEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclarationEnvironment,
     ClassDeclarationEnvironment {
     override fun getParent(): GlobalEnvironment
 
@@ -54,7 +54,7 @@ private class FileEnvironmentImpl(
 ) : FileEnvironment,
     FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, true),
     ClassDeclarationEnvironment by ClassDeclarationEnvironment(parent, true),
-    VariableDeclarationEnvironmentImpl(parent) {
+    GlobalVariableDeclarationEnvironmentImpl(parent) {
     private val _imports = mutableMapOf<String, ClassDesc>()
 
     init {

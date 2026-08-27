@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.ConstructorSymbol
-import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.*
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import java.lang.classfile.attribute.InnerClassInfo
@@ -132,7 +131,6 @@ class ClassDeclarationStatement(
                 )
 
                 for (variableSymbol in classEnvironment.variables) {
-                    if (variableSymbol !is GlobalVariableSymbol) continue
                     val value = variableSymbol.initializer ?: continue
 
                     loadThisReference()

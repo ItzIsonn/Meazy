@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.VariableDeclarationEnvironment
 
 class SharedModifier : Modifier("shared") {
     override fun canUse(modifierStatement: ModifierStatement, environment: Environment): Boolean {
@@ -31,7 +31,7 @@ class SharedModifier : Modifier("shared") {
         if (hasModifier) return true
 
         if (identifier is Identifier) {
-            if (environment !is VariableDeclarationEnvironment) return true
+            if (environment !is VariableDeclarationEnvironment<*>) return true
             if (environment.getVariable(identifier.id) == null) return true
 
             return !environment.isShared || environment is FileEnvironment || environment is GlobalEnvironment

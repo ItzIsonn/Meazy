@@ -3,8 +3,8 @@ package me.itzisonn_.meazy.runtime.environment
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironmentImpl
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironmentImpl
 import kotlin.uuid.Uuid
 
 /**
@@ -24,7 +24,8 @@ private class ConstructorEnvironmentImpl(
     endLabel: Uuid?,
     modifiers: Set<Modifier>,
     parameters: List<Parameter>
-) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), ConstructorEnvironment {
+) : ConstructorEnvironment,
+    LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
     override val isShared = false
     override fun getParent() = super.getParent() as ConstructorDeclarationEnvironment
 

@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.VariableDeclarationEnvironment
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import kotlin.reflect.KClass
@@ -269,7 +269,7 @@ fun areFromSamePackage(environment1: Environment, environment2: Environment): Bo
  * @return Environment that has requested variable or null
  */
 fun Environment.getVariable(id: String): VariableSymbol? {
-    if (this is VariableDeclarationEnvironment) {
+    if (this is VariableDeclarationEnvironment<*>) {
         val variableValue = getVariable(id)
         if (variableValue != null) return variableValue
     }
@@ -292,7 +292,7 @@ fun Environment.getVariable(id: String): VariableSymbol? {
  * @param id Variable's id
  * @return Environment that has requested variable or null
  */
-fun Environment.getVariableDeclarationEnvironment(id: String): VariableDeclarationEnvironment? {
+fun Environment.getVariableDeclarationEnvironment(id: String): VariableDeclarationEnvironment<*>? {
     return getVariable(id)?.parentEnvironment
 }
 

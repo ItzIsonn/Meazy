@@ -4,8 +4,8 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironmentImpl
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironmentImpl
 import kotlin.uuid.Uuid
 
 /**
@@ -30,7 +30,8 @@ private class FunctionEnvironmentImpl(
     override val returnDataType: DataType?,
     override val isShared: Boolean,
     modifiers: Set<Modifier>
-) : LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel), FunctionEnvironment {
+) : FunctionEnvironment,
+    LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
     override fun getParent() = super.getParent() as FunctionDeclarationEnvironment
 
     override val modifiers = modifiers.toSet()
