@@ -59,6 +59,10 @@ fun b(): List {
         println(s)
     }
 
+    for (var s: String in l) {
+        println(s)
+    }
+
     return l
 }
 

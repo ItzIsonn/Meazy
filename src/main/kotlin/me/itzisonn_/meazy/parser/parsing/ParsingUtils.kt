@@ -4,6 +4,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
+import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.lexer.TokenTypes.question
@@ -14,11 +15,10 @@ import me.itzisonn_.meazy.lexer.TokenTypes.string
 import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNonNull
 import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNullable
 import me.itzisonn_.meazy.parser.ast.expression.Expression
-import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
+import me.itzisonn_.meazy.parser.ast.statement.Statement
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.parser.parsing.expression.ExpressionParsingFunction
-import me.itzisonn_.meazy.parser.parsing.statement.LocalStatementParsingFunction
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.util.text.translatable
@@ -116,15 +116,19 @@ fun Parser.parseDataType(): DataType? {
     return ofNonNull(ClassDesc.of(dataTypeId))
 }
 
-fun Parser.parseBody(): List<LocalStatement> {
-    val body = mutableListOf<LocalStatement>()
-    consume(newLine, translatable("parser.expected", "new_line"))
+fun <T : Statement> Parser.parseBody(parsingFunction: EmptyParsingFunction<T>): List<T> {
+    val body = mutableListOf<T>()
+    consume(leftBrace, translatable("parser.expected.start", "left_brace", "body"))
 
     while (!isEndOfFile() && !isNext(rightBrace)) {
-        body.add(parse(LocalStatementParsingFunction))
-        consume(newLine, translatable("parser.expected", "new_line"))
+        body.add(parse(parsingFunction))
+
+        if (!isEndOfFile() && !isNext(rightBrace)) {
+            consume(newLine, translatable("parser.expected", "new_line"))
+        }
     }
 
+    consume(rightBrace, translatable("parser.expected.end", "right_brace", "body"))
     return body
 }
 
