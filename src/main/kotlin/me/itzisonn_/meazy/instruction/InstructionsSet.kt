@@ -249,6 +249,10 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
         with(GotoLabelIfEqualsZeroInstruction(uuid))
     }
 
+    fun gotoLabelIfNotEqualsZero(uuid: Uuid) {
+        with(GotoLabelIfNotEqualsZeroInstruction(uuid))
+    }
+
     fun gotoLabelIfComparisonTrue(type: NumberType, operation: ComparisonOperation, uuid: Uuid) {
         with(GotoLabelIfComparisonTrueInstruction(type, operation, uuid))
     }
