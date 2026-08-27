@@ -100,7 +100,7 @@ fun main() {
     b()
     a()
     println(String.valueOf(2 ^ 5))
-    println(String.valueOf(b + Math.random() - c.length()))
+    println(String.valueOf(b + Math.random()))
     testPrimitives()
     Test("Hi").ok()
 
@@ -118,6 +118,9 @@ fun a() {
 
     System.out.println("IS DOUBLE " + abc is Double)
     System.out.println("IS NOT NUMBER " + abc !is Number)
+
+    System.out.println("Testing " + abc as Number)
+    System.out.println("Testing " + ((abc as? String)?.length() ?: 0))
 }
 
 class Test {

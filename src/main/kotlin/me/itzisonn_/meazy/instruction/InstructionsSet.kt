@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction
 import me.itzisonn_.meazy.instruction.local.StoreLocalInstruction
 import me.itzisonn_.meazy.instruction.method.*
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
-import me.itzisonn_.meazy.instruction.misc.CheckCastInstruction
+import me.itzisonn_.meazy.instruction.misc.CastInstruction
 import me.itzisonn_.meazy.instruction.misc.InstanceOfInstruction
 import me.itzisonn_.meazy.instruction.misc.ReturnInstruction
 import me.itzisonn_.meazy.instruction.misc.WithClassInstruction
@@ -191,8 +191,8 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
         with(InstanceOfInstruction(target))
     }
 
-    fun checkCast(type: ClassDesc) {
-        with(CheckCastInstruction(type))
+    fun cast(type: ClassDesc) {
+        with(CastInstruction(type))
     }
 
     fun returnValue(classDesc: ClassDesc?) {

@@ -98,9 +98,9 @@ object SymbolResolver {
 
 
     context(parents: ParentMap)
-    fun Environment.resolveFunction(target: ProgramUnit): ResolvedFunction {
-        val functionSymbol = resolveFunctionSymbol(target) ?: error("Can't find function")
-        val className = functionSymbol.environment.getParent().fullClassName ?: error("Invalid function's parent")
+    fun Environment.resolveFunction(target: ProgramUnit): ResolvedFunction? {
+        val functionSymbol = resolveFunctionSymbol(target) ?: return null
+        val className = functionSymbol.environment.getParent().fullClassName ?: return null
 
         val target = if (Modifiers.shared in functionSymbol.modifiers || functionSymbol.environment.getParent() is FileEnvironment) {
             null

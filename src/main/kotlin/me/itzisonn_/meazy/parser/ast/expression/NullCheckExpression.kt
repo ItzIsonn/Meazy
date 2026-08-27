@@ -32,7 +32,6 @@ class NullCheckExpression(
         nullExpression.emit(instructions, environment)
         val nullExpressionClassDesc = nullExpression.getType(environment).classDesc
         if (nullExpressionClassDesc.isPrimitive) instructions.boxPrimitive(nullExpressionClassDesc)
-        instructions.gotoLabel(endLabel)
 
         instructions.bindLabel(endLabel)
     }
