@@ -19,9 +19,7 @@ class Identifier(val id: String) : Expression {
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        val resolvedVariable = environment.resolveVariable(this)
-
-        when (resolvedVariable) {
+        when (val resolvedVariable = environment.resolveVariable(this)) {
             is ResolvedLocalVariable -> {
                 instructions.getLocal(resolvedVariable.type, resolvedVariable.slot)
             }
