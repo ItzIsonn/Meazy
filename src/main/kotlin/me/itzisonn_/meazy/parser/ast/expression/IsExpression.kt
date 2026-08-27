@@ -2,19 +2,16 @@ package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.boxPrimitive
-import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
 import java.lang.constant.ConstantDescs
-import java.lang.constant.MethodTypeDesc
 
 class IsExpression(
     val value: Expression,
-    val dataType: String,
-    val isLike: Boolean
+    val dataType: String
 ) : Expression {
     override val children = setOf(value)
 
@@ -26,24 +23,7 @@ class IsExpression(
         value.emit(instructions, environment)
         if (valueClassDesc.isPrimitive) instructions.boxPrimitive(valueClassDesc)
 
-        if (isLike) {
-            instructions.instanceOf(classDesc)
-            return
-        }
-
-        instructions.invokeMethod(
-            ConstantDescs.CD_Object,
-            "getClass",
-            MethodTypeDesc.of(ConstantDescs.CD_Class),
-            InvokeType.VIRTUAL
-        )
-
-        instructions.invokeMethod(
-            ConstantDescs.CD_Object,
-            "equals",
-            MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object),
-            InvokeType.VIRTUAL
-        ) { loadConstant(classDesc) }
+        instructions.instanceOf(classDesc)
     }
 
     context(parents: ParentMap)

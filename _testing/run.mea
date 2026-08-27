@@ -117,9 +117,7 @@ fun a() {
     System.out.println(abc ?: null)
 
     System.out.println("IS DOUBLE " + abc is Double)
-    System.out.println("IS LIKE DOUBLE " + abc islike Double)
     System.out.println("IS NUMBER " + abc is Number)
-    System.out.println("IS LIKE NUMBER " + abc islike Number)
 }
 
 class Test {
