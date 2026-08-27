@@ -1,8 +1,6 @@
 package me.itzisonn_.meazy.parser.parsing.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
-import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.`while`
 import me.itzisonn_.meazy.parser.parsing.Parser
@@ -26,10 +24,7 @@ object WhileStatementParsingFunction : EmptyParsingFunction<WhileStatement>() {
             translatable("parser.expected.end", "right_parenthesis", "while_condition")
         )
 
-        consume(leftBrace, translatable("parser.expected.start", "left_brace", "while_body"))
-        val body = parseBody()
-        consume(rightBrace, translatable("parser.expected.end", "right_brace", "while_body"))
-
+        val body = parseBody(LocalStatementParsingFunction)
         return WhileStatement(condition, body)
     }
 }

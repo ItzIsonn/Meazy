@@ -5,13 +5,11 @@ import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.colon
 import me.itzisonn_.meazy.lexer.TokenTypes.`interface`
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
-import me.itzisonn_.meazy.lexer.TokenTypes.newLine
-import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.InterfaceDeclarationStatement
-import me.itzisonn_.meazy.parser.ast.statement.Statement
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.parseBody
 import me.itzisonn_.meazy.util.text.translatable
 
 object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceDeclarationStatement, Set<Modifier>> {
@@ -37,22 +35,7 @@ object InterfaceDeclarationStatementParsingFunction : ParsingFunction<InterfaceD
             return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
         }
 
-        consume(leftBrace, translatable("parser.expected.start", "left_brace", "interface_body"))
-
-        if (isNext(rightBrace)) {
-            consume(rightBrace, null)
-            return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, listOf())
-        }
-
-        consume(newLine, translatable("parser.expected", "new_line"))
-
-        val body = mutableListOf<Statement>()
-        while (!isEndOfFile() && !isNext(rightBrace)) {
-            val statement = parse(InterfaceBodyStatementParsingFunction)
-            body.add(statement)
-        }
-
-        consume(rightBrace, translatable("parser.expected.end", "right_brace", "interface_body"))
+        val body = parseBody(InterfaceBodyStatementParsingFunction)
         return InterfaceDeclarationStatement(modifiers, interfaceId, baseClasses, body)
     }
 }

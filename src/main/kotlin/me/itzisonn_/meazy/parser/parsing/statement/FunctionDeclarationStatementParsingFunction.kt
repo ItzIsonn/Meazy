@@ -4,9 +4,7 @@ import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.assign
 import me.itzisonn_.meazy.lexer.TokenTypes.dot
 import me.itzisonn_.meazy.lexer.TokenTypes.function
-import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.newLine
-import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.FunctionDeclarationStatement
 import me.itzisonn_.meazy.parser.ast.statement.LocalStatement
@@ -51,9 +49,7 @@ object FunctionDeclarationStatementParsingFunction : PairParsingFunction<Functio
             body = listOf(ReturnStatement(expression))
         }
         else {
-            consume(leftBrace, translatable("parser.expected.start", "left_brace", "function_body"))
-            body = parseBody()
-            consume(rightBrace, translatable("parser.expected.end", "right_brace", "function_body"))
+            body = parseBody(LocalStatementParsingFunction)
         }
 
         return FunctionDeclarationStatement(modifiers, functionId, classId, parameters, body, dataType)

@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.parsing.statement
 
 import me.itzisonn_.meazy.lexer.TokenTypes.constructor
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
-import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ConstructorDeclarationStatement
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
@@ -18,13 +17,10 @@ object ConstructorDeclarationStatementParsingFunction : ParsingFunction<Construc
 
         val parameters = parseParameters()
         if (!isNext(leftBrace)) {
-            return ConstructorDeclarationStatement(modifiers, parameters, mutableListOf())
+            return ConstructorDeclarationStatement(modifiers, parameters, listOf())
         }
 
-        consume(leftBrace, translatable("parser.expected.start", "left_brace", "constructor_body"))
-        val body = parseBody()
-        consume(rightBrace, translatable("parser.expected.end", "right_brace", "constructor_body"))
-
+        val body = parseBody(LocalStatementParsingFunction)
         return ConstructorDeclarationStatement(modifiers, parameters, body)
     }
 }

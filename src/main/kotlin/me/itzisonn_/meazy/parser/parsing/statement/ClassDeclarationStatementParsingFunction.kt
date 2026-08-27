@@ -5,12 +5,10 @@ import me.itzisonn_.meazy.lexer.TokenTypes.colon
 import me.itzisonn_.meazy.lexer.TokenTypes.comma
 import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
-import me.itzisonn_.meazy.lexer.TokenTypes.newLine
-import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.parser.ast.statement.ClassDeclarationStatement
-import me.itzisonn_.meazy.parser.ast.statement.Statement
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.parsing.ParsingFunction
+import me.itzisonn_.meazy.parser.parsing.parseBody
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.util.text.translatable
 
@@ -37,22 +35,7 @@ object ClassDeclarationStatementParsingFunction : ParsingFunction<ClassDeclarati
             return ClassDeclarationStatement(modifiers, classId, baseClasses, listOf())
         }
 
-        consume(leftBrace, translatable("parser.expected.start", "left_brace", "class_body"))
-
-        if (isNext(rightBrace)) {
-            consume(rightBrace, null)
-            return ClassDeclarationStatement(modifiers, classId, baseClasses, listOf())
-        }
-
-        consume(newLine, translatable("parser.expected", "new_line"))
-
-        val body = mutableListOf<Statement>()
-        while (!isEndOfFile() && !isNext(rightBrace)) {
-            val statement = parse(ClassBodyStatementParsingFunction)
-            body.add(statement)
-        }
-
-        consume(rightBrace, translatable("parser.expected.end", "right_brace", "class_body"))
+        val body = parseBody(ClassBodyStatementParsingFunction)
         return ClassDeclarationStatement(modifiers, classId, baseClasses, body)
     }
 }

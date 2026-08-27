@@ -3,9 +3,7 @@ package me.itzisonn_.meazy.parser.parsing.statement
 import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.`for`
 import me.itzisonn_.meazy.lexer.TokenTypes.`in`
-import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
-import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.parsing.Parser
@@ -39,10 +37,7 @@ object ForeachStatementParsingFunction : EmptyParsingFunction<ForeachStatement>(
             translatable("parser.expected.end", "right_parenthesis", "for_condition")
         )
 
-        consume(leftBrace, translatable("parser.expected.start", "left_brace", "for_body"))
-        val body = parseBody()
-        consume(rightBrace, translatable("parser.expected.end", "right_brace", "for_body"))
-
+        val body = parseBody(LocalStatementParsingFunction)
         return ForeachStatement(isConstant, id, dataType, collection, body)
     }
 }

@@ -28,7 +28,7 @@ object LocalStatementParsingFunction : EmptyParsingFunction<LocalStatement>() {
                 Pair(modifiers, false)
             )
         }
-        if (!modifiers.isEmpty()) throw InvalidSyntaxException(
+        if (modifiers.isNotEmpty()) throw InvalidSyntaxException(
             translatable("parser.modifier.unexpected")
         )
 
