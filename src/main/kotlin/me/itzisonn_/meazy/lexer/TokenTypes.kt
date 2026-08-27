@@ -20,7 +20,7 @@ object TokenTypes {
 
         add(TokenType("new_line", "\n*", TokenBehavior.IGNORE))
         add(TokenType("white_space", "(?!\n)\\s", TokenBehavior.SKIP))
-        add(TokenType("end_of_file", null as? Regex))
+        @Suppress("USELESS_CAST") add(TokenType("end_of_file", null as? Regex))
 
         add(TokenType("comment", "\\/\\/[^\n]*", TokenBehavior.SKIP))
         add(TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", TokenBehavior.SKIP))
@@ -40,7 +40,7 @@ object TokenTypes {
         add(TokenType("return", "return"))
         add(TokenType("continue", "continue"))
         add(TokenType("break", "break"))
-        add(TokenType("is", "islike|is"))
+        add(TokenType("is", "is"))
 
         add(TokenType("left_parenthesis", "\\("))
         add(TokenType("right_parenthesis", "\\)"))

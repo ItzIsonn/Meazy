@@ -13,9 +13,9 @@ object IsExpressionParsingFunction : EmptyParsingFunction<Expression>() {
         val value = parse(NegationExpressionParsingFunction)
 
         if (isNext(`is`)) {
-            val isLike = consume(`is`, null).value == "islike"
+            consume(`is`, null)
             val id = consume(TokenTypes.id, translatable("parser.expected.after_keyword", "id", "is")).value
-            return IsExpression(value, id, isLike)
+            return IsExpression(value, id)
         }
 
         return value
