@@ -152,19 +152,19 @@ class FunctionDeclarationStatement(
             initLabel(startLabel)
             initLabel(endLabel)
 
-            for (parameter in functionEnvironment.parameters) {
+            for ((id1, dataType, isConstant) in functionEnvironment.parameters) {
                 val parameterValue = functionEnvironment.declareVariable(
-                    parameter.id,
-                    parameter.dataType,
-                    parameter.isConstant,
+                    id1,
+                    dataType,
+                    isConstant,
                     null,
                     setOf()
                 )
 
                 setLocalName(
                     parameterValue.slot,
-                    parameter.id,
-                    parameter.dataType.classDesc,
+                    id1,
+                    dataType.classDesc,
                     startLabel,
                     endLabel
                 )

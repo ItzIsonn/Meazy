@@ -57,7 +57,7 @@ private class TranslatableText(private val key: String, args: List<String>) : Te
     private val args = args.toMutableList()
 
     init {
-        require(!key.isBlank()) { "Key can't be blank" }
+        require(key.isNotBlank()) { "Key can't be blank" }
     }
 
     override fun toString(): String {
@@ -94,7 +94,7 @@ private class MergedText(texts: List<Text>) : Text {
     private val texts = texts.toMutableList()
 
     init {
-        require(!texts.isEmpty()) { "Texts can't be empty" }
+        require(texts.isNotEmpty()) { "Texts can't be empty" }
     }
 
     override fun toString(): String {

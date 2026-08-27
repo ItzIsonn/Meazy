@@ -144,8 +144,8 @@ class CallExpression(
             resolvedConstructor.methodTypeDesc,
             false,
             null,
-            false,
-            false
+            isInterface = false,
+            isFunction = false
         )
     }
 

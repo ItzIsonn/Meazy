@@ -82,19 +82,19 @@ class ConstructorDeclarationStatement(
             initLabel(startLabel)
             initLabel(endLabel)
 
-            for (parameter in constructorEnvironment.parameters) {
+            for ((id, dataType, isConstant) in constructorEnvironment.parameters) {
                 val parameterValue = constructorEnvironment.declareVariable(
-                    parameter.id,
-                    parameter.dataType,
-                    parameter.isConstant,
+                    id,
+                    dataType,
+                    isConstant,
                     null,
                     setOf()
                 )
 
                 setLocalName(
                     parameterValue.slot,
-                    parameter.id,
-                    parameter.dataType.classDesc,
+                    id,
+                    dataType.classDesc,
                     startLabel,
                     endLabel
                 )

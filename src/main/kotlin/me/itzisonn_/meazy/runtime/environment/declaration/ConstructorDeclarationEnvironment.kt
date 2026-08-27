@@ -39,7 +39,7 @@ interface ConstructorDeclarationEnvironment : Environment {
      * @return Whether this environment has at least one declared constructor
      */
     fun hasConstructor(): Boolean {
-        return !constructors.isEmpty()
+        return constructors.isNotEmpty()
     }
 
     /**

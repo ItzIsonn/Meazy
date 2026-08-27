@@ -30,7 +30,6 @@ class OpenModifier : Modifier("open") {
         requestEnvironment: Environment, environment: Environment,
         identifier: Identifier, hasModifier: Boolean
     ): Boolean {
-        if (hasModifier) return true
-        return areFromSamePackage(environment, requestEnvironment)
+        return hasModifier || areFromSamePackage(environment, requestEnvironment)
     }
 }

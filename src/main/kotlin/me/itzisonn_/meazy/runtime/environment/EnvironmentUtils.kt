@@ -38,8 +38,7 @@ fun Environment.hasParent(predicate: (Environment?) -> Boolean): Boolean {
  * @return Whether this environment has requested parent
  */
 fun Environment.hasParentOrSelf(predicate: (Environment?) -> Boolean): Boolean {
-    if (predicate(this)) return true
-    return hasParent(predicate)
+    return predicate(this) || hasParent(predicate)
 }
 
 /**
@@ -49,8 +48,7 @@ fun Environment.hasParentOrSelf(predicate: (Environment?) -> Boolean): Boolean {
  */
 fun <T : Environment> Environment.hasParent(cls: KClass<T>): Boolean {
     val parent = getParent()
-    if (cls.isInstance(parent)) return true
-    return parent?.hasParent(cls) ?: false
+    return cls.isInstance(parent) || parent?.hasParent(cls) ?: false
 }
 
 /**
@@ -66,8 +64,7 @@ inline fun <reified T : Environment> Environment.hasParent() = hasParent(T::clas
  * @return Whether this environment or its parent is instance of given class
  */
 fun <T : Environment> Environment.hasParentOrSelf(cls: KClass<T>): Boolean {
-    if (cls.isInstance(this)) return true
-    return hasParent(cls)
+    return cls.isInstance(this) || hasParent(cls)
 }
 
 /**
@@ -188,7 +185,7 @@ fun Environment.getCommonOf(classDesc1: ClassDesc, classDesc2: ClassDesc): Class
  */
 fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean): ClassDesc {
     if (classDesc.isPrimitive || classDesc.isArray) return classDesc
-    if (!classDesc.packageName().isEmpty()) return classDesc
+    if (classDesc.packageName().isNotEmpty()) return classDesc
 
     val fileEnvironment = getParentOrSelf<FileEnvironment>() ?: return classDesc
 

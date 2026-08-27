@@ -88,7 +88,7 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
 
 
     init {
-        require(!parts.isEmpty()) { "Parts can't be empty" }
+        require(parts.isNotEmpty()) { "Parts can't be empty" }
 
         this.parts = parts.toList()
         this.type = type
