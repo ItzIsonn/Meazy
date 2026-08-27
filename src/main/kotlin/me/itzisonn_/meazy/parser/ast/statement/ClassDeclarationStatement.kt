@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.declareSymbol
-import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -25,8 +24,7 @@ class ClassDeclarationStatement(
     modifiers: Set<Modifier>,
     val id: String,
     val baseClasses: Set<String>,
-    val body: List<Statement>,
-    val enumIds: Map<String, List<Expression>> = mapOf()
+    val body: List<Statement>
 ) : ModifierStatement(modifiers), DeclarationStatement<ClassSymbol> {
     override val children = body.toSet()
 

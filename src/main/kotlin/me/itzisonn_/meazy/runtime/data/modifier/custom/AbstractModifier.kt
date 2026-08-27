@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 class AbstractModifier : Modifier("abstract") {
     override fun canUse(modifierStatement: ModifierStatement, environment: Environment): Boolean {
         if (Modifiers.private in modifierStatement.modifiers || Modifiers.shared in modifierStatement.modifiers ||
-            Modifiers.open in modifierStatement.modifiers || Modifiers.enum in modifierStatement.modifiers) return false
+            Modifiers.open in modifierStatement.modifiers) return false
 
         if (modifierStatement is ClassDeclarationStatement) return true
         if (modifierStatement is FunctionDeclarationStatement && environment is ClassEnvironment) {
