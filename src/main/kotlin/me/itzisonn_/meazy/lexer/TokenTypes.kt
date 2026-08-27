@@ -41,6 +41,7 @@ object TokenTypes {
         add(TokenType("continue", "continue"))
         add(TokenType("break", "break"))
         add(TokenType("is", "!?is"))
+        add(TokenType("as", "as\\??"))
 
         add(TokenType("left_parenthesis", "\\("))
         add(TokenType("right_parenthesis", "\\)"))
@@ -126,6 +127,7 @@ object TokenTypes {
     val `continue` get() = getNonNull("continue")
     val `break` get() = getNonNull("break")
     val `is` get() = getNonNull("is")
+    val `as` get() = getNonNull("as")
 
     val leftParenthesis get() = getNonNull("left_parenthesis")
     val rightParenthesis get() = getNonNull("right_parenthesis")

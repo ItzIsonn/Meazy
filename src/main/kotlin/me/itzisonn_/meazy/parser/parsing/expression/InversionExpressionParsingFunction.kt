@@ -11,10 +11,10 @@ object InversionExpressionParsingFunction : EmptyParsingFunction<Expression>() {
     override fun Parser.parse(): Expression {
         if (isNext(inversion)) {
             consume(inversion, null)
-            val expression = parse(IsExpressionParsingFunction)
+            val expression = parse(TypeCheckingExpressionParsingFunction)
             return OperatorExpression(expression, null, Operators.inversion)
         }
 
-        return parse(IsExpressionParsingFunction)
+        return parse(TypeCheckingExpressionParsingFunction)
     }
 }

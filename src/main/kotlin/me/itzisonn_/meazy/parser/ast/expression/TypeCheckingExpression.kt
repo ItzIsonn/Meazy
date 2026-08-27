@@ -9,20 +9,20 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
 import java.lang.constant.ConstantDescs
 
-class IsExpression(
+class TypeCheckingExpression(
     val value: Expression,
-    val dataType: String
+    val id: String
 ) : Expression {
     override val children = setOf(value)
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        val classDesc = environment.resolveClassDesc(dataType, false)
-        val valueClassDesc = value.getType(environment).classDesc
-
         value.emit(instructions, environment)
+
+        val valueClassDesc = value.getType(environment).classDesc
         if (valueClassDesc.isPrimitive) instructions.boxPrimitive(valueClassDesc)
 
+        val classDesc = environment.resolveClassDesc(id, false)
         instructions.instanceOf(classDesc)
     }
 

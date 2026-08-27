@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy.parser.ast.expression
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.boxPrimitive
+import me.itzisonn_.meazy.instruction.boxed
 import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
@@ -29,6 +31,7 @@ class CallExpression(
 
         if (resolvedCallable.isFunction) {
             var endLabel: Uuid? = null
+            var shouldBox = false
 
             if (resolvedCallable.target != null) {
                 resolvedCallable.target.emit(instructions, environment)
@@ -41,6 +44,8 @@ class CallExpression(
                         }
                     }
                     else {
+                        shouldBox = true
+
                         val nonnullLabel = instructions.createAndInitLabel()
                         endLabel = instructions.createAndInitLabel()
 
@@ -80,6 +85,14 @@ class CallExpression(
                 }
             }
 
+            if (shouldBox) {
+                val returnType = resolvedCallable.methodTypeDesc.returnType()
+
+                if (returnType.isPrimitive) {
+                    instructions.boxPrimitive(returnType)
+                }
+            }
+
             if (endLabel != null) {
                 instructions.bindLabel(endLabel)
             }
@@ -102,8 +115,22 @@ class CallExpression(
         val resolvedCallable = environment.resolveCallable()
 
         if (resolvedCallable.isFunction) {
-            val returnType = resolvedCallable.methodTypeDesc.returnType()
-            return DataType.of(returnType, resolvedCallable.isReturnTypeNullable)
+            var returnType = resolvedCallable.methodTypeDesc.returnType()
+            var isNullable = resolvedCallable.isReturnTypeNullable
+
+            if (resolvedCallable.target != null) {
+                val parent = parent
+
+                if (parent is MemberExpression && parent.isNullSafe) {
+                    isNullable = true
+
+                    if (returnType.isPrimitive) {
+                        returnType = returnType.boxed
+                    }
+                }
+            }
+
+            return DataType.of(returnType, isNullable)
         }
 
         else {
@@ -114,8 +141,8 @@ class CallExpression(
 
 
     context(parents: ParentMap)
-    private fun Environment.resolveFunction(): ResolvedCallable {
-        val resolvedFunction = resolveFunction(this@CallExpression)
+    private fun Environment.resolveFunction(): ResolvedCallable? {
+        val resolvedFunction = resolveFunction(this@CallExpression) ?: return null
 
         return ResolvedCallable(
             resolvedFunction.classDesc,
@@ -151,7 +178,7 @@ class CallExpression(
 
     context(parents: ParentMap)
     private fun Environment.resolveCallable(): ResolvedCallable {
-        val resolvedFunction = tryOrNull { resolveFunction() }
+        val resolvedFunction = resolveFunction()
         val resolvedConstructor = tryOrNull { resolveConstructor() }
 
         val resolvedCallable: ResolvedCallable
