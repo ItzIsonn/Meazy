@@ -25,26 +25,19 @@ class CastingExpression(
         val classDesc = environment.resolveClassDesc(id, false)
 
         if (isSafe) {
-            val nullLabel = instructions.createAndInitLabel()
             val endLabel = instructions.createAndInitLabel()
 
             instructions.duplicate()
             instructions.instanceOf(classDesc)
-            instructions.gotoLabelIfEqualsZero(nullLabel)
+            instructions.gotoLabelIfNotEqualsZero(endLabel)
 
-            instructions.cast(classDesc)
-            instructions.gotoLabel(endLabel)
-
-            instructions.bindLabel(nullLabel)
             instructions.pop()
             instructions.loadNull()
-            instructions.cast(classDesc)
 
             instructions.bindLabel(endLabel)
         }
-        else {
-            instructions.cast(classDesc)
-        }
+
+        instructions.cast(classDesc)
     }
 
     context(parents: ParentMap)
