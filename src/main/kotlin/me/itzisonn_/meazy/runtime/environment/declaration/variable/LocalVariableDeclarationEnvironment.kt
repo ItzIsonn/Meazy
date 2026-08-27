@@ -1,12 +1,12 @@
-package me.itzisonn_.meazy.runtime.environment.declaration
+package me.itzisonn_.meazy.runtime.environment.declaration.variable
 
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
-import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.symbol.LocalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ConstantDescs
 import kotlin.uuid.Uuid
@@ -14,8 +14,7 @@ import kotlin.uuid.Uuid
 /**
  * Adds to Environment ability to declare local variables
  */
-interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment {
-    override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): LocalVariableSymbol
+interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment<LocalVariableSymbol> {
     fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): LocalVariableSymbol
 
     //TODO
@@ -24,6 +23,7 @@ interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment {
 
     fun setStartLabel(label: Uuid)
     fun setEndLabel(label: Uuid)
+
     val usedSlotsCount: Int
 }
 
@@ -33,7 +33,10 @@ open class LocalVariableDeclarationEnvironmentImpl(
     parent: Environment,
     private var startLabel: Uuid?,
     private var endLabel: Uuid?
-) : VariableDeclarationEnvironmentImpl(parent), LocalVariableDeclarationEnvironment {
+) : EnvironmentImpl(parent), LocalVariableDeclarationEnvironment {
+    private val _variables = mutableListOf<LocalVariableSymbol>()
+    override val variables get() = _variables.toList()
+
     override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): LocalVariableSymbol {
         if (getVariable(id) != null) {
             throw EvaluationException(translatable("runtime.variable.already_exists", id))
@@ -85,15 +88,6 @@ open class LocalVariableDeclarationEnvironmentImpl(
 
             return usedSlots
         }
+
+    override val isShared get() = getParent().isShared
 }
-
-
-
-/** TODO Javadoc
- * Creates non-shared loop environment
- *
- * @param parent Parent
- * @return New loop environment
- */
-fun LocalVariableDeclarationEnvironment(parent: Environment, startLabel: Uuid?, endLabel: Uuid?): LocalVariableDeclarationEnvironment =
-    LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel)

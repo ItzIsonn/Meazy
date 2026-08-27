@@ -266,4 +266,5 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
 
+@Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
 val String.java get() = this as java.lang.String

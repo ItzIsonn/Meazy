@@ -3,7 +3,9 @@ package me.itzisonn_.meazy.runtime.data.symbol
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.VariableDeclarationEnvironment
 
 /**
  * Represents runtime variable symbol
@@ -27,7 +29,7 @@ sealed interface VariableSymbol : Symbol {
     /**
      * @return Parent environment
      */
-    val parentEnvironment: VariableDeclarationEnvironment
+    val parentEnvironment: VariableDeclarationEnvironment<*>
 
 
 
@@ -64,12 +66,12 @@ private data class LocalVariableSymbolImpl(
     override val isConstant: Boolean,
     override val modifiers: Set<Modifier>,
     override val slot: Int,
-    override val parentEnvironment: VariableDeclarationEnvironment
+    override val parentEnvironment: LocalVariableDeclarationEnvironment
 ) : LocalVariableSymbol
 
 fun LocalVariableSymbol(
     id: String?, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
-    slot: Int, parentEnvironment: VariableDeclarationEnvironment
+    slot: Int, parentEnvironment: LocalVariableDeclarationEnvironment
 ): LocalVariableSymbol = LocalVariableSymbolImpl(
     id, dataType, isConstant, modifiers.toSet(),
     slot, parentEnvironment
@@ -83,12 +85,12 @@ private data class GlobalVariableSymbolImpl(
     override val isConstant: Boolean,
     override val modifiers: Set<Modifier>,
     override val initializer: Expression?,
-    override val parentEnvironment: VariableDeclarationEnvironment
+    override val parentEnvironment: GlobalVariableDeclarationEnvironment
 ) : GlobalVariableSymbol
 
 fun GlobalVariableSymbol(
     id: String, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
-    initializer: Expression?, parentEnvironment: VariableDeclarationEnvironment
+    initializer: Expression?, parentEnvironment: GlobalVariableDeclarationEnvironment
 ): GlobalVariableSymbol = GlobalVariableSymbolImpl(
     id, dataType, isConstant, modifiers.toSet(),
     initializer, parentEnvironment

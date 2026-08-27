@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironmentImpl
 import java.lang.constant.ConstantDescs
 import kotlin.uuid.Uuid
 
@@ -49,7 +49,7 @@ class IfStatementCase(
     fun emit(instructions: InstructionsSet, environment: Environment, endLabel: Uuid) {
         val startLabel = instructions.createAndInitLabel()
         val elseLabel = instructions.createAndInitLabel()
-        val ifEnvironment = LocalVariableDeclarationEnvironment(
+        val ifEnvironment = LocalVariableDeclarationEnvironmentImpl(
             environment, startLabel, elseLabel
         )
 

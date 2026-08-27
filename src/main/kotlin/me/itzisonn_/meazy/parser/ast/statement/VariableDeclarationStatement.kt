@@ -16,8 +16,8 @@ import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.LocalVariableDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.VariableDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 import java.lang.reflect.AccessFlag
 
@@ -35,7 +35,7 @@ class VariableDeclarationStatement(
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun declare(environment: Environment) {
-        if (environment !is VariableDeclarationEnvironment) {
+        if (environment !is VariableDeclarationEnvironment<*>) {
             throw RuntimeException("CANT DECLARE variable HERE TODO")
         }
         val dataType = dataType ?: value?.getType(environment)

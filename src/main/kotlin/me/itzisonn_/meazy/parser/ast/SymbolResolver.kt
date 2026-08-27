@@ -39,7 +39,7 @@ object SymbolResolver {
 
             is GlobalVariableSymbol -> {
                 val className = variableSymbol.parentEnvironment.fullClassName
-                    ?: error("Invalid global variable symbol ${variableSymbol.id}")
+                    ?: error("Invalid global variable symbol ${variableSymbol.id} ${variableSymbol.parentEnvironment}")
 
                 val receiver = if (Modifiers.shared in variableSymbol.modifiers || variableSymbol.parentEnvironment is FileEnvironment) {
                     null

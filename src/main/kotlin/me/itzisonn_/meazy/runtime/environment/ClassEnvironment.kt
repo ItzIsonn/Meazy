@@ -4,19 +4,19 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
-import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
+import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.declaration.VariableDeclarationEnvironmentImpl
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironmentImpl
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
 /**
  * Represents environment for classes
  */
-sealed interface ClassEnvironment : VariableDeclarationEnvironment, FunctionDeclarationEnvironment,
+sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclarationEnvironment,
     ConstructorDeclarationEnvironment, ModifieredEnvironment {
     override fun getParent(): ClassDeclarationEnvironment
 
@@ -78,7 +78,7 @@ private class ClassEnvironmentImpl(
 ) : ClassEnvironment,
     FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, isShared),
     ConstructorDeclarationEnvironment by ConstructorDeclarationEnvironment(parent, isShared),
-    VariableDeclarationEnvironmentImpl(parent) {
+    GlobalVariableDeclarationEnvironmentImpl(parent) {
     override var baseClass = baseClass
         private set
     private val _interfaces = interfaces.toMutableSet()
@@ -121,8 +121,8 @@ private class ClassEnvironmentImpl(
 
 
 
-    override fun getVariable(id: String): VariableSymbol? {
-        val variableValue = super<VariableDeclarationEnvironmentImpl>.getVariable(id)
+    override fun getVariable(id: String): GlobalVariableSymbol? {
+        val variableValue = super<GlobalVariableDeclarationEnvironmentImpl>.getVariable(id)
         if (variableValue != null) return variableValue
 
         val baseClass = baseClass ?: return null
