@@ -45,7 +45,5 @@ object Modifiers {
     val abstract get() = getNonNull("abstract")
     val operator get() = getNonNull("operator")
 
-    private fun getNonNull(id: String): Modifier {
-        return get(id)!!
-    }
+    private fun getNonNull(id: String) = get(id)!!
 }

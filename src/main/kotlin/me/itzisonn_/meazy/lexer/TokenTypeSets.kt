@@ -102,7 +102,5 @@ object TokenTypeSets {
     val multiplication get() = getNonNull("multiplication")
     val addition get() = getNonNull("addition")
 
-    private fun getNonNull(id: String): TokenTypeSet {
-        return get(id)!!
-    }
+    private fun getNonNull(id: String) = get(id)!!
 }

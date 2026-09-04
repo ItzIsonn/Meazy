@@ -1,7 +1,5 @@
 package me.itzisonn_.meazy.util.version
 
-import java.util.*
-
 /**
  * Represents different types of version
  */
@@ -31,9 +29,7 @@ enum class VersionType {
          * @param string String representation of [VersionType]
          * @return Version type that matches given string or null
          */
-        fun of(string: String): VersionType? {
-            return VERSION_TYPES[string.uppercase(Locale.getDefault())]
-        }
+        fun of(string: String) = VERSION_TYPES[string.uppercase()]
 
         /**
          * Map of different spellings of version types

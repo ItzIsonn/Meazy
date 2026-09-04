@@ -68,9 +68,7 @@ object Operators {
     val negation get() = getNonNull("negation")
     val inversion get() = getNonNull("inversion")
 
-    private fun getNonNull(id: String): Operator {
-        return get(id)!!
-    }
+    private fun getNonNull(id: String) = get(id)!!
 
 
 
@@ -83,7 +81,7 @@ object Operators {
      */
     fun get(symbol: String, operatorType: OperatorType?): Operator? {
         return operators.find { operator ->
-            return@find symbol == operator.symbol && (operatorType == null || operator.operatorType == operatorType)
+            symbol == operator.symbol && (operatorType == null || operator.operatorType == operatorType)
         }
     }
 }

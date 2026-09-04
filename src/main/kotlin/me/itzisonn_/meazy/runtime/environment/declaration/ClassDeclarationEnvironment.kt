@@ -20,9 +20,7 @@ interface ClassDeclarationEnvironment : Environment {
      * @param id Class's id
      * @return Declared class with given id or null
      */
-    fun getClass(id: String): ClassSymbol? {
-        return classes.find { it.id == id }
-    }
+    fun getClass(id: String): ClassSymbol? = classes.find { it.id == id }
 
     /**
      * @return All declared classes

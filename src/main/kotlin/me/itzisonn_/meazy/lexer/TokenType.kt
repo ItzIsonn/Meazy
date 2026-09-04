@@ -52,9 +52,7 @@ class TokenType(
 
 
 
-    override fun toString(): String {
-        return "TokenType($id)"
-    }
+    override fun toString() = "TokenType($id)"
 
     override fun equals(other: Any?): Boolean {
         if (other === this) return true
@@ -62,7 +60,5 @@ class TokenType(
         return id == other.id
     }
 
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun hashCode() = id.hashCode()
 }

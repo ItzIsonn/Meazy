@@ -9,7 +9,7 @@ class TokenTypeSet(val id: String, tokenTypes: Set<TokenType>) {
     private val tokenTypes = tokenTypes.toMutableSet()
 
     /**
-     * Constructor with array of tokenTypes
+     * Constructor with the array of tokenTypes
      * 
      * @param id         Id
      * @param tokenTypes Array of TokenTypes
@@ -20,9 +20,7 @@ class TokenTypeSet(val id: String, tokenTypes: Set<TokenType>) {
     /**
      * @return Copy of this token type set
      */
-    fun getTokenTypes(): Set<TokenType> {
-        return tokenTypes.toSet()
-    }
+    fun getTokenTypes() = tokenTypes.toSet()
 
     /**
      * @param tokenType TokenType

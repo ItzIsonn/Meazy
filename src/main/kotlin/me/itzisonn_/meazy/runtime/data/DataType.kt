@@ -15,7 +15,7 @@ data class DataType private constructor(
     var classDesc: ClassDesc,
     val isNullable: Boolean
 ) {
-    override fun toString() = classDesc.displayName() + (if (isNullable) "?" else "")
+    override fun toString() = classDesc.displayName() + if (isNullable) "?" else ""
 
     fun resolve(environment: Environment) {
         classDesc = environment.resolveClassDesc(classDesc, !isNullable)

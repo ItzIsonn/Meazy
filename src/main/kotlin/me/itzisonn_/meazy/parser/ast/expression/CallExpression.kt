@@ -133,9 +133,7 @@ class CallExpression(
             return DataType.of(returnType, isNullable)
         }
 
-        else {
-            return DataType.ofNonNull(resolvedCallable.classDesc)
-        }
+        return DataType.ofNonNull(resolvedCallable.classDesc)
     }
 
 

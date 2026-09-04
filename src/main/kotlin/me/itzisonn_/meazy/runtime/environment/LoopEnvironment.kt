@@ -20,13 +20,8 @@ private class LoopEnvironmentImpl(
     endLabel: Uuid
 ) : LoopEnvironment,
     LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
-    override fun getStartLabel(): Uuid {
-        return super.getStartLabel() ?: error("StartLabel is null")
-    }
-
-    override fun getEndLabel(): Uuid {
-        return super.getEndLabel() ?: error("EndLabel is null")
-    }
+    override fun getStartLabel() = super.getStartLabel() ?: error("StartLabel is null")
+    override fun getEndLabel() = super.getEndLabel() ?: error("EndLabel is null")
 }
 
 

@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.lexer.Token
  *
  * @param T Type of ProgramUnit to parse into
  */
-interface ParsingFunction<T : ProgramUnit, D> {
+interface ParsingFunction<out T : ProgramUnit, in D> {
     /**
      * Parses tokens, which are stored in [Parser], into ProgramUnit of type [T]
      *
@@ -20,12 +20,12 @@ interface ParsingFunction<T : ProgramUnit, D> {
     fun Parser.parse(data: D): T
 }
 
-abstract class EmptyParsingFunction<T : ProgramUnit> : ParsingFunction<T, Unit> {
+abstract class EmptyParsingFunction<out T : ProgramUnit> : ParsingFunction<T, Unit> {
     abstract fun Parser.parse(): T
     final override fun Parser.parse(data: Unit) = parse()
 }
 
-abstract class PairParsingFunction<T : ProgramUnit, A, B> : ParsingFunction<T, Pair<A, B>> {
+abstract class PairParsingFunction<out T : ProgramUnit, in A, in B> : ParsingFunction<T, Pair<A, B>> {
     abstract fun Parser.parse(first: A, second: B): T
     final override fun Parser.parse(data: Pair<A, B>) = parse(data.first, data.second)
 }

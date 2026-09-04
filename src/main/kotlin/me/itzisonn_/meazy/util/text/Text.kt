@@ -36,9 +36,7 @@ private class LiteralText(private val text: String, args: List<String>) : Text {
         return result
     }
 
-    override fun append(text: Text): Text {
-        return MergedText(listOf(this, text))
-    }
+    override fun append(text: Text) = MergedText(listOf(this, text))
 }
 
 /**
@@ -47,9 +45,7 @@ private class LiteralText(private val text: String, args: List<String>) : Text {
  * @param text Text
  * @return Literal text
  */
-fun literal(text: String, vararg args: Any): Text {
-    return LiteralText(text, convertArgs(*args))
-}
+fun literal(text: String, vararg args: Any): Text = LiteralText(text, convertArgs(*args))
 
 
 
@@ -70,9 +66,7 @@ private class TranslatableText(private val key: String, args: List<String>) : Te
         return translation
     }
 
-    override fun append(text: Text): Text {
-        return MergedText(listOf(this, text))
-    }
+    override fun append(text: Text) = MergedText(listOf(this, text))
 }
 
 /**
@@ -84,9 +78,7 @@ private class TranslatableText(private val key: String, args: List<String>) : Te
  * @throws IllegalArgumentException When can't find LanguageFileProvider with given id or
  * when can't find bundle with LanguageFileProvider with given id
  */
-fun translatable(key: String, vararg args: Any): Text {
-    return TranslatableText(key, convertArgs(*args))
-}
+fun translatable(key: String, vararg args: Any): Text = TranslatableText(key, convertArgs(*args))
 
 
 
@@ -97,9 +89,7 @@ private class MergedText(texts: List<Text>) : Text {
         require(texts.isNotEmpty()) { "Texts can't be empty" }
     }
 
-    override fun toString(): String {
-        return texts.joinToString("") { it.toString() }
-    }
+    override fun toString() = texts.joinToString("") { it.toString() }
 
     override fun append(text: Text): Text {
         if (text is MergedText) texts.addAll(text.texts)

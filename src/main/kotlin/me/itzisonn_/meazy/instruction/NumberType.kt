@@ -49,9 +49,7 @@ enum class NumberType(val classDesc: ClassDesc, val isBoxed: Boolean) {
             return null
         }
 
-        fun isNumberType(classDesc: ClassDesc): Boolean {
-            return valueOf(classDesc) != null
-        }
+        fun isNumberType(classDesc: ClassDesc) = valueOf(classDesc) != null
 
         fun getCommonUnboxed(a: NumberType, b: NumberType): NumberType {
             if (a.isDouble || b.isDouble) return DOUBLE

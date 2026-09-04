@@ -102,7 +102,9 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
             fileEnvironment.declareClass(classSymbol)
             addFileEnvironment(fileEnvironment)
 
-            if (classEnvironment.baseClass != null) resolveJavaClass(classEnvironment.baseClass!!)
+            val baseClass = classEnvironment.baseClass
+            if (baseClass != null) resolveJavaClass(baseClass)
+
             for (interfaceClassDesc in classEnvironment.interfaces) {
                 resolveJavaClass(interfaceClassDesc)
             }

@@ -135,9 +135,7 @@ class Parser(tokens: List<Token>) {
      *
      * @return Parsed ProgramUnit
      */
-    fun <T : ProgramUnit, D> parse(parsingFunction: ParsingFunction<T, D>, data: D): T {
-        return parsingFunction.run { this@Parser.parse(data) }
-    }
+    fun <T : ProgramUnit, D> parse(parsingFunction: ParsingFunction<T, D>, data: D): T = parsingFunction.run { this@Parser.parse(data) }
 
     /**
      * Executes given ParsingFunction without parsing data
@@ -147,9 +145,7 @@ class Parser(tokens: List<Token>) {
      *
      * @return Parsed ProgramUnit
      */
-    fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T, Unit>): T {
-        return parse(parsingFunction, Unit)
-    }
+    fun <T : ProgramUnit> parse(parsingFunction: ParsingFunction<T, Unit>): T = parse(parsingFunction, Unit)
 
     /**
      * Executes given ParsingFunction, and if it fails, returns to position before parsing
@@ -182,9 +178,7 @@ class Parser(tokens: List<Token>) {
      *
      * @return Parsed ProgramUnit
      */
-    fun <T : ProgramUnit> tryParse(parsingFunction: ParsingFunction<T, Unit>): T? {
-        return tryParse(parsingFunction, Unit)
-    }
+    fun <T : ProgramUnit> tryParse(parsingFunction: ParsingFunction<T, Unit>): T? = tryParse(parsingFunction, Unit)
 
 
 

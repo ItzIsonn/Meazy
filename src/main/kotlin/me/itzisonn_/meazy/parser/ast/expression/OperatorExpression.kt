@@ -11,17 +11,14 @@ import me.itzisonn_.meazy.runtime.data.operator.OperatorType
 import me.itzisonn_.meazy.runtime.data.operator.Operators
 import me.itzisonn_.meazy.runtime.environment.Environment
 
-class OperatorExpression : Expression, LocalStatement {
-    val left: Expression
-    val right: Expression?
+class OperatorExpression(
+    val left: Expression,
+    val right: Expression?,
     val operator: Operator
+) : Expression, LocalStatement {
     override val children: Set<ProgramUnit>
 
-    constructor(left: Expression, right: Expression?, operator: Operator) {
-        this.left = left
-        this.right = right
-        this.operator = operator
-
+    init {
         if (operator.operatorType == OperatorType.INFIX) {
             requireNotNull(right) { "Expression with infix operator must have both sides" }
         }

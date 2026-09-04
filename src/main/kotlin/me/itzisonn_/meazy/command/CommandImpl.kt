@@ -16,7 +16,7 @@ private class CommandImpl(
 
         args.forEachIndexed { i, arg ->
             if (arguments.isEmpty()) {
-                return CommandResult.Failure(
+                return@execute CommandResult.Failure(
                     translatable("commands.incorrect_args_amount", id)
                 )
             }
@@ -40,7 +40,7 @@ private class CommandImpl(
                     return@forEachIndexed
                 }
 
-            return CommandResult.Failure(
+            return@execute CommandResult.Failure(
                 translatable("commands.arg_doesnt_match", arg, i + 1)
             )
         }
@@ -97,9 +97,8 @@ private class TypedArgumentImpl<T>(
 private class CommandContextImpl(arguments: Map<TypedArgument<*>, String>) : CommandContext {
     private val arguments = arguments.toMap()
 
-    override fun <T> getArgument(argument: TypedArgument<T>): T {
-        return argument.type.parse(arguments[argument]!!)
-    }
+    override fun <T> getArgument(argument: TypedArgument<T>) = argument.type.parse(arguments[argument]
+        ?: error("Can't find argument with id '${argument.id}' and type '${argument.type}'"))
 }
 
 

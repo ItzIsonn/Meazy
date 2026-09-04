@@ -23,9 +23,7 @@ class BytecodeBuilders private constructor(
 
 
 
-    fun getLabel(uuid: Uuid): Label {
-        return labels[uuid] ?: error("There's no label with id $uuid")
-    }
+    fun getLabel(uuid: Uuid) = labels[uuid] ?: error("There's no label with id $uuid")
 
     fun setLabel(uuid: Uuid, label: Label) {
         require(uuid in uninitializedLabels) { "Label with id $uuid does not exist" }
@@ -39,13 +37,8 @@ class BytecodeBuilders private constructor(
 
 
 
-    fun copy(classBuilder: ClassBuilder, codeBuilder: CodeBuilder? = null): BytecodeBuilders {
-        return BytecodeBuilders(classBuilder, codeBuilder, _classes, labels, uninitializedLabels)
-    }
-
-    fun copy(codeBuilder: CodeBuilder): BytecodeBuilders {
-        return BytecodeBuilders(classBuilder, codeBuilder, _classes, labels, uninitializedLabels)
-    }
+    fun copy(classBuilder: ClassBuilder, codeBuilder: CodeBuilder? = null) = BytecodeBuilders(classBuilder, codeBuilder, _classes, labels, uninitializedLabels)
+    fun copy(codeBuilder: CodeBuilder) = BytecodeBuilders(classBuilder, codeBuilder, _classes, labels, uninitializedLabels)
 
     companion object {
         fun of(classBuilder: ClassBuilder?, codeBuilder: CodeBuilder?): BytecodeBuilders {

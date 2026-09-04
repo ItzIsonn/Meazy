@@ -52,7 +52,7 @@ val runCommand = Command("run") {
                 RuntimeFunctions.loadClassesAndRun(classes)
             }
 
-            return@executes CommandResult.Success(
+            CommandResult.Success(
                 translatable("commands.run.info", runningTime / 1000.0)
             )
         }

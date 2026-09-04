@@ -49,6 +49,4 @@ val ClassDesc.boxed: ClassDesc get() {
     }
 }
 
-val ClassDesc.isBoolean: Boolean get() {
-    return this == ConstantDescs.CD_boolean || this == ConstantDescs.CD_Boolean
-}
+val ClassDesc.isBoolean: Boolean get() = this == ConstantDescs.CD_boolean || this == ConstantDescs.CD_Boolean

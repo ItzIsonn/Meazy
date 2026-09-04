@@ -18,7 +18,7 @@ context(symbols: SymbolMap)
 val <T : Symbol> DeclarationStatement<T>.symbol: T
     get() {
         @Suppress("UNCHECKED_CAST")
-        return (symbols[this] as? T) ?: error("There's no symbol for $this")
+        return symbols[this] as? T ?: error("There's no symbol for $this")
     }
 
 context(symbols: SymbolMap)

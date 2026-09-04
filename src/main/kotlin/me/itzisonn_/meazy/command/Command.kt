@@ -17,7 +17,7 @@ sealed interface Argument {
 
 sealed interface LiteralArgument : Argument
 
-sealed interface TypedArgument<T> : Argument {
+sealed interface TypedArgument<out T> : Argument {
     val type: ArgumentType<T>
 }
 

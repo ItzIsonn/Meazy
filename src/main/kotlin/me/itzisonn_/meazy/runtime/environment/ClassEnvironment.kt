@@ -37,14 +37,14 @@ sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, Functi
         val baseClass = baseClass
         if (baseClass != null) {
             val baseClass = resolveClassDesc(baseClass, false)
-            val baseClassSymbol = getClass(baseClass)!!
+            val baseClassSymbol = getClass(baseClass) ?: return null
             function = baseClassSymbol.environment.getFunctionRecursively(id, args)
             if (function != null) return function
         }
 
         for (interfaceClassDesc in interfaces) {
             val baseClass = resolveClassDesc(interfaceClassDesc, false)
-            val baseClassSymbol = getClass(baseClass)!!
+            val baseClassSymbol = getClass(baseClass) ?: return null
             function = baseClassSymbol.environment.getFunctionRecursively(id, args)
             if (function != null) return function
         }
@@ -106,7 +106,7 @@ private class ClassEnvironmentImpl(
     override fun resolveBaseClasses() {
         for (unresolvedBaseClass in unresolvedBaseClasses) {
             val classDesc = getParent().resolveClassDesc(unresolvedBaseClass, false)
-            val baseClassSymbol = getParent().getClass(classDesc)!!
+            val baseClassSymbol = getParent().getClass(classDesc) ?: error("Can't find base class $classDesc")
 
             if (baseClassSymbol.isInterface) _interfaces.add(baseClassSymbol.environment.classDesc)
             else {
