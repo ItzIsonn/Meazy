@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 /**
  * Adds to Environment ability to declare variables
  */
-sealed interface VariableDeclarationEnvironment<T : VariableSymbol> : Environment {
+sealed interface VariableDeclarationEnvironment<out T : VariableSymbol> : Environment {
     /**
      * Declares given VariableValue in this environment
      * @param id VariableValue TODO

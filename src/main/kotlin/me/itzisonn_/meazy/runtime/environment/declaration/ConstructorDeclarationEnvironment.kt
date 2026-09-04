@@ -31,16 +31,14 @@ interface ConstructorDeclarationEnvironment : Environment {
                 if (!DataType.matches(this, arg, parameter)) return@find false
             }
 
-            return@find true
+            true
         }
     }
 
     /**
      * @return Whether this environment has at least one declared constructor
      */
-    fun hasConstructor(): Boolean {
-        return constructors.isNotEmpty()
-    }
+    fun hasConstructor(): Boolean = constructors.isNotEmpty()
 
     /**
      * @return All declared constructors

@@ -34,7 +34,7 @@ interface FunctionDeclarationEnvironment : Environment {
                 if (!DataType.matches(this, arg, parameter)) return@find false
             }
 
-            return@find true
+            true
         }
     }
 

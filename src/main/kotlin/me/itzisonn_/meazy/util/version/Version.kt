@@ -35,7 +35,7 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
             if (part1 > part2) return false
         }
 
-        return type.ordinal < version.type.ordinal || (type.ordinal == version.type.ordinal && ordinal < version.ordinal)
+        return type.ordinal < version.type.ordinal || type.ordinal == version.type.ordinal && ordinal < version.ordinal
     }
 
     /**
@@ -44,9 +44,7 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
      * @param version Version to check
      * @return Whether given version is after this version
      */
-    fun isAfter(version: Version): Boolean {
-        return !equals(version) && !isBefore(version)
-    }
+    fun isAfter(version: Version) = !equals(version) && !isBefore(version)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -65,9 +63,7 @@ class Version(parts: List<Int>, type: VersionType, ordinal: Int) {
         return type.ordinal == other.type.ordinal && ordinal == other.ordinal
     }
 
-    override fun hashCode(): Int {
-        return Objects.hash(parts, type, ordinal)
-    }
+    override fun hashCode() = Objects.hash(parts, type, ordinal)
 
     override fun toString(): String {
         val partsString = parts.joinToString(".")

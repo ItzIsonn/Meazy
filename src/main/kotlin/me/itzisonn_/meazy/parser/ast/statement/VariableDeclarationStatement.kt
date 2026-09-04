@@ -86,7 +86,6 @@ class VariableDeclarationStatement(
             return
         }
 
-
         if (value != null) {
             value.emit(instructions, environment)
             val valueType = value.getType(environment).classDesc
@@ -103,11 +102,13 @@ class VariableDeclarationStatement(
         instructions.storeLocal(variableType, symbol.slot)
 
         if (environment is LocalVariableDeclarationEnvironment) {
-            if (environment.getStartLabel() == null || environment.getEndLabel() == null) return
+            val startLabel = environment.getStartLabel()
+            val endLabel = environment.getEndLabel()
+            if (startLabel == null || endLabel == null) return
 
             instructions.setLocalName(
                 symbol.slot, id, variableType,
-                environment.getStartLabel()!!, environment.getEndLabel()!!
+                startLabel, endLabel
             )
         }
     }

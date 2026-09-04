@@ -176,7 +176,5 @@ object TokenTypes {
     val `this` get() = getNonNull("this")
     val id get() = getNonNull("id")
 
-    private fun getNonNull(id: String): TokenType {
-        return get(id)!!
-    }
+    private fun getNonNull(id: String) = get(id)!!
 }

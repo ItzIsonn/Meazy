@@ -15,7 +15,7 @@ class WithMethodInstruction(
     override fun emit(bytecodeBuilders: BytecodeBuilders) {
         val classBuilder = bytecodeBuilders.classBuilder ?: error("Class builder is null")
 
-        if ((AccessFlag.ABSTRACT.mask() and flags) != 0) {
+        if (AccessFlag.ABSTRACT.mask() and flags != 0) {
             classBuilder.withMethod(id, methodTypeDesc, flags) {}
             return
         }

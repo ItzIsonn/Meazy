@@ -21,7 +21,7 @@ object PostfixStatementParsingFunction : EmptyParsingFunction<AssignmentStatemen
         val value = OperatorExpression(
             left,
             NumberLiteral("1"),
-            token.value.substring(0, 1), OperatorType.INFIX
+            token.value.take(1), OperatorType.INFIX
         )
 
         return AssignmentStatement(left, value)

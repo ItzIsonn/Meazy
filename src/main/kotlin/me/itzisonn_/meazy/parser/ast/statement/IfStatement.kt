@@ -65,7 +65,7 @@ class IfStatementCase(
         }
 
         val conditionType = condition.getType(environment)
-        if (conditionType.isNullable || (conditionType.classDesc != ConstantDescs.CD_boolean && conditionType.classDesc != ConstantDescs.CD_Boolean)) {
+        if (conditionType.isNullable || conditionType.classDesc != ConstantDescs.CD_boolean && conditionType.classDesc != ConstantDescs.CD_Boolean) {
             throw RuntimeException(
                 "If statement must always use boolean TODO but uses " + condition.getType(
                     environment

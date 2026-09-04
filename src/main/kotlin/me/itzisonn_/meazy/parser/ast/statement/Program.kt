@@ -42,7 +42,7 @@ class Program(
         val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
 
         var id = file.nameWithoutExtension
-        id = id.substring(0, 1).uppercase() + id.substring(1)
+        id = id.take(1).uppercase() + id.substring(1)
 
         val fileEnvironment = FileEnvironment(
             environment,

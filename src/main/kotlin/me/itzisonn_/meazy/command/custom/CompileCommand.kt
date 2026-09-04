@@ -62,7 +62,7 @@ val compileCommand = Command("compile") {
                     }
                 }
 
-                return@executes CommandResult.Success(
+                CommandResult.Success(
                     translatable("commands.compile.info", compilingTime / 1000.0)
                 )
             }

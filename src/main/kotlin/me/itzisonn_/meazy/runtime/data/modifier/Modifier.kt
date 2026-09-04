@@ -38,7 +38,5 @@ abstract class Modifier(val id: String) {
         return id == other.id
     }
 
-    override fun hashCode(): Int {
-        return 59 + id.hashCode()
-    }
+    override fun hashCode(): Int = id.hashCode()
 }

@@ -36,7 +36,7 @@ object FunctionDeclarationStatementParsingFunction : PairParsingFunction<Functio
         val parameters = parseParameters()
         val dataType = parseDataType()
 
-        if (abstract in modifiers || (canBeAbstractWithoutModifier && isNext(newLine))) {
+        if (abstract in modifiers || canBeAbstractWithoutModifier && isNext(newLine)) {
             modifiers.add(abstract)
             return FunctionDeclarationStatement(modifiers, functionId, parameters, mutableListOf(), dataType)
         }

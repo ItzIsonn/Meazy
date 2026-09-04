@@ -40,8 +40,8 @@ object LocalStatementParsingFunction : EmptyParsingFunction<LocalStatement>() {
         if (isNext(`break`)) return parse(BreakStatementParsingFunction)
         if (isNext(base)) return parse(BaseCallStatementParsingFunction)
 
-        tryParse(AssignmentStatementParsingFunction)?.let { return it }
-        tryParse(PostfixStatementParsingFunction)?.let { return it }
+        tryParse(AssignmentStatementParsingFunction)?.let { return@parse it }
+        tryParse(PostfixStatementParsingFunction)?.let { return@parse it }
 
         return when (val expression = parse(ExpressionParsingFunction)) {
             is CallExpression -> expression

@@ -33,7 +33,7 @@ class ProtectedModifier : Modifier("protected") {
         if (!hasModifier) return true
 
         return when (identifier) {
-            is Identifier -> (requestEnvironment === environment || requestEnvironment.hasParent(environment) ||
+            is Identifier -> requestEnvironment === environment || requestEnvironment.hasParent(environment) ||
                     requestEnvironment.hasParent { env ->
                         if (env is ClassEnvironment) {
                             val declarationEnvironment = environment.getParent<ClassEnvironment>() ?: return@hasParent false
@@ -48,7 +48,7 @@ class ProtectedModifier : Modifier("protected") {
                                 .any { it.displayName() == declarationEnvironment.id }
                         }
                         false
-                    })
+                    }
 
             else -> true
         }

@@ -4,7 +4,6 @@ import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
-import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.VariableDeclarationEnvironment
 import java.lang.constant.ClassDesc
@@ -19,7 +18,7 @@ import kotlin.reflect.cast
  */
 fun Environment.hasParent(target: Environment): Boolean {
     val parent = getParent()
-    return target == parent || (parent != null && parent.hasParent(target))
+    return target == parent || parent != null && parent.hasParent(target)
 }
 
 /**
@@ -37,18 +36,15 @@ fun Environment.hasParent(predicate: (Environment?) -> Boolean): Boolean {
  * @param predicate Predicate that matches parent environment
  * @return Whether this environment has requested parent
  */
-fun Environment.hasParentOrSelf(predicate: (Environment?) -> Boolean): Boolean {
-    return predicate(this) || hasParent(predicate)
-}
+fun Environment.hasParentOrSelf(predicate: (Environment?) -> Boolean) = predicate(this) || hasParent(predicate)
 
 /**
  * Searches for environment that is instance of given class in all parents of given environment
  * @param cls Class of parent environment
  * @return Whether this environment has parent of given class
  */
-fun <T : Environment> Environment.hasParent(cls: KClass<T>): Boolean {
-    val parent = getParent()
-    return cls.isInstance(parent) || parent?.hasParent(cls) ?: false
+fun <T : Environment> Environment.hasParent(cls: KClass<T>): Boolean = getParent().let { parent ->
+    cls.isInstance(parent) || parent?.hasParent(cls) ?: false
 }
 
 /**
@@ -63,9 +59,7 @@ inline fun <reified T : Environment> Environment.hasParent() = hasParent(T::clas
  * @param cls Class of parent environment
  * @return Whether this environment or its parent is instance of given class
  */
-fun <T : Environment> Environment.hasParentOrSelf(cls: KClass<T>): Boolean {
-    return cls.isInstance(this) || hasParent(cls)
-}
+fun <T : Environment> Environment.hasParentOrSelf(cls: KClass<T>) = cls.isInstance(this) || hasParent(cls)
 
 /**
  * Searches for environment that is instance of given class in given environment and all of its parents
@@ -81,10 +75,9 @@ inline fun <reified T : Environment> Environment.hasParentOrSelf() = hasParentOr
  * @param predicate Predicate that matches parent environment
  * @return Parent that matches given predicate or null
  */
-fun Environment.getParent(predicate: (Environment?) -> Boolean): Environment? {
-    val parent = getParent()
-    if (predicate(parent)) return parent
-    return parent?.getParent(predicate)
+fun Environment.getParent(predicate: (Environment?) -> Boolean): Environment? = getParent().let { parent ->
+    if (predicate(parent)) parent
+    else parent?.getParent(predicate)
 }
 
 /**
@@ -223,39 +216,29 @@ fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean)
 /**
  * TODO
  */
-fun Environment.resolveClassDesc(classDesc: String, allowPrimitives: Boolean): ClassDesc {
-    return resolveClassDesc(ClassDesc.of(classDesc), allowPrimitives)
-}
+fun Environment.resolveClassDesc(classDesc: String, allowPrimitives: Boolean) = resolveClassDesc(ClassDesc.of(classDesc), allowPrimitives)
 
 
 
 /**
  * @return File environment in parent environments of given environment
  */
-fun Environment.getFileEnvironment(): FileEnvironment? {
-    return getParentOrSelf<FileEnvironment>()
-}
+fun Environment.getFileEnvironment() = getParentOrSelf<FileEnvironment>()
 
 /**
  * @return Class name of this environment
  */
-fun Environment.getClassName(): String? {
-    return getFileEnvironment()?.className
-}
+fun Environment.getClassName() = getFileEnvironment()?.className
 
 /**
  * @return Package name of this environment
  */
-fun Environment.getPackageName(): String? {
-    return getFileEnvironment()?.packageName
-}
+fun Environment.getPackageName() = getFileEnvironment()?.packageName
 
 /**
  * @return Whether two given environments are from same package
  */
-fun areFromSamePackage(environment1: Environment, environment2: Environment): Boolean {
-    return environment1.getPackageName() == environment2.getPackageName()
-}
+fun areFromSamePackage(environment1: Environment, environment2: Environment) = environment1.getPackageName() == environment2.getPackageName()
 
 
 
@@ -289,9 +272,7 @@ fun Environment.getVariable(id: String): VariableSymbol? {
  * @param id Variable's id
  * @return Environment that has requested variable or null
  */
-fun Environment.getVariableDeclarationEnvironment(id: String): VariableDeclarationEnvironment<*>? {
-    return getVariable(id)?.parentEnvironment
-}
+fun Environment.getVariableDeclarationEnvironment(id: String) = getVariable(id)?.parentEnvironment
 
 
 
@@ -327,9 +308,8 @@ fun Environment.getFunction(id: String, args: List<DataType>): FunctionSymbol? {
  * @param parameters Function's parameters
  * @return Environment that has requested function or null
  */
-fun Environment.getFunctionDeclarationEnvironment(id: String, parameters: List<DataType>): FunctionDeclarationEnvironment? {
-    return getFunction(id, parameters)?.environment?.getParent()
-}
+fun Environment.getFunctionDeclarationEnvironment(id: String, parameters: List<DataType>) =
+    getFunction(id, parameters)?.environment?.getParent()
 
 
 
@@ -345,14 +325,8 @@ fun Environment.getClass(classDesc: ClassDesc): ClassSymbol? {
     return globalEnvironment.resolveJavaClass(classDesc)
 }
 
-fun Environment.getClass(id: String): ClassSymbol? {
-    return getClass(ClassDesc.of(id))
-}
+fun Environment.getClass(id: String) = getClass(ClassDesc.of(id))
 
-fun Environment.getClassDeclarationEnvironment(classDesc: ClassDesc): ClassDeclarationEnvironment? {
-    return getClass(classDesc)?.environment?.getParent()
-}
+fun Environment.getClassDeclarationEnvironment(classDesc: ClassDesc) = getClass(classDesc)?.environment?.getParent()
 
-fun Environment.getClassDeclarationEnvironment(id: String): ClassDeclarationEnvironment? {
-    return getClassDeclarationEnvironment(ClassDesc.of(id))
-}
+fun Environment.getClassDeclarationEnvironment(id: String) = getClassDeclarationEnvironment(ClassDesc.of(id))

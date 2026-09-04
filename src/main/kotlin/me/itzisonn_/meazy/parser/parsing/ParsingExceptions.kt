@@ -14,7 +14,7 @@ class UnexpectedTokenException(token: Token, text: Text?) : ParsingException(
             return@run append(literal(": ")).append(text)
         }
 
-        return@run this
+        this
     }
 )
 

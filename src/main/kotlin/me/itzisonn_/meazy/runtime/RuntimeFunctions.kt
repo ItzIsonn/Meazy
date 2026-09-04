@@ -48,7 +48,7 @@ object RuntimeFunctions {
 
             if (token == null) {
                 var errorString = substring.split("\n".toRegex()).dropLastWhile { it.isEmpty() }[0]
-                if (errorString.length > 20) errorString = errorString.substring(0, 20) + "..."
+                if (errorString.length > 20) errorString = errorString.take(20) + "..."
 
                 throw UnknownTokenException(lineNumber, errorString)
             }
