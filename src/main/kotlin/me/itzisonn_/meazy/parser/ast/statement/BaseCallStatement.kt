@@ -9,6 +9,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
 import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getParent
 import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
@@ -21,6 +22,10 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
         //TODO add support for automatic base calling before return
         require(environment.hasParentOrSelf<ConstructorEnvironment>()) {
             "Parent environment for BASE statement must be ConstructorEnvironment TODO"
+        }
+
+        require(!environment.hasParentOrSelf<LoopEnvironment>()) {
+            "Can't use BaseCallStatement inside loops"
         }
 
         val resolvedConstructor = environment.resolveConstructor()
