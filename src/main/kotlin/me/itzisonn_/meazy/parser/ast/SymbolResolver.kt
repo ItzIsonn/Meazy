@@ -24,7 +24,7 @@ import java.lang.constant.MethodTypeDesc
 object SymbolResolver {
     context(parents: ParentMap)
     fun Environment.resolveVariable(target: ProgramUnit): ResolvedVariable {
-        val variableSymbol = resolveVariableSymbol(target) ?: error("Can't find variable")
+        val variableSymbol = resolveVariableSymbol(target) ?: error("Can't find variable $target")
 
         return when (variableSymbol) {
             is LocalVariableSymbol -> {

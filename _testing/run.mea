@@ -5,7 +5,7 @@ import java.lang.Number
 import java.lang.System
 
 var testing = 52
-var test2 = testing + 1
+val test2 = testing + 1
 
 fun testPrimitives() {
     val a = 67
@@ -44,11 +44,11 @@ fun println(v: String?) {
     System.out.println(v)
 }
 
-fun get(): List = b()
+fun get(): List = testCollectionCreation()
 
 
 
-fun b(): List {
+fun testCollectionCreation(): List {
     val l = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
     val m = {"hi" = "23", "lol" = List.of(), "ban" = ["32"]}
     System.out.println(ArrayList(m.keySet()).get(0))
@@ -65,6 +65,8 @@ fun b(): List {
 
     return l
 }
+
+
 
 fun main() {
     var a = 52
@@ -97,8 +99,8 @@ fun main() {
 
     println("HI")
     var c = "Hello"
-    b()
-    a()
+    testCollectionCreation()
+    testCastsAndInstanceChecks()
     println(String.valueOf(2 ^ 5))
     println(String.valueOf(b + Math.random()))
     testPrimitives()
@@ -107,9 +109,13 @@ fun main() {
     val cls: Ok = Inheritor()
     println(cls.test())
     System.out.println(cls.pupok())
+
+    testParamShadowing(5)
 }
 
-fun a() {
+
+
+fun testCastsAndInstanceChecks() {
     val abc = 2.5
     val abcd = 2
     val str = "Hi"
@@ -123,10 +129,22 @@ fun a() {
     System.out.println("Testing " + ((abc as? String)?.length() ?: 0))
 }
 
+
+
+fun testParamShadowing(param: Int) {
+    println("======= Param shadowing =======")
+    var param = param + 2
+    System.out.println(param)
+}
+
+
+
 class Test {
     private val a = 5
 
     constructor(arg: String) {
+        var arg = arg + "hi, "
+
         if (arg.equals("no")) {
             System.out.println("Invalid arg!")
             return

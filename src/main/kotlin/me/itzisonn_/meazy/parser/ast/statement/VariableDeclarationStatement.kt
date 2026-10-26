@@ -53,14 +53,8 @@ class VariableDeclarationStatement(
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         if (!hasSymbol) {
-            if (environment !is FileEnvironment && environment !is ClassEnvironment) {
-                declare(environment)
-                resolve(environment)
-            }
-            else throw RuntimeException("Declared variable is unresolved TODO")
+            if (environment is FileEnvironment || environment is ClassEnvironment) throw RuntimeException("Declared variable is unresolved TODO")
         }
-
-        val variableType = symbol.dataType.classDesc
 
         if (environment is FileEnvironment) {
             val accessFlags = mutableSetOf(AccessFlag.STATIC)
@@ -69,6 +63,7 @@ class VariableDeclarationStatement(
             if (Modifiers.private in modifiers) accessFlags.add(AccessFlag.PRIVATE)
             else accessFlags.add(AccessFlag.PUBLIC)
 
+            val variableType = symbol.dataType.classDesc
             instructions.withField(id, variableType, accessFlags)
             return
         }
@@ -82,6 +77,7 @@ class VariableDeclarationStatement(
             if (Modifiers.shared in modifiers) accessFlags.add(AccessFlag.STATIC)
             if (isConstant) accessFlags.add(AccessFlag.FINAL)
 
+            val variableType = symbol.dataType.classDesc
             instructions.withField(id, variableType, accessFlags)
             return
         }
@@ -90,15 +86,28 @@ class VariableDeclarationStatement(
             value.emit(instructions, environment)
             val valueType = value.getType(environment).classDesc
 
+            if (!hasSymbol) {
+                declare(environment)
+                resolve(environment)
+            }
+
+            val variableType = symbol.dataType.classDesc
+
             if (!environment.isInstanceOf(valueType, variableType)) {
                 if (!instructions.convertPrimitiveOrBoxed(valueType, variableType)) {
                     throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                 }
             }
         }
+        else if (!hasSymbol) {
+            declare(environment)
+            resolve(environment)
+        }
 
         val symbol = symbol
         if (symbol !is LocalVariableSymbol) error("Can't declare non-local variable symbol as local variable")
+
+        val variableType = symbol.dataType.classDesc
         instructions.storeLocal(variableType, symbol.slot)
 
         if (environment is LocalVariableDeclarationEnvironment) {
@@ -112,4 +121,6 @@ class VariableDeclarationStatement(
             )
         }
     }
+
+    override fun toString() = "VariableDeclarationStatement($id, $dataType, $value)"
 }
