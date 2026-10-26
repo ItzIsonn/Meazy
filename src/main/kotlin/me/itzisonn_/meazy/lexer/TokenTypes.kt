@@ -18,9 +18,9 @@ object TokenTypes {
         check(!hasInitialized) { "TokenTypes have already been initialized" }
         hasInitialized = true
 
-        add(TokenType("new_line", "\n+", TokenBehavior.IGNORE))
+        add(TokenType("new_line", "[\n;]+", TokenBehavior.IGNORE))
         add(TokenType("white_space", "(?!\n)\\s", TokenBehavior.SKIP))
-        @Suppress("USELESS_CAST") add(TokenType("end_of_file", null as? Regex))
+        add(TokenType("end_of_file", null as Regex?))
 
         add(TokenType("comment", "\\/\\/[^\n]*", TokenBehavior.SKIP))
         add(TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", TokenBehavior.SKIP))
