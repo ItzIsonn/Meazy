@@ -7,6 +7,7 @@ import me.itzisonn_.meazy.parser.ast.declareSymbol
 import me.itzisonn_.meazy.parser.ast.symbol
 import me.itzisonn_.meazy.parser.cfg.CfgBuilder
 import me.itzisonn_.meazy.parser.cfg.ConstructorAnalyzer
+import me.itzisonn_.meazy.parser.cfg.ConstructorNormalizer
 import me.itzisonn_.meazy.parser.cfg.MissingReturnAnalyzer
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
@@ -42,6 +43,7 @@ class ConstructorDeclarationStatement(
         declareSymbol(symbol)
         environment.declareConstructor(symbol)
 
+        ConstructorNormalizer.normalize(this, true)
         val cfg = CfgBuilder().build(body)
 
         val constructorAnalyzer = ConstructorAnalyzer(cfg)

@@ -129,12 +129,10 @@ class Test {
     constructor(val arg: String) {
         if (arg.equals("no")) {
             System.out.println("Invalid arg!")
-            base()
             return
         }
 
         System.out.println(arg + " ok")
-        base()
     }
 
     fun ok(): Int {
