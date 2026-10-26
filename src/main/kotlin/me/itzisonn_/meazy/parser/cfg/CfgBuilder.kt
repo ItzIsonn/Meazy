@@ -35,8 +35,9 @@ class CfgBuilder {
         }
 
         return when (statement) {
-            is WhileStatement -> buildWhile(statement, incoming)
             is IfStatement -> buildIf(statement, incoming)
+            is ForeachStatement -> buildForeach(statement, incoming)
+            is WhileStatement -> buildWhile(statement, incoming)
 
             is BreakStatement -> {
                 val block = newBlock()
@@ -105,7 +106,11 @@ class CfgBuilder {
             val nextConditionBlock = newBlock()
 
             connect(currentIncoming, conditionBlock)
-            conditionBlock.terminator = Terminator.ConditionalJump(condition, bodyBlock, nextConditionBlock)
+            conditionBlock.terminator = Terminator.ConditionalJump(
+                TerminatorCondition.ExpressionCondition(condition),
+                bodyBlock,
+                nextConditionBlock
+            )
 
             conditionBlock.connectTo(bodyBlock)
             conditionBlock.connectTo(nextConditionBlock)
@@ -120,6 +125,42 @@ class CfgBuilder {
         return setOf(mergeBlock)
     }
 
+    private fun buildForeach(
+        statement: ForeachStatement,
+        incoming: Set<BasicBlock>
+    ): Set<BasicBlock> {
+        val iteratorBlock = newBlock()
+        val bodyBlock = newBlock()
+        val afterLoopBlock = newBlock()
+
+        connect(incoming, iteratorBlock)
+
+        iteratorBlock.terminator = Terminator.ConditionalJump(
+            TerminatorCondition.ForeachHasNext(
+                statement.collection,
+                statement.id,
+                statement.dataType
+            ),
+            bodyBlock,
+            afterLoopBlock
+        )
+
+        iteratorBlock.connectTo(bodyBlock)
+        iteratorBlock.connectTo(afterLoopBlock)
+
+        loops.addLast(LoopContext(afterLoopBlock, iteratorBlock))
+
+        val bodyExits = try {
+            buildStatements(statement.body, setOf(bodyBlock))
+        }
+        finally {
+            loops.removeLast()
+        }
+
+        connect(bodyExits, iteratorBlock)
+        return setOf(afterLoopBlock)
+    }
+
     private fun buildWhile(
         statement: WhileStatement,
         incoming: Set<BasicBlock>
@@ -129,7 +170,11 @@ class CfgBuilder {
         val afterLoopBlock = newBlock()
 
         connect(incoming, conditionBlock)
-        conditionBlock.terminator = Terminator.ConditionalJump(statement.condition, bodyBlock, afterLoopBlock)
+
+        conditionBlock.terminator = Terminator.ConditionalJump(
+            TerminatorCondition.ExpressionCondition(statement.condition),
+            bodyBlock, afterLoopBlock
+        )
         conditionBlock.connectTo(bodyBlock)
         conditionBlock.connectTo(afterLoopBlock)
 
