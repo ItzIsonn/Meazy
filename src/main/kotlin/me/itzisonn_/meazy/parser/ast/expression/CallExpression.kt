@@ -192,17 +192,15 @@ class CallExpression(
 
         return resolvedCallable
     }
-
-    override fun alwaysReturns() = false
-
-
-
-    private class ResolvedCallable(
-        val classDesc: ClassDesc,
-        val methodTypeDesc: MethodTypeDesc,
-        val isReturnTypeNullable: Boolean,
-        val target: Expression?,
-        val isInterface: Boolean,
-        val isFunction: Boolean
-    )
 }
+
+
+
+private class ResolvedCallable(
+    val classDesc: ClassDesc,
+    val methodTypeDesc: MethodTypeDesc,
+    val isReturnTypeNullable: Boolean,
+    val target: Expression?,
+    val isInterface: Boolean,
+    val isFunction: Boolean
+)

@@ -36,10 +36,6 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
         }
     }
 
-    override fun alwaysReturns() = false
-
-
-
     context(parents: ParentMap)
     private fun Environment.resolveConstructor(): ResolvedConstructor {
         val classEnvironment = getParent<ClassEnvironment>()

@@ -49,6 +49,4 @@ class AssignmentStatement(val target: Expression, val value: Expression) : Local
             }
         }
     }
-
-    override fun alwaysReturns() = false
 }

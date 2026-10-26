@@ -25,14 +25,6 @@ class IfStatement(
 
         instructions.bindLabel(endLabel)
     }
-
-    override fun alwaysReturns(): Boolean {
-        for (case in cases) {
-            if (!case.alwaysReturns()) return false
-        }
-
-        return cases.last().condition == null
-    }
 }
 
 
@@ -84,13 +76,5 @@ class IfStatementCase(
         instructions.gotoLabel(endLabel)
 
         instructions.bindLabel(elseLabel)
-    }
-
-    fun alwaysReturns(): Boolean {
-        for (localStatement in body) {
-            if (localStatement.alwaysReturns()) return true
-        }
-
-        return false
     }
 }

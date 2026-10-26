@@ -112,6 +112,4 @@ class VariableDeclarationStatement(
             )
         }
     }
-
-    override fun alwaysReturns() = false
 }

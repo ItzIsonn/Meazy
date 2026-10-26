@@ -45,6 +45,4 @@ class OperatorExpression(
     override fun getType(environment: Environment): DataType {
         return operator.getType(environment, this)
     }
-
-    override fun alwaysReturns() = false
 }
