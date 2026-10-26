@@ -31,7 +31,7 @@ object SymbolResolver {
                 ResolvedLocalVariable(
                     variableSymbol.slot,
                     variableSymbol.isConstant,
-                    variableSymbol.id!!,
+                    variableSymbol.id,
                     variableSymbol.dataType.classDesc,
                     variableSymbol.dataType.isNullable
                 )

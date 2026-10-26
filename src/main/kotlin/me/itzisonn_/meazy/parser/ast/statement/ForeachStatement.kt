@@ -15,7 +15,6 @@ import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
 class ForeachStatement(
-    val isConstant: Boolean,
     val id: String,
     val dataType: DataType,
     val collection: Expression,
@@ -74,7 +73,7 @@ class ForeachStatement(
         dataType.resolve(environment)
         instructions.cast(dataType.classDesc)
 
-        val variableValue = loopEnvironment.declareVariable(id, dataType, isConstant, null, setOf())
+        val variableValue = loopEnvironment.declareVariable(id, dataType, true, null, setOf())
         instructions.storeLocal(variableValue.dataType.classDesc, variableValue.slot)
         instructions.setLocalName(
             variableValue.slot,

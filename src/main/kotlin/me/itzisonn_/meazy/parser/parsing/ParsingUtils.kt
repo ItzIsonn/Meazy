@@ -10,7 +10,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.lexer.TokenTypes.question
 import me.itzisonn_.meazy.lexer.TokenTypes.rightBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
-import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.lexer.TokenTypes.string
 import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNonNull
 import me.itzisonn_.meazy.runtime.data.DataType.Companion.ofNullable
@@ -46,14 +45,13 @@ fun Parser.parseModifiers(): Set<Modifier> {
 }
 
 private fun Parser.parseParameter(): Parameter {
-    val isConstant = consume(variable, translatable("parser.expected.start_expression", "variable", "parameter")).value == "val"
     val id = consume(id, translatable("parser.expected.after_keyword", "id", "variable")).value
 
     val dataType = parseDataType() ?: throw InvalidSyntaxException(
         translatable("parser.exception.parameter_without_datatype")
     )
 
-    return Parameter(id, dataType, isConstant)
+    return Parameter(id, dataType)
 }
 
 fun Parser.parseParameters(): List<Parameter> {

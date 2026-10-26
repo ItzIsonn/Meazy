@@ -5,7 +5,6 @@ import me.itzisonn_.meazy.lexer.TokenTypes.`for`
 import me.itzisonn_.meazy.lexer.TokenTypes.`in`
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
-import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.ForeachStatement
 import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
@@ -22,7 +21,6 @@ object ForeachStatementParsingFunction : EmptyParsingFunction<ForeachStatement>(
             translatable("parser.expected.start", "left_parenthesis", "for_condition")
         )
 
-        val isConstant = consume(variable, translatable("parser.expected.keyword", "variable")).value == "val"
         val id = consume(TokenTypes.id, translatable("parser.expected", "id")).value
 
         val dataType = parseDataType() ?: throw InvalidSyntaxException(
@@ -38,6 +36,6 @@ object ForeachStatementParsingFunction : EmptyParsingFunction<ForeachStatement>(
         )
 
         val body = parseBody(LocalStatementParsingFunction)
-        return ForeachStatement(isConstant, id, dataType, collection, body)
+        return ForeachStatement(id, dataType, collection, body)
     }
 }

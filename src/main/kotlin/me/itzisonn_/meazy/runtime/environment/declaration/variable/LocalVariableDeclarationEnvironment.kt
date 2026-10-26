@@ -15,6 +15,7 @@ import kotlin.uuid.Uuid
  * Adds to Environment ability to declare local variables
  */
 interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment<LocalVariableSymbol> {
+    fun declareShadowableVariable(id: String, type: DataType, value: Expression?): LocalVariableSymbol
     fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): LocalVariableSymbol
 
     //TODO
@@ -38,8 +39,8 @@ open class LocalVariableDeclarationEnvironmentImpl(
     override val variables get() = _variables.toList()
 
     override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): LocalVariableSymbol {
-        if (getVariable(id) != null) {
-            throw EvaluationException(translatable("runtime.variable.already_exists", id))
+        getVariable(id)?.let { variable ->
+            if (!variable.shadowable) throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
         var slot = usedSlotsCount
@@ -51,7 +52,26 @@ open class LocalVariableDeclarationEnvironmentImpl(
             parentEnvironment = parentEnvironment.getParent()
         }
 
-        val variableValue = LocalVariableSymbol(id, type, isConstant, modifiers, slot, this)
+        val variableValue = LocalVariableSymbol(id, type, isConstant, modifiers, slot, false, this)
+        _variables.add(variableValue)
+        return variableValue
+    }
+
+    override fun declareShadowableVariable(id: String, type: DataType, value: Expression?): LocalVariableSymbol {
+        getVariable(id)?.let { variable ->
+            if (!variable.shadowable) throw EvaluationException(translatable("runtime.variable.already_exists", id))
+        }
+
+        var slot = usedSlotsCount
+        if (!isShared) slot++
+
+        var parentEnvironment: Environment? = getParent()
+        while (parentEnvironment is LocalVariableDeclarationEnvironment) {
+            slot += parentEnvironment.usedSlotsCount
+            parentEnvironment = parentEnvironment.getParent()
+        }
+
+        val variableValue = LocalVariableSymbol(id, type, true, setOf(), slot, true, this)
         _variables.add(variableValue)
         return variableValue
     }
@@ -66,7 +86,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
             parentEnvironment = parentEnvironment.getParent()
         }
 
-        val variableValue = LocalVariableSymbol(null, type, isConstant, setOf(), slot, this)
+        val variableValue = LocalVariableSymbol(null, type, isConstant, setOf(), slot, false, this)
         _variables.add(variableValue)
         return variableValue
     }

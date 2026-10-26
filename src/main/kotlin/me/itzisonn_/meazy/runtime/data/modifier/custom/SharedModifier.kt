@@ -30,13 +30,9 @@ class SharedModifier : Modifier("shared") {
     ): Boolean {
         if (hasModifier) return true
 
-        if (identifier is Identifier) {
-            if (environment !is VariableDeclarationEnvironment<*>) return true
-            if (environment.getVariable(identifier.id) == null) return true
+        if (environment !is VariableDeclarationEnvironment<*>) return true
+        if (environment.getVariable(identifier.id) == null) return true
 
-            return !environment.isShared || environment is FileEnvironment || environment is GlobalEnvironment
-        }
-
-        return true
+        return !environment.isShared || environment is FileEnvironment || environment is GlobalEnvironment
     }
 }

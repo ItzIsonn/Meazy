@@ -78,21 +78,12 @@ class ConstructorDeclarationStatement(
         else if (Modifiers.protected in constructorEnvironment.modifiers) accessFlags.add(AccessFlag.PROTECTED)
         else accessFlags.add(AccessFlag.PUBLIC)
 
-        instructions.withConstructor(
-            methodTypeDesc,
-            accessFlags
-        ) {
+        instructions.withConstructor(methodTypeDesc, accessFlags) {
             initLabel(startLabel)
             initLabel(endLabel)
 
-            for ((id, dataType, isConstant) in constructorEnvironment.parameters) {
-                val parameterValue = constructorEnvironment.declareVariable(
-                    id,
-                    dataType,
-                    isConstant,
-                    null,
-                    setOf()
-                )
+            for ((id, dataType) in constructorEnvironment.parameters) {
+                val parameterValue = constructorEnvironment.declareShadowableVariable(id, dataType, null)
 
                 setLocalName(
                     parameterValue.slot,

@@ -30,27 +30,22 @@ class ProtectedModifier : Modifier("protected") {
         requestEnvironment: Environment, environment: Environment,
         identifier: Identifier, hasModifier: Boolean
     ): Boolean {
-        if (!hasModifier) return true
+        return !hasModifier || requestEnvironment === environment || requestEnvironment.hasParent(environment) ||
+                requestEnvironment.hasParent { env ->
+                    if (env is ClassEnvironment) {
+                        val declarationEnvironment =
+                            environment.getParent<ClassEnvironment>() ?: return@hasParent false
+                        if (env.id == declarationEnvironment.id) return@hasParent true
 
-        return when (identifier) {
-            is Identifier -> requestEnvironment === environment || requestEnvironment.hasParent(environment) ||
-                    requestEnvironment.hasParent { env ->
-                        if (env is ClassEnvironment) {
-                            val declarationEnvironment = environment.getParent<ClassEnvironment>() ?: return@hasParent false
-                            if (env.id == declarationEnvironment.id) return@hasParent true
+                        val parentClassEnvironment = environment.getClass(env.id)
+                            ?: throw EvaluationException(
+                                translatable("runtime.class.doesnt_exist", env.id)
+                            )
 
-                            val parentClassEnvironment = environment.getClass(env.id)
-                                ?: throw EvaluationException(
-                                    translatable("runtime.class.doesnt_exist", env.id)
-                                )
-
-                            return@hasParent parentClassEnvironment.environment.interfaces
-                                .any { it.displayName() == declarationEnvironment.id }
-                        }
-                        false
+                        return@hasParent parentClassEnvironment.environment.interfaces
+                            .any { it.displayName() == declarationEnvironment.id }
                     }
-
-            else -> true
-        }
+                    false
+                }
     }
 }

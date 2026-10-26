@@ -152,18 +152,12 @@ class FunctionDeclarationStatement(
             initLabel(startLabel)
             initLabel(endLabel)
 
-            for ((id1, dataType, isConstant) in functionEnvironment.parameters) {
-                val parameterValue = functionEnvironment.declareVariable(
-                    id1,
-                    dataType,
-                    isConstant,
-                    null,
-                    setOf()
-                )
+            for ((id, dataType) in functionEnvironment.parameters) {
+                val parameterValue = functionEnvironment.declareShadowableVariable(id, dataType, null)
 
                 setLocalName(
                     parameterValue.slot,
-                    id1,
+                    id,
                     dataType.classDesc,
                     startLabel,
                     endLabel
