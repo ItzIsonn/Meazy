@@ -5,10 +5,8 @@ package me.itzisonn_.meazy.runtime.data
  *
  * @param id         Id
  * @param dataType   Data type
- * @param isConstant Whether this parameter is constant
  */
 data class Parameter(
     val id: String,
-    val dataType: DataType,
-    val isConstant: Boolean
+    val dataType: DataType
 )

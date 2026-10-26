@@ -40,7 +40,7 @@ fun testPrimitives() {
     }
 }
 
-fun println(val v: String?) {
+fun println(v: String?) {
     System.out.println(v)
 }
 
@@ -53,13 +53,13 @@ fun b(): List {
     val m = {"hi" = "23", "lol" = List.of(), "ban" = ["32"]}
     System.out.println(ArrayList(m.keySet()).get(0))
 
-    for (var s: String in l) {
-        s = s + " "
-        if (s.equals("pididi")) break
-        println(s)
+    for (s: String in l) {
+        var s2 = s + " "
+        if (s2.equals("pididi")) break
+        println(s2)
     }
 
-    for (var s: String in l) {
+    for (s: String in l) {
         println(s)
     }
 
@@ -126,7 +126,7 @@ fun a() {
 class Test {
     private val a = 5
 
-    constructor(val arg: String) {
+    constructor(arg: String) {
         if (arg.equals("no")) {
             System.out.println("Invalid arg!")
             return

@@ -51,6 +51,7 @@ sealed interface VariableSymbol : Symbol {
 sealed interface LocalVariableSymbol : VariableSymbol {
     //TODO
     val slot: Int
+    val shadowable: Boolean
 }
 
 sealed interface GlobalVariableSymbol : VariableSymbol {
@@ -66,15 +67,16 @@ private data class LocalVariableSymbolImpl(
     override val isConstant: Boolean,
     override val modifiers: Set<Modifier>,
     override val slot: Int,
+    override val shadowable: Boolean,
     override val parentEnvironment: LocalVariableDeclarationEnvironment
 ) : LocalVariableSymbol
 
 fun LocalVariableSymbol(
     id: String?, dataType: DataType, isConstant: Boolean, modifiers: Set<Modifier>,
-    slot: Int, parentEnvironment: LocalVariableDeclarationEnvironment
+    slot: Int, shadowable: Boolean, parentEnvironment: LocalVariableDeclarationEnvironment
 ): LocalVariableSymbol = LocalVariableSymbolImpl(
     id, dataType, isConstant, modifiers.toSet(),
-    slot, parentEnvironment
+    slot, shadowable, parentEnvironment
 )
 
 
