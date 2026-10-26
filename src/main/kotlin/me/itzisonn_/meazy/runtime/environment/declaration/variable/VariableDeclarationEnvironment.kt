@@ -20,7 +20,7 @@ sealed interface VariableDeclarationEnvironment<out T : VariableSymbol> : Enviro
      * @param id Variable's id
      * @return Declared variable with given id
      */
-    fun getVariable(id: String) = variables.find { it.id == id }
+    fun getVariable(id: String) = variables.findLast { it.id == id }
 
     /**
      * @return All declared variables
