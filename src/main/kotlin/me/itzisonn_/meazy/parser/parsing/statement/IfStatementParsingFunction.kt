@@ -2,7 +2,6 @@ package me.itzisonn_.meazy.parser.parsing.statement
 
 import me.itzisonn_.meazy.lexer.TokenTypes.`else`
 import me.itzisonn_.meazy.lexer.TokenTypes.`if`
-import me.itzisonn_.meazy.lexer.TokenTypes.leftBrace
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
 import me.itzisonn_.meazy.parser.parsing.Parser
@@ -23,10 +22,7 @@ object IfStatementParsingFunction : EmptyParsingFunction<IfStatement>() {
                 cases += parseCase()
             }
             else {
-                val body =
-                    if (isNext(leftBrace)) parseBody(LocalStatementParsingFunction)
-                    else listOf(parse(LocalStatementParsingFunction))
-
+                val body = parseBody(LocalStatementParsingFunction, false)
                 cases += IfStatementCase(null, body)
             }
         }
@@ -41,10 +37,7 @@ object IfStatementParsingFunction : EmptyParsingFunction<IfStatement>() {
         val condition = parse(ExpressionParsingFunction)
         consume(rightParenthesis, translatable("parser.expected.end", "right_parenthesis", "if_condition"))
 
-        val body =
-            if (isNext(leftBrace)) parseBody(LocalStatementParsingFunction)
-            else listOf(parse(LocalStatementParsingFunction))
-
+        val body = parseBody(LocalStatementParsingFunction, false)
         return IfStatementCase(condition, body)
     }
 }

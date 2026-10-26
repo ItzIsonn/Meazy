@@ -35,7 +35,7 @@ object ForeachStatementParsingFunction : EmptyParsingFunction<ForeachStatement>(
             translatable("parser.expected.end", "right_parenthesis", "for_condition")
         )
 
-        val body = parseBody(LocalStatementParsingFunction)
+        val body = parseBody(LocalStatementParsingFunction, false)
         return ForeachStatement(id, dataType, collection, body)
     }
 }
