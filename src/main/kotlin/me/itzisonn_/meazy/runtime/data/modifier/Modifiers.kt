@@ -1,13 +1,5 @@
 package me.itzisonn_.meazy.runtime.data.modifier
 
-import me.itzisonn_.meazy.runtime.data.modifier.custom.AbstractModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.OpenModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.OperatorModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.OverrideModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.PrivateModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.ProtectedModifier
-import me.itzisonn_.meazy.runtime.data.modifier.custom.SharedModifier
-
 /**
  * Modifiers registrar
  */
@@ -26,13 +18,13 @@ object Modifiers {
         check(!hasInitialized) { "Modifiers have already been initialized" }
         hasInitialized = true
 
-        add(PrivateModifier())
-        add(ProtectedModifier())
-        add(OpenModifier())
-        add(SharedModifier())
-        add(OverrideModifier())
-        add(AbstractModifier())
-        add(OperatorModifier())
+        add(Modifier("private"))
+        add(Modifier("protected"))
+        add(Modifier("open"))
+        add(Modifier("shared"))
+        add(Modifier("override"))
+        add(Modifier("abstract"))
+        add(Modifier("operator"))
     }
 
 

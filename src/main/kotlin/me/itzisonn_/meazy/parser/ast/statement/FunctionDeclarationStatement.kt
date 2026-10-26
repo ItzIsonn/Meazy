@@ -118,7 +118,7 @@ class FunctionDeclarationStatement(
                             throw RuntimeException("Can't override non-open function $id")
                         }
                         if (Modifiers.override !in functionEnvironment.modifiers) throw RuntimeException(
-                            "Must specify override keyword on function $id"
+                            "Missing override keyword on function $id"
                         )
                     }
             }
