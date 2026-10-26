@@ -5,10 +5,10 @@ import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.declareSymbol
 import me.itzisonn_.meazy.parser.ast.symbol
-import me.itzisonn_.meazy.parser.cfg.CfgBuilder
-import me.itzisonn_.meazy.parser.cfg.ConstructorAnalyzer
-import me.itzisonn_.meazy.parser.cfg.ConstructorNormalizer
-import me.itzisonn_.meazy.parser.cfg.MissingReturnAnalyzer
+import me.itzisonn_.meazy.parser.cfg.ControlFlowGraph
+import me.itzisonn_.meazy.parser.cfg.helper.ConstructorAnalyzer
+import me.itzisonn_.meazy.parser.cfg.helper.ConstructorNormalizer
+import me.itzisonn_.meazy.parser.cfg.helper.MissingReturnAnalyzer
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -44,16 +44,12 @@ class ConstructorDeclarationStatement(
         environment.declareConstructor(symbol)
 
         ConstructorNormalizer.normalize(this, true)
-        val cfg = CfgBuilder().build(body)
+        val controlFlowGraph = ControlFlowGraph.build(body)
 
-        val constructorAnalyzer = ConstructorAnalyzer(cfg)
-        val errors = constructorAnalyzer.analyze()
-        if (errors.isNotEmpty()) {
-            error(errors.joinToString("\n"))
-        }
+        val constructorAnalyzer = ConstructorAnalyzer(controlFlowGraph)
+        constructorAnalyzer.analyze()
 
-        val missingReturnAnalyzer = MissingReturnAnalyzer(cfg)
-        if (missingReturnAnalyzer.hasMissingReturn()) {
+        if (MissingReturnAnalyzer.hasMissingReturn(controlFlowGraph)) {
             body.add(ReturnStatement(null))
         }
     }

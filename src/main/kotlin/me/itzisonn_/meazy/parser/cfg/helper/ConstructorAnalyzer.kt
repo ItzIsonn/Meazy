@@ -1,25 +1,26 @@
-package me.itzisonn_.meazy.parser.cfg
+package me.itzisonn_.meazy.parser.cfg.helper
 
 import me.itzisonn_.meazy.parser.ast.statement.BaseCallStatement
+import me.itzisonn_.meazy.parser.cfg.ControlFlowBlock
+import me.itzisonn_.meazy.parser.cfg.ControlFlowGraph
+import me.itzisonn_.meazy.parser.cfg.Terminator
 
-class ConstructorAnalyzer(private val cfg: Cfg) {
-    private val reachable = linkedSetOf<BasicBlock>()
-    private val inState = mutableMapOf<BasicBlock, Boolean>()
-    private val outState = mutableMapOf<BasicBlock, Boolean>()
-    private val errors = mutableListOf<String>()
+class ConstructorAnalyzer(private val controlFlowGraph: ControlFlowGraph) {
+    private val reachable = linkedSetOf<ControlFlowBlock>()
+    private val inState = mutableMapOf<ControlFlowBlock, Boolean>()
+    private val outState = mutableMapOf<ControlFlowBlock, Boolean>()
 
-    fun analyze(): List<String> {
+    fun analyze() {
         findReachableBlocks()
         initializeStates()
         solveDataFlow()
         checkReturns()
         checkFallThrough()
-        return errors
     }
 
     private fun findReachableBlocks() {
-        val worklist = ArrayDeque<BasicBlock>()
-        worklist.addLast(cfg.entry)
+        val worklist = ArrayDeque<ControlFlowBlock>()
+        worklist.addLast(controlFlowGraph.entry)
 
         while (worklist.isNotEmpty()) {
             val block = worklist.removeLast()
@@ -37,8 +38,8 @@ class ConstructorAnalyzer(private val cfg: Cfg) {
             outState[block] = true
         }
 
-        inState[cfg.entry] = false
-        outState[cfg.entry] = false
+        inState[controlFlowGraph.entry] = false
+        outState[controlFlowGraph.entry] = false
     }
 
     private fun solveDataFlow() {
@@ -47,7 +48,7 @@ class ConstructorAnalyzer(private val cfg: Cfg) {
         do {
             changed = false
 
-            for (block in cfg.blocks) {
+            for (block in controlFlowGraph.blocks) {
                 if (block !in reachable) continue
                 val newIn = calculateInState(block)
                 val newOut = transfer(block, newIn)
@@ -62,8 +63,8 @@ class ConstructorAnalyzer(private val cfg: Cfg) {
         while (changed)
     }
 
-    private fun calculateInState(block: BasicBlock): Boolean {
-        if (block == cfg.entry) {
+    private fun calculateInState(block: ControlFlowBlock): Boolean {
+        if (block == controlFlowGraph.entry) {
             return false
         }
 
@@ -77,7 +78,7 @@ class ConstructorAnalyzer(private val cfg: Cfg) {
         return result
     }
 
-    private fun transfer(block: BasicBlock, incoming: Boolean): Boolean {
+    private fun transfer(block: ControlFlowBlock, incoming: Boolean): Boolean {
         var initialized = incoming
 
         for (statement in block.statements) {
@@ -86,7 +87,7 @@ class ConstructorAnalyzer(private val cfg: Cfg) {
                     initialized = true
                 }
 
-                /*is ThisCallStmt -> { TODO
+                /*is ThisCallStatement -> { TODO
                     initialized = true
                 }*/
             }
@@ -97,22 +98,17 @@ class ConstructorAnalyzer(private val cfg: Cfg) {
 
     private fun checkReturns() {
         for (block in reachable) {
-            if (block.terminator is Terminator.Return) {
-                val initialized = outState.getValue(block)
+            if (block.terminator !is Terminator.Return) continue
 
-                if (!initialized) {
-                    errors.add("Constructor returns before calling base() at $block")
-                }
-            }
+            val initialized = outState.getValue(block)
+            if (!initialized) error("Constructor returns before calling base() at $block")
         }
     }
 
     private fun checkFallThrough() {
-        if (cfg.exit !in reachable) return
-        val initialized = inState.getValue(cfg.exit)
+        if (controlFlowGraph.exit !in reachable) return
 
-        if (!initialized) {
-            errors.add("Constructor reaches its end without calling base()")
-        }
+        val initialized = inState.getValue(controlFlowGraph.exit)
+        if (!initialized) error("Constructor reaches its end without calling base()")
     }
 }

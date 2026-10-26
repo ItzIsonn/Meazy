@@ -5,13 +5,13 @@ import me.itzisonn_.meazy.runtime.data.DataType
 
 sealed interface Terminator {
     data class Jump(
-        val target: BasicBlock
+        val target: ControlFlowBlock
     ) : Terminator
 
     data class ConditionalJump(
         val condition: TerminatorCondition,
-        val trueTarget: BasicBlock,
-        val falseTarget: BasicBlock
+        val trueTarget: ControlFlowBlock,
+        val falseTarget: ControlFlowBlock
     ) : Terminator
 
     data class Return(
