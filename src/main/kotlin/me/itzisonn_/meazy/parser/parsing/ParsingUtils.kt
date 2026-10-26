@@ -114,7 +114,11 @@ fun Parser.parseDataType(): DataType? {
     return ofNonNull(ClassDesc.of(dataTypeId))
 }
 
-fun <T : Statement> Parser.parseBody(parsingFunction: EmptyParsingFunction<T>): List<T> {
+fun <T : Statement> Parser.parseBody(parsingFunction: EmptyParsingFunction<T>, requireBraces: Boolean = true): List<T> {
+    if (!isNext(leftBrace) && !requireBraces) {
+        return listOf(parse(parsingFunction))
+    }
+
     val body = mutableListOf<T>()
     consume(leftBrace, translatable("parser.expected.start", "left_brace", "body"))
 

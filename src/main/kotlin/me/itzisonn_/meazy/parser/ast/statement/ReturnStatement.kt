@@ -33,7 +33,7 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
 
         if (value == null) {
             if (returnDataType != null) {
-                throw RuntimeException("Function must return value TODO")
+                error("Return statement with missing value")
             }
 
             instructions.returnVoid()
@@ -41,7 +41,7 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
         }
 
         if (returnDataType == null) {
-            throw RuntimeException("Function must not return value TODO")
+            error("Function must not return value TODO")
         }
 
         value.emit(instructions, environment)
@@ -50,7 +50,7 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
 
         if (!functionEnvironment.isInstanceOf(valueClassDesc, returnTypeClassDesc)) {
             if (!instructions.convertPrimitiveOrBoxed(valueClassDesc, returnTypeClassDesc)) {
-                throw RuntimeException("Function's return value not matches its return data type TODO")
+                error("Function's return value not matches its return data type TODO")
             }
         }
 

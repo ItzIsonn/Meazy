@@ -24,7 +24,7 @@ object WhileStatementParsingFunction : EmptyParsingFunction<WhileStatement>() {
             translatable("parser.expected.end", "right_parenthesis", "while_condition")
         )
 
-        val body = parseBody(LocalStatementParsingFunction)
+        val body = parseBody(LocalStatementParsingFunction, false)
         return WhileStatement(condition, body)
     }
 }
