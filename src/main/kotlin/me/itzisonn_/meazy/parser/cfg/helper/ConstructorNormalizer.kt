@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.parser.cfg
+package me.itzisonn_.meazy.parser.cfg.helper
 
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.parser.ast.statement.BaseCallStatement

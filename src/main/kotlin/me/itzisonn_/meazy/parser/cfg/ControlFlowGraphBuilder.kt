@@ -2,24 +2,21 @@ package me.itzisonn_.meazy.parser.cfg
 
 import me.itzisonn_.meazy.parser.ast.statement.*
 
-class CfgBuilder {
-    private val cfg = Cfg()
+class ControlFlowGraphBuilder {
+    private val controlFlowGraph = ControlFlowGraph()
     private val loops = ArrayDeque<LoopContext>()
 
-    fun build(body: List<Statement>): Cfg {
-        val exits = buildStatements(
-            body,
-            mutableSetOf(cfg.entry)
-        )
+    fun build(body: List<Statement>): ControlFlowGraph {
+        val exits = buildStatements(body, mutableSetOf(controlFlowGraph.entry))
 
         for (block in exits) {
-            block.connectTo(cfg.exit)
+            block.connectTo(controlFlowGraph.exit)
         }
 
-        return cfg
+        return controlFlowGraph
     }
 
-    private fun buildStatements(statements: List<Statement>, incoming: Set<BasicBlock>): Set<BasicBlock> {
+    private fun buildStatements(statements: List<Statement>, incoming: Set<ControlFlowBlock>): Set<ControlFlowBlock> {
         var current = incoming
 
         for (statement in statements) {
@@ -29,7 +26,7 @@ class CfgBuilder {
         return current
     }
 
-    private fun buildStatement(statement: Statement, incoming: Set<BasicBlock>): Set<BasicBlock> {
+    private fun buildStatement(statement: Statement, incoming: Set<ControlFlowBlock>): Set<ControlFlowBlock> {
         if (incoming.isEmpty()) {
             return setOf()
         }
@@ -40,7 +37,7 @@ class CfgBuilder {
             is WhileStatement -> buildWhile(statement, incoming)
 
             is BreakStatement -> {
-                val block = newBlock()
+                val block = controlFlowGraph.newBlock()
                 connect(incoming, block)
 
                 val context = currentLoop()
@@ -51,7 +48,7 @@ class CfgBuilder {
             }
 
             is ContinueStatement -> {
-                val block = newBlock()
+                val block = controlFlowGraph.newBlock()
                 connect(incoming, block)
 
                 val context = currentLoop()
@@ -62,7 +59,7 @@ class CfgBuilder {
             }
 
             is ReturnStatement -> {
-                val block = newBlock()
+                val block = controlFlowGraph.newBlock()
                 connect(incoming, block)
 
                 block.terminator = Terminator.Return(statement.value)
@@ -70,10 +67,10 @@ class CfgBuilder {
             }
 
             else -> {
-                val block = newBlock()
+                val block = controlFlowGraph.newBlock()
                 connect(incoming, block)
 
-                block.statements.add(statement)
+                block.addStatement(statement)
                 setOf(block)
             }
         }
@@ -83,11 +80,11 @@ class CfgBuilder {
 
     private fun buildIf(
         statement: IfStatement,
-        incoming: Set<BasicBlock>
-    ): Set<BasicBlock> {
+        incoming: Set<ControlFlowBlock>
+    ): Set<ControlFlowBlock> {
         if (incoming.isEmpty()) return emptySet()
 
-        val mergeBlock = newBlock()
+        val mergeBlock = controlFlowGraph.newBlock()
         var currentIncoming = incoming
 
         for (case in statement.cases) {
@@ -101,9 +98,9 @@ class CfgBuilder {
                 break
             }
 
-            val conditionBlock = newBlock()
-            val bodyBlock = newBlock()
-            val nextConditionBlock = newBlock()
+            val conditionBlock = controlFlowGraph.newBlock()
+            val bodyBlock = controlFlowGraph.newBlock()
+            val nextConditionBlock = controlFlowGraph.newBlock()
 
             connect(currentIncoming, conditionBlock)
             conditionBlock.terminator = Terminator.ConditionalJump(
@@ -127,11 +124,11 @@ class CfgBuilder {
 
     private fun buildForeach(
         statement: ForeachStatement,
-        incoming: Set<BasicBlock>
-    ): Set<BasicBlock> {
-        val iteratorBlock = newBlock()
-        val bodyBlock = newBlock()
-        val afterLoopBlock = newBlock()
+        incoming: Set<ControlFlowBlock>
+    ): Set<ControlFlowBlock> {
+        val iteratorBlock = controlFlowGraph.newBlock()
+        val bodyBlock = controlFlowGraph.newBlock()
+        val afterLoopBlock = controlFlowGraph.newBlock()
 
         connect(incoming, iteratorBlock)
 
@@ -163,11 +160,11 @@ class CfgBuilder {
 
     private fun buildWhile(
         statement: WhileStatement,
-        incoming: Set<BasicBlock>
-    ): Set<BasicBlock> {
-        val conditionBlock = newBlock()
-        val bodyBlock = newBlock()
-        val afterLoopBlock = newBlock()
+        incoming: Set<ControlFlowBlock>
+    ): Set<ControlFlowBlock> {
+        val conditionBlock = controlFlowGraph.newBlock()
+        val bodyBlock = controlFlowGraph.newBlock()
+        val afterLoopBlock = controlFlowGraph.newBlock()
 
         connect(incoming, conditionBlock)
 
@@ -188,12 +185,8 @@ class CfgBuilder {
 
 
 
-    private fun newBlock(): BasicBlock {
-        return cfg.newBlock()
-    }
-
-    private fun connect(from: Set<BasicBlock>, to: BasicBlock) {
-        for (block in from) {
+    private fun connect(blocks: Set<ControlFlowBlock>, to: ControlFlowBlock) {
+        for (block in blocks) {
             block.connectTo(to)
         }
     }
@@ -207,6 +200,6 @@ class CfgBuilder {
 
 
 private class LoopContext(
-    val breakTarget: BasicBlock,
-    val continueTarget: BasicBlock
+    val breakTarget: ControlFlowBlock,
+    val continueTarget: ControlFlowBlock
 )

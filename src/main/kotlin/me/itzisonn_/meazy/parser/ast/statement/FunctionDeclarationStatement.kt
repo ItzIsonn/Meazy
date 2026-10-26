@@ -5,8 +5,8 @@ import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.declareSymbol
 import me.itzisonn_.meazy.parser.ast.symbol
-import me.itzisonn_.meazy.parser.cfg.CfgBuilder
-import me.itzisonn_.meazy.parser.cfg.MissingReturnAnalyzer
+import me.itzisonn_.meazy.parser.cfg.ControlFlowGraph
+import me.itzisonn_.meazy.parser.cfg.helper.MissingReturnAnalyzer
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
@@ -59,10 +59,8 @@ class FunctionDeclarationStatement(
 
         if (Modifiers.abstract in modifiers) return
 
-        val cfg = CfgBuilder().build(body)
-        val analyzer = MissingReturnAnalyzer(cfg)
-
-        if (analyzer.hasMissingReturn()) {
+        val controlFlowGraph = ControlFlowGraph.build(body)
+        if (MissingReturnAnalyzer.hasMissingReturn(controlFlowGraph)) {
             if (returnDataType != null) {
                 error("Function with id '$id' doesn't always return a value")
             }
