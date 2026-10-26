@@ -5,6 +5,9 @@ import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.declareSymbol
 import me.itzisonn_.meazy.parser.ast.symbol
+import me.itzisonn_.meazy.parser.cfg.CfgBuilder
+import me.itzisonn_.meazy.parser.cfg.ConstructorAnalyzer
+import me.itzisonn_.meazy.parser.cfg.MissingReturnAnalyzer
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
@@ -39,16 +42,18 @@ class ConstructorDeclarationStatement(
         declareSymbol(symbol)
         environment.declareConstructor(symbol)
 
-        var alwaysReturns = false
-        var hasBaseCall = false
+        val cfg = CfgBuilder().build(body)
 
-        for (localStatement in body) {
-            if (localStatement.alwaysReturns()) alwaysReturns = true
-            if (localStatement is BaseCallStatement) hasBaseCall = true
+        val constructorAnalyzer = ConstructorAnalyzer(cfg)
+        val errors = constructorAnalyzer.analyze()
+        if (errors.isNotEmpty()) {
+            error(errors.joinToString("\n"))
         }
 
-        if (!hasBaseCall) body.addFirst(BaseCallStatement(listOf()))
-        if (!alwaysReturns) body.add(ReturnStatement(null))
+        val missingReturnAnalyzer = MissingReturnAnalyzer(cfg)
+        if (missingReturnAnalyzer.hasMissingReturn()) {
+            body.add(ReturnStatement(null))
+        }
     }
 
     context(parents: ParentMap, symbols: SymbolMap)

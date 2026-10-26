@@ -23,6 +23,4 @@ class MemberExpression(
     override fun getType(environment: Environment): DataType {
         return member.getType(environment)
     }
-
-    override fun alwaysReturns() = false
 }

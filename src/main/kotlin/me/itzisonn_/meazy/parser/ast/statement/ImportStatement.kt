@@ -11,6 +11,4 @@ class ImportStatement(val name: String) : LocalStatement {
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {}
-
-    override fun alwaysReturns() = false
 }

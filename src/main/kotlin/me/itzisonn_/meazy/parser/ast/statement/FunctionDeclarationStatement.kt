@@ -5,6 +5,8 @@ import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.declareSymbol
 import me.itzisonn_.meazy.parser.ast.symbol
+import me.itzisonn_.meazy.parser.cfg.CfgBuilder
+import me.itzisonn_.meazy.parser.cfg.MissingReturnAnalyzer
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.Parameter
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
@@ -57,16 +59,16 @@ class FunctionDeclarationStatement(
 
         if (Modifiers.abstract in modifiers) return
 
-        for (localStatement in body) {
-            if (localStatement.alwaysReturns()) return
-        }
+        val cfg = CfgBuilder().build(body)
+        val analyzer = MissingReturnAnalyzer(cfg)
 
-        if (returnDataType == null) {
+        if (analyzer.hasMissingReturn()) {
+            if (returnDataType != null) {
+                error("Function with id '$id' doesn't always return a value")
+            }
+
             body.add(ReturnStatement(null))
-            return
         }
-
-        throw RuntimeException("Function with id $id doesn't always return a value")
     }
 
     context(parents: ParentMap, symbols: SymbolMap)

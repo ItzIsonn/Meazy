@@ -56,6 +56,4 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
 
         instructions.returnValue(returnTypeClassDesc)
     }
-
-    override fun alwaysReturns() = true
 }

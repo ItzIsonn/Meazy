@@ -132,8 +132,8 @@ class Test {
             base()
             return
         }
-        System.out.println(arg + " ok")
 
+        System.out.println(arg + " ok")
         base()
     }
 

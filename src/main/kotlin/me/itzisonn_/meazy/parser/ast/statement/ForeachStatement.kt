@@ -91,12 +91,4 @@ class ForeachStatement(
         instructions.gotoLabel(conditionLabel)
         instructions.bindLabel(endLabel)
     }
-
-    override fun alwaysReturns(): Boolean {
-        for (localStatement in body) {
-            if (localStatement.alwaysReturns()) return true
-        }
-
-        return false
-    }
 }

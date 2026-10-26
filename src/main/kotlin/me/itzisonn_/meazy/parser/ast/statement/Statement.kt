@@ -11,9 +11,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
  */
 interface Statement : ProgramUnit
 
-interface LocalStatement : Statement {
-    fun alwaysReturns(): Boolean
-}
+interface LocalStatement : Statement
 
 interface DeclarationStatement<T : Symbol> : Statement {
     context(parents: ParentMap, symbols: SymbolMap)

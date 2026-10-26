@@ -18,6 +18,4 @@ class BreakStatement : LocalStatement {
 
         instructions.gotoLabel(loopEnvironment.getEndLabel())
     }
-
-    override fun alwaysReturns() = false
 }

@@ -18,6 +18,4 @@ class ContinueStatement : LocalStatement {
 
         instructions.gotoLabel(loopEnvironment.getStartLabel())
     }
-
-    override fun alwaysReturns() = false
 }
