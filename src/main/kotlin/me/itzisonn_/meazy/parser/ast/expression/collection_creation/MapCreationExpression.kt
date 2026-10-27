@@ -25,18 +25,18 @@ class MapCreationExpression(val map: Map<Expression, Expression>) : Expression {
             invokeMethod(
                 ConstantDescs.CD_Map,
                 "ofEntries",
-                MethodTypeDesc.of(ConstantDescs.CD_Map, ClassDesc.of($$"java.util.Map$Entry").arrayType()),
+                MethodTypeDesc.of(ConstantDescs.CD_Map, MAP_ENTRY_CLASS_DESC.arrayType()),
                 InvokeType.STATIC_INTERFACE
             ) {
                 loadConstant(map.size)
-                newReferenceArray(ClassDesc.of($$"java.util.Map$Entry"))
+                newArray(MAP_ENTRY_CLASS_DESC)
 
                 map.entries.forEachIndexed { i, (key, value) ->
                     invokeMethod(
                         ClassDesc.of("java.util.Map"),
                         "entry",
                         MethodTypeDesc.of(
-                            ClassDesc.of($$"java.util.Map$Entry"),
+                            MAP_ENTRY_CLASS_DESC,
                             ConstantDescs.CD_Object,
                             ConstantDescs.CD_Object
                         ),
@@ -49,7 +49,7 @@ class MapCreationExpression(val map: Map<Expression, Expression>) : Expression {
                         value.emit(this, environment)
                     }
 
-                    storeReferenceIntoArray()
+                    storeIntoArray(MAP_ENTRY_CLASS_DESC)
                 }
             }
         }
@@ -58,5 +58,9 @@ class MapCreationExpression(val map: Map<Expression, Expression>) : Expression {
     context(parents: ParentMap)
     override fun getType(environment: Environment): DataType {
         return DataType.ofNonNull(ClassDesc.of("java.util.HashMap"))
+    }
+
+    companion object {
+        val MAP_ENTRY_CLASS_DESC = ClassDesc.of($$"java.util.Map$Entry")
     }
 }

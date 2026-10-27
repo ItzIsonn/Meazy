@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.boxed
+import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
@@ -41,11 +43,11 @@ class ForeachStatement(
         instructions.invokeMethod(
             ClassDesc.of("java.lang.Iterable"),
             "iterator",
-            MethodTypeDesc.of(ClassDesc.of("java.util.Iterator")),
+            MethodTypeDesc.of(ITERATOR_CLASS_DESC),
             InvokeType.INTERFACE
         )
 
-        instructions.storeLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.slot)
+        instructions.storeLocal(ITERATOR_CLASS_DESC, iterableVariableValue.slot)
 
         val conditionLabel = instructions.createAndInitLabel()
         val endLabel = instructions.createAndInitLabel()
@@ -53,25 +55,29 @@ class ForeachStatement(
 
         instructions.bindLabel(conditionLabel)
 
-        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.slot)
+        instructions.getLocal(ITERATOR_CLASS_DESC, iterableVariableValue.slot)
         instructions.invokeMethod(
-            ClassDesc.of("java.util.Iterator"),
+            ITERATOR_CLASS_DESC,
             "hasNext",
             MethodTypeDesc.of(ConstantDescs.CD_boolean),
             InvokeType.INTERFACE
         )
         instructions.gotoLabelIfEqualsZero(endLabel)
 
-        instructions.getLocal(ClassDesc.of("java.util.Iterator"), iterableVariableValue.slot)
+        instructions.getLocal(ITERATOR_CLASS_DESC, iterableVariableValue.slot)
         instructions.invokeMethod(
-            ClassDesc.of("java.util.Iterator"),
+            ITERATOR_CLASS_DESC,
             "next",
             MethodTypeDesc.of(ConstantDescs.CD_Object),
             InvokeType.INTERFACE
         )
 
         dataType.resolve(environment)
-        instructions.cast(dataType.classDesc)
+
+        instructions.cast(dataType.classDesc.boxed)
+        if (!instructions.convertPrimitiveOrBoxed(dataType.classDesc.boxed, dataType.classDesc)) {
+            throw RuntimeException("Foreach variable has unsupported type ${dataType.classDesc}")
+        }
 
         val variableValue = loopEnvironment.declareVariable(id, dataType, true, null, setOf())
         instructions.storeLocal(variableValue.dataType.classDesc, variableValue.slot)
@@ -89,5 +95,9 @@ class ForeachStatement(
 
         instructions.gotoLabel(conditionLabel)
         instructions.bindLabel(endLabel)
+    }
+
+    companion object {
+        val ITERATOR_CLASS_DESC = ClassDesc.of("java.util.Iterator")
     }
 }
