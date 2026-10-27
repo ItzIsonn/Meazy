@@ -30,3 +30,5 @@ object TestingHelper {
         run(string)
     }.replace(System.lineSeparator(), "\n")
 }
+
+fun asMultiline(vararg values: Any) = values.joinToString("\n", postfix = "\n")

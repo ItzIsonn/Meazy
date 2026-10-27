@@ -1,0 +1,17 @@
+fun main() {
+    System.out.println(21 % 4)
+    System.out.println(20 % 4)
+    System.out.println(19 % 4)
+
+    System.out.println(-21 % 4)
+    System.out.println(-20 % 4)
+    System.out.println(-19 % 4)
+
+    System.out.println(21 % -4)
+    System.out.println(20 % -4)
+    System.out.println(19 % -4)
+
+    System.out.println(-21 % -4)
+    System.out.println(-20 % -4)
+    System.out.println(-19 % -4)
+}
