@@ -112,6 +112,7 @@ fun main() {
 
     testParamShadowing(5)
     testListPrimitivesLooping()
+    testOop()
 }
 
 
@@ -144,6 +145,13 @@ fun testListPrimitivesLooping() {
     for (i: Int in [1, 2, 3]) {
         System.out.println("Looping " + i)
     }
+}
+
+fun testOop() {
+    println("======= Oop =======")
+    System.out.println(100 - 2 * 3 ^ 3)
+    System.out.println(10 + 4 ^ 2 / 2)
+    System.out.println(100 - 2 * 3 ^ 3 + 4 ^ 2 / 2)
 }
 
 

@@ -13,7 +13,7 @@ object AdditionExpressionParsingFunction : EmptyParsingFunction<Expression>() {
 
         while (isNext(addition)) {
             val operator = consume(addition, null).value
-            val right = parse(AdditionExpressionParsingFunction)
+            val right = parse(MultiplicationExpressionParsingFunction)
             left = OperatorExpression(left, right, operator, OperatorType.INFIX)
         }
 
