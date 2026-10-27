@@ -1,0 +1,7 @@
+fun main() {
+    f("Bob")
+}
+
+fun f(name: String) {
+    System.out.println("Hi, " + name)
+}

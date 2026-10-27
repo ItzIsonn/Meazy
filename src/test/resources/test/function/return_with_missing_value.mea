@@ -1,0 +1,7 @@
+fun main() {
+    System.out.println(f())
+}
+
+fun f(): Int {
+    return
+}

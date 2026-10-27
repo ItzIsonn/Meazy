@@ -1,0 +1,8 @@
+fun main() {
+    f()
+    System.out.println("I know this won't work")
+}
+
+fun f() {
+    return 52
+}

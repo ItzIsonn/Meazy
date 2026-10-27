@@ -1,0 +1,7 @@
+fun main() {
+    f("Joe", 87)
+}
+
+fun f(name: String, age: Int) {
+    System.out.println("Hello, " + name + ", which is " + age + " years old")
+}

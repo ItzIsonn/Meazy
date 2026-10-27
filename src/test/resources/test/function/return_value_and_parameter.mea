@@ -1,0 +1,7 @@
+fun main() {
+    System.out.println(f(67))
+}
+
+fun f(a: Int): Int {
+    return a + 2
+}

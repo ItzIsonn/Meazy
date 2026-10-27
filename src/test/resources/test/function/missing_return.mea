@@ -1,0 +1,7 @@
+fun main() {
+    System.out.println(f())
+}
+
+fun f(): Int {
+    System.out.println("Can't imagine, I forgot to return a value!")
+}

@@ -1,0 +1,8 @@
+fun main() {
+    System.out.println(f())
+}
+
+fun f(): Int {
+    for (i: Int in [1, 2, 3]) return 67
+    System.out.println("Can't imagine, I forgot to return a value!")
+}
