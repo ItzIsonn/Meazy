@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.instruction
 
-import me.itzisonn_.meazy.instruction.array.NewReferenceArrayInstruction
-import me.itzisonn_.meazy.instruction.array.StoreReferenceIntoArrayInstruction
+import me.itzisonn_.meazy.instruction.array.NewArrayInstruction
+import me.itzisonn_.meazy.instruction.array.StoreIntoArrayInstruction
 import me.itzisonn_.meazy.instruction.field.GetFieldInstruction
 import me.itzisonn_.meazy.instruction.field.StoreFieldInstruction
 import me.itzisonn_.meazy.instruction.field.WithFieldInstruction
@@ -155,12 +155,12 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
 
 
-    fun newReferenceArray(type: ClassDesc) {
-        with(NewReferenceArrayInstruction(type))
+    fun newArray(type: ClassDesc) {
+        with(NewArrayInstruction(type))
     }
 
-    fun storeReferenceIntoArray() {
-        with(StoreReferenceIntoArrayInstruction())
+    fun storeIntoArray(type: ClassDesc) {
+        with(StoreIntoArrayInstruction(type))
     }
 
 

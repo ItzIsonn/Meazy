@@ -111,6 +111,7 @@ fun main() {
     System.out.println(cls.pupok())
 
     testParamShadowing(5)
+    testListPrimitivesLooping()
 }
 
 
@@ -135,6 +136,14 @@ fun testParamShadowing(param: Int) {
     println("======= Param shadowing =======")
     var param = param + 2
     System.out.println(param)
+}
+
+
+fun testListPrimitivesLooping() {
+    println("======= List primitives looping =======")
+    for (i: Int in [1, 2, 3]) {
+        System.out.println("Looping " + i)
+    }
 }
 
 

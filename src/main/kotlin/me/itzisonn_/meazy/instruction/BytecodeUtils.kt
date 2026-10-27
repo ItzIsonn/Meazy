@@ -18,6 +18,8 @@ fun InstructionsSet.boxPrimitive(classDesc: ClassDesc) {
 }
 
 fun InstructionsSet.convertPrimitiveOrBoxed(from: ClassDesc, to: ClassDesc): Boolean {
+    if (from == to) return true
+
     val fromNumberType = NumberType.valueOf(from)
     val toNumberType = NumberType.valueOf(to)
 

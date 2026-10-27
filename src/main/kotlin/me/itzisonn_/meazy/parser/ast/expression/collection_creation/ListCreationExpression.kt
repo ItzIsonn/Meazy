@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy.parser.ast.expression.collection_creation
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.boxed
+import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
@@ -27,16 +29,24 @@ class ListCreationExpression(val list: List<Expression>) : Expression {
                 InvokeType.STATIC_INTERFACE
             ) {
                 loadConstant(list.size)
-                newReferenceArray(
+
+                val classDesc =
                     if (list.isEmpty()) ConstantDescs.CD_Object
                     else list.first().getType(environment).classDesc
-                )
+
+                val boxedClassDesc = classDesc.boxed
+                newArray(boxedClassDesc)
 
                 list.forEachIndexed { i, arg ->
                     duplicate()
                     loadConstant(i)
+
                     arg.emit(this, environment)
-                    storeReferenceIntoArray()
+                    if (!convertPrimitiveOrBoxed(classDesc, boxedClassDesc)) {
+                        throw RuntimeException("Failed to create List of type ${classDesc.descriptorString()}")
+                    }
+
+                    storeIntoArray(boxedClassDesc)
                 }
             }
         }
