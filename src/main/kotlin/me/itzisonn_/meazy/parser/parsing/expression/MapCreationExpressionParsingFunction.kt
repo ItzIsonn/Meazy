@@ -14,7 +14,7 @@ object MapCreationExpressionParsingFunction : EmptyParsingFunction<Expression>()
     override fun Parser.parse(): Expression {
         if (isNext(leftBrace)) {
             consume(leftBrace, null)
-            val map = mutableMapOf<Expression, Expression>()
+            val map = linkedMapOf<Expression, Expression>()
 
             while (!isNext(rightBrace)) {
                 val key = parse(ListCreationExpressionParsingFunction)

@@ -55,4 +55,16 @@ object ExpressionTests {
         val output = TestingHelper.loadAndRun("expression/order_of_operations")
         assertEquals(asMultiline(7, 7, 9, 8, 10, 10, 8, 2, 54f), output)
     }
+
+    @Test
+    fun test_list_creation() {
+        val output = TestingHelper.loadAndRun("expression/list_creation")
+        assertEquals(asMultiline("1 2 3 4 ", "1.5 2.7 3.2 4.0 ", "true false true true ", "Hi! My name is John "), output)
+    }
+
+    @Test
+    fun test_map_creation() {
+        val output = TestingHelper.loadAndRun("expression/map_creation")
+        assertEquals(asMultiline("0 = 0.0", "1 = true", "67 = 52", "5 = Wow!"), output)
+    }
 }

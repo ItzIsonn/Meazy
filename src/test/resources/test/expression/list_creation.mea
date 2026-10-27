@@ -1,0 +1,17 @@
+fun main() {
+    val a = [1, 2, 3, 4]
+    for (item: Int in a) System.out.print(item + " ")
+    System.out.println()
+
+    val b = [1.5, 2.7, 3.2, 4.0]
+    for (item: Double in b) System.out.print(item + " ")
+    System.out.println()
+
+    val c = [true, false, true, true]
+    for (item: Boolean in c) System.out.print(item + " ")
+    System.out.println()
+
+    val d = ["Hi!", "My", "name", "is", "John"]
+    for (item: String in d) System.out.print(item + " ")
+    System.out.println()
+}

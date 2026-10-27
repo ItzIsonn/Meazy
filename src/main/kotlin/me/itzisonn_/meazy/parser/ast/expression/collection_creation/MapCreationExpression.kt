@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.ast.expression.collection_creation
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
+import me.itzisonn_.meazy.instruction.boxPrimitive
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
@@ -46,7 +47,14 @@ class MapCreationExpression(val map: Map<Expression, Expression>) : Expression {
                         loadConstant(i)
 
                         key.emit(this, environment)
+                        key.getType(environment).classDesc.let { classDesc ->
+                            if (classDesc.isPrimitive) boxPrimitive(classDesc)
+                        }
+
                         value.emit(this, environment)
+                        value.getType(environment).classDesc.let { classDesc ->
+                            if (classDesc.isPrimitive) boxPrimitive(classDesc)
+                        }
                     }
 
                     storeIntoArray(MAP_ENTRY_CLASS_DESC)
