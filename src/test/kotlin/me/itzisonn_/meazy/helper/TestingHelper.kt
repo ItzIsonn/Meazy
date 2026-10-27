@@ -1,8 +1,15 @@
-package me.itzisonn_.meazy
+package me.itzisonn_.meazy.helper
 
+import me.itzisonn_.meazy.Meazy
 import me.itzisonn_.meazy.runtime.RuntimeFunctions
 
 object TestingHelper {
+    fun initialize() {
+        if (!Meazy.isInitialized) {
+            Meazy.initialize()
+        }
+    }
+
     fun run(string: String) {
         val tokens = RuntimeFunctions.tokenize(string)
         val program = RuntimeFunctions.parseTokens(null, tokens)

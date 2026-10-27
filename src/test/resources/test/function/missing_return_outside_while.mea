@@ -1,0 +1,14 @@
+fun main() {
+    System.out.println(f())
+}
+
+fun f(): Int {
+    var i = 0
+
+    while (i != 2) {
+        System.out.println("Looping " + i)
+        i++
+    }
+
+    return 67
+}

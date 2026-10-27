@@ -1,0 +1,11 @@
+fun main() {
+    System.out.println(f())
+}
+
+fun f(): Int {
+    for (i: Int in [1, 2, 3]) {
+        System.out.println("Looping " + i)
+    }
+
+    return 67
+}

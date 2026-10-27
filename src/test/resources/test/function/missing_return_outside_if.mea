@@ -1,0 +1,8 @@
+fun main() {
+    System.out.println(f())
+}
+
+fun f(): Int {
+    if (1 == 1) System.out.println("Oh wow, 1 is equal to 1!")
+    return 67
+}

@@ -1,0 +1,8 @@
+fun main() {
+    f()
+    System.out.println("But this would!")
+}
+
+fun f() {
+    return
+}

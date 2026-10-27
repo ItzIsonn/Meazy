@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy
+package me.itzisonn_.meazy.helper
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

@@ -1,0 +1,8 @@
+fun main() {
+    System.out.println(f())
+}
+
+fun f(): Int {
+    if (1 == 1) return 67
+    System.out.println("Can't imagine, I forgot to return a value!")
+}
