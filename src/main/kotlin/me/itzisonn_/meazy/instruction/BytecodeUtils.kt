@@ -17,6 +17,18 @@ fun InstructionsSet.boxPrimitive(classDesc: ClassDesc) {
     )
 }
 
+fun InstructionsSet.unboxPrimitive(classDesc: ClassDesc) {
+    val boxedClassDesc = classDesc.boxed
+    if (boxedClassDesc == ConstantDescs.CD_Void) return
+
+    invokeMethod(
+        boxedClassDesc,
+        classDesc.displayName() + "Value",
+        MethodTypeDesc.of(classDesc),
+        InvokeType.VIRTUAL
+    )
+}
+
 fun InstructionsSet.convertPrimitiveOrBoxed(from: ClassDesc, to: ClassDesc): Boolean {
     if (from == to) return true
 

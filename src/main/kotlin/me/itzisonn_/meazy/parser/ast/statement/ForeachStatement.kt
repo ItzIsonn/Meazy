@@ -2,8 +2,8 @@ package me.itzisonn_.meazy.parser.ast.statement
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.boxed
-import me.itzisonn_.meazy.instruction.convertPrimitiveOrBoxed
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.instruction.unboxPrimitive
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.parser.ast.ProgramUnit
@@ -75,8 +75,8 @@ class ForeachStatement(
         dataType.resolve(environment)
 
         instructions.cast(dataType.classDesc.boxed)
-        if (!instructions.convertPrimitiveOrBoxed(dataType.classDesc.boxed, dataType.classDesc)) {
-            throw RuntimeException("Foreach variable has unsupported type ${dataType.classDesc}")
+        if (dataType.classDesc.isPrimitive) {
+            instructions.unboxPrimitive(dataType.classDesc)
         }
 
         val variableValue = loopEnvironment.declareVariable(id, dataType, true, null, setOf())

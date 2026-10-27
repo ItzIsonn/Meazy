@@ -1,0 +1,4 @@
+fun main() {
+    val myMap = {1 = true, 67 = 52, 5 = "Wow!", 0 = 0.0}
+    for (key: Any in myMap.keySet()) System.out.println(key + " = " + myMap.get(key))
+}
