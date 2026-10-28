@@ -18,7 +18,6 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.VariableDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 import java.lang.reflect.AccessFlag
 
 class VariableDeclarationStatement(
@@ -92,11 +91,8 @@ class VariableDeclarationStatement(
             }
 
             val variableType = symbol.dataType.classDesc
-
-            if (!environment.isInstanceOf(valueType, variableType)) {
-                if (!instructions.convertPrimitiveOrBoxed(valueType, variableType)) {
-                    throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
-                }
+            if (!instructions.convertPrimitiveOrBoxed(valueType, variableType, environment)) {
+                throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
             }
         }
         else if (!hasSymbol) {

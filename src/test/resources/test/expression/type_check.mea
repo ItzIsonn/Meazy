@@ -1,0 +1,34 @@
+fun main() {
+    System.out.println(5 is Int)
+    System.out.println(5 is Double)
+    System.out.println(5 is String)
+
+    System.out.println(5.0 is Int)
+    System.out.println(5.0 is Double)
+    System.out.println(5.0 is String)
+
+    System.out.println("hi" is Int)
+    System.out.println("hi" is Double)
+    System.out.println("hi" is String)
+
+    System.out.println(null is Int)
+    System.out.println(null is Double)
+    System.out.println(null is String)
+
+
+    System.out.println(5 !is Int)
+    System.out.println(5 !is Double)
+    System.out.println(5 !is String)
+
+    System.out.println(5.0 !is Int)
+    System.out.println(5.0 !is Double)
+    System.out.println(5.0 !is String)
+
+    System.out.println("hi" !is Int)
+    System.out.println("hi" !is Double)
+    System.out.println("hi" !is String)
+
+    System.out.println(null !is Int)
+    System.out.println(null !is Double)
+    System.out.println(null !is String)
+}

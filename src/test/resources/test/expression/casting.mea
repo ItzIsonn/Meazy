@@ -1,0 +1,10 @@
+import java.io.PrintStream
+import java.io.Closeable
+
+fun main() {
+    val a: Any = 5
+    System.out.println((a as Int) + 2)
+
+    val b: Closeable = System.out
+    (b as PrintStream).println("Why did I do this?")
+}

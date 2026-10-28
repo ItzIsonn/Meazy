@@ -54,7 +54,7 @@ object TokenTypes {
         add(TokenType("dot", "\\."))
         add(TokenType("question", "\\?"))
         add(TokenType("question_dot", "\\?\\."))
-        add(TokenType("question_colon", "\\?:"))
+        add(TokenType("double_question", "\\?\\?"))
         add(TokenType("arrow", "->"))
 
         add(TokenType("assign", "="))
@@ -140,7 +140,7 @@ object TokenTypes {
     val dot get() = getNonNull("dot")
     val question get() = getNonNull("question")
     val questionDot get() = getNonNull("question_dot")
-    val questionColon get() = getNonNull("question_colon")
+    val doubleQuestion get() = getNonNull("double_question")
     val arrow get() = getNonNull("arrow")
     
     val assign get() = getNonNull("assign")

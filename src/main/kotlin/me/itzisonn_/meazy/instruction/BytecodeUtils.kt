@@ -1,6 +1,8 @@
 package me.itzisonn_.meazy.instruction
 
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
+import me.itzisonn_.meazy.runtime.environment.Environment
+import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
@@ -29,8 +31,15 @@ fun InstructionsSet.unboxPrimitive(classDesc: ClassDesc) {
     )
 }
 
-fun InstructionsSet.convertPrimitiveOrBoxed(from: ClassDesc, to: ClassDesc): Boolean {
+fun InstructionsSet.convertPrimitiveOrBoxed(from: ClassDesc, to: ClassDesc, environment: Environment): Boolean {
     if (from == to) return true
+
+    if (from.isPrimitive && !to.isPrimitive) {
+        boxPrimitive(from)
+        return true
+    }
+
+    if (environment.isInstanceOf(from, to)) return true
 
     val fromNumberType = NumberType.valueOf(from)
     val toNumberType = NumberType.valueOf(to)

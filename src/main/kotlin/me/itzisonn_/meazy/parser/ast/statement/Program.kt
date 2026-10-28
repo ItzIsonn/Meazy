@@ -11,7 +11,6 @@ import me.itzisonn_.meazy.runtime.data.symbol.FileSymbol
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
-import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 import me.itzisonn_.meazy.util.version.Version
 import java.io.File
 import java.lang.classfile.attribute.InnerClassesAttribute
@@ -123,11 +122,8 @@ class Program(
                     value.emit(this, fileEnvironment)
                     val valueType = value.getType(fileEnvironment).classDesc
                     val variableType = variableSymbol.dataType.classDesc
-
-                    if (!fileEnvironment.isInstanceOf(valueType, variableType)) {
-                        if (!convertPrimitiveOrBoxed(valueType, variableType)) {
-                            throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
-                        }
+                    if (!convertPrimitiveOrBoxed(valueType, variableType, fileEnvironment)) {
+                        throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                     }
 
                     storeStaticField(

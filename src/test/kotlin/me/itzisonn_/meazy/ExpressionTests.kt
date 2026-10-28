@@ -5,6 +5,7 @@ package me.itzisonn_.meazy
 import me.itzisonn_.meazy.helper.TestingHelper
 import me.itzisonn_.meazy.helper.asMultiline
 import org.junit.jupiter.api.BeforeAll
+import java.lang.reflect.InvocationTargetException
 import kotlin.test.*
 
 object ExpressionTests {
@@ -72,5 +73,61 @@ object ExpressionTests {
     fun test_map_creation() {
         val output = TestingHelper.loadAndRun("expression/map_creation")
         assertEquals(asMultiline("0 = 0.0", "1 = true", "67 = 52", "5 = Wow!"), output)
+    }
+
+    @Test
+    fun test_casting() {
+        val output = TestingHelper.loadAndRun("expression/casting")
+        assertEquals(asMultiline(7, "Why did I do this?"), output)
+    }
+
+    @Test
+    fun test_casting_fail() {
+        assertFailsWith<InvocationTargetException> {
+            TestingHelper.loadAndRun("expression/casting_fail")
+        }
+    }
+
+    @Test
+    fun test_casting_safe() {
+        val output = TestingHelper.loadAndRun("expression/casting_safe")
+        assertEquals("null does work\n", output)
+    }
+
+    @Test
+    fun test_type_check() {
+        val output = TestingHelper.loadAndRun("expression/type_check")
+        assertEquals(
+            asMultiline(
+                true, false, false, false, true, false, false, false, true, false, false, false,
+                false, true, true, true, false, true, true, true, false, true, true, true
+            ),
+            output
+        )
+    }
+
+    @Test
+    fun test_null_check() {
+        val output = TestingHelper.loadAndRun("expression/null_check")
+        assertEquals(asMultiline(5, 5, "ok", "ok", false, "ok"), output)
+    }
+
+    @Test
+    fun test_comparison() {
+        val output = TestingHelper.loadAndRun("expression/comparison")
+        assertEquals(asMultiline(true, false, false, true, true, false, false, false, false, true, true, true, false, false, true, true), output)
+    }
+
+    @Test
+    fun test_inversion() {
+        val output = TestingHelper.loadAndRun("expression/inversion")
+        assertEquals(
+            asMultiline(
+                true, false,
+                true, true, false, true, true, false, true, true,
+                false, true, false, false, false, false, true, false
+            ),
+            output
+        )
     }
 }

@@ -3,165 +3,22 @@ import java.util.List
 import java.lang.Math
 import java.lang.Number
 import java.lang.System
+import java.io.PrintStream
+import java.io.Closeable
 
 var testing = 52
 val test2 = testing + 1
-
-fun testPrimitives() {
-    val a = 67
-    System.out.println(a)
-    ArrayList()
-
-    if (a > 67) {
-        val c = 52.52
-        val ok = 67.67
-        System.out.println(
-          c
-    +
-     ok
-         )
-
-        if (ok == c) {
-            val lol = ok
-            System.out.println(lol)
-        }
-    }
-    else {
-        val de = 69.69
-        System.out.println(de)
-
-        val bil = 100
-        System.out.println(bil)
-
-        if (de == bil) {
-            val haha = de + bil
-            System.out.println(haha)
-        }
-    }
-}
 
 fun println(v: String?) {
     System.out.println(v)
 }
 
-fun get(): List = testCollectionCreation()
-
-
-
-fun testCollectionCreation(): List {
-    val l = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-    val m = {"hi" = "23", "lol" = List.of(), "ban" = ["32"]}
-    System.out.println(ArrayList(m.keySet()).get(0))
-
-    for (s: String in l) {
-        var s2 = s + " "
-        if (s2.equals("pididi")) break
-        println(s2)
-    }
-
-    for (s: String in l) {
-        println(s)
-    }
-
-    return l
-}
-
-
-
 fun main() {
-    var a = 52
-    var b = a + 5
-    System.out.println(b)
-
-    var bool = !(-a <= b)
-    if (bool) {
-        println("True")
-    }
-    else if (b > 57) {
-        println("Greater")
-    }
-    else {
-        println("Less or equal" + 52 + "ok" + true)
-    }
-
-    var i = 10
-    while (i > 0) {
-        if (i == 5) {
-            i--
-            continue
-        }
-        println(String.valueOf(i))
-        i--
-    }
-
-    var tst = "Ok" ?: "Not ok"
-    println(tst)
-
-    println("HI")
-    var c = "Hello"
-    testCollectionCreation()
-    testCastsAndInstanceChecks()
-    println(String.valueOf(2 ^ 5))
-    println(String.valueOf(b + Math.random()))
-    testPrimitives()
     Test("Hi").ok()
-
     val cls: Ok = Inheritor()
     println(cls.test())
     System.out.println(cls.pupok())
-
-    testParamShadowing(5)
-    testListPrimitivesLooping()
-    testOop()
-    testMaps()
 }
-
-
-
-fun testCastsAndInstanceChecks() {
-    val abc = 2.5
-    val abcd = 2
-    val str = "Hi"
-
-    System.out.println(abc ?: null)
-
-    System.out.println("IS DOUBLE " + abc is Double)
-    System.out.println("IS NOT NUMBER " + abc !is Number)
-
-    System.out.println("Testing " + abc as Number)
-    System.out.println("Testing " + ((abc as? String)?.length() ?: 0))
-}
-
-
-
-fun testParamShadowing(param: Int) {
-    println("======= Param shadowing =======")
-    var param = param + 2
-    System.out.println(param)
-}
-
-
-fun testListPrimitivesLooping() {
-    println("======= List primitives looping =======")
-    for (i: Int in [1, 2, 3]) {
-        System.out.println("Looping " + i)
-    }
-}
-
-fun testOop() {
-    println("======= Oop =======")
-    System.out.println(100 - 2 * 3 ^ 3)
-    System.out.println(10 + 4 ^ 2 / 2)
-    System.out.println(100 - 2 * 3 ^ 3 + 4 ^ 2 / 2)
-}
-
-fun testMaps() {
-    println("======= Maps =======")
-    val myMap = {1 = true, 67 = 52, 5 = "Wow!", 0 = 0.0}
-    for (key: Any in myMap.keySet()) System.out.println(key + " = " + myMap.get(key))
-}
-
-
 
 class Test {
     private val a = 5

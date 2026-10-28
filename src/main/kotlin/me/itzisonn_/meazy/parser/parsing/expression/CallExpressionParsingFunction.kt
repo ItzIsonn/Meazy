@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.parser.parsing.expression
 
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
+import me.itzisonn_.meazy.lexer.TokenTypes.newLine
 import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.expression.CallExpression
 import me.itzisonn_.meazy.parser.ast.expression.Expression
@@ -12,7 +13,7 @@ import me.itzisonn_.meazy.util.text.translatable
 object CallExpressionParsingFunction : EmptyParsingFunction<Expression>() {
     override fun Parser.parse(): Expression {
         val expression = parse(PrimaryExpressionParsingFunction)
-        if (!isNext(leftParenthesis)) return expression
+        if (!isNext(leftParenthesis) || isNext(newLine)) return expression
 
         if (expression !is Identifier) throw InvalidSyntaxException(translatable("parser.exception.call_not_identifier"))
         return CallExpression(expression.id, parseArgs())

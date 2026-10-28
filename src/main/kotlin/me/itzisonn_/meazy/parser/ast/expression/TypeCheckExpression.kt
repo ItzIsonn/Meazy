@@ -9,7 +9,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.resolveClassDesc
 import java.lang.constant.ConstantDescs
 
-class TypeCheckingExpression(
+class TypeCheckExpression(
     val value: Expression,
     val id: String
 ) : Expression {

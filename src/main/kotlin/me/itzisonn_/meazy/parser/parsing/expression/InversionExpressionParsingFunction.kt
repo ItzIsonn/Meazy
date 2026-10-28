@@ -9,10 +9,10 @@ import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 
 object InversionExpressionParsingFunction : EmptyParsingFunction<Expression>() {
     override fun Parser.parse(): Expression {
-        if (!isNext(inversion)) return parse(TypeCheckingExpressionParsingFunction)
+        if (!isNext(inversion)) return parse(TypeCheckExpressionParsingFunction)
         consume(inversion, null)
 
-        val expression = parse(TypeCheckingExpressionParsingFunction)
+        val expression = parse(TypeCheckExpressionParsingFunction)
         return OperatorExpression(expression, null, Operators.inversion)
     }
 }

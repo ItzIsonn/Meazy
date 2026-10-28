@@ -76,11 +76,8 @@ class CallExpression(
                     val argType = arg.getType(environment).classDesc
 
                     arg.emit(this, environment)
-
-                    if (!environment.isInstanceOf(argType, parameterType)) {
-                        if (!instructions.convertPrimitiveOrBoxed(argType, parameterType)) {
-                            throw RuntimeException("Can't pass argument of type $argType to parameter of type $parameterType")
-                        }
+                    if (!instructions.convertPrimitiveOrBoxed(argType, parameterType, environment)) {
+                        throw RuntimeException("Can't pass argument of type $argType to parameter of type $parameterType")
                     }
                 }
             }

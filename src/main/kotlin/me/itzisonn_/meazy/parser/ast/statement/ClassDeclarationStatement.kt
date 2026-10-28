@@ -136,11 +136,8 @@ class ClassDeclarationStatement(
 
                     val valueType = value.getType(classEnvironment).classDesc
                     val variableType = variableSymbol.dataType.classDesc
-
-                    if (!classEnvironment.isInstanceOf(valueType, variableType)) {
-                        if (!convertPrimitiveOrBoxed(valueType, variableType)) {
-                            throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
-                        }
+                    if (!convertPrimitiveOrBoxed(valueType, variableType, classEnvironment)) {
+                        throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
                     }
 
                     storeField(

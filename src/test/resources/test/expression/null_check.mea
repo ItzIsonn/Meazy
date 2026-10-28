@@ -1,0 +1,8 @@
+fun main() {
+    System.out.println(5 ?? false)
+    System.out.println(5 ?? "ok")
+    System.out.println("ok" ?? 5)
+    System.out.println("ok" ?? "not ok")
+    System.out.println(null ?? false)
+    System.out.println(null ?? "ok")
+}

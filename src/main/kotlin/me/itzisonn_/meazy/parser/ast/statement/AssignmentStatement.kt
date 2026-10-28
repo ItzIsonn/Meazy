@@ -9,7 +9,6 @@ import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.SymbolResolver.resolveVariable
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 
 class AssignmentStatement(val target: Expression, val value: Expression) : LocalStatement {
     override val children = setOf(target, value)
@@ -27,11 +26,8 @@ class AssignmentStatement(val target: Expression, val value: Expression) : Local
         }
 
         value.emit(instructions, environment)
-
-        if (!environment.isInstanceOf(valueType, variableType)) {
-            if (!instructions.convertPrimitiveOrBoxed(valueType, variableType)) {
-                throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
-            }
+        if (!instructions.convertPrimitiveOrBoxed(valueType, variableType, environment)) {
+            throw RuntimeException("Can't assign value of type $valueType to variable with type $variableType")
         }
 
         when (resolvedVariable) {

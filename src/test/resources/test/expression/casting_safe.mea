@@ -1,0 +1,4 @@
+fun main() {
+    val a: Any = 5
+    System.out.println((a as? String) + " does work")
+}

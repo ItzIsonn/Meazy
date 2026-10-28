@@ -10,7 +10,6 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
 import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
-import me.itzisonn_.meazy.runtime.environment.isInstanceOf
 
 class ReturnStatement(val value: Expression?) : LocalStatement {
     override val children = let {
@@ -47,11 +46,8 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
         value.emit(instructions, environment)
         val valueClassDesc = value.getType(environment).classDesc
         val returnTypeClassDesc = returnDataType.classDesc
-
-        if (!functionEnvironment.isInstanceOf(valueClassDesc, returnTypeClassDesc)) {
-            if (!instructions.convertPrimitiveOrBoxed(valueClassDesc, returnTypeClassDesc)) {
-                error("Function's return value not matches its return data type TODO")
-            }
+        if (!instructions.convertPrimitiveOrBoxed(valueClassDesc, returnTypeClassDesc, functionEnvironment)) {
+            error("Function's return value not matches its return data type TODO")
         }
 
         instructions.returnValue(returnTypeClassDesc)
