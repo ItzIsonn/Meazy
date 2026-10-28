@@ -8,14 +8,11 @@ import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 
 object NullCheckExpressionParsingFunction : EmptyParsingFunction<Expression>() {
     override fun Parser.parse(): Expression {
-        val checkExpression = parse(LogicalExpressionParsingFunction)
+        val checkExpression = parse(OrExpressionParsingFunction)
+        if (!isNext(questionColon)) return checkExpression
+        consume(questionColon, null)
 
-        if (isNext(questionColon)) {
-            consume(questionColon, null)
-            val nullExpression = parse(ExpressionParsingFunction)
-            return NullCheckExpression(checkExpression, nullExpression)
-        }
-
-        return checkExpression
+        val nullExpression = parse(ExpressionParsingFunction)
+        return NullCheckExpression(checkExpression, nullExpression)
     }
 }

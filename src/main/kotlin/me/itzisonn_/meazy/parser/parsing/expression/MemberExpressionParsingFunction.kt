@@ -19,9 +19,7 @@ object MemberExpressionParsingFunction : EmptyParsingFunction<Expression>() {
             val member = parse(CallExpressionParsingFunction)
 
             if (member !is Identifier && member !is CallExpression) {
-                throw UnexpectedTokenException(
-                    translatable("parser.exception.member_expression")
-                )
+                throw UnexpectedTokenException(translatable("parser.exception.member_expression"))
             }
 
             receiver = MemberExpression(receiver, member, isNullSafe)

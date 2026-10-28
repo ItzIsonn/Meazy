@@ -13,16 +13,13 @@ import me.itzisonn_.meazy.util.text.translatable
 object TypeCheckingExpressionParsingFunction : EmptyParsingFunction<Expression>() {
     override fun Parser.parse(): Expression {
         val value = parse(CastingExpressionParsingFunction)
+        if (!isNext(`is`)) return value
 
-        if (isNext(`is`)) {
-            val isInverted = consume(`is`, null).value.startsWith("!")
-            val id = consume(TokenTypes.id, translatable("parser.expected.after_keyword", "id", "is")).value
+        val isInverted = consume(`is`, null).value.startsWith("!")
+        val id = consume(TokenTypes.id, translatable("parser.expected.after_keyword", "id", "is")).value
 
-            val expression = TypeCheckingExpression(value, id)
-            return if (isInverted) OperatorExpression(expression, null, Operators.inversion)
-            else expression
-        }
-
-        return value
+        val expression = TypeCheckingExpression(value, id)
+        return if (isInverted) OperatorExpression(expression, null, Operators.inversion)
+        else expression
     }
 }

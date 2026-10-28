@@ -12,18 +12,9 @@ import me.itzisonn_.meazy.util.text.translatable
 object CallExpressionParsingFunction : EmptyParsingFunction<Expression>() {
     override fun Parser.parse(): Expression {
         val expression = parse(PrimaryExpressionParsingFunction)
+        if (!isNext(leftParenthesis)) return expression
 
-        if (isNext(leftParenthesis)) {
-            if (expression !is Identifier) {
-                throw InvalidSyntaxException(
-                    translatable("parser.exception.call_not_identifier")
-                )
-            }
-
-            val args = parseArgs()
-            return CallExpression(expression.id, args)
-        }
-
-        return expression
+        if (expression !is Identifier) throw InvalidSyntaxException(translatable("parser.exception.call_not_identifier"))
+        return CallExpression(expression.id, parseArgs())
     }
 }

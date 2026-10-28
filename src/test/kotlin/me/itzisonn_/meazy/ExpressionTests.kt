@@ -51,9 +51,15 @@ object ExpressionTests {
     }
 
     @Test
-    fun test_order_of_operations() {
-        val output = TestingHelper.loadAndRun("expression/order_of_operations")
+    fun test_order_of_math_operations() {
+        val output = TestingHelper.loadAndRun("expression/order_of_math_operations")
         assertEquals(asMultiline(7, 7, 9, 8, 10, 10, 8, 2, 54f), output)
+    }
+
+    @Test
+    fun test_order_of_logical_operations() {
+        val output = TestingHelper.loadAndRun("expression/order_of_logical_operations")
+        assertEquals(asMultiline(false, true, false, false, true, true, true, true, false, true, true, false, false, true, true, true), output)
     }
 
     @Test

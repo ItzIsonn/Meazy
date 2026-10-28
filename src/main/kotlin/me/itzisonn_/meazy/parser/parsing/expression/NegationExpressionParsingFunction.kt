@@ -9,12 +9,10 @@ import me.itzisonn_.meazy.parser.parsing.EmptyParsingFunction
 
 object NegationExpressionParsingFunction : EmptyParsingFunction<Expression>() {
     override fun Parser.parse(): Expression {
-        if (isNext(minus)) {
-            consume(minus, null)
-            val expression = parse(MemberExpressionParsingFunction)
-            return OperatorExpression(expression, null, negation)
-        }
+        if (!isNext(minus)) return parse(MemberExpressionParsingFunction)
+        consume(minus, null)
 
-        return parse(MemberExpressionParsingFunction)
+        val expression = parse(MemberExpressionParsingFunction)
+        return OperatorExpression(expression, null, negation)
     }
 }
