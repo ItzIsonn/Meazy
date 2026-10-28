@@ -22,15 +22,8 @@ object LocalStatementParsingFunction : EmptyParsingFunction<LocalStatement>() {
     override fun Parser.parse(): LocalStatement {
         val modifiers = parseModifiers()
 
-        if (isNext(variable)) {
-            return parse(
-                VariableDeclarationStatementParsingFunction,
-                Pair(modifiers, false)
-            )
-        }
-        if (modifiers.isNotEmpty()) throw InvalidSyntaxException(
-            translatable("parser.modifier.unexpected")
-        )
+        if (isNext(variable)) return parse(VariableDeclarationStatementParsingFunction, Pair(modifiers, false))
+        if (modifiers.isNotEmpty()) throw InvalidSyntaxException(translatable("parser.modifier.unexpected"))
 
         if (isNext(`if`)) return parse(IfStatementParsingFunction)
         if (isNext(`for`)) return parse(ForeachStatementParsingFunction)

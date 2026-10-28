@@ -7,14 +7,19 @@ import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
 import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.hasParent
 
-class BreakStatement : LocalStatement {
+class BreakStatement(val id: String?) : LocalStatement {
     override val children = setOf<ProgramUnit>()
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        val loopEnvironment = environment.getParentOrSelf<LoopEnvironment>()
-            ?: error("Parent environment for BREAK statement must be LoopEnvironment TODO")
+        val loopEnvironment = environment.getParentOrSelf<LoopEnvironment> { id == null || it.getId() == id }
+
+        if (loopEnvironment == null) {
+            if (!environment.hasParent<LoopEnvironment>()) error("Parent environment for BREAK statement must be LoopEnvironment TODO")
+            error("Can't find parent Loop with id $id")
+        }
 
         instructions.gotoLabel(loopEnvironment.getEndLabel())
     }

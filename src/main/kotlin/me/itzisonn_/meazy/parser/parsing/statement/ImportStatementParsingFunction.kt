@@ -12,11 +12,7 @@ object ImportStatementParsingFunction : EmptyParsingFunction<ImportStatement>() 
     override fun Parser.parse(): ImportStatement {
         consume(import, translatable("parser.expected.keyword", "import"))
 
-        val name = StringBuilder(
-            consume(
-                id, translatable("parser.expected.after_keyword", "id", "import")
-            ).value
-        )
+        val name = StringBuilder(consume(id, translatable("parser.expected.after_keyword", "id", "import")).value)
 
         while (isNext(dot)) {
             consume(dot, null)

@@ -14,6 +14,16 @@ fun println(v: String?) {
 }
 
 fun main() {
+    var a = 5
+    while (a > 0) #outer {
+        a--
+        for (b: Int in [3, 2, 1]) {
+            println("Counting down... " + b)
+            if (b == 0) break #outer
+            if (b == 1) break
+        }
+    }
+
     Test("Hi").ok()
     val cls: Ok = Inheritor()
     println(cls.test())

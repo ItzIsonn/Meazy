@@ -11,7 +11,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
  */
 interface Statement : ProgramUnit
 
-interface LocalStatement : Statement
+interface LocalStatement : Statement //TODO remove
 
 interface DeclarationStatement<T : Symbol> : Statement {
     context(parents: ParentMap, symbols: SymbolMap)

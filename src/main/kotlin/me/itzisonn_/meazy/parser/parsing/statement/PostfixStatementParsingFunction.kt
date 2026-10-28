@@ -13,10 +13,7 @@ import me.itzisonn_.meazy.util.text.translatable
 object PostfixStatementParsingFunction : EmptyParsingFunction<AssignmentStatement>() {
     override fun Parser.parse(): AssignmentStatement {
         val left = parse(ExpressionParsingFunction)
-        val token = consume(
-            operatorPostfix,
-            translatable("parser.expected.end_statement", "operator_postfix", "postfix_statement")
-        )
+        val token = consume(operatorPostfix, translatable("parser.expected.end_statement", "operator_postfix", "postfix_statement"))
 
         val value = OperatorExpression(
             left,

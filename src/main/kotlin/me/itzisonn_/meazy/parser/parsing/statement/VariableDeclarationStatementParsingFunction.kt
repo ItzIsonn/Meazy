@@ -22,31 +22,15 @@ object VariableDeclarationStatementParsingFunction : PairParsingFunction<Variabl
         val dataType = parseDataType()
 
         if (!isNext(assign)) {
-            if (dataType == null) throw InvalidSyntaxException(
-                translatable("parser.exception.variable_without_datatype_and_value")
-            )
+            if (dataType == null) throw InvalidSyntaxException(translatable("parser.exception.variable_without_datatype_and_value"))
 
-            if (canBeConstantWithoutValue) return VariableDeclarationStatement(
-                modifiers,
-                isConstant,
-                variableId,
-                dataType,
-                null
-            )
-            if (isConstant) throw InvalidSyntaxException(
-                translatable("parser.exception.constant_without_value")
-            )
+            if (canBeConstantWithoutValue) return VariableDeclarationStatement(modifiers, isConstant, variableId, dataType, null)
+            if (isConstant) throw InvalidSyntaxException(translatable("parser.exception.constant_without_value"))
+
             return VariableDeclarationStatement(modifiers, false, variableId, dataType, NullLiteral())
         }
 
         consume(assign, translatable("parser.expected.after", "assign", "id"))
-
-        return VariableDeclarationStatement(
-            modifiers,
-            isConstant,
-            variableId,
-            dataType,
-            parse(ExpressionParsingFunction)
-        )
+        return VariableDeclarationStatement(modifiers, isConstant, variableId, dataType, parse(ExpressionParsingFunction))
     }
 }

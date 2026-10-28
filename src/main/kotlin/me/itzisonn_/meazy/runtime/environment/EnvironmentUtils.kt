@@ -26,9 +26,9 @@ fun Environment.hasParent(target: Environment): Boolean {
  * @param predicate Predicate that matches parent environment
  * @return Whether this environment has requested parent
  */
-fun Environment.hasParent(predicate: (Environment?) -> Boolean): Boolean {
-    val parent = getParent()
-    return predicate(parent) || parent != null && parent.hasParent(predicate)
+fun Environment.hasParent(predicate: (Environment) -> Boolean): Boolean {
+    val parent = getParent() ?: return false
+    return predicate(parent) || parent.hasParent(predicate)
 }
 
 /**
@@ -36,7 +36,7 @@ fun Environment.hasParent(predicate: (Environment?) -> Boolean): Boolean {
  * @param predicate Predicate that matches parent environment
  * @return Whether this environment has requested parent
  */
-fun Environment.hasParentOrSelf(predicate: (Environment?) -> Boolean) = predicate(this) || hasParent(predicate)
+fun Environment.hasParentOrSelf(predicate: (Environment) -> Boolean) = predicate(this) || hasParent(predicate)
 
 /**
  * Searches for environment that is instance of given class in all parents of given environment
@@ -68,6 +68,49 @@ fun <T : Environment> Environment.hasParentOrSelf(cls: KClass<T>) = cls.isInstan
  */
 inline fun <reified T : Environment> Environment.hasParentOrSelf() = hasParentOrSelf(T::class)
 
+/**
+ * Searches for environment that is instance of given class and matches given predicate in all parents of given environment
+ * @param cls Class of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return Whether this environment has parent that is instance of given class and matches given predicate
+ */
+fun <T : Environment> Environment.hasParent(cls: KClass<T>, predicate: (T) -> Boolean): Boolean {
+    val parent = getParent() ?: return false
+    if (cls.isInstance(parent)) {
+        val castedParent = cls.cast(parent)
+        if (predicate(castedParent)) return true
+    }
+    return parent.hasParent(cls, predicate)
+}
+
+/**
+ * Searches for environment that is instance of given class and matches given predicate in all parents of given environment
+ * @param T Type of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return  Whether this environment has parent that is instance of given class and matches given predicate
+ */
+@JvmName("hasParentOfType")
+inline fun <reified T : Environment> Environment.hasParent(noinline predicate: (T) -> Boolean) = hasParent(T::class, predicate)
+
+/**
+ * Searches for environment that is instance of given class and matches given predicate in given environment and all of its parents
+ * @param cls Class of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return Whether this environment or its parent is instance of given class and matches given predicate
+ */
+fun <T : Environment> Environment.hasParentOrSelf(cls: KClass<T>, predicate: (T) -> Boolean): Boolean {
+    return cls.isInstance(this) && predicate(cls.cast(this)) || hasParent(cls, predicate)
+}
+
+/**
+ * Searches for environment that is instance of given class and matches given predicate in given environment and all of its parents
+ * @param T Type of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return Whether this environment or its parent is instance of given class and matches given predicate
+ */
+@JvmName("hasParentOrSelfOfType")
+inline fun <reified T : Environment> Environment.hasParentOrSelf(noinline predicate: (T) -> Boolean) = hasParentOrSelf(T::class, predicate)
+
 
 
 /**
@@ -75,9 +118,9 @@ inline fun <reified T : Environment> Environment.hasParentOrSelf() = hasParentOr
  * @param predicate Predicate that matches parent environment
  * @return Parent that matches given predicate or null
  */
-fun Environment.getParent(predicate: (Environment?) -> Boolean): Environment? = getParent().let { parent ->
+fun Environment.getParent(predicate: (Environment) -> Boolean): Environment? = getParent()?.let { parent ->
     if (predicate(parent)) parent
-    else parent?.getParent(predicate)
+    else parent.getParent(predicate)
 }
 
 /**
@@ -85,7 +128,7 @@ fun Environment.getParent(predicate: (Environment?) -> Boolean): Environment? = 
  * @param predicate Predicate that matches parent environment
  * @return Parent or given environment that matches given predicate or null
  */
-fun Environment.getParentOrSelf(predicate: (Environment?) -> Boolean): Environment? {
+fun Environment.getParentOrSelf(predicate: (Environment) -> Boolean): Environment? {
     if (predicate(this)) return this
     return getParent(predicate)
 }
@@ -124,6 +167,53 @@ fun <T : Environment> Environment.getParentOrSelf(cls: KClass<T>): T? {
  * @return Parent or given environment of given class or null
  */
 inline fun <reified T : Environment> Environment.getParentOrSelf() = getParentOrSelf(T::class)
+
+/**
+ * Searches for environment that is instance of given class and matches given predicate in all parents of given environment
+ * @param cls Class of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return Parent of given class and that matches given predicate or null
+ */
+fun <T : Environment> Environment.getParent(cls: KClass<T>, predicate: (T) -> Boolean): T? {
+    val parent = getParent() ?: return null
+    if (cls.isInstance(parent)) {
+        val castedParent = cls.cast(parent)
+        if (predicate(castedParent)) return castedParent
+    }
+    return parent.getParent(cls, predicate)
+}
+
+/**
+ * Searches for environment that is instance of given class and matches given predicate in all parents of given environment
+ * @param T Type of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return Parent of given class and that matches given predicate or null
+ */
+@JvmName("getParentOfType")
+inline fun <reified T : Environment> Environment.getParent(noinline predicate: (T) -> Boolean) = getParent(T::class, predicate)
+
+/**
+ * Searches for environment that is instance of given class and matches given predicate in given environment and all of its parents
+ * @param cls Class of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return Parent or given environment of given class and that matches given predicate or null
+ */
+fun <T : Environment> Environment.getParentOrSelf(cls: KClass<T>, predicate: (T) -> Boolean): T? {
+    if (cls.isInstance(this)) {
+        val castedThis = cls.cast(this)
+        if (predicate(castedThis)) return castedThis
+    }
+    return getParent(cls, predicate)
+}
+
+/**
+ * Searches for environment that is instance of given class and matches given predicate in given environment and all of its parents
+ * @param T Type of parent environment
+ * @param predicate Predicate that matches parent environment
+ * @return Parent or given environment of given class and that matches given predicate or null
+ */
+@JvmName("getParentOrSelfOfType")
+inline fun <reified T : Environment> Environment.getParentOrSelf(noinline predicate: (T) -> Boolean) = getParentOrSelf(T::class, predicate)
 
 
 

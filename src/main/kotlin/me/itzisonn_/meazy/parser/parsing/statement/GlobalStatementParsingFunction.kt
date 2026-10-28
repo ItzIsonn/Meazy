@@ -14,33 +14,10 @@ object GlobalStatementParsingFunction : EmptyParsingFunction<Statement>() {
     override fun Parser.parse(): Statement {
         val modifiers = parseModifiers()
 
-        if (isNext(`class`)) {
-            return parse(
-                ClassDeclarationStatementParsingFunction,
-                modifiers
-            )
-        }
-
-        if (isNext(`interface`)) {
-            return parse(
-                InterfaceDeclarationStatementParsingFunction,
-                modifiers
-            )
-        }
-
-        if (isNext(function)) {
-            return parse(
-                FunctionDeclarationStatementParsingFunction,
-                Pair(modifiers, false)
-            )
-        }
-
-        if (isNext(variable)) {
-            return parse(
-                VariableDeclarationStatementParsingFunction,
-                Pair(modifiers, false)
-            )
-        }
+        if (isNext(`class`)) return parse(ClassDeclarationStatementParsingFunction, modifiers)
+        if (isNext(`interface`)) return parse(InterfaceDeclarationStatementParsingFunction, modifiers)
+        if (isNext(function)) return parse(FunctionDeclarationStatementParsingFunction, Pair(modifiers, false))
+        if (isNext(variable)) return parse(VariableDeclarationStatementParsingFunction, Pair(modifiers, false))
 
         throw InvalidStatementException(translatable("parser.exception.global_statement"))
     }

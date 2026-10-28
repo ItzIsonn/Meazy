@@ -8,9 +8,11 @@ import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
+import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
 import java.lang.constant.ConstantDescs
 
 class WhileStatement(
+    val id: String?,
     val condition: Expression,
     val body: List<LocalStatement>
 ) : LocalStatement {
@@ -24,9 +26,13 @@ class WhileStatement(
             throw RuntimeException("While statement must always use boolean TODO")
         }
 
+        if (id != null && environment.hasParentOrSelf<LoopEnvironment> { it.getId() == id }) {
+            error("Loop with id $id already exists")
+        }
+
         val conditionLabel = instructions.createAndInitLabel()
         val endLabel = instructions.createAndInitLabel()
-        val loopEnvironment = LoopEnvironment(environment, conditionLabel, endLabel)
+        val loopEnvironment = LoopEnvironment(environment, id, conditionLabel, endLabel)
 
         instructions.bindLabel(conditionLabel)
         condition.emit(instructions, environment)

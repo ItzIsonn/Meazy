@@ -10,16 +10,7 @@ import me.itzisonn_.meazy.util.text.translatable
 object InterfaceBodyStatementParsingFunction : EmptyParsingFunction<Statement>() {
     override fun Parser.parse(): Statement {
         val modifiers = parseModifiers()
-
-        if (isNext(function)) {
-            return parse(
-                FunctionDeclarationStatementParsingFunction,
-                Pair(modifiers, true)
-            )
-        }
-
-        throw InvalidStatementException(
-            translatable("parser.expected.statement", "interface_body")
-        )
+        if (isNext(function)) return parse(FunctionDeclarationStatementParsingFunction, Pair(modifiers, true))
+        throw InvalidStatementException(translatable("parser.expected.statement", "interface_body"))
     }
 }

@@ -1,7 +1,8 @@
 package me.itzisonn_.meazy.parser.parsing.statement
 
-import me.itzisonn_.meazy.lexer.TokenTypes
 import me.itzisonn_.meazy.lexer.TokenTypes.`for`
+import me.itzisonn_.meazy.lexer.TokenTypes.hash
+import me.itzisonn_.meazy.lexer.TokenTypes.id
 import me.itzisonn_.meazy.lexer.TokenTypes.`in`
 import me.itzisonn_.meazy.lexer.TokenTypes.leftParenthesis
 import me.itzisonn_.meazy.lexer.TokenTypes.rightParenthesis
@@ -16,26 +17,23 @@ import me.itzisonn_.meazy.util.text.translatable
 object ForeachStatementParsingFunction : EmptyParsingFunction<ForeachStatement>() {
     override fun Parser.parse(): ForeachStatement {
         consume(`for`, translatable("parser.expected.keyword", "for"))
-        consume(
-            leftParenthesis,
-            translatable("parser.expected.start", "left_parenthesis", "for_condition")
-        )
+        consume(leftParenthesis, translatable("parser.expected.start", "left_parenthesis", "for_condition"))
 
-        val id = consume(TokenTypes.id, translatable("parser.expected", "id")).value
-
-        val dataType = parseDataType() ?: throw InvalidSyntaxException(
-            translatable("parser.exception.foreach_variable_without_datatype")
-        )
+        val variableId = consume(id, translatable("parser.expected", "id")).value
+        val dataType = parseDataType() ?: throw InvalidSyntaxException(translatable("parser.exception.foreach_variable_without_datatype"))
 
         consume(`in`, translatable("parser.expected.after_statement", "in", "variable_declaration"))
         val collection = parse(ExpressionParsingFunction)
 
-        consume(
-            rightParenthesis,
-            translatable("parser.expected.end", "right_parenthesis", "for_condition")
-        )
+        consume(rightParenthesis, translatable("parser.expected.end", "right_parenthesis", "for_condition"))
+
+        val id = if (isNext(hash)) {
+            consume(hash, null)
+            consume(id, translatable("parser.expected.after", "id", "hash")).value
+        }
+        else null
 
         val body = parseBody(LocalStatementParsingFunction, false)
-        return ForeachStatement(id, dataType, collection, body)
+        return ForeachStatement(id, variableId, dataType, collection, body)
     }
 }

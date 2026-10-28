@@ -13,26 +13,9 @@ object ClassBodyStatementParsingFunction : EmptyParsingFunction<Statement>() {
     override fun Parser.parse(): Statement {
         val modifiers = parseModifiers()
 
-        if (isNext(function)) {
-            return parse(
-                FunctionDeclarationStatementParsingFunction,
-                Pair(modifiers, false)
-            )
-        }
-
-        if (isNext(variable)) {
-            return parse(
-                VariableDeclarationStatementParsingFunction,
-                Pair(modifiers, true)
-            )
-        }
-
-        if (isNext(constructor)) {
-            return parse(
-                ConstructorDeclarationStatementParsingFunction,
-                modifiers
-            )
-        }
+        if (isNext(function)) return parse(FunctionDeclarationStatementParsingFunction, Pair(modifiers, false))
+        if (isNext(variable)) return parse(VariableDeclarationStatementParsingFunction, Pair(modifiers, true))
+        if (isNext(constructor)) return parse(ConstructorDeclarationStatementParsingFunction, modifiers)
 
         throw InvalidStatementException(translatable("parser.expected.statement", "class_body"))
     }

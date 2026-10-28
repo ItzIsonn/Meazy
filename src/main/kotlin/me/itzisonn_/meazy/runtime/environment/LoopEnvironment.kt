@@ -8,6 +8,7 @@ import kotlin.uuid.Uuid
  * Represents environment for loops
  */
 sealed interface LoopEnvironment : LocalVariableDeclarationEnvironment {
+    fun getId(): String?
     override fun getStartLabel(): Uuid
     override fun getEndLabel(): Uuid
 }
@@ -16,10 +17,12 @@ sealed interface LoopEnvironment : LocalVariableDeclarationEnvironment {
 
 private class LoopEnvironmentImpl(
     parent: Environment,
+    private val id: String?,
     startLabel: Uuid,
     endLabel: Uuid
 ) : LoopEnvironment,
     LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
+    override fun getId() = id
     override fun getStartLabel() = super.getStartLabel() ?: error("StartLabel is null")
     override fun getEndLabel() = super.getEndLabel() ?: error("EndLabel is null")
 }
@@ -32,5 +35,5 @@ private class LoopEnvironmentImpl(
  * @param parent Parent
  * @return New loop environment
  */
-fun LoopEnvironment(parent: Environment, startLabel: Uuid, endLabel: Uuid): LoopEnvironment =
-    LoopEnvironmentImpl(parent, startLabel, endLabel)
+fun LoopEnvironment(parent: Environment, id: String?, startLabel: Uuid, endLabel: Uuid): LoopEnvironment =
+    LoopEnvironmentImpl(parent, id, startLabel, endLabel)

@@ -12,12 +12,14 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
+import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
 class ForeachStatement(
-    val id: String,
+    val id: String?,
+    val variableId: String,
     val dataType: DataType,
     val collection: Expression,
     val body: List<LocalStatement>
@@ -30,6 +32,10 @@ class ForeachStatement(
     override fun emit(instructions: InstructionsSet, environment: Environment) {
         if (environment !is LocalVariableDeclarationEnvironment) {
             throw RuntimeException("Foreach statement must be inside variableDeclarationEnvironment TODO")
+        }
+
+        if (id != null && environment.hasParentOrSelf<LoopEnvironment> { it.getId() == id }) {
+            error("Loop with id $id already exists")
         }
 
         val iterableVariableValue = environment.declareVariable(
@@ -51,7 +57,7 @@ class ForeachStatement(
 
         val conditionLabel = instructions.createAndInitLabel()
         val endLabel = instructions.createAndInitLabel()
-        val loopEnvironment = LoopEnvironment(environment, conditionLabel, endLabel)
+        val loopEnvironment = LoopEnvironment(environment, id, conditionLabel, endLabel)
 
         instructions.bindLabel(conditionLabel)
 
@@ -79,11 +85,11 @@ class ForeachStatement(
             instructions.unboxPrimitive(dataType.classDesc)
         }
 
-        val variableValue = loopEnvironment.declareVariable(id, dataType, true, null, setOf())
+        val variableValue = loopEnvironment.declareVariable(variableId, dataType, true, null, setOf())
         instructions.storeLocal(variableValue.dataType.classDesc, variableValue.slot)
         instructions.setLocalName(
             variableValue.slot,
-            id,
+            variableId,
             variableValue.dataType.classDesc,
             conditionLabel,
             endLabel

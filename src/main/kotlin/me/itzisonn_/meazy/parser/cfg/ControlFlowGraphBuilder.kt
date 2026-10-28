@@ -135,7 +135,7 @@ class ControlFlowGraphBuilder {
         iteratorBlock.terminator = Terminator.ConditionalJump(
             TerminatorCondition.ForeachHasNext(
                 statement.collection,
-                statement.id,
+                statement.variableId,
                 statement.dataType
             ),
             bodyBlock,
