@@ -8,9 +8,7 @@ import me.itzisonn_.meazy.util.text.translatable
 import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
 import java.io.File
-import java.io.IOException
 import java.lang.constant.ClassDesc
-import java.nio.file.Files
 import kotlin.system.measureTimeMillis
 
 val compileAndRunCommand = Command("compile_and_run") {
@@ -44,25 +42,8 @@ val compileAndRunCommand = Command("compile_and_run") {
                     classes = RuntimeFunctions.compileProgram(program)
 
                     val outputDirectory = File(getArgument(outputArg))
-                    if (!outputDirectory.exists()) {
-                        if (!outputDirectory.mkdirs()) {
-                            return@executes CommandResult.Failure(
-                                translatable("file.cant_create", outputDirectory.absolutePath)
-                            )
-                        }
-                    }
-                    else outputDirectory.listFiles()?.forEach { it.delete() }
-
-                    for ((classDesc, classFile) in classes) {
-                        val outputFile = File(outputDirectory, classDesc.displayName() + ".class")
-
-                        try {
-                            Files.write(outputFile.toPath(), classFile)
-                        }
-                        catch (e: IOException) {
-                            throw RuntimeException(e)
-                        }
-                    }
+                    val result = CommandUtils.outputClasses(outputDirectory, classes)
+                    if (result is CommandResult.Failure) return@executes result
                 }
 
                 Logger.log(
