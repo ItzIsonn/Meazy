@@ -12,7 +12,6 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import me.itzisonn_.meazy.util.version.Version
-import java.io.File
 import java.lang.classfile.attribute.InnerClassesAttribute
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
@@ -20,49 +19,34 @@ import java.lang.constant.MethodTypeDesc
 import java.lang.reflect.AccessFlag
 
 class Program(
-    file: File?,
+    val name: String,
     val version: Version,
-    private val _body: List<Statement>
+    body: List<Statement>
 ) : DeclarationStatement<FileSymbol> {
-    val file: File
+    val body = body.toList()
 
-    override val children = _body.toSet()
-
-    init {
-        require(file?.exists() != false) { "File doesn't exist" }
-        require(file?.isDirectory() != true) { "File can't be directory" }
-
-        this.file = file ?: File("internal.mea")
-    }
+    override val children = body.toSet()
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun declare(environment: Environment) {
         if (environment !is GlobalEnvironment) throw RuntimeException("Environment must be global")
-        val path = file.absolutePath.split("\\\\".toRegex()).dropLastWhile { it.isEmpty() }
 
-        var id = file.nameWithoutExtension
-        id = id.take(1).uppercase() + id.substring(1)
+        val packageName = body.filterIsInstance<PackageStatement>().firstOrNull()?.name ?: ""
+        val className = name.take(1).uppercase() + name.substring(1) + "Mea"
 
-        val fileEnvironment = FileEnvironment(
-            environment,
-            path[path.size - 2],
-            id
-        )
+        val fileEnvironment = FileEnvironment(environment, packageName, className)
+        val symbol = FileSymbol(packageName, className, fileEnvironment)
 
-        val symbol = FileSymbol(
-            path[path.size - 2], id,
-            fileEnvironment
-        )
         declareSymbol(symbol)
         environment.addFileEnvironment(fileEnvironment)
 
-        for (statement in _body) {
+        for (statement in body) {
             if (statement is ImportStatement) {
                 fileEnvironment.addImport(statement.name)
             }
         }
 
-        for (statement in _body) {
+        for (statement in body) {
             if (statement is DeclarationStatement<*>) {
                 statement.declare(fileEnvironment)
             }
@@ -71,7 +55,7 @@ class Program(
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
-        for (statement in _body) {
+        for (statement in body) {
             if (statement is DeclarationStatement<*>) {
                 statement.resolve(symbol.environment)
             }
@@ -84,7 +68,7 @@ class Program(
         val fileEnvironment = symbol.environment
 
         val attributes = mutableListOf<InnerClassesAttribute>()
-        for (statement in _body) {
+        for (statement in body) {
             if (statement !is ClassDeclarationStatement) continue
             if (Modifiers.private !in statement.modifiers) continue
             attributes.add(statement.getInnerClassesAttribute(fileEnvironment))
@@ -97,7 +81,7 @@ class Program(
             setOf(AccessFlag.PUBLIC, AccessFlag.FINAL),
             attributes
         ) {
-            for (statement in _body) {
+            for (statement in body) {
                 statement.emit(this, fileEnvironment)
             }
             withConstructor(

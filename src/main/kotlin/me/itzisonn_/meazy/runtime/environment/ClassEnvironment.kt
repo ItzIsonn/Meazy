@@ -155,7 +155,9 @@ private class ClassEnvironmentImpl(
                 if (Modifiers.private in _modifiers) getClassName()!! + "$"
                 else ""
 
-            return getPackageName()!! + "." + classSpecifier + id
+            var packageName = getPackageName() ?: ""
+            if (packageName.isNotEmpty()) packageName += "."
+            return packageName + classSpecifier + id
         }
 
     override val classDesc: ClassDesc get() = ClassDesc.of(fullClassName)

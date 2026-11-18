@@ -37,7 +37,7 @@ val compileCommand = Command("compile") {
 
                 val compilingTime = measureTimeMillis {
                     val tokens = RuntimeFunctions.tokenize(file.readText())
-                    val program = RuntimeFunctions.parseTokens(file, tokens)
+                    val program = RuntimeFunctions.parseTokens(file.nameWithoutExtension, tokens)
                     val classes = RuntimeFunctions.compileProgram(program)
 
                     val outputDirectory = File(getArgument(outputArg))

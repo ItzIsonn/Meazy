@@ -12,7 +12,6 @@ import me.itzisonn_.meazy.parser.parsing.Parser
 import me.itzisonn_.meazy.parser.ast.statement.Program
 import me.itzisonn_.meazy.parser.parsing.statement.ProgramParsingFunction
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
-import java.io.File
 import java.lang.constant.ClassDesc
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -66,9 +65,9 @@ object RuntimeFunctions {
 
 
 
-    fun parseTokens(file: File?, tokens: List<Token>): Program {
+    fun parseTokens(programName: String, tokens: List<Token>): Program {
         val parser = Parser(tokens)
-        return parser.parse(ProgramParsingFunction, file)
+        return parser.parse(ProgramParsingFunction, programName)
     }
 
 

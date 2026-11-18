@@ -73,7 +73,12 @@ private class FileEnvironmentImpl(
 
     override fun getParent() = super.getParent() as GlobalEnvironment
     override val isShared = true
-    override val fullClassName get() = "$packageName.$className"
+    override val fullClassName: String
+        get() {
+            var packageName = packageName
+            if (packageName.isNotEmpty()) packageName += "."
+            return packageName + className
+        }
 
 
 

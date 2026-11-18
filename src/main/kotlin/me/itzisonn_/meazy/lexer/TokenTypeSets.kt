@@ -1,5 +1,6 @@
 package me.itzisonn_.meazy.lexer
 
+import me.itzisonn_.meazy.lexer.TokenTypes.`as`
 import me.itzisonn_.meazy.lexer.TokenTypes.`import`
 import me.itzisonn_.meazy.lexer.TokenTypes.variable
 import me.itzisonn_.meazy.lexer.TokenTypes.function
@@ -61,7 +62,7 @@ object TokenTypeSets {
                 "keywords",
                 `import`, variable, function, `class`, `interface`,
                 `constructor`, base, `if`, `else`, `for`, `in`, `while`,
-                `return`, `continue`, `break`, `is`, `null`, boolean, `this`
+                `return`, `continue`, `break`, `is`, `as`, `null`, boolean, `this`
             )
         )
 

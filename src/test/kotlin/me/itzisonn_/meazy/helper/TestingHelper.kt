@@ -2,6 +2,8 @@ package me.itzisonn_.meazy.helper
 
 import me.itzisonn_.meazy.Meazy
 import me.itzisonn_.meazy.runtime.RuntimeFunctions
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.toPath
 
 object TestingHelper {
     fun initialize() {
@@ -10,24 +12,19 @@ object TestingHelper {
         }
     }
 
-    fun run(string: String) {
-        val tokens = RuntimeFunctions.tokenize(string)
-        val program = RuntimeFunctions.parseTokens(null, tokens)
+    fun run(name: String, contents: String) {
+        val tokens = RuntimeFunctions.tokenize(contents)
+        val program = RuntimeFunctions.parseTokens(name, tokens)
 
         val classes = RuntimeFunctions.compileProgram(program)
         RuntimeFunctions.loadClassesAndRun(classes)
     }
 
-    fun loadTest(path: String): String {
-        return this::class.java.getResourceAsStream("/test/$path.mea")
-            ?.bufferedReader()
-            ?.use { it.readText() }
-            ?: error("Can't load test with path '$path'")
-    }
-
     fun loadAndRun(path: String) = OutputInterceptor.capture {
-        val string = loadTest(path)
-        run(string)
+        val resource = this::class.java.getResource("/test/$path.mea") ?: error("Can't load test with path '$path'")
+        val fullPath = resource.toURI().toPath().nameWithoutExtension
+        val contents = resource.readText()
+        run(fullPath, contents)
     }.replace(System.lineSeparator(), "\n")
 }
 

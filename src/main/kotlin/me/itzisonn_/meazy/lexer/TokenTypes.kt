@@ -24,7 +24,8 @@ object TokenTypes {
 
         add(TokenType("comment", "\\/\\/[^\n]*", TokenBehavior.SKIP))
         add(TokenType("multi_line_comment", "\\/\\*(?:(?!\\*\\/).)*\\*\\/", TokenBehavior.SKIP))
-        
+
+        add(TokenType("package", "package"))
         add(TokenType("import", "import"))
         add(TokenType("variable", "var|val"))
         add(TokenType("function", "fun"))
@@ -111,6 +112,7 @@ object TokenTypes {
     val newLine get() = getNonNull("new_line")
     val endOfFile get() = getNonNull("end_of_file")
 
+    val `package` get() = getNonNull("package")
     val import get() = getNonNull("import")
     val variable get() = getNonNull("variable")
     val function get() = getNonNull("function")
