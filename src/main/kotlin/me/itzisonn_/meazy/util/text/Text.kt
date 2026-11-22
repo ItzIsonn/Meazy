@@ -1,7 +1,9 @@
 package me.itzisonn_.meazy.util.text
 
+import me.itzisonn_.meazy.util.toStringWithAdequateMillisRepresentation
 import java.io.PrintWriter
 import java.io.StringWriter
+import kotlin.time.Duration
 
 /**
  * Represents text
@@ -101,16 +103,22 @@ private class MergedText(texts: List<Text>) : Text {
 
 
 
-private fun convertArgs(vararg args: Any): MutableList<String> {
+private fun convertArgs(vararg args: Any): List<String> {
     val list = mutableListOf<String>()
 
     for (arg in args) {
-        if (arg is Throwable) {
-            val writer = StringWriter()
-            arg.printStackTrace(PrintWriter(writer, true))
-            list.add(writer.buffer.toString())
+        val string = when (arg) {
+            is Throwable -> {
+                val writer = StringWriter()
+                arg.printStackTrace(PrintWriter(writer, true))
+                writer.buffer.toString()
+            }
+
+            is Duration -> arg.toStringWithAdequateMillisRepresentation()
+            else -> arg.toString()
         }
-        else list.add(arg.toString())
+
+        list.add(string)
     }
 
     return list

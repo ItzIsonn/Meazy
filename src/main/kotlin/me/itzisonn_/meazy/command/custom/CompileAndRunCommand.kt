@@ -7,9 +7,10 @@ import me.itzisonn_.meazy.util.Result
 import me.itzisonn_.meazy.util.text.translatable
 import me.itzisonn_.meazy.util.logger.LogLevel
 import me.itzisonn_.meazy.util.logger.Logger
+import me.itzisonn_.meazy.util.toStringWithAdequateMillisRepresentation
 import java.io.File
 import java.lang.constant.ClassDesc
-import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
 val compileAndRunCommand = Command("compile_and_run") {
     argument("target", StringType) { targetArg ->
@@ -23,7 +24,7 @@ val compileAndRunCommand = Command("compile_and_run") {
                 }
 
                 val compileResult: Result<Map<ClassDesc, ByteArray>, CommandResult>
-                val compilingTime = measureTimeMillis {
+                val compilingTime = measureTime {
                     compileResult = CommandUtils.compile(file)
                 }
 
@@ -32,7 +33,7 @@ val compileAndRunCommand = Command("compile_and_run") {
                     is Result.Success -> {
                         val classes = compileResult.value
 
-                        val outputtingTime = measureTimeMillis {
+                        val outputtingTime = measureTime {
                             val outputDirectory = File(getArgument(outputArg))
                             val outputResult = CommandUtils.outputClasses(outputDirectory, classes)
                             if (outputResult is CommandResult.Failure) return@executes outputResult
@@ -40,18 +41,18 @@ val compileAndRunCommand = Command("compile_and_run") {
 
                         Logger.log(
                             LogLevel.INFO,
-                            translatable("commands.compile.info", (compilingTime + outputtingTime) / 1000.0)
+                            translatable("commands.compile.info", compilingTime + outputtingTime)
                         )
 
                         Logger.log(LogLevel.INFO, translatable("commands.run.running", file.absolutePath))
 
-                        val runningTime = measureTimeMillis {
+                        val runningTime = measureTime {
                             val runResult = CommandUtils.loadClassesAndRun(classes, file.absolutePath)
                             if (runResult is CommandResult.Failure) return@executes runResult
                         }
 
                         return@executes CommandResult.Success(
-                            translatable("commands.run.info", runningTime / 1000.0)
+                            translatable("commands.run.info", runningTime.toStringWithAdequateMillisRepresentation())
                         )
                     }
                 }

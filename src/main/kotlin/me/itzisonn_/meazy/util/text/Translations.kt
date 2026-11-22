@@ -20,18 +20,18 @@ object Translations {
         "commands.incorrect_args_amount" to "Incorrect number of arguments for command with id '{0}'",
         "commands.arg_doesnt_match" to "Given argument '{0}' at position {1} doesn't match any available arguments",
         "commands.available" to "Available commands:",
-        "commands.initialization_time" to "Initialized in {0}s",
+        "commands.initialization_time" to "Initialized in {0}",
 
         "commands.version" to "Meazy version {0}",
 
         "commands.run.running" to "Running file '{0}'",
         "commands.run.no_main_function" to "Can't find main function to run file '{0}'",
         "commands.run.multiple_main_functions" to "Found {0} main functions in attempt to run file '{1}'",
-        "commands.run.info" to "Executed in {0}s",
+        "commands.run.info" to "Executed in {0}",
 
         "commands.compile.compiling" to "Compiling file '{0}'",
         "commands.compile.no_files" to "Can't compile directory '{0}' because it doesn't have any .mea files",
-        "commands.compile.info" to "Compiled in {0}s",
+        "commands.compile.info" to "Compiled in {0}",
 
 
 

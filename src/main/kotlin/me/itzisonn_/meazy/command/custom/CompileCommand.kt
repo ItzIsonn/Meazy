@@ -7,7 +7,7 @@ import me.itzisonn_.meazy.util.Result
 import me.itzisonn_.meazy.util.text.translatable
 import java.io.File
 import java.lang.constant.ClassDesc
-import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
 val compileCommand = Command("compile") {
     argument("target", StringType) { targetArg ->
@@ -21,7 +21,7 @@ val compileCommand = Command("compile") {
                 }
 
                 val compileResult: Result<Map<ClassDesc, ByteArray>, CommandResult>
-                val compilingTime = measureTimeMillis {
+                val compilingTime = measureTime {
                     compileResult = CommandUtils.compile(file)
                 }
 
@@ -30,14 +30,14 @@ val compileCommand = Command("compile") {
                     is Result.Success -> {
                         val classes = compileResult.value
 
-                        val outputtingTime = measureTimeMillis {
+                        val outputtingTime = measureTime {
                             val outputDirectory = File(getArgument(outputArg))
                             val outputResult = CommandUtils.outputClasses(outputDirectory, classes)
                             if (outputResult is CommandResult.Failure) return@executes outputResult
                         }
 
                         return@executes CommandResult.Success(
-                            translatable("commands.compile.info", (compilingTime + outputtingTime) / 1000.0)
+                            translatable("commands.compile.info", compilingTime + outputtingTime)
                         )
                     }
                 }
