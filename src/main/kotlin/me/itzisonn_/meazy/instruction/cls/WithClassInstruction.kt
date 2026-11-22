@@ -1,4 +1,4 @@
-package me.itzisonn_.meazy.instruction.misc
+package me.itzisonn_.meazy.instruction.cls
 
 import me.itzisonn_.meazy.instruction.BytecodeBuilders
 import me.itzisonn_.meazy.instruction.Instruction

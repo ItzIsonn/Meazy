@@ -12,10 +12,12 @@ import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction
 import me.itzisonn_.meazy.instruction.local.StoreLocalInstruction
 import me.itzisonn_.meazy.instruction.method.*
 import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction.InvokeType
-import me.itzisonn_.meazy.instruction.misc.CastInstruction
-import me.itzisonn_.meazy.instruction.misc.InstanceOfInstruction
-import me.itzisonn_.meazy.instruction.misc.ReturnInstruction
-import me.itzisonn_.meazy.instruction.misc.WithClassInstruction
+import me.itzisonn_.meazy.instruction.cls.CastInstruction
+import me.itzisonn_.meazy.instruction.cls.InstanceOfInstruction
+import me.itzisonn_.meazy.instruction.method.ReturnInstruction
+import me.itzisonn_.meazy.instruction.cls.WithClassInstruction
+import me.itzisonn_.meazy.instruction.control_flow.IfThenElseInstruction
+import me.itzisonn_.meazy.instruction.control_flow.IfThenInstruction
 import me.itzisonn_.meazy.instruction.number.*
 import me.itzisonn_.meazy.instruction.number.ArithmeticOperationInstruction.ArithmeticOperation
 import me.itzisonn_.meazy.instruction.number.LogicalOperationInstruction.LogicalOperation
@@ -259,6 +261,16 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
 
     fun gotoLabelIfReferenceComparisonTrue(operation: ComparisonOperation, uuid: Uuid) {
         with(GotoLabelIfReferenceComparisonTrueInstruction(operation, uuid))
+    }
+
+
+
+    fun ifThen(thenInstructions: InstructionsSet.() -> Unit) {
+        with(IfThenInstruction(thenInstructions))
+    }
+
+    fun ifThenElse(thenInstructions: InstructionsSet.() -> Unit, elseInstructions: InstructionsSet.() -> Unit) {
+        with(IfThenElseInstruction(thenInstructions, elseInstructions))
     }
 
 

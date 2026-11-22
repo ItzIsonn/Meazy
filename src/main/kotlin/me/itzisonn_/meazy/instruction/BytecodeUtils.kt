@@ -8,17 +8,10 @@ import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
 fun InstructionsSet.invertBoolean() {
-    val trueLabel = createAndInitLabel()
-    val endLabel = createAndInitLabel()
-    gotoLabelIfEqualsZero(trueLabel)
-
-    loadConstant(0)
-    gotoLabel(endLabel)
-
-    bindLabel(trueLabel)
-    loadConstant(1)
-
-    bindLabel(endLabel)
+    ifThenElse(
+        { loadConstant(0) },
+        { loadConstant(1) }
+    )
 }
 
 
