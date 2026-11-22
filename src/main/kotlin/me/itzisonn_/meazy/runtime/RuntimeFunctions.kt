@@ -13,12 +13,6 @@ import me.itzisonn_.meazy.parser.ast.statement.Program
 import me.itzisonn_.meazy.parser.parsing.statement.ProgramParsingFunction
 import me.itzisonn_.meazy.runtime.environment.GlobalEnvironment
 import java.lang.constant.ClassDesc
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
-import kotlin.reflect.KCallable
-import kotlin.reflect.KVisibility
-import kotlin.reflect.typeOf
 
 object RuntimeFunctions {
     fun tokenize(string: String): List<Token> {
@@ -72,18 +66,28 @@ object RuntimeFunctions {
 
 
 
-    fun compileProgram(program: Program): Map<ClassDesc, ByteArray> {
+    fun compilePrograms(programs: List<Program>): Map<ClassDesc, ByteArray> {
         val globalEnvironment = GlobalEnvironment()
-        val parentMap = ParentMap(program)
         val symbolMap = SymbolMap()
 
         val bytecodeBuilders = BytecodeBuilders.of(null, null)
         val instructionsSet = InstructionsSet(bytecodeBuilders)
 
-        context(parentMap, symbolMap) {
-            program.declare(globalEnvironment)
-            program.resolve(globalEnvironment)
-            program.emit(instructionsSet, globalEnvironment)
+        val parentMaps = programs.associateWith { program -> ParentMap(program) }
+        fun Program.parentMap() = parentMaps[this] ?: error("There's no ParentMap for program $name")
+
+        context(symbolMap) {
+            for (program in programs) {
+                context(program.parentMap()) { program.declare(globalEnvironment) }
+            }
+
+            for (program in programs) {
+                context(program.parentMap()) { program.resolve(globalEnvironment) }
+            }
+
+            for (program in programs) {
+                context(program.parentMap()) { program.emit(instructionsSet, globalEnvironment) }
+            }
         }
 
         for (instruction in instructionsSet.instructions) {
@@ -91,36 +95,5 @@ object RuntimeFunctions {
         }
 
         return bytecodeBuilders.classes
-    }
-
-
-
-    fun loadClassesAndRun(classes: Map<ClassDesc, ByteArray>) {
-        val classLoader = ClassLoaderWrapper()
-        val mainMethods = mutableSetOf<KCallable<*>>()
-
-        for ((classDesc, classFile) in classes) {
-            val loadedClass = classLoader.defineClass(classFile).kotlin
-
-            val method = loadedClass.members.find { it.name == "main" }
-            if (method == null) {
-                System.err.println("No method main in class $classDesc")
-                continue
-            }
-
-            if (method.returnType != typeOf<Unit>() || method.parameters.isNotEmpty()) {
-                System.err.println("Main method has invalid signature in class $classDesc") //TODO
-                continue
-            }
-
-            if (method.visibility != KVisibility.PUBLIC) {
-                System.err.println("Main method is inaccessible in class $classDesc")
-                continue
-            }
-
-            mainMethods += method
-        }
-
-        mainMethods.forEach { it.call() }
     }
 }

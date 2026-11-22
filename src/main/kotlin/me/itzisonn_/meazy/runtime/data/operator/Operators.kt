@@ -3,7 +3,7 @@ package me.itzisonn_.meazy.runtime.data.operator
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
 import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
+import me.itzisonn_.meazy.instruction.label.ComparisonOperation
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
@@ -102,6 +102,25 @@ fun InstructionsSet.compare(
     val rightNumberType = valueOf(rightType.classDesc)
 
     if (leftNumberType == null || rightNumberType == null) {
+        if (operation == ComparisonOperation.EQUALS || operation == ComparisonOperation.NOT_EQUALS) {
+            if (leftType.isNullable || rightType.isNullable) error("Can't compare nullable references")
+            val trueLabel = createAndInitLabel()
+            val endLabel = createAndInitLabel()
+
+            left.emit(this, environment)
+            right.emit(this, environment)
+
+            gotoLabelIfReferenceComparisonTrue(operation, trueLabel)
+            loadConstant(0)
+            gotoLabel(endLabel)
+
+            bindLabel(trueLabel)
+            loadConstant(1)
+
+            bindLabel(endLabel)
+            return
+        }
+
         error("Can't compare values $leftType and $rightType") //TODO
     }
 
@@ -117,7 +136,7 @@ fun InstructionsSet.compare(
     right.emit(this, environment)
     convertToNumberType(rightNumberType, commonNumberType)
 
-    gotoLabelIfComparisonTrue(commonNumberType, operation, trueLabel)
+    gotoLabelIfNumberComparisonTrue(commonNumberType, operation, trueLabel)
     loadConstant(0)
     gotoLabel(endLabel)
 

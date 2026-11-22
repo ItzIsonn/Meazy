@@ -7,6 +7,7 @@ import java.lang.Number
 import java.lang.System
 import java.io.PrintStream
 import java.io.Closeable
+import Wow
 
 var testing = 52
 val test2 = testing + 1
@@ -30,6 +31,8 @@ fun main() {
     val cls: Ok = Inheritor()
     println(cls.test())
     System.out.println(cls.pupok())
+
+    Wow()
 }
 
 class Test {

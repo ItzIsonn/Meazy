@@ -25,11 +25,12 @@ object Translations {
         "commands.version" to "Meazy version {0}",
 
         "commands.run.running" to "Running file '{0}'",
-        "commands.run.incompatible_version" to "Can't run file that has been compiled by a more recent version of the Meazy ({0}) in an older version ({1})",
-        "commands.run.unsafe" to "It's unsafe to run file that has been compiled by an older version of the Meazy ({0}) in a more recent version ({1})",
+        "commands.run.no_main_function" to "Can't find main function to run file '{0}'",
+        "commands.run.multiple_main_functions" to "Found {0} main functions in attempt to run file '{1}'",
         "commands.run.info" to "Executed in {0}s",
 
         "commands.compile.compiling" to "Compiling file '{0}'",
+        "commands.compile.no_files" to "Can't compile directory '{0}' because it doesn't have any .mea files",
         "commands.compile.info" to "Compiled in {0}s",
 
 

@@ -5,7 +5,7 @@ import me.itzisonn_.meazy.instruction.Instruction
 import me.itzisonn_.meazy.instruction.NumberType
 import kotlin.uuid.Uuid
 
-class GotoLabelIfComparisonTrueInstruction(
+class GotoLabelIfNumberComparisonTrueInstruction(
     private val type: NumberType,
     private val operation: ComparisonOperation,
     private val uuid: Uuid
@@ -42,14 +42,5 @@ class GotoLabelIfComparisonTrueInstruction(
             ComparisonOperation.LESS -> codeBuilder.iflt(label)
             ComparisonOperation.LESS_OR_EQUALS -> codeBuilder.ifle(label)
         }
-    }
-
-    enum class ComparisonOperation {
-        EQUALS,
-        NOT_EQUALS,
-        GREATER,
-        GREATER_OR_EQUALS,
-        LESS,
-        LESS_OR_EQUALS
     }
 }

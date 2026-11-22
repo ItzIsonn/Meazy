@@ -1,7 +1,7 @@
 package me.itzisonn_.meazy.runtime.data.operator.custom
 
 import me.itzisonn_.meazy.instruction.InstructionsSet
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
+import me.itzisonn_.meazy.instruction.label.ComparisonOperation
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.data.DataType

@@ -1,6 +1,7 @@
 package me.itzisonn_.meazy.helper
 
 import me.itzisonn_.meazy.Meazy
+import me.itzisonn_.meazy.command.custom.CommandUtils
 import me.itzisonn_.meazy.runtime.RuntimeFunctions
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.toPath
@@ -16,8 +17,8 @@ object TestingHelper {
         val tokens = RuntimeFunctions.tokenize(contents)
         val program = RuntimeFunctions.parseTokens(name, tokens)
 
-        val classes = RuntimeFunctions.compileProgram(program)
-        RuntimeFunctions.loadClassesAndRun(classes)
+        val classes = RuntimeFunctions.compilePrograms(listOf(program))
+        CommandUtils.loadClassesAndRun(classes, name)
     }
 
     fun loadAndRun(path: String) = OutputInterceptor.capture {

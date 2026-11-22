@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.instruction.field.GetFieldInstruction
 import me.itzisonn_.meazy.instruction.field.StoreFieldInstruction
 import me.itzisonn_.meazy.instruction.field.WithFieldInstruction
 import me.itzisonn_.meazy.instruction.label.*
-import me.itzisonn_.meazy.instruction.label.GotoLabelIfComparisonTrueInstruction.ComparisonOperation
+import me.itzisonn_.meazy.instruction.label.ComparisonOperation
 import me.itzisonn_.meazy.instruction.local.GetLocalInstruction
 import me.itzisonn_.meazy.instruction.local.SetLocalNameInstruction
 import me.itzisonn_.meazy.instruction.local.StoreLocalInstruction
@@ -253,8 +253,12 @@ class InstructionsSet(private val bytecodeBuilders: BytecodeBuilders) {
         with(GotoLabelIfNotEqualsZeroInstruction(uuid))
     }
 
-    fun gotoLabelIfComparisonTrue(type: NumberType, operation: ComparisonOperation, uuid: Uuid) {
-        with(GotoLabelIfComparisonTrueInstruction(type, operation, uuid))
+    fun gotoLabelIfNumberComparisonTrue(type: NumberType, operation: ComparisonOperation, uuid: Uuid) {
+        with(GotoLabelIfNumberComparisonTrueInstruction(type, operation, uuid))
+    }
+
+    fun gotoLabelIfReferenceComparisonTrue(operation: ComparisonOperation, uuid: Uuid) {
+        with(GotoLabelIfReferenceComparisonTrueInstruction(operation, uuid))
     }
 
 
