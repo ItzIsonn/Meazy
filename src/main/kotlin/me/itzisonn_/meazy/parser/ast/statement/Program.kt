@@ -42,7 +42,7 @@ class Program(
 
         for (statement in body) {
             if (statement is ImportStatement) {
-                fileEnvironment.addImport(statement.name)
+                fileEnvironment.addImport(statement.name.substringAfterLast("."), statement.name)
             }
         }
 

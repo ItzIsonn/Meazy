@@ -1,3 +1,5 @@
+package hi
+
 import org.example.Test
 
 fun isOleg(name: String): Boolean {

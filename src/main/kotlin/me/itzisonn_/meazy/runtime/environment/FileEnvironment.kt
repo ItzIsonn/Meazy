@@ -4,15 +4,13 @@ import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnviro
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironmentImpl
-import java.lang.constant.ClassDesc
-import java.lang.constant.ConstantDescs
 
 /**
  * Represents file environment
  */
-interface FileEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclarationEnvironment,
-    ClassDeclarationEnvironment {
+interface FileEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclarationEnvironment, ClassDeclarationEnvironment {
     override fun getParent(): GlobalEnvironment
+
 
 
     /**
@@ -30,19 +28,14 @@ interface FileEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclar
 
 
     /**
-     * Adds to this file environment given import
+     * Adds imports symbol with [name] pointing at [fullName] to this file environment
      */
-    fun addImport(classDesc: ClassDesc, name: String)
-
-    /**
-     * Adds to this file environment given import
-     */
-    fun addImport(fullName: String)
+    fun addImport(name: String, fullName: String)
 
     /**
      * @return All imports
      */
-    val imports: Map<String, ClassDesc>
+    val imports: Map<String, String>
 }
 
 
@@ -55,21 +48,7 @@ private class FileEnvironmentImpl(
     FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, true),
     ClassDeclarationEnvironment by ClassDeclarationEnvironment(parent, true),
     GlobalVariableDeclarationEnvironmentImpl(parent) {
-    private val _imports = mutableMapOf<String, ClassDesc>()
-
-    init {
-        addImport("java.lang.String")
-        addImport("java.lang.System")
-        addImport("java.lang.IO")
-        addImport(ConstantDescs.CD_Object, "Any")
-        addImport(ConstantDescs.CD_Integer, "Int")
-        addImport("java.lang.Long")
-        addImport("java.lang.Float")
-        addImport("java.lang.Double")
-        addImport("java.lang.Boolean")
-    }
-
-
+    private val _imports = mutableMapOf<String, String>()
 
     override fun getParent() = super.getParent() as GlobalEnvironment
     override val isShared = true
@@ -80,15 +59,8 @@ private class FileEnvironmentImpl(
             return packageName + className
         }
 
-
-
-    override fun addImport(classDesc: ClassDesc, name: String) {
-        _imports[name] = classDesc
-    }
-
-    override fun addImport(fullName: String) {
-        val classDesc = ClassDesc.of(fullName)
-        _imports[classDesc.displayName()] = classDesc
+    override fun addImport(name: String, fullName: String) {
+        _imports[name] = fullName
     }
 
     override val imports get() = _imports.toMap()
@@ -102,7 +74,7 @@ private class FileEnvironmentImpl(
  * @param parent Parent
  * @param packageName Package name
  * @param className Class name
+ *
  * @return New file environment
  */
-fun FileEnvironment(parent: GlobalEnvironment, packageName: String, className: String): FileEnvironment =
-    FileEnvironmentImpl(parent, packageName, className)
+fun FileEnvironment(parent: GlobalEnvironment, packageName: String, className: String): FileEnvironment = FileEnvironmentImpl(parent, packageName, className)

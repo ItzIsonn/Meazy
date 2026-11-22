@@ -271,36 +271,36 @@ fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean)
     if (classDesc.packageName().isNotEmpty()) return classDesc
 
     val fileEnvironment = getParentOrSelf<FileEnvironment>() ?: return classDesc
+    fileEnvironment.getClass(classDesc.displayName())?.let { return@resolveClassDesc it.environment.classDesc }
 
-    var classSymbol = fileEnvironment.getClass(classDesc.displayName())
-    if (classSymbol != null) return classSymbol.environment.classDesc
-
-    classSymbol = getClass(classDesc)
-    if (classSymbol != null) return classSymbol.environment.classDesc
-
-    val fullId: String
-    val fullClassDesc = fileEnvironment.imports[classDesc.displayName()]
-    if (fullClassDesc != null) {
-        if (fullClassDesc.isPrimitive || classDesc.isArray) return fullClassDesc
-        fullId = (if (fullClassDesc.packageName().isEmpty()) ""
-        else fullClassDesc.packageName() + ".") + fullClassDesc.displayName()
+    fileEnvironment.imports[classDesc.displayName()]?.let { fullName ->
+        getClass(fullName)?.let { return@resolveClassDesc it.environment.classDesc }
     }
-    else fullId = classDesc.displayName()
 
     if (allowPrimitives) {
-        if (classDesc.displayName() == "Int") return ConstantDescs.CD_int
-        if (classDesc.displayName() == "Long") return ConstantDescs.CD_long
-        if (classDesc.displayName() == "Float") return ConstantDescs.CD_float
-        if (classDesc.displayName() == "Double") return ConstantDescs.CD_double
-        if (classDesc.displayName() == "Boolean") return ConstantDescs.CD_boolean
+        when (classDesc.displayName()) {
+            "Int" -> return ConstantDescs.CD_int
+            "Long" -> return ConstantDescs.CD_long
+            "Float" -> return ConstantDescs.CD_float
+            "Double" -> return ConstantDescs.CD_double
+            "Boolean" -> return ConstantDescs.CD_boolean
+        }
     }
 
-    classSymbol = getClass(fullId)
-    if (classSymbol != null) return classSymbol.environment.classDesc
+    when (classDesc.displayName()) {
+        "Any" -> return ConstantDescs.CD_Object
+        "Int" -> return ConstantDescs.CD_Integer
+        "Long" -> return ConstantDescs.CD_Long
+        "Float" -> return ConstantDescs.CD_Float
+        "Double" -> return ConstantDescs.CD_Double
+        "Boolean" -> return ConstantDescs.CD_Boolean
+        "String" -> return ConstantDescs.CD_String
+        "System" -> return ClassDesc.of("java.lang.System")
+        "IO" -> return ClassDesc.of("java.lang.IO")
+    }
 
-    val resolvedClassDesc = ClassDesc.of(fullId)
-    fileEnvironment.getParent().resolveJavaClass(resolvedClassDesc)
-    return resolvedClassDesc
+    fileEnvironment.getParent().resolveJavaClass(classDesc)
+    return classDesc
 }
 
 /**
@@ -340,17 +340,17 @@ fun areFromSamePackage(environment1: Environment, environment2: Environment) = e
  */
 fun Environment.getVariable(id: String): VariableSymbol? {
     if (this is VariableDeclarationEnvironment<*>) {
-        val variableValue = getVariable(id)
-        if (variableValue != null) return variableValue
+        getVariable(id)?.let { return@getVariable it }
     }
 
-    if (this is GlobalEnvironment) {
-        for (fileEnvironment in fileEnvironments) {
-            val variableValue = fileEnvironment.getVariable(id)
-            if (variableValue != null) return variableValue
-        }
+    if (this is FileEnvironment) {
+        imports[id]?.let { fullName ->
+            val packageName = fullName.substringBeforeLast(".")
 
-        return null
+            for (fileEnvironment in getParent().getFileEnvironments(packageName)) {
+                fileEnvironment.getVariable(id)?.let { return@getVariable it }
+            }
+        }
     }
 
     return getParent()?.getVariable(id)
@@ -375,17 +375,17 @@ fun Environment.getVariableDeclarationEnvironment(id: String) = getVariable(id)?
  */
 fun Environment.getFunction(id: String, args: List<DataType>): FunctionSymbol? {
     if (this is FunctionDeclarationEnvironment) {
-        val function = getFunction(id, args)
-        if (function != null) return function
+        getFunction(id, args)?.let { return@getFunction it }
     }
 
-    if (this is GlobalEnvironment) {
-        for (fileEnvironment in fileEnvironments) {
-            val function = fileEnvironment.getFunction(id, args)
-            if (function != null) return function
-        }
+    if (this is FileEnvironment) {
+        imports[id]?.let { fullName ->
+            val packageName = fullName.substringBeforeLast(".")
 
-        return null
+            for (fileEnvironment in getParent().getFileEnvironments(packageName)) {
+                fileEnvironment.getFunction(id, args)?.let { return@getFunction it }
+            }
+        }
     }
 
     return getParent()?.getFunction(id, args)
