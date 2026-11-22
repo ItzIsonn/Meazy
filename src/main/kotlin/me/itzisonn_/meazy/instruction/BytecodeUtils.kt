@@ -7,6 +7,22 @@ import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
 
+fun InstructionsSet.invertBoolean() {
+    val trueLabel = createAndInitLabel()
+    val endLabel = createAndInitLabel()
+    gotoLabelIfEqualsZero(trueLabel)
+
+    loadConstant(0)
+    gotoLabel(endLabel)
+
+    bindLabel(trueLabel)
+    loadConstant(1)
+
+    bindLabel(endLabel)
+}
+
+
+
 fun InstructionsSet.boxPrimitive(classDesc: ClassDesc) {
     val boxedClassDesc = classDesc.boxed
     if (boxedClassDesc == ConstantDescs.CD_Void) return

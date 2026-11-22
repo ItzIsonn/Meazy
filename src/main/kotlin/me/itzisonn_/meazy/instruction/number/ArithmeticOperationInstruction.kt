@@ -52,7 +52,7 @@ class ArithmeticOperationInstruction(
                 }
             }
 
-            else -> error("Can't apply arithmetic operation to boxed number $type")
+            else -> error("Can't apply arithmetic operation to number of type $type")
         }
     }
 

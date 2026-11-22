@@ -3,7 +3,9 @@ package me.itzisonn_.meazy.runtime.data.operator
 import me.itzisonn_.meazy.instruction.InstructionsSet
 import me.itzisonn_.meazy.instruction.NumberType.Companion.getCommonUnboxed
 import me.itzisonn_.meazy.instruction.NumberType.Companion.valueOf
+import me.itzisonn_.meazy.instruction.invertBoolean
 import me.itzisonn_.meazy.instruction.label.ComparisonOperation
+import me.itzisonn_.meazy.instruction.method.InvokeMethodInstruction
 import me.itzisonn_.meazy.parser.ast.ParentMap
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.OperatorExpression
@@ -24,6 +26,9 @@ import me.itzisonn_.meazy.runtime.data.operator.custom.PowerOperator
 import me.itzisonn_.meazy.runtime.data.operator.custom.RemainderOperator
 import me.itzisonn_.meazy.runtime.data.operator.custom.SubtractionOperator
 import me.itzisonn_.meazy.runtime.environment.Environment
+import java.lang.constant.ClassDesc
+import java.lang.constant.ConstantDescs
+import java.lang.constant.MethodTypeDesc
 
 /**
  * Operators registrar
@@ -89,9 +94,7 @@ object Operators {
 
 
 context(parents: ParentMap, symbols: SymbolMap)
-fun InstructionsSet.compare(
-    environment: Environment, operatorExpression: OperatorExpression, operation: ComparisonOperation
-) {
+fun InstructionsSet.compare(environment: Environment, operatorExpression: OperatorExpression, operation: ComparisonOperation) {
     val left = operatorExpression.left
     val right = operatorExpression.right ?: error("Right side of operator expression is null")
 
@@ -103,21 +106,17 @@ fun InstructionsSet.compare(
 
     if (leftNumberType == null || rightNumberType == null) {
         if (operation == ComparisonOperation.EQUALS || operation == ComparisonOperation.NOT_EQUALS) {
-            if (leftType.isNullable || rightType.isNullable) error("Can't compare nullable references")
-            val trueLabel = createAndInitLabel()
-            val endLabel = createAndInitLabel()
+            invokeMethod(
+                ClassDesc.of("java.util.Objects"),
+                "equals",
+                MethodTypeDesc.of(ConstantDescs.CD_boolean, ConstantDescs.CD_Object, ConstantDescs.CD_Object),
+                InvokeMethodInstruction.InvokeType.STATIC
+            ) {
+                left.emit(this, environment)
+                right.emit(this, environment)
+            }
 
-            left.emit(this, environment)
-            right.emit(this, environment)
-
-            gotoLabelIfReferenceComparisonTrue(operation, trueLabel)
-            loadConstant(0)
-            gotoLabel(endLabel)
-
-            bindLabel(trueLabel)
-            loadConstant(1)
-
-            bindLabel(endLabel)
+            if (operation == ComparisonOperation.NOT_EQUALS) invertBoolean()
             return
         }
 
