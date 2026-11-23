@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
-import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.hasParent
 import java.lang.constant.ConstantDescs
 
 class WhileStatement(
@@ -26,7 +26,7 @@ class WhileStatement(
             throw RuntimeException("While statement must always use boolean TODO")
         }
 
-        if (id != null && environment.hasParentOrSelf<LoopEnvironment> { it.getId() == id }) {
+        if (id != null && environment.hasParent<LoopEnvironment>(true) { it.getId() == id }) {
             error("Loop with id $id already exists")
         }
 

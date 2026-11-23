@@ -6,7 +6,7 @@ import me.itzisonn_.meazy.parser.ast.ProgramUnit
 import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
-import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.getParent
 import me.itzisonn_.meazy.runtime.environment.hasParent
 
 class ContinueStatement(val id: String?) : LocalStatement {
@@ -14,7 +14,7 @@ class ContinueStatement(val id: String?) : LocalStatement {
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        val loopEnvironment = environment.getParentOrSelf<LoopEnvironment> { id == null || it.getId() == id }
+        val loopEnvironment = environment.getParent<LoopEnvironment>(true) { id == null || it.getId() == id }
 
         if (loopEnvironment == null) {
             if (!environment.hasParent<LoopEnvironment>()) error("Parent environment for CONTINUE statement must be LoopEnvironment TODO")

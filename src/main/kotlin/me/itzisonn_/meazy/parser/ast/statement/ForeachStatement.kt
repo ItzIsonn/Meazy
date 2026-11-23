@@ -12,7 +12,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
-import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.hasParent
 import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 import java.lang.constant.MethodTypeDesc
@@ -34,7 +34,7 @@ class ForeachStatement(
             throw RuntimeException("Foreach statement must be inside variableDeclarationEnvironment TODO")
         }
 
-        if (id != null && environment.hasParentOrSelf<LoopEnvironment> { it.getId() == id }) {
+        if (id != null && environment.hasParent<LoopEnvironment>(true) { it.getId() == id }) {
             error("Loop with id $id already exists")
         }
 

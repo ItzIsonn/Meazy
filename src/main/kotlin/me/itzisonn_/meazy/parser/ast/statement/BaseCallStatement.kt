@@ -12,18 +12,18 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
 import me.itzisonn_.meazy.runtime.environment.asSymbol
 import me.itzisonn_.meazy.runtime.environment.getParent
-import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.hasParent
 
 class BaseCallStatement(val args: List<Expression>) : LocalStatement {
     override val children = args.toSet()
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        require(environment.hasParentOrSelf<ConstructorEnvironment>()) {
+        require(environment.hasParent<ConstructorEnvironment>(true)) {
             "Parent environment for BASE statement must be ConstructorEnvironment TODO"
         }
 
-        require(!environment.hasParentOrSelf<LoopEnvironment>()) {
+        require(!environment.hasParent<LoopEnvironment>(true)) {
             "Can't use BaseCallStatement inside loops"
         }
 

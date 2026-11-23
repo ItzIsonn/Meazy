@@ -10,8 +10,8 @@ import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
-import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
-import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.getParent
+import me.itzisonn_.meazy.runtime.environment.hasParent
 import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ConstantDescs
 import kotlin.uuid.Uuid
@@ -78,8 +78,8 @@ open class LocalVariableDeclarationEnvironmentImpl(
     override val nextAvailableSlot: Int
         get() {
             var usedSlots = 0
-            if (hasParentOrSelf<ConstructorEnvironment>()) usedSlots++
-            getParentOrSelf<FunctionEnvironment>()?.let { functionEnvironment ->
+            if (hasParent<ConstructorEnvironment>(true)) usedSlots++
+            getParent<FunctionEnvironment>(true)?.let { functionEnvironment ->
                 if (functionEnvironment.getParent() is ClassEnvironment) usedSlots++
             }
 

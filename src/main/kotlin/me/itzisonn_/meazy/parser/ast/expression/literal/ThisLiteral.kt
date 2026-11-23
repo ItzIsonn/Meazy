@@ -8,7 +8,7 @@ import me.itzisonn_.meazy.parser.ast.SymbolMap
 import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
-import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.getParent
 import java.lang.constant.ClassDesc
 
 class ThisLiteral : Expression {
@@ -21,7 +21,7 @@ class ThisLiteral : Expression {
 
     context(parents: ParentMap)
     override fun getType(environment: Environment): DataType {
-        val classEnvironment = environment.getParentOrSelf<ClassEnvironment>()
+        val classEnvironment = environment.getParent<ClassEnvironment>(true)
             ?: error("Parent environment for THIS expression must be ClassEnvironment")
         return DataType.ofNonNull(ClassDesc.of(classEnvironment.fullClassName))
     }

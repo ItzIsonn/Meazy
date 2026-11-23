@@ -9,8 +9,8 @@ import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 import me.itzisonn_.meazy.runtime.environment.asSymbol
-import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
-import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.getParent
+import me.itzisonn_.meazy.runtime.environment.hasParent
 
 class ReturnStatement(val value: Expression?) : LocalStatement {
     override val children = let {
@@ -20,13 +20,13 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
-        if (environment.hasParentOrSelf<ConstructorEnvironment>()) {
+        if (environment.hasParent<ConstructorEnvironment>(true)) {
             if (value != null) throw RuntimeException("Constructor can't return value TODO")
             instructions.returnVoid()
             return
         }
 
-        val functionEnvironment = environment.getParentOrSelf<FunctionEnvironment>()
+        val functionEnvironment = environment.getParent<FunctionEnvironment>(true)
             ?: error("Parent environment for RETURN statement must be FunctionEnvironment TODO")
 
         val returnDataType = functionEnvironment.asSymbol().returnDataType
