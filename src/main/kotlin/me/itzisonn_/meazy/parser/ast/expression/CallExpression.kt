@@ -151,7 +151,7 @@ class CallExpression(
 
     context(parents: ParentMap)
     private fun Environment.resolveConstructor(): ResolvedCallable {
-        val classSymbol = getClass(resolveClassDesc(id, false)) ?: error("Can't find class with id $id")
+        val classSymbol = resolveClass(id) ?: error("Can't find class with id $id")
         val classEnvironment = classSymbol.environment
 
         if (classSymbol.hasModifier(Modifiers.abstract)) {

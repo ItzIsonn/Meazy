@@ -299,8 +299,33 @@ fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean)
         "IO" -> return ClassDesc.of("java.lang.IO")
     }
 
-    fileEnvironment.getParent().resolveJavaClass(classDesc)
     return classDesc
+}
+
+/**
+ * TODO
+ */
+fun Environment.resolveClass(id: String): ClassSymbol? {
+    val fileEnvironment = getParentOrSelf<FileEnvironment>() ?: return null
+    fileEnvironment.getClass(id)?.let { return@resolveClass it }
+
+    fileEnvironment.imports[id]?.let { fullName ->
+        getClass(fullName)?.let { return@resolveClass it }
+    }
+
+    when (id) {
+        "Any" -> return getClass(ConstantDescs.CD_Object)
+        "Int" -> return getClass(ConstantDescs.CD_Integer)
+        "Long" -> return getClass(ConstantDescs.CD_Long)
+        "Float" -> return getClass(ConstantDescs.CD_Float)
+        "Double" -> return getClass(ConstantDescs.CD_Double)
+        "Boolean" -> return getClass(ConstantDescs.CD_Boolean)
+        "String" -> return getClass(ConstantDescs.CD_String)
+        "System" -> return getClass(ClassDesc.of("java.lang.System"))
+        "IO" -> return getClass(ClassDesc.of("java.lang.IO"))
+    }
+
+    return null
 }
 
 /**

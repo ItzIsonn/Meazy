@@ -36,6 +36,7 @@ fun main() {
     Wow()
     System.out.println(isOleg("Vanya"))
     System.out.println(isOleg("Oleg"))
+    Lol()
 }
 
 class Test {
