@@ -46,10 +46,7 @@ interface FunctionDeclarationEnvironment : Environment {
 
 
 
-private class FunctionDeclarationEnvironmentImpl(
-    parent: Environment,
-    override val isShared: Boolean
-) : FunctionDeclarationEnvironment, EnvironmentImpl(parent) {
+private class FunctionDeclarationEnvironmentImpl(parent: Environment) : FunctionDeclarationEnvironment, EnvironmentImpl(parent) {
     private val _functions = mutableSetOf<FunctionSymbol>()
 
     override val functions get() = _functions.toSet()
@@ -76,5 +73,4 @@ private class FunctionDeclarationEnvironmentImpl(
 
 
 
-fun FunctionDeclarationEnvironment(parent: Environment, isShared: Boolean): FunctionDeclarationEnvironment =
-    FunctionDeclarationEnvironmentImpl(parent, isShared)
+fun FunctionDeclarationEnvironment(parent: Environment): FunctionDeclarationEnvironment = FunctionDeclarationEnvironmentImpl(parent)

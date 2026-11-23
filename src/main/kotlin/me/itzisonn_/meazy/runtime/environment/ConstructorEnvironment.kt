@@ -18,9 +18,7 @@ private class ConstructorEnvironmentImpl(
     parent: ConstructorDeclarationEnvironment,
     startLabel: Uuid?,
     endLabel: Uuid?
-) : ConstructorEnvironment,
-    LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
-    override val isShared = false
+) : ConstructorEnvironment, LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
     override fun getParent() = super.getParent() as ConstructorDeclarationEnvironment
 }
 

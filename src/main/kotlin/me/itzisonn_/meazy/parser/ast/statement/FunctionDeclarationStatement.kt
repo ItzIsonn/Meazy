@@ -44,16 +44,8 @@ class FunctionDeclarationStatement(
             throw RuntimeException("CANT DECLARE FUNCTION HERE TODO")
         }
 
-        val isShared = Modifiers.shared in modifiers || environment is FileEnvironment
-
-        val functionEnvironment = FunctionEnvironment(
-            environment, null, null,
-            isShared
-        )
-
-        val symbol = FunctionSymbol(
-            id, parameters, returnDataType, modifiers, functionEnvironment
-        )
+        val functionEnvironment = FunctionEnvironment(environment, null, null)
+        val symbol = FunctionSymbol(id, parameters, returnDataType, modifiers, functionEnvironment)
         declareSymbol(symbol)
         environment.declareFunction(symbol)
 
@@ -125,7 +117,7 @@ class FunctionDeclarationStatement(
             }
         }
 
-        val isShared = functionEnvironment.isShared
+        val isShared = Modifiers.shared in modifiers || functionEnvironment.getParent() is FileEnvironment
         val returnDataType = symbol.returnDataType
 
         val methodTypeDesc = MethodTypeDesc.of(

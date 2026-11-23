@@ -17,8 +17,7 @@ sealed interface FunctionEnvironment : LocalVariableDeclarationEnvironment {
 private class FunctionEnvironmentImpl(
     parent: FunctionDeclarationEnvironment,
     startLabel: Uuid?,
-    endLabel: Uuid?,
-    override val isShared: Boolean
+    endLabel: Uuid?
 ) : FunctionEnvironment,
     LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
     override fun getParent() = super.getParent() as FunctionDeclarationEnvironment
@@ -30,8 +29,7 @@ private class FunctionEnvironmentImpl(
  * Creates function environment
  *
  * @param parent Parent
- * @param isShared Whether function environment is shared
  * @return New function environment
  */
-fun FunctionEnvironment(parent: FunctionDeclarationEnvironment, startLabel: Uuid?, endLabel: Uuid?, isShared: Boolean): FunctionEnvironment =
-    FunctionEnvironmentImpl(parent, startLabel, endLabel, isShared)
+fun FunctionEnvironment(parent: FunctionDeclarationEnvironment, startLabel: Uuid?, endLabel: Uuid?): FunctionEnvironment =
+    FunctionEnvironmentImpl(parent, startLabel, endLabel)

@@ -12,8 +12,7 @@ import me.itzisonn_.meazy.util.text.translatable
 /**
  * Adds to Environment ability to declare global variables
  */
-interface GlobalVariableDeclarationEnvironment
-    : VariableDeclarationEnvironment<GlobalVariableSymbol>
+interface GlobalVariableDeclarationEnvironment : VariableDeclarationEnvironment<GlobalVariableSymbol>
 
 
 
@@ -32,6 +31,4 @@ open class GlobalVariableDeclarationEnvironmentImpl(
         _variables.add(variableValue)
         return variableValue
     }
-
-    override val isShared get() = getParent().isShared
 }

@@ -32,18 +32,8 @@ class ClassDeclarationStatement(
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
-        val isInner = Modifiers.private in modifiers
-
-        val classEnvironment = ClassEnvironment(
-            environment,
-            isInner || Modifiers.shared in modifiers,
-            baseClasses
-        )
-
-        val symbol = ClassSymbol(
-            id, false,
-            modifiers, classEnvironment
-        )
+        val classEnvironment = ClassEnvironment(environment, baseClasses)
+        val symbol = ClassSymbol(id, false, modifiers, classEnvironment)
         declareSymbol(symbol)
         environment.declareClass(symbol)
 

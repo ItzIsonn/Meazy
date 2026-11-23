@@ -5,8 +5,13 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.EvaluationException
 import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.symbol.LocalVariableSymbol
+import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
+import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.EnvironmentImpl
+import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
+import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
+import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
 import me.itzisonn_.meazy.util.text.translatable
 import java.lang.constant.ConstantDescs
 import kotlin.uuid.Uuid
@@ -25,7 +30,7 @@ interface LocalVariableDeclarationEnvironment : VariableDeclarationEnvironment<L
     fun setStartLabel(label: Uuid)
     fun setEndLabel(label: Uuid)
 
-    val usedSlotsCount: Int
+    val nextAvailableSlot: Int
 }
 
 
@@ -43,16 +48,7 @@ open class LocalVariableDeclarationEnvironmentImpl(
             if (!variable.shadowable) throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
-        var slot = usedSlotsCount
-        if (!isShared) slot++
-
-        var parentEnvironment: Environment? = getParent()
-        while (parentEnvironment is LocalVariableDeclarationEnvironment) {
-            slot += parentEnvironment.usedSlotsCount
-            parentEnvironment = parentEnvironment.getParent()
-        }
-
-        val variableValue = LocalVariableSymbol(id, type, isConstant, modifiers, slot, false, this)
+        val variableValue = LocalVariableSymbol(id, type, isConstant, modifiers, nextAvailableSlot, false, this)
         _variables.add(variableValue)
         return variableValue
     }
@@ -62,31 +58,13 @@ open class LocalVariableDeclarationEnvironmentImpl(
             if (!variable.shadowable) throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
-        var slot = usedSlotsCount
-        if (!isShared) slot++
-
-        var parentEnvironment: Environment? = getParent()
-        while (parentEnvironment is LocalVariableDeclarationEnvironment) {
-            slot += parentEnvironment.usedSlotsCount
-            parentEnvironment = parentEnvironment.getParent()
-        }
-
-        val variableValue = LocalVariableSymbol(id, type, true, setOf(), slot, true, this)
+        val variableValue = LocalVariableSymbol(id, type, true, setOf(), nextAvailableSlot, true, this)
         _variables.add(variableValue)
         return variableValue
     }
 
     override fun declareVariable(type: DataType, isConstant: Boolean, value: Expression?): LocalVariableSymbol {
-        var slot = usedSlotsCount
-        if (!isShared) slot++
-
-        var parentEnvironment: Environment? = getParent()
-        while (parentEnvironment is LocalVariableDeclarationEnvironment) {
-            slot += parentEnvironment.usedSlotsCount
-            parentEnvironment = parentEnvironment.getParent()
-        }
-
-        val variableValue = LocalVariableSymbol(null, type, isConstant, setOf(), slot, false, this)
+        val variableValue = LocalVariableSymbol(null, type, isConstant, setOf(), nextAvailableSlot, false, this)
         _variables.add(variableValue)
         return variableValue
     }
@@ -97,17 +75,19 @@ open class LocalVariableDeclarationEnvironmentImpl(
     override fun setStartLabel(label: Uuid) { startLabel = label }
     override fun setEndLabel(label: Uuid) { endLabel = label }
 
-    override val usedSlotsCount: Int
+    override val nextAvailableSlot: Int
         get() {
             var usedSlots = 0
+            if (hasParentOrSelf<ConstructorEnvironment>()) usedSlots++
+            getParentOrSelf<FunctionEnvironment>()?.let { functionEnvironment ->
+                if (functionEnvironment.getParent() is ClassEnvironment) usedSlots++
+            }
 
             for (variableValue in _variables) {
                 val classDesc = variableValue.dataType.classDesc
                 usedSlots += if (classDesc == ConstantDescs.CD_double || classDesc == ConstantDescs.CD_long) 2 else 1
             }
 
-            return usedSlots
+            return usedSlots + ((getParent() as? LocalVariableDeclarationEnvironment)?.nextAvailableSlot ?: 0)
         }
-
-    override val isShared get() = getParent().isShared
 }

@@ -50,7 +50,6 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
     }
 
     override fun getParent() = null
-    override val isShared = false
     override val fileEnvironments get() = _fileEnvironments.toSet()
 
     override fun resolveJavaClass(classDesc: ClassDesc): ClassSymbol? {
@@ -76,7 +75,6 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
 
             val classEnvironment = ClassEnvironment(
                 fileEnvironment,
-                false,
                 if (cls.getSuperclass() == null) null else cls.getSuperclass().describeConstable().orElseThrow(),
                 cls.interfaces.map { it.describeConstable().orElseThrow() }.toSet()
             )
@@ -118,8 +116,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 val functionEnvironment = FunctionEnvironment(
                     classEnvironment,
                     null,
-                    null,
-                    JavaModifier.isStatic(method.modifiers)
+                    null
                 )
 
                 classEnvironment.declareFunction(

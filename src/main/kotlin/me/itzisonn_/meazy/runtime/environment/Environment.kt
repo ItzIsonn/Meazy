@@ -8,11 +8,6 @@ interface Environment {
      * @return This environment's parent
      */
     fun getParent(): Environment?
-
-    /**
-     * @return Whether this environment is shared
-     */
-    val isShared: Boolean
 }
 
 

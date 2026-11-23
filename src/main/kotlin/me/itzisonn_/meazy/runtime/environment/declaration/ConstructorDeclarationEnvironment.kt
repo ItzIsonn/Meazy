@@ -48,10 +48,7 @@ interface ConstructorDeclarationEnvironment : Environment {
 
 
 
-private class ConstructorDeclarationEnvironmentImpl(
-    parent: Environment,
-    override val isShared: Boolean
-) : ConstructorDeclarationEnvironment, EnvironmentImpl(parent) {
+private class ConstructorDeclarationEnvironmentImpl(parent: Environment) : ConstructorDeclarationEnvironment, EnvironmentImpl(parent) {
     private val _constructors = mutableSetOf<ConstructorSymbol>()
 
     override val constructors get() = _constructors.toSet()
@@ -78,9 +75,6 @@ private class ConstructorDeclarationEnvironmentImpl(
 
 /**
  * @param parent Parent
- * @param isShared Whether environment is shared
  * @return New constructor declaration environment
  */
-fun ConstructorDeclarationEnvironment(
-    parent: ClassDeclarationEnvironment, isShared: Boolean
-): ConstructorDeclarationEnvironment = ConstructorDeclarationEnvironmentImpl(parent, isShared)
+fun ConstructorDeclarationEnvironment(parent: ClassDeclarationEnvironment): ConstructorDeclarationEnvironment = ConstructorDeclarationEnvironmentImpl(parent)

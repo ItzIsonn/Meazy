@@ -60,26 +60,24 @@ sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, Functi
 
 private class ClassEnvironmentImpl(
     parent: ClassDeclarationEnvironment,
-    isShared: Boolean,
     baseClass: ClassDesc?,
     interfaces: Set<ClassDesc>,
     unresolvedBaseClasses: Set<String>
 ) : ClassEnvironment,
-    FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, isShared),
-    ConstructorDeclarationEnvironment by ConstructorDeclarationEnvironment(parent, isShared),
+    FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent),
+    ConstructorDeclarationEnvironment by ConstructorDeclarationEnvironment(parent),
     GlobalVariableDeclarationEnvironmentImpl(parent) {
     override var baseClass = baseClass
         private set
     private val _interfaces = interfaces.toMutableSet()
     private val unresolvedBaseClasses = unresolvedBaseClasses.toMutableSet()
 
-    constructor(parent: ClassDeclarationEnvironment, isShared: Boolean, unresolvedBaseClasses: Set<String>) :
-            this(parent, isShared, null, setOf(), unresolvedBaseClasses)
+    constructor(parent: ClassDeclarationEnvironment, unresolvedBaseClasses: Set<String>) :
+            this(parent, null, setOf(), unresolvedBaseClasses)
 
 
 
     override fun getParent() = super.getParent() as ClassDeclarationEnvironment
-    override val isShared = isShared
     override val interfaces get() = _interfaces.toSet()
 
     override fun resolveBaseClasses() {
@@ -146,18 +144,16 @@ private class ClassEnvironmentImpl(
  * Creates class environment
  *
  * @param parent Parent
- * @param isShared Whether class environment is shared
  * @return New class environment
  */
-fun ClassEnvironment(parent: ClassDeclarationEnvironment, isShared: Boolean, baseClass: ClassDesc?, interfaces: Set<ClassDesc>): ClassEnvironment =
-    ClassEnvironmentImpl(parent, isShared, baseClass, interfaces, setOf())
+fun ClassEnvironment(parent: ClassDeclarationEnvironment, baseClass: ClassDesc?, interfaces: Set<ClassDesc>): ClassEnvironment =
+    ClassEnvironmentImpl(parent, baseClass, interfaces, setOf())
 
 /**
  * Creates class environment
  *
  * @param parent Parent
- * @param isShared Whether class environment is shared
  * @return New class environment
  */
-fun ClassEnvironment(parent: ClassDeclarationEnvironment, isShared: Boolean, unresolvedBaseClasses: Set<String>): ClassEnvironment =
-    ClassEnvironmentImpl(parent, isShared, unresolvedBaseClasses)
+fun ClassEnvironment(parent: ClassDeclarationEnvironment, unresolvedBaseClasses: Set<String>): ClassEnvironment =
+    ClassEnvironmentImpl(parent, unresolvedBaseClasses)

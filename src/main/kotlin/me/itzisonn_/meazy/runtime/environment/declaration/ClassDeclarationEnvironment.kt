@@ -31,8 +31,7 @@ interface ClassDeclarationEnvironment : Environment {
 
 
 private class ClassDeclarationEnvironmentImpl(
-    parent: Environment,
-    override val isShared: Boolean
+    parent: Environment
 ) : ClassDeclarationEnvironment, EnvironmentImpl(parent) {
     private val _classes = mutableSetOf<ClassSymbol>()
 
@@ -51,5 +50,4 @@ private class ClassDeclarationEnvironmentImpl(
 
 
 
-fun ClassDeclarationEnvironment(parent: Environment, isShared: Boolean): ClassDeclarationEnvironment =
-    ClassDeclarationEnvironmentImpl(parent, isShared)
+fun ClassDeclarationEnvironment(parent: Environment): ClassDeclarationEnvironment = ClassDeclarationEnvironmentImpl(parent)

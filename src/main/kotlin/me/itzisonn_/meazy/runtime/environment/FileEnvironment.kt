@@ -45,13 +45,12 @@ private class FileEnvironmentImpl(
     override val packageName: String,
     override val className: String
 ) : FileEnvironment,
-    FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, true),
-    ClassDeclarationEnvironment by ClassDeclarationEnvironment(parent, true),
+    FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent),
+    ClassDeclarationEnvironment by ClassDeclarationEnvironment(parent),
     GlobalVariableDeclarationEnvironmentImpl(parent) {
     private val _imports = mutableMapOf<String, String>()
 
     override fun getParent() = super.getParent() as GlobalEnvironment
-    override val isShared = true
     override val fullClassName: String
         get() {
             var packageName = packageName
