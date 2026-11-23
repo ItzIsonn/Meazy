@@ -8,27 +8,11 @@ import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
 /**
  * Represents function symbol
  */
-sealed interface FunctionSymbol : Symbol {
+sealed interface FunctionSymbol : SymbolWithModifiers {
     val id: String
     val parameters: List<Parameter>
     val returnDataType: DataType?
     val environment: FunctionEnvironment
-
-
-
-    /**
-     * @param modifier Target modifier
-     * @return Whether this variable has given modifier
-     */
-    fun hasModifier(modifier: Modifier) = modifier in modifiers
-
-    /**
-     * @param id Modifier's id
-     * @return Whether this variable has modifier with given id
-     */
-    fun hasModifier(id: String) = modifiers.find { it.id == id } != null
-
-    val modifiers: Set<Modifier>
 }
 
 

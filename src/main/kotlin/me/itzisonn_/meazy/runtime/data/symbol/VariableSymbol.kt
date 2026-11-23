@@ -10,7 +10,7 @@ import me.itzisonn_.meazy.runtime.environment.declaration.variable.VariableDecla
 /**
  * Represents runtime variable symbol
  */
-sealed interface VariableSymbol : Symbol {
+sealed interface VariableSymbol : SymbolWithModifiers {
     /**
      * @return Id
      */
@@ -30,22 +30,6 @@ sealed interface VariableSymbol : Symbol {
      * @return Parent environment
      */
     val parentEnvironment: VariableDeclarationEnvironment<*>
-
-
-
-    /**
-     * @param modifier Target modifier
-     * @return Whether this variable has given modifier
-     */
-    fun hasModifier(modifier: Modifier) = modifier in modifiers
-
-    /**
-     * @param id Modifier's id
-     * @return Whether this variable has modifier with given id
-     */
-    fun hasModifier(id: String) = modifiers.find { it.id == id } != null
-
-    val modifiers: Set<Modifier>
 }
 
 sealed interface LocalVariableSymbol : VariableSymbol {

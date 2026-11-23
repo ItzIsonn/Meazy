@@ -7,28 +7,12 @@ import java.lang.constant.ClassDesc
 /**
  * Represents class symbol
  */
-sealed interface ClassSymbol : Symbol {
+sealed interface ClassSymbol : SymbolWithModifiers {
     val id: String
     val isInterface: Boolean
     val unresolvedBaseClasses: Set<String>
     val classDesc: ClassDesc
     val environment: ClassEnvironment
-
-
-
-    /**
-     * @param modifier Target modifier
-     * @return Whether this variable has given modifier
-     */
-    fun hasModifier(modifier: Modifier) = modifier in modifiers
-
-    /**
-     * @param id Modifier's id
-     * @return Whether this variable has modifier with given id
-     */
-    fun hasModifier(id: String) = modifiers.find { it.id == id } != null
-
-    val modifiers: Set<Modifier>
 }
 
 

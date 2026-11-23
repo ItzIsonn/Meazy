@@ -7,25 +7,9 @@ import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 /**
  * Represents constructor symbol
  */
-sealed interface ConstructorSymbol : Symbol {
+sealed interface ConstructorSymbol : SymbolWithModifiers {
     val parameters: List<Parameter>
     val environment: ConstructorEnvironment
-
-
-
-    /**
-     * @param modifier Target modifier
-     * @return Whether this variable has given modifier
-     */
-    fun hasModifier(modifier: Modifier) = modifier in modifiers
-
-    /**
-     * @param id Modifier's id
-     * @return Whether this variable has modifier with given id
-     */
-    fun hasModifier(id: String) = modifiers.find { it.id == id } != null
-
-    val modifiers: Set<Modifier>
 }
 
 
