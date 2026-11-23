@@ -16,6 +16,7 @@ import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
 import me.itzisonn_.meazy.runtime.environment.asSymbol
 import me.itzisonn_.meazy.runtime.environment.getClass
+import me.itzisonn_.meazy.runtime.environment.getFullClassName
 import me.itzisonn_.meazy.runtime.environment.getFunction
 import me.itzisonn_.meazy.runtime.environment.getVariable
 import java.lang.constant.ClassDesc
@@ -39,7 +40,7 @@ object SymbolResolver {
             }
 
             is GlobalVariableSymbol -> {
-                val className = variableSymbol.parentEnvironment.fullClassName
+                val className = variableSymbol.parentEnvironment.getFullClassName()
                     ?: error("Invalid global variable symbol ${variableSymbol.id} ${variableSymbol.parentEnvironment}")
 
                 val receiver = if (Modifiers.shared in variableSymbol.modifiers || variableSymbol.parentEnvironment is FileEnvironment) {
@@ -101,7 +102,7 @@ object SymbolResolver {
     context(parents: ParentMap)
     fun Environment.resolveFunction(target: ProgramUnit): ResolvedFunction? {
         val functionSymbol = resolveFunctionSymbol(target) ?: return null
-        val className = functionSymbol.environment.getParent().fullClassName ?: return null
+        val className = functionSymbol.environment.getParent().getFullClassName() ?: return null
 
         val target = if (Modifiers.shared in functionSymbol.modifiers || functionSymbol.environment.getParent() is FileEnvironment) {
             null
@@ -158,9 +159,11 @@ object SymbolResolver {
             ?: error("Failed to resolve constructor")
 
         val parameters = constructorSymbol.parameters.map { it.dataType.classDesc }
+        val className = constructorSymbol.environment.getParent().getFullClassName()
+            ?: error("Invalid constructor symbol $constructorSymbol ${constructorSymbol.environment.getParent()}")
 
         return ResolvedConstructor(
-            ClassDesc.of(constructorSymbol.environment.getParent().fullClassName),
+            ClassDesc.of(className),
             MethodTypeDesc.of(ConstantDescs.CD_void, parameters)
         )
     }

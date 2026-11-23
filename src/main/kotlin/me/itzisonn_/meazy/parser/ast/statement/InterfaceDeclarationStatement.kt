@@ -39,7 +39,7 @@ class InterfaceDeclarationStatement(
         )
 
         val symbol = ClassSymbol(
-            id, true, baseClasses,
+            id, true,
             modifiers, classEnvironment
         )
         declareSymbol(symbol)

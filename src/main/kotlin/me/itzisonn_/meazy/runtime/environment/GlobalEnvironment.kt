@@ -83,15 +83,6 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
 
             val classSymbol = ClassSymbol(
                 classDesc.displayName(), cls.isInterface,
-                cls.interfaces
-                    .map { it.describeConstable().orElseThrow() }
-                    .map { it.packageName() + "." + it.displayName() }
-                    .toMutableSet().apply {
-                        if (cls.getSuperclass() != null) {
-                            val baseClass = cls.getSuperclass().describeConstable().orElseThrow()
-                            add(baseClass.packageName() + "." + baseClass.displayName())
-                        }
-                    },
                 classEnvironmentModifiers,
                 classEnvironment
             )

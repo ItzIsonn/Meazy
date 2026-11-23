@@ -18,7 +18,7 @@ import java.lang.constant.ConstantDescs
 sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
     override fun getParent(): ClassDeclarationEnvironment
 
-    override val fullClassName: String
+    val fullClassName: String
 
 
 

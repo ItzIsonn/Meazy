@@ -23,7 +23,7 @@ interface FileEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclar
      */
     val className: String
 
-    override val fullClassName: String
+    val fullClassName: String
 
 
 

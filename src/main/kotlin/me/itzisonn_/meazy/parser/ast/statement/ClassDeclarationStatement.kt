@@ -41,7 +41,7 @@ class ClassDeclarationStatement(
         )
 
         val symbol = ClassSymbol(
-            id, false, baseClasses,
+            id, false,
             modifiers, classEnvironment
         )
         declareSymbol(symbol)

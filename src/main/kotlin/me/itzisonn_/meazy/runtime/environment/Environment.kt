@@ -13,9 +13,6 @@ interface Environment {
      * @return Whether this environment is shared
      */
     val isShared: Boolean
-
-    val fullClassName: String?
-        get() = null
 }
 
 

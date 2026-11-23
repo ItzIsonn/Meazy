@@ -330,6 +330,12 @@ fun Environment.getPackageName() = getFileEnvironment()?.packageName
  */
 fun areFromSamePackage(environment1: Environment, environment2: Environment) = environment1.getPackageName() == environment2.getPackageName()
 
+fun Environment.getFullClassName(): String? {
+    if (this is ClassEnvironment) return fullClassName
+    if (this is FileEnvironment) return fullClassName
+    return getParent()?.getFullClassName()
+}
+
 
 
 /**
