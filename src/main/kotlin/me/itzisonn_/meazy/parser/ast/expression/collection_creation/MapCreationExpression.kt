@@ -69,6 +69,6 @@ class MapCreationExpression(val map: Map<Expression, Expression>) : Expression {
     }
 
     companion object {
-        val MAP_ENTRY_CLASS_DESC = ClassDesc.of($$"java.util.Map$Entry")
+        val MAP_ENTRY_CLASS_DESC: ClassDesc = ClassDesc.of($$"java.util.Map$Entry")
     }
 }

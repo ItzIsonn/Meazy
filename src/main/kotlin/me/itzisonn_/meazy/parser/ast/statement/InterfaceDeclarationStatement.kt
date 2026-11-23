@@ -35,10 +35,7 @@ class InterfaceDeclarationStatement(
         val classEnvironment = ClassEnvironment(
             environment,
             isInner || Modifiers.shared in modifiers,
-            true,
-            id,
-            baseClasses,
-            modifiers
+            baseClasses
         )
 
         val symbol = ClassSymbol(

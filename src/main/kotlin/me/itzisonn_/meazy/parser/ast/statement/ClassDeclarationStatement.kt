@@ -37,10 +37,7 @@ class ClassDeclarationStatement(
         val classEnvironment = ClassEnvironment(
             environment,
             isInner || Modifiers.shared in modifiers,
-            false,
-            id,
-            baseClasses,
-            modifiers
+            baseClasses
         )
 
         val symbol = ClassSymbol(
@@ -61,7 +58,7 @@ class ClassDeclarationStatement(
                 ConstructorSymbol(
                     listOf(), setOf(),
                     ConstructorEnvironment(
-                        classEnvironment, null, null, setOf(), listOf()
+                        classEnvironment, null, null
                     )
                 )
             )
@@ -100,6 +97,7 @@ class ClassDeclarationStatement(
             else if (Modifiers.open !in modifiers) flags.add(AccessFlag.FINAL)
         }
 
+        val symbol = symbol
         val classEnvironment = symbol.environment
 
         instructions.withClass(
@@ -121,7 +119,7 @@ class ClassDeclarationStatement(
             ) {
                 loadThisReference()
                 val baseClass = classEnvironment.baseClass
-                    ?: error("Class " + classEnvironment.id + " has no base class")
+                    ?: error("Class " + symbol.id + " has no base class")
 
                 invokeSuperClass(
                     baseClass,

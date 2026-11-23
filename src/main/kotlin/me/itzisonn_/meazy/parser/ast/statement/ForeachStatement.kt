@@ -104,6 +104,6 @@ class ForeachStatement(
     }
 
     companion object {
-        val ITERATOR_CLASS_DESC = ClassDesc.of("java.util.Iterator")
+        val ITERATOR_CLASS_DESC: ClassDesc = ClassDesc.of("java.util.Iterator")
     }
 }

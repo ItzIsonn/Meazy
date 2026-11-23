@@ -77,11 +77,8 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
             val classEnvironment = ClassEnvironment(
                 fileEnvironment,
                 false,
-                cls.isInterface,
-                classDesc.displayName(),
                 if (cls.getSuperclass() == null) null else cls.getSuperclass().describeConstable().orElseThrow(),
-                cls.interfaces.map { it.describeConstable().orElseThrow() }.toSet(),
-                classEnvironmentModifiers
+                cls.interfaces.map { it.describeConstable().orElseThrow() }.toSet()
             )
 
             val classSymbol = ClassSymbol(
@@ -131,19 +128,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                     classEnvironment,
                     null,
                     null,
-                    method.name,
-                    method.parameters.map { p ->
-                        Parameter(
-                            p.name,
-                            DataType.of(
-                                p.getType().describeConstable().orElseThrow(),
-                                !p.getType().isPrimitive
-                            )
-                        )
-                    },
-                    returnDataType,
-                    JavaModifier.isStatic(method.modifiers),
-                    functionModifiers
+                    JavaModifier.isStatic(method.modifiers)
                 )
 
                 classEnvironment.declareFunction(
@@ -173,18 +158,7 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 val constructorEnvironment = ConstructorEnvironment(
                     classEnvironment,
                     null,
-                    null,
-                    constructorModifiers,
-                    constructor.parameters
-                        .map { p ->
-                            Parameter(
-                                p.name,
-                                DataType.of(
-                                    p.getType().describeConstable().orElseThrow(),
-                                    !p.getType().isPrimitive
-                                )
-                            )
-                        }.toList()
+                    null
                 )
 
                 classEnvironment.declareConstructor(

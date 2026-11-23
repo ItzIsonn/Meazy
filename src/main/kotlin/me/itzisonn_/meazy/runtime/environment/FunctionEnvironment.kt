@@ -1,8 +1,5 @@
 package me.itzisonn_.meazy.runtime.environment
 
-import me.itzisonn_.meazy.runtime.data.DataType
-import me.itzisonn_.meazy.runtime.data.Parameter
-import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.LocalVariableDeclarationEnvironmentImpl
@@ -11,11 +8,7 @@ import kotlin.uuid.Uuid
 /**
  * Represents environment for functions
  */
-sealed interface FunctionEnvironment : LocalVariableDeclarationEnvironment, ModifieredEnvironment {
-    val id: String
-    val parameters: List<Parameter>
-    val returnDataType: DataType?
-
+sealed interface FunctionEnvironment : LocalVariableDeclarationEnvironment {
     override fun getParent(): FunctionDeclarationEnvironment
 }
 
@@ -25,20 +18,10 @@ private class FunctionEnvironmentImpl(
     parent: FunctionDeclarationEnvironment,
     startLabel: Uuid?,
     endLabel: Uuid?,
-    override val id: String,
-    parameters: List<Parameter>,
-    override val returnDataType: DataType?,
-    override val isShared: Boolean,
-    modifiers: Set<Modifier>
+    override val isShared: Boolean
 ) : FunctionEnvironment,
     LocalVariableDeclarationEnvironmentImpl(parent, startLabel, endLabel) {
     override fun getParent() = super.getParent() as FunctionDeclarationEnvironment
-
-    override val modifiers = modifiers.toSet()
-        get() = field.toSet()
-
-    override val parameters = parameters.toList()
-        get() = field.toList()
 }
 
 
@@ -50,10 +33,5 @@ private class FunctionEnvironmentImpl(
  * @param isShared Whether function environment is shared
  * @return New function environment
  */
-fun FunctionEnvironment(
-    parent: FunctionDeclarationEnvironment, startLabel: Uuid?, endLabel: Uuid?, id: String,
-    parameters: List<Parameter>, returnDataType: DataType?,
-    isShared: Boolean, modifiers: Set<Modifier>
-): FunctionEnvironment = FunctionEnvironmentImpl(
-    parent, startLabel, endLabel, id, parameters, returnDataType, isShared, modifiers
-)
+fun FunctionEnvironment(parent: FunctionDeclarationEnvironment, startLabel: Uuid?, endLabel: Uuid?, isShared: Boolean): FunctionEnvironment =
+    FunctionEnvironmentImpl(parent, startLabel, endLabel, isShared)

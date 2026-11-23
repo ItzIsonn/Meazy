@@ -14,6 +14,7 @@ import me.itzisonn_.meazy.runtime.data.symbol.VariableSymbol
 import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FileEnvironment
+import me.itzisonn_.meazy.runtime.environment.asSymbol
 import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getFunction
 import me.itzisonn_.meazy.runtime.environment.getVariable
@@ -121,7 +122,7 @@ object SymbolResolver {
             returnDataType != null && returnDataType.isNullable,
             target,
             functionSymbol.environment.getParent().run {
-                this is ClassEnvironment && isInterface
+                this is ClassEnvironment && asSymbol().isInterface
             }
         )
     }

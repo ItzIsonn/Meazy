@@ -271,10 +271,10 @@ fun Environment.resolveClassDesc(classDesc: ClassDesc, allowPrimitives: Boolean)
     if (classDesc.packageName().isNotEmpty()) return classDesc
 
     val fileEnvironment = getParentOrSelf<FileEnvironment>() ?: return classDesc
-    fileEnvironment.getClass(classDesc.displayName())?.let { return@resolveClassDesc it.environment.classDesc }
+    fileEnvironment.getClass(classDesc.displayName())?.let { return@resolveClassDesc it.classDesc }
 
     fileEnvironment.imports[classDesc.displayName()]?.let { fullName ->
-        getClass(fullName)?.let { return@resolveClassDesc it.environment.classDesc }
+        getClass(fullName)?.let { return@resolveClassDesc it.classDesc }
     }
 
     if (allowPrimitives) {
@@ -401,6 +401,10 @@ fun Environment.getFunction(id: String, args: List<DataType>): FunctionSymbol? {
 fun Environment.getFunctionDeclarationEnvironment(id: String, parameters: List<DataType>) =
     getFunction(id, parameters)?.environment?.getParent()
 
+fun FunctionEnvironment.asSymbol(): FunctionSymbol {
+    return getParent().functions.find { it.environment == this } ?: error("Can't find FunctionSymbol associated with FunctionEnvironment $this")
+}
+
 
 
 fun Environment.getClass(classDesc: ClassDesc): ClassSymbol? {
@@ -420,3 +424,7 @@ fun Environment.getClass(id: String) = getClass(ClassDesc.of(id))
 fun Environment.getClassDeclarationEnvironment(classDesc: ClassDesc) = getClass(classDesc)?.environment?.getParent()
 
 fun Environment.getClassDeclarationEnvironment(id: String) = getClassDeclarationEnvironment(ClassDesc.of(id))
+
+fun ClassEnvironment.asSymbol(): ClassSymbol {
+    return getParent().classes.find { it.environment == this } ?: error("Can't find ClassSymbol associated with ClassEnvironment $this")
+}

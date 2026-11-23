@@ -16,8 +16,10 @@ import kotlin.io.path.extension
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.readText
 import kotlin.io.path.walk
-import kotlin.reflect.KCallable
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
 import kotlin.reflect.KVisibility
+import kotlin.reflect.full.staticFunctions
 import kotlin.reflect.typeOf
 
 object CommandUtils {
@@ -114,16 +116,21 @@ object CommandUtils {
 
     fun loadClassesAndRun(classes: Map<ClassDesc, ByteArray>, absoluteFilePath: String): CommandResult {
         val classLoader = ClassLoaderWrapper()
-        val mainFunctions = mutableSetOf<KCallable<*>>()
+        val loadedClasses = mutableSetOf<KClass<*>>()
 
         for ((_, classFile) in classes) {
-            val loadedClass = classLoader.defineClass(classFile).kotlin
+            loadedClasses += classLoader.defineClass(classFile).kotlin
+        }
 
-            val function = loadedClass.members.find { it.name == "main" } ?: continue
-            if (function.returnType != typeOf<Unit>() || function.parameters.isNotEmpty()) continue
-            if (function.visibility != KVisibility.PUBLIC) continue
+        val mainFunctions = mutableSetOf<KFunction<*>>()
 
-            mainFunctions += function
+        for (loadedClass in loadedClasses) {
+            for (function in loadedClass.staticFunctions) {
+                if (function.name != "main") continue
+                if (function.returnType != typeOf<Unit>() || function.parameters.isNotEmpty()) continue
+                if (function.visibility != KVisibility.PUBLIC) continue
+                mainFunctions += function
+            }
         }
 
         if (mainFunctions.isEmpty()) {

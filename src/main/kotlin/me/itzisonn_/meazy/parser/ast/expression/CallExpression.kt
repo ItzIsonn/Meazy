@@ -151,15 +151,14 @@ class CallExpression(
 
     context(parents: ParentMap)
     private fun Environment.resolveConstructor(): ResolvedCallable {
-        val classSymbol = getClass(resolveClassDesc(id, false))
-            ?: error("Can't find class with id $id")
+        val classSymbol = getClass(resolveClassDesc(id, false)) ?: error("Can't find class with id $id")
         val classEnvironment = classSymbol.environment
 
-        val resolvedConstructor = resolveConstructor(classEnvironment, args)
-
-        if (classEnvironment.hasModifier(Modifiers.abstract)) {
-            throw RuntimeException("Can't create instance of abstract class " + classEnvironment.id)
+        if (classSymbol.hasModifier(Modifiers.abstract)) {
+            throw RuntimeException("Can't create instance of abstract class " + classSymbol.id)
         }
+
+        val resolvedConstructor = resolveConstructor(classEnvironment, args)
 
         return ResolvedCallable(
             resolvedConstructor.classDesc,

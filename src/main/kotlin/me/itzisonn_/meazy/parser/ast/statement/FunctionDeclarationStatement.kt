@@ -47,8 +47,8 @@ class FunctionDeclarationStatement(
         val isShared = Modifiers.shared in modifiers || environment is FileEnvironment
 
         val functionEnvironment = FunctionEnvironment(
-            environment, null, null, id, parameters,
-            returnDataType, isShared, modifiers
+            environment, null, null,
+            isShared
         )
 
         val symbol = FunctionSymbol(
@@ -71,13 +71,14 @@ class FunctionDeclarationStatement(
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
-        val functionEnvironment = symbol.environment
-        functionEnvironment.returnDataType?.resolve(environment)
-        functionEnvironment.parameters.forEach { it.dataType.resolve(environment) }
+        val symbol = symbol
+        symbol.returnDataType?.resolve(environment)
+        symbol.parameters.forEach { it.dataType.resolve(environment) }
     }
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val symbol = symbol
         val functionEnvironment = symbol.environment
 
         val startLabel = instructions.createLabel()
@@ -94,13 +95,13 @@ class FunctionDeclarationStatement(
                     ?: error("Unknown base class $baseClass")
 
                 cls.environment.getFunctionRecursively(
-                    functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
+                    symbol.id, symbol.parameters.map { it.dataType }
                 )
                     ?.let { f ->
                         if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
                             throw RuntimeException("Can't override non-open function $id")
                         }
-                        if (Modifiers.override !in functionEnvironment.modifiers) throw RuntimeException(
+                        if (Modifiers.override !in symbol.modifiers) throw RuntimeException(
                             "Must specify override keyword on function $id"
                         )
                     }
@@ -111,13 +112,13 @@ class FunctionDeclarationStatement(
                     ?: error("Unknown interface $interfaceClassDesc")
 
                 cls.environment.getFunctionRecursively(
-                    functionEnvironment.id, functionEnvironment.parameters.map { it.dataType }
+                    symbol.id, symbol.parameters.map { it.dataType }
                 )
                     ?.let { f ->
                         if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
                             throw RuntimeException("Can't override non-open function $id")
                         }
-                        if (Modifiers.override !in functionEnvironment.modifiers) throw RuntimeException(
+                        if (Modifiers.override !in symbol.modifiers) throw RuntimeException(
                             "Missing override keyword on function $id"
                         )
                     }
@@ -125,34 +126,34 @@ class FunctionDeclarationStatement(
         }
 
         val isShared = functionEnvironment.isShared
-        val returnDataType = functionEnvironment.returnDataType
+        val returnDataType = symbol.returnDataType
 
         val methodTypeDesc = MethodTypeDesc.of(
             returnDataType?.classDesc ?: ConstantDescs.CD_void,
-            functionEnvironment.parameters.map { it.dataType.classDesc }
+            symbol.parameters.map { it.dataType.classDesc }
         )
 
         val accessFlags = mutableSetOf<AccessFlag>()
-        if (Modifiers.private in functionEnvironment.modifiers) accessFlags.add(AccessFlag.PRIVATE)
-        else if (Modifiers.protected in functionEnvironment.modifiers) accessFlags.add(AccessFlag.PROTECTED)
+        if (Modifiers.private in symbol.modifiers) accessFlags.add(AccessFlag.PRIVATE)
+        else if (Modifiers.protected in symbol.modifiers) accessFlags.add(AccessFlag.PROTECTED)
         else accessFlags.add(AccessFlag.PUBLIC)
 
         if (isShared) accessFlags.add(AccessFlag.STATIC)
-        if (Modifiers.abstract in functionEnvironment.modifiers) accessFlags.add(AccessFlag.ABSTRACT)
-        else if (Modifiers.open !in functionEnvironment.modifiers &&
-            !(functionEnvironment.getParent() is ClassEnvironment && (functionEnvironment.getParent() as ClassEnvironment).isInterface)) {
+        if (Modifiers.abstract in symbol.modifiers) accessFlags.add(AccessFlag.ABSTRACT)
+        else if (Modifiers.open !in symbol.modifiers &&
+            !(functionEnvironment.getParent() is ClassEnvironment && (functionEnvironment.getParent() as ClassEnvironment).asSymbol().isInterface)) {
             accessFlags.add(AccessFlag.FINAL)
         }
 
         instructions.withMethod(
-            functionEnvironment.id,
+            symbol.id,
             methodTypeDesc,
             accessFlags
         ) {
             initLabel(startLabel)
             initLabel(endLabel)
 
-            for ((id, dataType) in functionEnvironment.parameters) {
+            for ((id, dataType) in symbol.parameters) {
                 val parameterValue = functionEnvironment.declareShadowableVariable(id, dataType, null)
 
                 setLocalName(

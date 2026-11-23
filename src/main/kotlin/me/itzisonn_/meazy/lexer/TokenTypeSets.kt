@@ -70,7 +70,7 @@ object TokenTypeSets {
         add(TokenTypeSet("operator_postfix", doublePlus, doubleMinus))
         add(TokenTypeSet("member_access", dot, questionDot))
 
-        add(TokenTypeSet("comparison", equals, notEquals, greater, greaterOrEquals, less, lessOrEquals,))
+        add(TokenTypeSet("comparison", equals, notEquals, greater, greaterOrEquals, less, lessOrEquals))
         add(TokenTypeSet("multiplication", multiply, divide, percent))
         add(TokenTypeSet("addition", plus, minus))
     }

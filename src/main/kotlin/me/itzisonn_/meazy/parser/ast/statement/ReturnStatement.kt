@@ -8,6 +8,7 @@ import me.itzisonn_.meazy.parser.ast.expression.Expression
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.FunctionEnvironment
+import me.itzisonn_.meazy.runtime.environment.asSymbol
 import me.itzisonn_.meazy.runtime.environment.getParentOrSelf
 import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
 
@@ -28,7 +29,7 @@ class ReturnStatement(val value: Expression?) : LocalStatement {
         val functionEnvironment = environment.getParentOrSelf<FunctionEnvironment>()
             ?: error("Parent environment for RETURN statement must be FunctionEnvironment TODO")
 
-        val returnDataType = functionEnvironment.returnDataType
+        val returnDataType = functionEnvironment.asSymbol().returnDataType
 
         if (value == null) {
             if (returnDataType != null) {

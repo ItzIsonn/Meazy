@@ -71,6 +71,6 @@ abstract class AbstractClass : Ok {
     abstract fun hello()
 }
 
-class Lol : AbstractClass {
-
+private class Lol : AbstractClass {
+    constructor()
 }

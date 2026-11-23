@@ -1,7 +1,6 @@
 package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.runtime.data.DataType
-import me.itzisonn_.meazy.runtime.data.modifier.Modifier
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
@@ -16,17 +15,10 @@ import java.lang.constant.ConstantDescs
 /**
  * Represents environment for classes
  */
-sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclarationEnvironment,
-    ConstructorDeclarationEnvironment, ModifieredEnvironment {
+sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, FunctionDeclarationEnvironment, ConstructorDeclarationEnvironment {
     override fun getParent(): ClassDeclarationEnvironment
 
-    /**
-     * @return This class environment's id
-     */
-    val id: String
-    val isInterface: Boolean
     override val fullClassName: String
-    val classDesc: ClassDesc
 
 
 
@@ -69,12 +61,9 @@ sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, Functi
 private class ClassEnvironmentImpl(
     parent: ClassDeclarationEnvironment,
     isShared: Boolean,
-    override val isInterface: Boolean,
-    override val id: String,
     baseClass: ClassDesc?,
     interfaces: Set<ClassDesc>,
-    unresolvedBaseClasses: Set<String>,
-    modifiers: Set<Modifier>
+    unresolvedBaseClasses: Set<String>
 ) : ClassEnvironment,
     FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent, isShared),
     ConstructorDeclarationEnvironment by ConstructorDeclarationEnvironment(parent, isShared),
@@ -83,19 +72,9 @@ private class ClassEnvironmentImpl(
         private set
     private val _interfaces = interfaces.toMutableSet()
     private val unresolvedBaseClasses = unresolvedBaseClasses.toMutableSet()
-    private val _modifiers = modifiers.toMutableSet()
 
-    constructor(
-        parent: ClassDeclarationEnvironment,
-        isShared: Boolean,
-        isInterface: Boolean,
-        id: String,
-        unresolvedBaseClasses: Set<String>,
-        modifiers: Set<Modifier>
-    ) : this(
-        parent, isShared, isInterface, id,
-        null, setOf(), unresolvedBaseClasses, modifiers
-    )
+    constructor(parent: ClassDeclarationEnvironment, isShared: Boolean, unresolvedBaseClasses: Set<String>) :
+            this(parent, isShared, null, setOf(), unresolvedBaseClasses)
 
 
 
@@ -108,14 +87,14 @@ private class ClassEnvironmentImpl(
             val classDesc = getParent().resolveClassDesc(unresolvedBaseClass, false)
             val baseClassSymbol = getParent().getClass(classDesc) ?: error("Can't find base class $classDesc")
 
-            if (baseClassSymbol.isInterface) _interfaces.add(baseClassSymbol.environment.classDesc)
+            if (baseClassSymbol.isInterface) _interfaces.add(baseClassSymbol.classDesc)
             else {
                 if (baseClass != null) throw RuntimeException("Class can't have more than one base class TODO")
-                baseClass = baseClassSymbol.environment.classDesc
+                baseClass = baseClassSymbol.classDesc
             }
         }
 
-        if (baseClass == null && !isInterface) baseClass = ConstantDescs.CD_Object
+        if (baseClass == null && !asSymbol().isInterface) baseClass = ConstantDescs.CD_Object
         unresolvedBaseClasses.clear()
     }
 
@@ -147,20 +126,18 @@ private class ClassEnvironmentImpl(
 
 
 
-    override val modifiers get() = _modifiers.toSet()
-
     override val fullClassName: String
         get() {
+            val symbol = asSymbol()
+
             val classSpecifier =
-                if (Modifiers.private in _modifiers) getClassName()!! + "$"
+                if (Modifiers.private in symbol.modifiers) getClassName()!! + "$"
                 else ""
 
             var packageName = getPackageName() ?: ""
             if (packageName.isNotEmpty()) packageName += "."
-            return packageName + classSpecifier + id
+            return packageName + classSpecifier + symbol.id
         }
-
-    override val classDesc: ClassDesc get() = ClassDesc.of(fullClassName)
 }
 
 
@@ -170,31 +147,17 @@ private class ClassEnvironmentImpl(
  *
  * @param parent Parent
  * @param isShared Whether class environment is shared
- * @param id Id
- * @param modifiers Modifiers
  * @return New class environment
  */
-fun ClassEnvironment(
-    parent: ClassDeclarationEnvironment, isShared: Boolean, isInterface: Boolean,
-    id: String, baseClass: ClassDesc?, interfaces: Set<ClassDesc>, modifiers: Set<Modifier>
-): ClassEnvironment = ClassEnvironmentImpl(
-    parent, isShared, isInterface,
-    id, baseClass, interfaces, setOf(), modifiers
-)
+fun ClassEnvironment(parent: ClassDeclarationEnvironment, isShared: Boolean, baseClass: ClassDesc?, interfaces: Set<ClassDesc>): ClassEnvironment =
+    ClassEnvironmentImpl(parent, isShared, baseClass, interfaces, setOf())
 
 /**
  * Creates class environment
  *
  * @param parent Parent
  * @param isShared Whether class environment is shared
- * @param id Id
- * @param modifiers Modifiers
  * @return New class environment
  */
-fun ClassEnvironment(
-    parent: ClassDeclarationEnvironment, isShared: Boolean, isInterface: Boolean,
-    id: String, unresolvedBaseClasses: Set<String>, modifiers: Set<Modifier>
-): ClassEnvironment = ClassEnvironmentImpl(
-    parent, isShared, isInterface,
-    id, unresolvedBaseClasses, modifiers
-)
+fun ClassEnvironment(parent: ClassDeclarationEnvironment, isShared: Boolean, unresolvedBaseClasses: Set<String>): ClassEnvironment =
+    ClassEnvironmentImpl(parent, isShared, unresolvedBaseClasses)

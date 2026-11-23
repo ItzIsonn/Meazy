@@ -36,7 +36,7 @@ class ConstructorDeclarationStatement(
         }
 
         val constructorEnvironment = ConstructorEnvironment(
-            environment, null, null, modifiers, parameters
+            environment, null, null
         )
 
         val symbol = ConstructorSymbol(parameters, modifiers, constructorEnvironment)
@@ -56,11 +56,12 @@ class ConstructorDeclarationStatement(
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
-        symbol.environment.parameters.forEach { it.dataType.resolve(environment) }
+        symbol.parameters.forEach { it.dataType.resolve(environment) }
     }
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun emit(instructions: InstructionsSet, environment: Environment) {
+        val symbol = symbol
         val constructorEnvironment = symbol.environment
 
         val startLabel = instructions.createLabel()
@@ -70,19 +71,19 @@ class ConstructorDeclarationStatement(
 
         val methodTypeDesc = MethodTypeDesc.of(
             ConstantDescs.CD_void,
-            constructorEnvironment.parameters.map { it.dataType.classDesc }.toList()
+            symbol.parameters.map { it.dataType.classDesc }.toList()
         )
 
         val accessFlags = mutableSetOf<AccessFlag>()
-        if (Modifiers.private in constructorEnvironment.modifiers) accessFlags.add(AccessFlag.PRIVATE)
-        else if (Modifiers.protected in constructorEnvironment.modifiers) accessFlags.add(AccessFlag.PROTECTED)
+        if (Modifiers.private in symbol.modifiers) accessFlags.add(AccessFlag.PRIVATE)
+        else if (Modifiers.protected in symbol.modifiers) accessFlags.add(AccessFlag.PROTECTED)
         else accessFlags.add(AccessFlag.PUBLIC)
 
         instructions.withConstructor(methodTypeDesc, accessFlags) {
             initLabel(startLabel)
             initLabel(endLabel)
 
-            for ((id, dataType) in constructorEnvironment.parameters) {
+            for ((id, dataType) in symbol.parameters) {
                 val parameterValue = constructorEnvironment.declareShadowableVariable(id, dataType, null)
 
                 setLocalName(
