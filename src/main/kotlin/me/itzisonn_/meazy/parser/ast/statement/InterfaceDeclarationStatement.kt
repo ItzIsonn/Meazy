@@ -78,7 +78,7 @@ class InterfaceDeclarationStatement(
         instructions.withClass(
             classDesc,
             null,
-            classEnvironment.interfaces,
+            classEnvironment.interfaces.map { it.classDesc }.toSet(),
             flags,
             attributes
         ) {

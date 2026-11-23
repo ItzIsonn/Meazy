@@ -73,10 +73,23 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
             if (JavaModifier.isPrivate(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.private)
             if (JavaModifier.isAbstract(cls.modifiers)) classEnvironmentModifiers.add(Modifiers.abstract)
 
+            val baseClass =
+                if (cls.getSuperclass() == null) null
+                else {
+                    val classDesc = cls.getSuperclass().describeConstable().orElseThrow()
+                    val symbol = resolveJavaClass(classDesc)
+                    symbol ?: error("Failed to resolve base java class $classDesc")
+                }
+
+            val interfaces = cls.interfaces
+                .map { it.describeConstable().orElseThrow() }
+                .map { resolveJavaClass(it) ?: error("Failed to resolve java interface $classDesc") }
+                .toSet()
+
             val classEnvironment = ClassEnvironment(
                 fileEnvironment,
-                if (cls.getSuperclass() == null) null else cls.getSuperclass().describeConstable().orElseThrow(),
-                cls.interfaces.map { it.describeConstable().orElseThrow() }.toSet()
+                baseClass,
+                interfaces
             )
 
             val classSymbol = ClassSymbol(
@@ -87,13 +100,6 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
 
             fileEnvironment.declareClass(classSymbol)
             addFileEnvironment(fileEnvironment)
-
-            val baseClass = classEnvironment.baseClass
-            if (baseClass != null) resolveJavaClass(baseClass)
-
-            for (interfaceClassDesc in classEnvironment.interfaces) {
-                resolveJavaClass(interfaceClassDesc)
-            }
 
             for (method in cls.declaredMethods) {
                 if (method.isSynthetic) continue

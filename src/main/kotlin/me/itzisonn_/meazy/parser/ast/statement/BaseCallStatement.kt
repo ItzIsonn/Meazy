@@ -10,7 +10,6 @@ import me.itzisonn_.meazy.runtime.environment.ClassEnvironment
 import me.itzisonn_.meazy.runtime.environment.ConstructorEnvironment
 import me.itzisonn_.meazy.runtime.environment.Environment
 import me.itzisonn_.meazy.runtime.environment.LoopEnvironment
-import me.itzisonn_.meazy.runtime.environment.getClass
 import me.itzisonn_.meazy.runtime.environment.getParent
 import me.itzisonn_.meazy.runtime.environment.hasParentOrSelf
 
@@ -43,12 +42,8 @@ class BaseCallStatement(val args: List<Expression>) : LocalStatement {
 
     context(parents: ParentMap)
     private fun Environment.resolveConstructor(): ResolvedConstructor {
-        val classEnvironment = getParent<ClassEnvironment>()
-            ?: error("Can't call super class not inside class")
-
-        val baseClassDesc = classEnvironment.baseClass ?: error("Failed to resolve constructor")
-        val baseClassSymbol = getClass(baseClassDesc) ?: error("Failed to resolve constructor")
-
-        return resolveConstructor(baseClassSymbol.environment, args)
+        val classEnvironment = getParent<ClassEnvironment>() ?: error("Can't call super class not inside class")
+        val baseClass = classEnvironment.baseClass ?: error("Failed to resolve constructor")
+        return resolveConstructor(baseClass.environment, args)
     }
 }

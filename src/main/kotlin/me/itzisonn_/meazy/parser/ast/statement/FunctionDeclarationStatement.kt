@@ -82,38 +82,24 @@ class FunctionDeclarationStatement(
             val classEnvironment = functionEnvironment.getParent() as ClassEnvironment
             val baseClass = classEnvironment.baseClass
 
-            if (baseClass != null) {
-                val cls = classEnvironment.getClass(baseClass)
-                    ?: error("Unknown base class $baseClass")
-
-                cls.environment.getFunctionRecursively(
-                    symbol.id, symbol.parameters.map { it.dataType }
+            baseClass?.environment?.getFunctionRecursively(symbol.id, symbol.parameters.map { it.dataType })?.let { f ->
+                if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
+                    throw RuntimeException("Can't override non-open function $id")
+                }
+                if (Modifiers.override !in symbol.modifiers) throw RuntimeException(
+                    "Must specify override keyword on function $id"
                 )
-                    ?.let { f ->
-                        if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
-                            throw RuntimeException("Can't override non-open function $id")
-                        }
-                        if (Modifiers.override !in symbol.modifiers) throw RuntimeException(
-                            "Must specify override keyword on function $id"
-                        )
-                    }
             }
 
-            for (interfaceClassDesc in classEnvironment.interfaces) {
-                val cls = classEnvironment.getClass(interfaceClassDesc)
-                    ?: error("Unknown interface $interfaceClassDesc")
-
-                cls.environment.getFunctionRecursively(
-                    symbol.id, symbol.parameters.map { it.dataType }
-                )
-                    ?.let { f ->
-                        if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
-                            throw RuntimeException("Can't override non-open function $id")
-                        }
-                        if (Modifiers.override !in symbol.modifiers) throw RuntimeException(
-                            "Missing override keyword on function $id"
-                        )
+            for (interfaceSymbol in classEnvironment.interfaces) {
+                interfaceSymbol.environment.getFunctionRecursively(symbol.id, symbol.parameters.map { it.dataType })?.let { f ->
+                    if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
+                        throw RuntimeException("Can't override non-open function $id")
                     }
+                    if (Modifiers.override !in symbol.modifiers) throw RuntimeException(
+                        "Missing override keyword on function $id"
+                    )
+                }
             }
         }
 

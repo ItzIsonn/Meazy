@@ -92,8 +92,8 @@ class ClassDeclarationStatement(
 
         instructions.withClass(
             classDesc,
-            classEnvironment.baseClass,
-            classEnvironment.interfaces,
+            classEnvironment.baseClass?.classDesc,
+            classEnvironment.interfaces.map { it.classDesc }.toSet(),
             flags,
             attributes
         ) {
@@ -108,11 +108,10 @@ class ClassDeclarationStatement(
                 setOf(AccessFlag.PUBLIC)
             ) {
                 loadThisReference()
-                val baseClass = classEnvironment.baseClass
-                    ?: error("Class " + symbol.id + " has no base class")
+                val baseClass = classEnvironment.baseClass ?: error("Class " + symbol.id + " has no base class")
 
                 invokeSuperClass(
-                    baseClass,
+                    baseClass.classDesc,
                     MethodTypeDesc.of(ConstantDescs.CD_void)
                 )
 

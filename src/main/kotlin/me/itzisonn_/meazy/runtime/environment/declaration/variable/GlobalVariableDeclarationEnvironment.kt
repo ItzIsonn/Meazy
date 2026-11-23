@@ -23,8 +23,8 @@ open class GlobalVariableDeclarationEnvironmentImpl(
     override val variables get() = _variables.toList()
 
     override fun declareVariable(id: String, type: DataType, isConstant: Boolean, value: Expression?, modifiers: Set<Modifier>): GlobalVariableSymbol {
-        if (getVariable(id) != null) {
-            throw EvaluationException(translatable("runtime.variable.already_exists", id))
+        getVariable(id)?.let { variableSymbol ->
+            if (variableSymbol.parentEnvironment == this) throw EvaluationException(translatable("runtime.variable.already_exists", id))
         }
 
         val variableValue = GlobalVariableSymbol(id, type, isConstant, modifiers, value, this)

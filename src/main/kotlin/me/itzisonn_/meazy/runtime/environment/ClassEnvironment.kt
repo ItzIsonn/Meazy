@@ -2,6 +2,7 @@ package me.itzisonn_.meazy.runtime.environment
 
 import me.itzisonn_.meazy.runtime.data.DataType
 import me.itzisonn_.meazy.runtime.data.modifier.Modifiers
+import me.itzisonn_.meazy.runtime.data.symbol.ClassSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.FunctionSymbol
 import me.itzisonn_.meazy.runtime.data.symbol.GlobalVariableSymbol
 import me.itzisonn_.meazy.runtime.environment.declaration.ClassDeclarationEnvironment
@@ -9,7 +10,6 @@ import me.itzisonn_.meazy.runtime.environment.declaration.ConstructorDeclaration
 import me.itzisonn_.meazy.runtime.environment.declaration.FunctionDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironment
 import me.itzisonn_.meazy.runtime.environment.declaration.variable.GlobalVariableDeclarationEnvironmentImpl
-import java.lang.constant.ClassDesc
 import java.lang.constant.ConstantDescs
 
 /**
@@ -23,22 +23,11 @@ sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, Functi
 
 
     fun getFunctionRecursively(id: String, args: List<DataType>): FunctionSymbol? {
-        var function = getFunction(id, args)
-        if (function != null) return function
+        getFunction(id, args)?.let { return@getFunctionRecursively it }
+        baseClass?.environment?.getFunctionRecursively(id, args)?.let { return@getFunctionRecursively it }
 
-        val baseClass = baseClass
-        if (baseClass != null) {
-            val baseClass = resolveClassDesc(baseClass, false)
-            val baseClassSymbol = getClass(baseClass) ?: return null
-            function = baseClassSymbol.environment.getFunctionRecursively(id, args)
-            if (function != null) return function
-        }
-
-        for (interfaceClassDesc in interfaces) {
-            val baseClass = resolveClassDesc(interfaceClassDesc, false)
-            val baseClassSymbol = getClass(baseClass) ?: return null
-            function = baseClassSymbol.environment.getFunctionRecursively(id, args)
-            if (function != null) return function
+        for (interfaceSymbol in interfaces) {
+            interfaceSymbol.environment.getFunctionRecursively(id, args)?.let { return@getFunctionRecursively it }
         }
 
         return null
@@ -47,11 +36,11 @@ sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, Functi
 
 
     /**
-     * @return ClassDesc of this class environment's base class
+     * ClassSymbol of this class environment's base class
      */
-    val baseClass: ClassDesc?
+    val baseClass: ClassSymbol?
 
-    val interfaces: Set<ClassDesc>
+    val interfaces: Set<ClassSymbol>
 
     fun resolveBaseClasses()
 }
@@ -60,8 +49,8 @@ sealed interface ClassEnvironment : GlobalVariableDeclarationEnvironment, Functi
 
 private class ClassEnvironmentImpl(
     parent: ClassDeclarationEnvironment,
-    baseClass: ClassDesc?,
-    interfaces: Set<ClassDesc>,
+    baseClass: ClassSymbol?,
+    interfaces: Set<ClassSymbol>,
     unresolvedBaseClasses: Set<String>
 ) : ClassEnvironment,
     FunctionDeclarationEnvironment by FunctionDeclarationEnvironment(parent),
@@ -85,14 +74,14 @@ private class ClassEnvironmentImpl(
             val classDesc = getParent().resolveClassDesc(unresolvedBaseClass, false)
             val baseClassSymbol = getParent().getClass(classDesc) ?: error("Can't find base class $classDesc")
 
-            if (baseClassSymbol.isInterface) _interfaces.add(baseClassSymbol.classDesc)
+            if (baseClassSymbol.isInterface) _interfaces.add(baseClassSymbol)
             else {
                 if (baseClass != null) throw RuntimeException("Class can't have more than one base class TODO")
-                baseClass = baseClassSymbol.classDesc
+                baseClass = baseClassSymbol
             }
         }
 
-        if (baseClass == null && !asSymbol().isInterface) baseClass = ConstantDescs.CD_Object
+        if (baseClass == null && !asSymbol().isInterface) baseClass = getClass(ConstantDescs.CD_Object)
         unresolvedBaseClasses.clear()
     }
 
@@ -101,12 +90,7 @@ private class ClassEnvironmentImpl(
     override fun getVariable(id: String): GlobalVariableSymbol? {
         val variableValue = super<GlobalVariableDeclarationEnvironmentImpl>.getVariable(id)
         if (variableValue != null) return variableValue
-
-        val baseClass = baseClass ?: return null
-        val baseClassSymbol = getClass(baseClass.displayName())
-
-        if (baseClassSymbol != null) return baseClassSymbol.environment.getVariable(id)
-        return null
+        return baseClass?.environment?.getVariable(id)
     }
 
 
@@ -114,12 +98,7 @@ private class ClassEnvironmentImpl(
     override fun getFunction(id: String, args: List<DataType>): FunctionSymbol? {
         val function = super<FunctionDeclarationEnvironment>.getFunction(id, args)
         if (function != null) return function
-
-        val baseClass = baseClass ?: return null
-        val baseClassSymbol = getClass(baseClass)
-
-        if (baseClassSymbol != null) return baseClassSymbol.environment.getFunction(id, args)
-        return null
+        return baseClass?.environment?.getFunction(id, args)
     }
 
 
@@ -146,7 +125,7 @@ private class ClassEnvironmentImpl(
  * @param parent Parent
  * @return New class environment
  */
-fun ClassEnvironment(parent: ClassDeclarationEnvironment, baseClass: ClassDesc?, interfaces: Set<ClassDesc>): ClassEnvironment =
+fun ClassEnvironment(parent: ClassDeclarationEnvironment, baseClass: ClassSymbol?, interfaces: Set<ClassSymbol>): ClassEnvironment =
     ClassEnvironmentImpl(parent, baseClass, interfaces, setOf())
 
 /**

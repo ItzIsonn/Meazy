@@ -225,12 +225,12 @@ fun Environment.isInstanceOf(classDesc: ClassDesc, target: ClassDesc): Boolean {
     val classSymbol = getClass(classDesc) ?: return false
 
     val baseClass = classSymbol.environment.baseClass
-    if (baseClass != null && isInstanceOf(baseClass, target)) {
+    if (baseClass != null && isInstanceOf(baseClass.classDesc, target)) {
         return true
     }
 
-    for (interfaceClassDesc in classSymbol.environment.interfaces) {
-        if (isInstanceOf(interfaceClassDesc, target)) return true
+    for (interfaceSymbol in classSymbol.environment.interfaces) {
+        if (isInstanceOf(interfaceSymbol.classDesc, target)) return true
     }
 
     return false
@@ -249,13 +249,13 @@ fun Environment.getCommonOf(classDesc1: ClassDesc, classDesc2: ClassDesc): Class
 
     val baseClass = classSymbol.environment.baseClass
     if (baseClass != null) {
-        val commonClassDesc = getCommonOf(baseClass, classDesc2)
+        val commonClassDesc = getCommonOf(baseClass.classDesc, classDesc2)
         if (ConstantDescs.CD_Object == commonClassDesc) gotObjectAsCommon = true
         else if (commonClassDesc != null) return commonClassDesc
     }
 
-    for (interfaceClassDesc in classSymbol.environment.interfaces) {
-        val commonClassDesc = getCommonOf(interfaceClassDesc, classDesc2)
+    for (interfaceSymbol in classSymbol.environment.interfaces) {
+        val commonClassDesc = getCommonOf(interfaceSymbol.classDesc, classDesc2)
         if (commonClassDesc != null) return commonClassDesc
     }
 
