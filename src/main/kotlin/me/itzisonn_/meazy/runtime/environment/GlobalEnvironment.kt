@@ -86,17 +86,8 @@ private class GlobalEnvironmentImpl : GlobalEnvironment {
                 .map { resolveJavaClass(it) ?: error("Failed to resolve java interface $classDesc") }
                 .toSet()
 
-            val classEnvironment = ClassEnvironment(
-                fileEnvironment,
-                baseClass,
-                interfaces
-            )
-
-            val classSymbol = ClassSymbol(
-                classDesc.displayName(), cls.isInterface,
-                classEnvironmentModifiers,
-                classEnvironment
-            )
+            val classEnvironment = ClassEnvironment(fileEnvironment)
+            val classSymbol = ClassSymbol(classDesc.displayName(), cls.isInterface, classEnvironmentModifiers, classEnvironment, baseClass, interfaces)
 
             fileEnvironment.declareClass(classSymbol)
             addFileEnvironment(fileEnvironment)

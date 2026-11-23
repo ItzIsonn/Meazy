@@ -30,8 +30,8 @@ class InterfaceDeclarationStatement(
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
-        val classEnvironment = ClassEnvironment(environment, baseClasses)
-        val symbol = ClassSymbol(id, true, modifiers, classEnvironment)
+        val classEnvironment = ClassEnvironment(environment)
+        val symbol = ClassSymbol(id, true, modifiers, classEnvironment, baseClasses)
         declareSymbol(symbol)
         environment.declareClass(symbol)
 
@@ -44,8 +44,9 @@ class InterfaceDeclarationStatement(
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
+        val symbol = symbol
         val classEnvironment = symbol.environment
-        classEnvironment.resolveBaseClasses()
+        symbol.resolveBaseClasses()
 
         for (statement in body) {
             if (statement is DeclarationStatement<*>) {
@@ -73,12 +74,13 @@ class InterfaceDeclarationStatement(
             else flags.add(AccessFlag.PUBLIC)
         }
 
+        val symbol = symbol
         val classEnvironment = symbol.environment
 
         instructions.withClass(
             classDesc,
             null,
-            classEnvironment.interfaces.map { it.classDesc }.toSet(),
+            symbol.interfaces.map { it.classDesc }.toSet(),
             flags,
             attributes
         ) {

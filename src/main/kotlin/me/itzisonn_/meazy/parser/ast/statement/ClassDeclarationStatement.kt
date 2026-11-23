@@ -32,8 +32,8 @@ class ClassDeclarationStatement(
     override fun declare(environment: Environment) {
         require(environment is ClassDeclarationEnvironment) { "Environment must be file TODO" }
 
-        val classEnvironment = ClassEnvironment(environment, baseClasses)
-        val symbol = ClassSymbol(id, false, modifiers, classEnvironment)
+        val classEnvironment = ClassEnvironment(environment)
+        val symbol = ClassSymbol(id, false, modifiers, classEnvironment, baseClasses)
         declareSymbol(symbol)
         environment.declareClass(symbol)
 
@@ -57,8 +57,9 @@ class ClassDeclarationStatement(
 
     context(parents: ParentMap, symbols: SymbolMap)
     override fun resolve(environment: Environment) {
+        val symbol = symbol
         val classEnvironment = symbol.environment
-        classEnvironment.resolveBaseClasses()
+        symbol.resolveBaseClasses()
 
         for (statement in body) {
             if (statement is DeclarationStatement<*>) {
@@ -92,8 +93,8 @@ class ClassDeclarationStatement(
 
         instructions.withClass(
             classDesc,
-            classEnvironment.baseClass?.classDesc,
-            classEnvironment.interfaces.map { it.classDesc }.toSet(),
+            symbol.baseClass?.classDesc,
+            symbol.interfaces.map { it.classDesc }.toSet(),
             flags,
             attributes
         ) {
@@ -108,7 +109,7 @@ class ClassDeclarationStatement(
                 setOf(AccessFlag.PUBLIC)
             ) {
                 loadThisReference()
-                val baseClass = classEnvironment.baseClass ?: error("Class " + symbol.id + " has no base class")
+                val baseClass = symbol.baseClass ?: error("Class " + symbol.id + " has no base class")
 
                 invokeSuperClass(
                     baseClass.classDesc,

@@ -79,8 +79,8 @@ class FunctionDeclarationStatement(
         functionEnvironment.setEndLabel(endLabel)
 
         if (functionEnvironment.getParent() is ClassEnvironment) {
-            val classEnvironment = functionEnvironment.getParent() as ClassEnvironment
-            val baseClass = classEnvironment.baseClass
+            val classSymbol = (functionEnvironment.getParent() as ClassEnvironment).asSymbol()
+            val baseClass = classSymbol.baseClass
 
             baseClass?.environment?.getFunctionRecursively(symbol.id, symbol.parameters.map { it.dataType })?.let { f ->
                 if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
@@ -91,7 +91,7 @@ class FunctionDeclarationStatement(
                 )
             }
 
-            for (interfaceSymbol in classEnvironment.interfaces) {
+            for (interfaceSymbol in classSymbol.interfaces) {
                 interfaceSymbol.environment.getFunctionRecursively(symbol.id, symbol.parameters.map { it.dataType })?.let { f ->
                     if (Modifiers.open !in f.modifiers && Modifiers.abstract !in f.modifiers) {
                         throw RuntimeException("Can't override non-open function $id")
